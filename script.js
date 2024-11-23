@@ -12,6 +12,7 @@ const elements = {
   stopwatch: document.getElementById('stopwatch'),
   startPauseButton: document.getElementById('startPauseButton'),
   goalButton: document.getElementById('goalButton'),
+  opgoalButton: document.getElementById('opgoalButton'),
   goalScorer: document.getElementById('goalScorer'),
   goalAssist: document.getElementById('goalAssist'),
   resetButton: document.getElementById('resetButton'),
@@ -132,16 +133,38 @@ function addGoal(event) {
   M.FormSelect.init(elements.goalAssist);
 }
 
+function opaddGoal() {
+  const currentSeconds = getCurrentSeconds();
+  const opgoalData = {
+    timestamp: formatTime(currentSeconds),
+    goalScorerName: "Opposition Team",
+    goalAssistName: "Opposition Team",
+    rawTime: currentSeconds
+  };
+  
+  STATE.data.push(opgoalData);
+  updateLog();
+  Storage.save(STORAGE_KEYS.GOALS, STATE.data);
+  
+    // Reset form and update Materialize select
+  elements.goalForm.reset();
+  M.FormSelect.init(elements.goalScorer);
+  M.FormSelect.init(elements.goalAssist);
+}
+
 function updateLog() {
   elements.log.innerHTML = STATE.data
     .sort((a, b) => a.rawTime - b.rawTime)
-    .map(({ timestamp, goalScorerName, goalAssistName }) => 
-      `<div class="card-panel">
+    .map(({ timestamp, goalScorerName, goalAssistName }) => {
+      const isOppositionGoal = goalScorerName === "Opposition Team";
+      const cardClass = isOppositionGoal ? 'red lighten-4' : ''; // Add red background for opposition goals
+      
+      return `<div class="card-panel ${cardClass}">
         <span class="blue-text text-darken-2">${timestamp}</span>: 
-        <strong>Goal:</strong> ${goalScorerName}, 
-        <strong>Assist:</strong> ${goalAssistName}
-       </div>`
-    )
+        <strong>${isOppositionGoal ? 'Opposition Goal' : 'Goal'}</strong>
+        ${isOppositionGoal ? '' : `: ${goalScorerName}, <strong>Assist:</strong> ${goalAssistName}`}
+       </div>`;
+    })
     .join('');
 }
 
@@ -172,9 +195,12 @@ function formatLogForWhatsApp() {
   
   const goals = STATE.data
     .sort((a, b) => a.rawTime - b.rawTime)
-    .map(({ timestamp, goalScorerName, goalAssistName }) => 
-      `🥅 ${timestamp} - Goal: ${goalScorerName}, Assist: ${goalAssistName}`
-    )
+    .map(({ timestamp, goalScorerName, goalAssistName }) => {
+      const isOppositionGoal = goalScorerName === "Opposition Team";
+      return isOppositionGoal 
+        ? `❌ ${timestamp} - Opposition Goal`
+        : `🥅 ${timestamp} - Goal: ${goalScorerName}, Assist: ${goalAssistName}`;
+    })
     .join('\n');
     
   const stats = generateStats();
@@ -187,11 +213,18 @@ function generateStats() {
   // Count goals
   const goalScorers = new Map();
   const assists = new Map();
+  let oppositionGoals = 0;  // Initialize opposition goals counter
+  let teamGoals = 0;       // Initialize team goals counter
   
   STATE.data.forEach(({ goalScorerName, goalAssistName }) => {
-    goalScorers.set(goalScorerName, (goalScorers.get(goalScorerName) || 0) + 1);
-    if (goalAssistName) {
-      assists.set(goalAssistName, (assists.get(goalAssistName) || 0) + 1);
+   if (goalScorerName === "Opposition Team") {
+      oppositionGoals++;
+    } else {
+		teamGoals++;
+      goalScorers.set(goalScorerName, (goalScorers.get(goalScorerName) || 0) + 1);
+      if (goalAssistName) {
+        assists.set(goalAssistName, (assists.get(goalAssistName) || 0) + 1);
+      }
     }
   });
   
@@ -207,7 +240,7 @@ function generateStats() {
     .map(([name, assists]) => `${name}: ${assists}`)
     .join(', ');
   
-  return `📊 Stats:\nTop Scorers: ${topScorers}\nTop Assists: ${topAssists}`;
+  return `📊 Stats:\nTeam Goals: ${goalScorers.size > 0 ? Array.from(goalScorers.values()).reduce((a, b) => a + b) : 0}\nOpposition Goals: ${oppositionGoals}\nTop Scorers: ${topScorers}\nTop Assists: ${topAssists}`;
 }
 
 // Share to WhatsApp function
@@ -257,6 +290,7 @@ function initializeApp() {
 // Event Listeners
 elements.startPauseButton.addEventListener('click', startStopwatch);
 elements.goalForm.addEventListener('submit', addGoal);
+elements.opgoalButton.addEventListener('click', opaddGoal);
 elements.resetButton.addEventListener('click', resetTracker);
 elements.shareButton.addEventListener('click', shareToWhatsApp);
 document.addEventListener('DOMContentLoaded', initializeApp);

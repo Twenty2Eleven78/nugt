@@ -1,0 +1,15 @@
+{
+    "name": "NU Goal Tracker",
+    "short_name": "NUGT",
+	"start_url": "http://twenty2eleven78.github.io/NUU12GB",
+    "theme_color": "#8B0000",
+    "background_color": "#fff",
+    "display": "standalone",
+    "description": "Goal Tracker",
+    "icons": [
+        {
+            "src": "https://twenty2eleven78.github.io/NUU12GB/goal.png",
+            "sizes": "208x242"
+        }
+    ]
+}

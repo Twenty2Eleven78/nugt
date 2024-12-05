@@ -56,10 +56,9 @@ const Storage = {
 
 // Time formatting utility
 function formatTime(seconds) {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
+  const minutes = Math.floor(seconds / 60);
   const secs = seconds % 60;
-  return [hours, minutes, secs]
+  return [ minutes, secs]
     .map(num => num.toString().padStart(2, '0'))
     .join(':');
 }
@@ -122,7 +121,7 @@ function addGoal(event) {
   
   const currentSeconds = getCurrentSeconds();
   const goalData = {
-    timestamp: formatTime(currentSeconds),
+    timestamp: Math.ceil(currentSeconds / 60),
     goalScorerName,
     goalAssistName,
     rawTime: currentSeconds
@@ -141,7 +140,7 @@ function addGoal(event) {
 function opaddGoal() {
   const currentSeconds = getCurrentSeconds();
   const opgoalData = {
-    timestamp: formatTime(currentSeconds),
+    timestamp: Math.ceil(currentSeconds / 60),
     goalScorerName: "Opposition Team",
     goalAssistName: "Opposition Team",
     rawTime: currentSeconds
@@ -165,7 +164,7 @@ function updateLog() {
       const cardClass = isOppositionGoal ? 'red lighten-4' : ''; // Add red background for opposition goals
       
       return `<div class="card-panel ${cardClass}">
-        <span class="blue-text text-darken-2">${timestamp}</span>: 
+        <span class="blue-text text-darken-2">${timestamp}</span>' -  
         <strong>${isOppositionGoal ? 'Opposition Goal' : 'Goal'}</strong>
         ${isOppositionGoal ? '' : `: ${goalScorerName}, <strong>Assist:</strong> ${goalAssistName}`}
        </div>`;

@@ -65,9 +65,8 @@ function formatTime(seconds) {
 
 function getCurrentSeconds() {
   if (!STATE.isRunning || !STATE.startTimestamp) return STATE.seconds;
-  
-  const currentTime = Date.now();
-  const elapsedSeconds = Math.floor((currentTime - STATE.startTimestamp) / 1000);
+    const currentTime = Date.now();
+    const elapsedSeconds = Math.floor((currentTime - STATE.startTimestamp) / 1000);
   return elapsedSeconds;
 }
 
@@ -88,6 +87,7 @@ function startStopwatch() {
     }
     STATE.intervalId = setInterval(updateStopwatchDisplay, 100);
   } else {
+
     // Pausing the timer
     clearInterval(STATE.intervalId);
     STATE.isRunning = false;
@@ -102,7 +102,12 @@ function startStopwatch() {
   Storage.save(STORAGE_KEYS.ELAPSED_TIME, STATE.seconds);
 }
 
-// Goal tracking
+// reset form selects
+function resetSelect(selectElement) {
+  selectElement.selectedIndex = 0;
+}
+
+// Add Goal tracking
 function addGoal(event) {
   event.preventDefault();
   
@@ -110,12 +115,12 @@ function addGoal(event) {
   const goalAssistName = elements.goalAssist.value;
   
    if (!goalScorerName) {
-    M.toast({html: 'Please select a goal scorer'});
+    alert('Please select a Goal Scorer!');
    return;
   }
   
   if (!goalAssistName) {
-    M.toast({html: 'Please select an assist'});
+    alert('Please select a Goal Assist!');
     return;
   }
   
@@ -131,12 +136,13 @@ function addGoal(event) {
   updateLog();
   Storage.save(STORAGE_KEYS.GOALS, STATE.data);
   
-  // Reset form and update Materialize select
+  // Reset form
   elements.goalForm.reset();
-  M.FormSelect.init(elements.goalScorer);
-  M.FormSelect.init(elements.goalAssist);
+  resetSelect(elements.goalScorer);
+  resetSelect(elements.goalAssist);
 }
 
+// Add opposition Goal
 function opaddGoal() {
   const currentSeconds = getCurrentSeconds();
   const opgoalData = {
@@ -152,10 +158,11 @@ function opaddGoal() {
   
     // Reset form and update Materialize select
   elements.goalForm.reset();
-  M.FormSelect.init(elements.goalScorer);
-  M.FormSelect.init(elements.goalAssist);
+  resetSelect(elements.goalScorer);
+  resetSelect(elements.goalAssist);
 }
 
+// Update goal log
 function updateLog() {
   elements.log.innerHTML = STATE.data
     .sort((a, b) => a.rawTime - b.rawTime)
@@ -172,6 +179,7 @@ function updateLog() {
     .join('');
 }
 
+// Reset whole tracker and start new
 function resetTracker() {
   if (!confirm('Are you sure you want to reset the stopwatch and log data?')) {
     return;
@@ -193,6 +201,7 @@ function resetTracker() {
   Storage.clear();
 }
 
+// format log for whatsapp
 function formatLogForWhatsApp() {
   const gameTime = formatTime(STATE.seconds);
   const header = `⚽ Match Summary (Time: ${gameTime})\n\n`;
@@ -250,7 +259,7 @@ function generateStats() {
 // Share to WhatsApp function
 function shareToWhatsApp() {
   if (STATE.data.length === 0) {
-    M.toast({html: 'No goals to share yet!'});
+    alert('No goals to share yet!');
     return;
   }
   const formattedLog = formatLogForWhatsApp();
@@ -285,10 +294,8 @@ function initializeApp() {
   // Update UI with saved data
   updateStopwatchDisplay();
   updateLog();
-  elements.startPauseButton.textContent = STATE.isRunning ? "Pause" : "Start";
+  elements.startPauseButton.textContent = STATE.isRunning ? "Pause Game" : "Start Game";
   
-  // Initialize Materialize components
-  M.FormSelect.init(document.querySelectorAll('select'));
 }
 
 // Event Listeners

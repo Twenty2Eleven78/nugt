@@ -8,7 +8,7 @@ var APP_PREFIX = 'nugt_';
 // you need to change this version (version_01, version_02…). 
 // If you don't change the version, the service worker will give your
 // users the old files!
-var VERSION = 'version_133';
+var VERSION = 'version_212';
  
 // The files to make available for offline use. make sure to add 
 // others to this list
@@ -18,5 +18,8 @@ var URLS = [
   `${nugtPATH}/style.css`,
   `${nugtPATH}/materialIcons.woff2`,
   `${nugtPATH}/script.js`,
-  `${nugtPATH}/jquery-3.6.0.min.js`
+  `${nugtPATH}/roster.js`,
+  `${nugtPATH}/jquery-3.6.0.min.js`,
+  `${nugtPATH}/materialize.min.js`,
+  `${nugtPATH}/materialize.min.css`
 ]

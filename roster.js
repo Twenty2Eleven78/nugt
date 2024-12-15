@@ -4,7 +4,7 @@ const RosterManager = (function() {
   const STORAGE_KEY = 'goalTracker_roster';
   let roster = [];
 
-  // Save Roster
+  // Private methods
   function saveRoster() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(roster));
@@ -13,7 +13,6 @@ const RosterManager = (function() {
     }
   }
 
-  // Load roster
   function loadRoster() {
     try {
       const savedRoster = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -24,7 +23,6 @@ const RosterManager = (function() {
     }
   }
 
-  // Default roster
   function getDefaultRoster() {
     return [
       'Player1', 'Player2'
@@ -174,15 +172,11 @@ const RosterManager = (function() {
       }
 
       // Open roster modal button
-      //const openRosterModalBtn = document.getElementById('openRosterModalBtn');
-      //if (openRosterModalBtn) {
-      //  openRosterModalBtn.addEventListener('click', () => {
-      //   const rosterModal = M.Modal.getInstance(document.getElementById('rosterModal'));
-      //    rosterModal.open();
-      //  });
-      if (openRosterModalBtn && rosterModal) {
+      const openRosterModalBtn = document.getElementById('openRosterModalBtn');
+      if (openRosterModalBtn) {
         openRosterModalBtn.addEventListener('click', () => {
-          rosterModal.classList.add('modal-open');
+          const rosterModal = M.Modal.getInstance(document.getElementById('rosterModal'));
+          rosterModal.open();
         });
       }
     }

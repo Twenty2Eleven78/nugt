@@ -4,3 +4,4 @@ NUFC Goal Tracker
 2.1 - General application ui and function improvements
 2.11 - Added time rounding (round up) to Goal Log
 2.12  - localise google font style and fix manifest start_url
+2.13 - remove dependancy on materialise JS

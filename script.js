@@ -195,7 +195,7 @@ function resetTracker() {
   // Reset UI
   updateStopwatchDisplay();
   updateLog();
-  elements.startPauseButton.textContent = "Start";
+  elements.startPauseButton.textContent = "Start Game";
   
   // Clear storage
   Storage.clear();
@@ -272,8 +272,7 @@ function initializeApp() {
 	
 	  // Initialize Materialize Modal and Form Select
   M.Modal.init(document.getElementById('rosterModal'));
-  //M.FormSelect.init(document.querySelectorAll('select'));
-  
+    
     // Initialize roster
   RosterManager.init();
 	

@@ -16,7 +16,7 @@ var URLS = [
   `${nugtPATH}/`,
   `${nugtPATH}/index.html`,
   `${nugtPATH}/style.css`,
-  `${nnugtPATH}/materialIcons.woff2`,
+  `${nugtPATH}/materialIcons.woff2`,
   `${nugtPATH}/script.js`,
   `${nugtPATH}/jquery-3.6.0.min.js`
 ]

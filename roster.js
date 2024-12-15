@@ -4,7 +4,7 @@ const RosterManager = (function() {
   const STORAGE_KEY = 'goalTracker_roster';
   let roster = [];
 
-  // Private methods
+  // Save Roster
   function saveRoster() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(roster));
@@ -13,6 +13,7 @@ const RosterManager = (function() {
     }
   }
 
+  // Load roster
   function loadRoster() {
     try {
       const savedRoster = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -23,6 +24,7 @@ const RosterManager = (function() {
     }
   }
 
+  // Default roster
   function getDefaultRoster() {
     return [
       'Player1', 'Player2'

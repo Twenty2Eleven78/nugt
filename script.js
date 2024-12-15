@@ -96,7 +96,7 @@ function startStopwatch() {
   }
   
   // Update UI and save state
-  elements.startPauseButton.textContent = STATE.isRunning ? "Pause" : "Start";
+  elements.startPauseButton.textContent = STATE.isRunning ? "Pause Game" : "Start Game";
   Storage.save(STORAGE_KEYS.IS_RUNNING, STATE.isRunning);
   Storage.save(STORAGE_KEYS.START_TIMESTAMP, STATE.startTimestamp);
   Storage.save(STORAGE_KEYS.ELAPSED_TIME, STATE.seconds);

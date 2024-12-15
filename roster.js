@@ -174,11 +174,15 @@ const RosterManager = (function() {
       }
 
       // Open roster modal button
-      const openRosterModalBtn = document.getElementById('openRosterModalBtn');
-      if (openRosterModalBtn) {
+      //const openRosterModalBtn = document.getElementById('openRosterModalBtn');
+      //if (openRosterModalBtn) {
+      //  openRosterModalBtn.addEventListener('click', () => {
+      //   const rosterModal = M.Modal.getInstance(document.getElementById('rosterModal'));
+      //    rosterModal.open();
+      //  });
+      if (openRosterModalBtn && rosterModal) {
         openRosterModalBtn.addEventListener('click', () => {
-          const rosterModal = M.Modal.getInstance(document.getElementById('rosterModal'));
-          rosterModal.open();
+          rosterModal.classList.add('modal-open');
         });
       }
     }

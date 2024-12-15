@@ -270,6 +270,7 @@ function shareToWhatsApp() {
 // Replace Materialize Modal initialization with native JavaScript
 function initModal() {
   const modal = document.getElementById('rosterModal');
+  const openModalBtn = document.getElementById('openRosterModalBtn');
   const closeButtons = modal.querySelectorAll('.modal-close');
   
   // Function to open the modal
@@ -281,6 +282,9 @@ function initModal() {
   function closeModal() {
     modal.classList.remove('modal-open');
   }
+
+  // Add click event listener to open button
+  openModalBtn.addEventListener('click', openModal);
   
   // Add click event listeners to close buttons
   closeButtons.forEach(button => {

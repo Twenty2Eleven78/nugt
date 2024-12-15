@@ -12,7 +12,6 @@ const elements = {
   stopwatch: document.getElementById('stopwatch'),
   startPauseButton: document.getElementById('startPauseButton'),
   goalButton: document.getElementById('goalButton'),
-  opgoalButton: document.getElementById('opgoalButton'),
   goalScorer: document.getElementById('goalScorer'),
   goalAssist: document.getElementById('goalAssist'),
   resetButton: document.getElementById('resetButton'),
@@ -56,17 +55,19 @@ const Storage = {
 
 // Time formatting utility
 function formatTime(seconds) {
-  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
   const secs = seconds % 60;
-  return [ minutes, secs]
+  return [hours, minutes, secs]
     .map(num => num.toString().padStart(2, '0'))
     .join(':');
 }
 
 function getCurrentSeconds() {
   if (!STATE.isRunning || !STATE.startTimestamp) return STATE.seconds;
-    const currentTime = Date.now();
-    const elapsedSeconds = Math.floor((currentTime - STATE.startTimestamp) / 1000);
+  
+  const currentTime = Date.now();
+  const elapsedSeconds = Math.floor((currentTime - STATE.startTimestamp) / 1000);
   return elapsedSeconds;
 }
 
@@ -87,7 +88,6 @@ function startStopwatch() {
     }
     STATE.intervalId = setInterval(updateStopwatchDisplay, 100);
   } else {
-
     // Pausing the timer
     clearInterval(STATE.intervalId);
     STATE.isRunning = false;
@@ -96,37 +96,27 @@ function startStopwatch() {
   }
   
   // Update UI and save state
-  elements.startPauseButton.textContent = STATE.isRunning ? "Pause Game" : "Start Game";
+  elements.startPauseButton.textContent = STATE.isRunning ? "Pause" : "Start";
   Storage.save(STORAGE_KEYS.IS_RUNNING, STATE.isRunning);
   Storage.save(STORAGE_KEYS.START_TIMESTAMP, STATE.startTimestamp);
   Storage.save(STORAGE_KEYS.ELAPSED_TIME, STATE.seconds);
 }
 
-// reset form selects
-function resetSelect(selectElement) {
-  selectElement.selectedIndex = 0;
-}
-
-// Add Goal tracking
+// Goal tracking
 function addGoal(event) {
   event.preventDefault();
   
   const goalScorerName = elements.goalScorer.value;
   const goalAssistName = elements.goalAssist.value;
   
-   if (!goalScorerName) {
-    alert('Please select a Goal Scorer!');
-   return;
-  }
-  
-  if (!goalAssistName) {
-    alert('Please select a Goal Assist!');
+  if (!goalScorerName || !goalAssistName) {
+    M.toast({html: 'Please select both scorer and assistant'});
     return;
   }
   
   const currentSeconds = getCurrentSeconds();
   const goalData = {
-    timestamp: Math.ceil(currentSeconds / 60),
+    timestamp: formatTime(currentSeconds),
     goalScorerName,
     goalAssistName,
     rawTime: currentSeconds
@@ -136,50 +126,25 @@ function addGoal(event) {
   updateLog();
   Storage.save(STORAGE_KEYS.GOALS, STATE.data);
   
-  // Reset form
+  // Reset form and update Materialize select
   elements.goalForm.reset();
-  resetSelect(elements.goalScorer);
-  resetSelect(elements.goalAssist);
+  M.FormSelect.init(elements.goalScorer);
+  M.FormSelect.init(elements.goalAssist);
 }
 
-// Add opposition Goal
-function opaddGoal() {
-  const currentSeconds = getCurrentSeconds();
-  const opgoalData = {
-    timestamp: Math.ceil(currentSeconds / 60),
-    goalScorerName: "Opposition Team",
-    goalAssistName: "Opposition Team",
-    rawTime: currentSeconds
-  };
-  
-  STATE.data.push(opgoalData);
-  updateLog();
-  Storage.save(STORAGE_KEYS.GOALS, STATE.data);
-  
-    // Reset form and update Materialize select
-  elements.goalForm.reset();
-  resetSelect(elements.goalScorer);
-  resetSelect(elements.goalAssist);
-}
-
-// Update goal log
 function updateLog() {
   elements.log.innerHTML = STATE.data
     .sort((a, b) => a.rawTime - b.rawTime)
-    .map(({ timestamp, goalScorerName, goalAssistName }) => {
-      const isOppositionGoal = goalScorerName === "Opposition Team";
-      const cardClass = isOppositionGoal ? 'red lighten-4' : ''; // Add red background for opposition goals
-      
-      return `<div class="card-panel ${cardClass}">
-        <span class="blue-text text-darken-2">${timestamp}</span>' -  
-        <strong>${isOppositionGoal ? 'Opposition Goal' : 'Goal'}</strong>
-        ${isOppositionGoal ? '' : `: ${goalScorerName}, <strong>Assist:</strong> ${goalAssistName}`}
-       </div>`;
-    })
+    .map(({ timestamp, goalScorerName, goalAssistName }) => 
+      `<div class="card-panel">
+        <span class="blue-text text-darken-2">${timestamp}</span>: 
+        <strong>Goal:</strong> ${goalScorerName}, 
+        <strong>Assist:</strong> ${goalAssistName}
+       </div>`
+    )
     .join('');
 }
 
-// Reset whole tracker and start new
 function resetTracker() {
   if (!confirm('Are you sure you want to reset the stopwatch and log data?')) {
     return;
@@ -195,25 +160,21 @@ function resetTracker() {
   // Reset UI
   updateStopwatchDisplay();
   updateLog();
-  elements.startPauseButton.textContent = "Start Game";
+  elements.startPauseButton.textContent = "Start";
   
   // Clear storage
   Storage.clear();
 }
 
-// format log for whatsapp
 function formatLogForWhatsApp() {
   const gameTime = formatTime(STATE.seconds);
   const header = `⚽ Match Summary (Time: ${gameTime})\n\n`;
   
   const goals = STATE.data
     .sort((a, b) => a.rawTime - b.rawTime)
-    .map(({ timestamp, goalScorerName, goalAssistName }) => {
-      const isOppositionGoal = goalScorerName === "Opposition Team";
-      return isOppositionGoal 
-        ? `❌ ${timestamp} - Opposition Goal`
-        : `🥅 ${timestamp} - Goal: ${goalScorerName}, Assist: ${goalAssistName}`;
-    })
+    .map(({ timestamp, goalScorerName, goalAssistName }) => 
+      `🥅 ${timestamp} - Goal: ${goalScorerName}, Assist: ${goalAssistName}`
+    )
     .join('\n');
     
   const stats = generateStats();
@@ -226,18 +187,11 @@ function generateStats() {
   // Count goals
   const goalScorers = new Map();
   const assists = new Map();
-  let oppositionGoals = 0;  // Initialize opposition goals counter
-  let teamGoals = 0;       // Initialize team goals counter
   
   STATE.data.forEach(({ goalScorerName, goalAssistName }) => {
-   if (goalScorerName === "Opposition Team") {
-      oppositionGoals++;
-    } else {
-		teamGoals++;
-      goalScorers.set(goalScorerName, (goalScorers.get(goalScorerName) || 0) + 1);
-      if (goalAssistName) {
-        assists.set(goalAssistName, (assists.get(goalAssistName) || 0) + 1);
-      }
+    goalScorers.set(goalScorerName, (goalScorers.get(goalScorerName) || 0) + 1);
+    if (goalAssistName) {
+      assists.set(goalAssistName, (assists.get(goalAssistName) || 0) + 1);
     }
   });
   
@@ -253,13 +207,13 @@ function generateStats() {
     .map(([name, assists]) => `${name}: ${assists}`)
     .join(', ');
   
-  return `📊 Stats:\nTeam Goals: ${goalScorers.size > 0 ? Array.from(goalScorers.values()).reduce((a, b) => a + b) : 0}\nOpposition Goals: ${oppositionGoals}\nTop Scorers: ${topScorers}\nTop Assists: ${topAssists}`;
+  return `📊 Stats:\nTop Scorers: ${topScorers}\nTop Assists: ${topAssists}`;
 }
 
 // Share to WhatsApp function
 function shareToWhatsApp() {
   if (STATE.data.length === 0) {
-    alert('No goals to share yet!');
+    M.toast({html: 'No goals to share yet!'});
     return;
   }
   const formattedLog = formatLogForWhatsApp();
@@ -267,45 +221,13 @@ function shareToWhatsApp() {
   window.open(whatsappURL, '_blank');
 }
 
-// Replace Materialize Modal initialization with native JavaScript
-function initModal() {
-  const modal = document.getElementById('rosterModal');
-  const openModalBtn = document.getElementById('openRosterModalBtn');
-  const closeButtons = modal.querySelectorAll('.modal-close');
-  
-  // Function to open the modal
-  function openModal() {
-    modal.classList.add('modal-open');
-  }
-  
-  // Function to close the modal
-  function closeModal() {
-    modal.classList.remove('modal-open');
-  }
-
-  // Add click event listener to open button
-  openModalBtn.addEventListener('click', openModal);
-  
-  // Add click event listeners to close buttons
-  closeButtons.forEach(button => {
-    button.addEventListener('click', closeModal);
-  });
-  
-  // Optional: Add method to programmatically open modal if needed
-  return {
-    open: openModal,
-    close: closeModal
-  };
-}
-
-
 // Initialize application
 function initializeApp() {
 	
 	  // Initialize Materialize Modal and Form Select
-  //M.Modal.init(document.getElementById('rosterModal'));
-  const rosterModal = initModal();
-    
+  M.Modal.init(document.getElementById('rosterModal'));
+  M.FormSelect.init(document.querySelectorAll('select'));
+  
     // Initialize roster
   RosterManager.init();
 	
@@ -326,14 +248,15 @@ function initializeApp() {
   // Update UI with saved data
   updateStopwatchDisplay();
   updateLog();
-  elements.startPauseButton.textContent = STATE.isRunning ? "Pause Game" : "Start Game";
+  elements.startPauseButton.textContent = STATE.isRunning ? "Pause" : "Start";
   
+  // Initialize Materialize components
+  M.FormSelect.init(document.querySelectorAll('select'));
 }
 
 // Event Listeners
 elements.startPauseButton.addEventListener('click', startStopwatch);
 elements.goalForm.addEventListener('submit', addGoal);
-elements.opgoalButton.addEventListener('click', opaddGoal);
 elements.resetButton.addEventListener('click', resetTracker);
 elements.shareButton.addEventListener('click', shareToWhatsApp);
 document.addEventListener('DOMContentLoaded', initializeApp);

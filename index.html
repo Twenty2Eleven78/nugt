@@ -3,27 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Goal Tracker v2.12</title>
+  <title>Goal Tracker v2.0 (dev)</title>
   <link rel="stylesheet" href="materialize.min.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" >
   <link rel="manifest" href="manifest.json">
-  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
-  </head>
+</head>
 <body>
   <div class="container">
     <div class="row">
       <div class="col s12">
-        <div>&nbsp;</div>
-        <h4 style="display: inline;">Goal Tracker v2.12 </h4><small style="display: inline;"><a href="https://twenty2eleven78.github.io/nugt/README.md"> (Release Notes)</a></small>
+        <h4>Goal Tracker v2.0</h4>
       </div>
     </div>
     <div class="row">
       <div class="col s12 m6">
         <div class="card">
           <div class="card-content">
-            <span class="card-title">Game Timer</span>
+            <span class="card-title">Stopwatch</span>
             <div class="center-align">
-              <button class="btn waves-effect waves-light red" id="startPauseButton">Start Game</button>
+              <button class="btn waves-effect waves-light red" id="startPauseButton">Start</button>
               <h5 id="stopwatch" role="timer">00:00:00</h5>
             </div>
           </div>
@@ -32,10 +30,10 @@
       <div class="col s12 m6">
         <div class="card">
           <div class="card-content">
-            <span class="card-title">Goal Scored</span>
+            <span class="card-title">Add Goal</span>
             <form id="goalForm"><label for="goalScorer">Goal Scorer:</label>
 			<div class="input-field">
-                <select id="goalScorer">
+                <select id="goalScorer" required>
                   <option value="" disabled selected>Select goal scorer</option>
 				<!-- Roster entries will be dynamically added here -->
 				</select>
@@ -49,7 +47,6 @@
                 </select>
               </div>
               <button type="submit" class="btn waves-effect waves-light red" id="goalButton">Add Goal</button>
-			  <button class="btn red waves-effect waves-light" type="button" id="opgoalButton">Opposition Goal</button>
             </form>
           </div>
         </div>
@@ -58,7 +55,7 @@
     <div class="row">
       <div class="col s12">
         <h4>Goal Log</h4>
-        <div id="log" role="log"></div>
+        <div id="log" role="log" aria-live="polite"></div>
       </div>
     </div>
     <div class="row">
@@ -71,8 +68,7 @@
   
  <div id="rosterModal" class="modal">
   <div class="modal-content">
-    <span class="modal-close">&times;</span>
-    <h4>Team Management</h4>
+    <h4>Roster Management</h4>
     <div class="row">
       <div class="input-field col s12 m8">
         <input type="text" id="newPlayerName" class="validate">
@@ -106,24 +102,24 @@
 </div>
 
 <!-- Floating action button to open roster modal -->
-<div class="fixed-action-btn" style="top: 10px; right: 24px;">
-  <a  id="openRosterModalBtn" class="btn-floating btn-large waves-effect waves-light modal-trigger red">
+<div class="fixed-action-btn" style="top: 35px; right: 24px;">
+  <a class="btn-floating btn-large waves-effect waves-light modal-trigger red" href="#rosterModal">
     <i class="large material-icons">people</i>
+	<span>Players</span>
   </a>
 </div>
 
   <!-- Scripts -->
   <script src="jquery-3.6.0.min.js"></script>
   <script src="materialize.min.js"></script>
+  <script>
+    // Initialize Materialize Select
+    document.addEventListener('DOMContentLoaded', function() {
+      var elems = document.querySelectorAll('select');
+      var instances = M.FormSelect.init(elems);
+    });
+  </script>
   <script src="script.js"></script>
   <script src="roster.js"></script>
-  <script>
-    if (navigator.serviceWorker) {
-      navigator.serviceWorker.register (
-        'sw.js',
-        {scope: ''}
-      )
-    }
-</script>
 </body>
 </html>

@@ -267,11 +267,40 @@ function shareToWhatsApp() {
   window.open(whatsappURL, '_blank');
 }
 
+// Replace Materialize Modal initialization with native JavaScript
+function initModal() {
+  const modal = document.getElementById('rosterModal');
+  const closeButtons = modal.querySelectorAll('.modal-close');
+  
+  // Function to open the modal
+  function openModal() {
+    modal.classList.add('modal-open');
+  }
+  
+  // Function to close the modal
+  function closeModal() {
+    modal.classList.remove('modal-open');
+  }
+  
+  // Add click event listeners to close buttons
+  closeButtons.forEach(button => {
+    button.addEventListener('click', closeModal);
+  });
+  
+  // Optional: Add method to programmatically open modal if needed
+  return {
+    open: openModal,
+    close: closeModal
+  };
+}
+
+
 // Initialize application
 function initializeApp() {
 	
 	  // Initialize Materialize Modal and Form Select
-  M.Modal.init(document.getElementById('rosterModal'));
+  //M.Modal.init(document.getElementById('rosterModal'));
+  const rosterModal = initModal();
     
     // Initialize roster
   RosterManager.init();

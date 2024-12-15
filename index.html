@@ -117,6 +117,14 @@
   <script src="script.js"></script>
   <script src="roster.js"></script>
   <script>
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.register (
+        'sw.js',
+        {scope: ''}
+      )
+    }
+</script>
+  <script>
     // Initialize Materialize Select
     document.addEventListener('DOMContentLoaded', function() {
       var elems = document.querySelectorAll('select');

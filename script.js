@@ -272,7 +272,7 @@ function initializeApp() {
 	
 	  // Initialize Materialize Modal and Form Select
   M.Modal.init(document.getElementById('rosterModal'));
-  M.FormSelect.init(document.querySelectorAll('select'));
+  //M.FormSelect.init(document.querySelectorAll('select'));
   
     // Initialize roster
   RosterManager.init();

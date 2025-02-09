@@ -1,14 +1,14 @@
 {
-    "name": "NU Goal Tracker",
-    "short_name": "NUGT",
-	"start_url": "https://twenty2eleven78.github.io/nugt/",
+    "name": "NU Goal Tracker dev",
+    "short_name": "NUGTdev",
+	"start_url": "https://twenty2eleven78.github.io/nugtdev/",
     "theme_color": "#8B0000",
     "background_color": "#fff",
     "display": "standalone",
-    "description": "Goal Tracker",
+    "description": "Goal Tracker dev",
     "icons": [
         {
-            "src": "https://twenty2eleven78.github.io/nugt/goal.png",
+            "src": "https://twenty2eleven78.github.io/nugtdev/goal.png",
             "sizes": "208x242"
         }
     ]

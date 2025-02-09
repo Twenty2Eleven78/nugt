@@ -1,10 +1,11 @@
 // Roster Management Module
 const RosterManager = (function() {
+  
   // Private variables
   const STORAGE_KEY = 'goalTracker_roster';
   let roster = [];
 
-  // Private methods
+  // Save roster to local storage
   function saveRoster() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(roster));
@@ -12,7 +13,7 @@ const RosterManager = (function() {
       console.error('Error saving roster:', error);
     }
   }
-
+  // Load roster from local storage
   function loadRoster() {
     try {
       const savedRoster = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -22,10 +23,11 @@ const RosterManager = (function() {
       return getDefaultRoster();
     }
   }
-
+  // Set a default roster if not roster is stored
   function getDefaultRoster() {
     return [
-      'Player1', 'Player2'
+      'A.Seaman','A-R.Obidi','D.Peacock','E.Doyle','E.Van-Kerro','E.Mutiti','F.Asadi','F.Kendall','H.Strowthers','M.Finch','M.Luttwak','R.Azar','S.Smith'
+      ,'T.Rushmer','V.Aig-Imoru'
     ];
   }
 
@@ -54,10 +56,10 @@ const RosterManager = (function() {
         const currentGoalScorer = goalScorerSelect.value;
         const currentGoalAssist = goalAssistSelect.value;
 
-        // Clear existing options
-        goalScorerSelect.innerHTML = '<option value="">Select goal scorer</option>';
-        goalAssistSelect.innerHTML = '<option value="">Select goal assist</option>';
-        goalAssistSelect.innerHTML += '<option value="N/A">N/A</option>';
+        // set default options
+        //goalScorerSelect.innerHTML = '<option value="">Select goal scorer</option>';
+        //goalAssistSelect.innerHTML = '<option value="">Select goal assist</option>';
+        //goalAssistSelect.innerHTML += '<option value="N/A">N/A</option>';
 
         // Add roster options
         roster.forEach(player => {
@@ -72,10 +74,6 @@ const RosterManager = (function() {
         if (currentGoalAssist && (currentGoalAssist === 'N/A' || roster.includes(currentGoalAssist))) {
           goalAssistSelect.value = currentGoalAssist;
         }
-
-        // Reinitialize Materialize selects
-        M.FormSelect.init(goalScorerSelect);
-        M.FormSelect.init(goalAssistSelect);
       }
     },
 
@@ -88,9 +86,8 @@ const RosterManager = (function() {
             <tr>
               <td>${player}</td>
               <td>
-                <button class="btn-small red waves-effect waves-light remove-player" 
-                        data-player="${player}">
-                  Remove
+                 <button class="btn btn-sm btn-outline-danger remove-player" data-player="${player}">
+                  <i class="fas fa-trash"></i> Remove
                 </button>
               </td>
             </tr>

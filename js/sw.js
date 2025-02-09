@@ -16,10 +16,7 @@ var URLS = [
   `${nugtPATH}/`,
   `${nugtPATH}/index.html`,
   `${nugtPATH}/style.css`,
-  `${nugtPATH}/materialIcons.woff2`,
   `${nugtPATH}/script.js`,
   `${nugtPATH}/roster.js`,
-  `${nugtPATH}/jquery-3.6.0.min.js`,
-  `${nugtPATH}/materialize.min.js`,
-  `${nugtPATH}/materialize.min.css`
+  `${nugtPATH}/materialize.min.js`
 ]

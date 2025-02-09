@@ -17,8 +17,12 @@
 <body>
   <!-- Main Container -->
   <div class="main-container">
+
+    <!--Notification Container-->
     <div id="notification-container" style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999;"></div>
-    
+    <!--END Notification Container-->
+
+    <!-- Main Content Container-->
     <div class="container-fluid px-4 py-3">
         <div class="content-width">
         <!-- Header -->
@@ -27,11 +31,13 @@
             <h3>NUFC GameTime v3.1</h3>
           </div>
         </div>
+        <!-- END Header -->
         
         <!-- Tab Content -->
         <div class="content-wrapper">
           <div class="tab-content" id="gametab-content">
-            <!-- Game Tab -->
+            
+            <!-- Game Tab Content -->
             <div class="tab-pane fade show active" id="gametab">
               
               <!-- Game Timer Card -->
@@ -39,57 +45,14 @@
                 <div class="card-body">
                   <h5 class="card-title"><i class="fa-regular fa-clock"></i> Game Timer</h5><hr>
                   <div class="text-center">
-                    <button class="btn btn-danger timer-btn-inline" id="startPauseButton">
-                      Start Game
-                      <span id="stopwatch" role="timer" class="timer-badge">00:00</span>
+                    <button class="btn btn-danger timer-btn-inline" id="startPauseButton">Start Game
+                    <span id="stopwatch" role="timer" class="timer-badge">00:00</span>
                     </button>
                   </div>
                 </div>
               </div>
-
-              <!-- Game Actions Card -->
-              <div class="card">
-                <div class="card-body">
-                  <h5 class="card-title"><i class="fa-regular fa-futbol"></i> Game Actions</h5><hr>
-                    <div class="container-fluid p-0">
-                      <!-- Goals Row -->
-                      <div class="row g-2 mb-3">
-                        <div class="col-6">
-                          <button id="goalButton" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#goalModal">
-                            <i class="fa-solid fa-futbol me-2"></i>Netherton
-                          </button>
-                        </div>
-                        <div class="col-6">
-                          <button id="opgoalButton" class="btn btn-danger w-100" type="button">
-                            <i class="fa-solid fa-futbol me-2"></i>Opposition
-                          </button>
-                        </div>
-                      </div>
-                
-                      <!-- Time Markers Row -->
-                      <div class="row g-2 mb-3">
-                        <div class="col-6">
-                          <button id="HalfTimeButton" class="btn btn-secondary w-100" type="button"><i class="fa-solid fa-stopwatch me-2"></i>Half Time</button>
-                        </div>
-                        <div class="col-6">
-                          <button id="FullTimeButton" class="btn btn-secondary w-100" type="button"><i class="fa-solid fa-stopwatch me-2"></i>Full Time</button>
-                        </div>
-                      </div>
-                
-                      <!-- Fouls Row -->
-                      <div class="row g-2">
-                        <div class="col-6">
-                          <button id="IncidentButton" class="btn btn-warning w-100" type="button"><i class="fa-solid fa-hand me-2"></i>Incident</button>
-                        </div>
-                        <div class="col-6">
-                          <button id="PenaltyButton" class="btn btn-warning w-100" type="button"><i class="fa-solid fa-circle-exclamation me-2"></i>Penalty</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                 </div>
+              <!--END Gate Timer Card-->
               
-
               <!-- Score Board Card -->
               <div class="card" id="scoreboard">
                 <div class="card-body">
@@ -106,9 +69,58 @@
                   </div>
                 </div>
               </div>
-            </div>
+              <!--END Score Board Card-->
 
-            <!-- Game Log Tab -->
+              <!-- Game Actions Card -->
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title"><i class="fa-regular fa-futbol"></i> Game Actions</h5><hr>
+                    <div class="container-fluid p-0">
+                      
+                      <!-- Goals Row -->
+                      <div class="row g-2 mb-3">
+                        <div class="col-6">
+                          <button id="goalButton" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#goalModal">
+                            <i class="fa-solid fa-futbol me-2"></i>Netherton
+                          </button>
+                        </div>
+                        <div class="col-6">
+                          <button id="opgoalButton" class="btn btn-danger w-100" type="button">
+                            <i class="fa-solid fa-futbol me-2"></i>Opposition
+                          </button>
+                        </div>
+                      </div>
+                      <!--END Goals Row-->
+                
+                      <!-- Time Markers Row -->
+                      <div class="row g-2 mb-3">
+                        <div class="col-6">
+                          <button id="HalfTimeButton" class="btn btn-secondary w-100" type="button"><i class="fa-solid fa-stopwatch me-2"></i>Half Time</button>
+                        </div>
+                        <div class="col-6">
+                          <button id="FullTimeButton" class="btn btn-secondary w-100" type="button"><i class="fa-solid fa-stopwatch me-2"></i>Full Time</button>
+                        </div>
+                      </div>
+                      <!-- END Time Marker Row-->
+
+                      <!-- Incidents Row -->
+                      <div class="row g-2">
+                        <div class="col-6">
+                          <button id="IncidentButton" class="btn btn-warning w-100" type="button"><i class="fa-solid fa-hand me-2"></i>Incident</button>
+                        </div>
+                        <div class="col-6">
+                          <button id="PenaltyButton" class="btn btn-warning w-100" type="button"><i class="fa-solid fa-circle-exclamation me-2"></i>Penalty</button>
+                        </div>
+                      </div>
+                      <!--END Incidents Row-->
+                    
+                    </div>
+                </div>
+              </div>
+            </div>
+            <!--END Game Tab Content-->
+
+            <!-- Event Tab Content -->
             <div class="tab-pane fade" id="gamelogtab">
               <div class="card">
                 <div class="card-body">
@@ -117,14 +129,15 @@
                 </div>
               </div>
             </div>
+            <!--END Event Tab Content-->
 
-            <!-- Options Tab -->
+            <!-- Options Tab Content -->
             <div class="tab-pane fade" id="optionstab">
               <div class="card">
                 <div class="card-body">
                   <h5 class="card-title"><i class="fa-solid fa-gears"></i> Options</h5><hr>
                   <div class="mb-3">
-                    <label for="gameTimeSelect" class="form-label">Game Duration:</label>
+                    <label for="gameTimeSelect" class="form-label"><h5>Game Duration:</h5></label>
                     <select id="gameTimeSelect" class="form-select mb-2">
                       <option value="2400">40 minutes</option>
                       <option value="3600" selected>60 minutes</option>
@@ -146,6 +159,7 @@
       </div>
     </div>
   </div>
+  <!-- END MAIN CONTAINER -->
 
   <!-- Fixed Bottom Navigation -->
   <div class="bottom-nav">
@@ -169,6 +183,7 @@
       </ul>
     </div>
   </div>
+  <!--END Fixed Bottom Navigation-->
 
 <!-----------------------------------------Modal Section-------------------------------------->
 
@@ -187,6 +202,7 @@
     </div>
   </div>
 </div>
+<!--END Release Notes Modal-->
 
 <!-- Fixture Modal Team 1 -->
 <div class="modal fade" id="fixtureModalTeam1" tabindex="-1">
@@ -215,6 +231,7 @@
     </div>
   </div>
 </div>
+<!-- END Fixture Modal Team 1 -->
 
 <!-- Fixture Modal Team 2 -->
 <div class="modal fade" id="fixtureModalTeam2" tabindex="-1">
@@ -243,6 +260,7 @@
     </div>
   </div>
 </div>
+<!-- END Fixture Modal Team 2 -->
 
 <!-- Goal Modal -->
 <div class="modal fade" id="goalModal" tabindex="-1">
@@ -285,6 +303,7 @@
     </div>
   </div>
 </div>
+<!-- END Goal Modal -->
 
 <!-- Roster Modal -->
   <div class="modal fade" id="rosterModal" tabindex="-1">
@@ -323,8 +342,9 @@
       </div>
     </div>
   </div>
+<!-- END Roster Modal -->
 
-  <!--Confirm Reset Modal-->
+<!--Confirm Reset Modal-->
 <div class="modal fade" id="resetConfirmModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -357,11 +377,12 @@
     </div>
   </div>
 </div>
+<!--END Confirm Reset Modal-->
 
-
-  <!-- Scripts -->
-  <script src="js/bootstrap.bundle.min.js"></script>
-  <script src="js/script.js"></script>
-  <script src="js/roster.js"></script>
+<!-- Scripts -->
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/script.js"></script>
+<script src="js/roster.js"></script>
+<!-- ENDScripts -->
 </body>
 </html>

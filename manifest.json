@@ -1,14 +1,14 @@
 {
-    "name": "NU Goal Tracker dev",
-    "short_name": "NUGTdev",
-	"start_url": "https://twenty2eleven78.github.io/nugtdev/",
+    "name": "Netherton United Goal Time App",
+    "short_name": "NUGT",
+	"start_url": "https://twenty2eleven78.github.io/nugt/",
     "theme_color": "#8B0000",
     "background_color": "#fff",
     "display": "standalone",
-    "description": "Goal Tracker dev",
+    "description": "Netherton United Goal Time App",
     "icons": [
         {
-            "src": "https://twenty2eleven78.github.io/nugtdev/goal.png",
+            "src": "https://twenty2eleven78.github.io/nugt/goal.png",
             "sizes": "208x242"
         }
     ]

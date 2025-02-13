@@ -1,22 +1,28 @@
-// Change this to your repository name
-var nugtPATH = '';
- 
-// Choose a different app prefix name
-var APP_PREFIX = 'nugt_';
- 
-// The version of the cache. Every time you change any of the files
-// you need to change this version (version_01, version_02…). 
-// If you don't change the version, the service worker will give your
-// users the old files!
-var VERSION = 'version_212';
- 
-// The files to make available for offline use. make sure to add 
-// others to this list
-var URLS = [    
-  `${nugtPATH}/`,
-  `${nugtPATH}/index.html`,
-  `${nugtPATH}/style.css`,
-  `${nugtPATH}/script.js`,
-  `${nugtPATH}/roster.js`,
-  `${nugtPATH}/materialize.min.js`
-]
+//Cache Name
+const CACHE_NAME = "nugt-cache-v1";
+//Files to cache
+const cacheFiles = [
+  '/',
+  '/index.html',
+  '/css/all.min.css',
+  '/css/bootstrap.min.css',
+  '/css/style.css',
+  '/js/bootstrap.bundle.min.js',
+  '/js/roster.js',
+  '/js/script.js',
+  '/nugt512.png',
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(cacheFiles))
+  );
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => response || fetch(event.request))
+  );
+});

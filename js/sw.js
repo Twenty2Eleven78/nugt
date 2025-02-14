@@ -5,7 +5,7 @@ const cacheFiles = [
   '/',
   '/index.html',
   './css/all.min.css',
-  './css/bootstrap.min.css',
+  '../css/bootstrap.min.css',
   './css/style.css',
   './js/bootstrap.bundle.min.js',
   './js/roster.js',

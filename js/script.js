@@ -459,6 +459,8 @@ function updateScoreBoard(scorecard) {
 function updatefixtureTeams(team,teamName) {
   if (team === 'first') {
     elements.Team1NameElement.textContent = teamName;
+    const icon = elements.opgoalButton.querySelector('i');
+    elements.goalButton.innerHTML  = icon.outerHTML + "Goal " + teamName;
     Storage.save(STORAGE_KEYS.TEAM1_NAME, teamName);
     // Update input placeholder
     const team1Input = document.getElementById('team1Name');
@@ -466,7 +468,8 @@ function updatefixtureTeams(team,teamName) {
   }
   if (team === 'second') {
     elements.Team2NameElement.textContent = teamName;
-    elements.opgoalButton.textContent = teamName;
+    const icon = elements.opgoalButton.querySelector('i');
+    elements.opgoalButton.innerHTML = icon.outerHTML + "Goal " + teamName;
     Storage.save(STORAGE_KEYS.TEAM2_NAME, teamName);
     // Update input placeholder
     const team2Input = document.getElementById('team2Name');
@@ -715,6 +718,10 @@ function initializeApp() {
   const team2Name = Storage.load(STORAGE_KEYS.TEAM2_NAME, 'Opposition Team');
   elements.Team1NameElement.textContent = team1Name;
   elements.Team2NameElement.textContent = team2Name;
+  const icon = elements.opgoalButton.querySelector('i')
+
+  elements.goalButton.innerHTML = icon.outerHTML + "Goal " + team1Name;
+  elements.opgoalButton.innerHTML = icon.outerHTML + "Goal " + team2Name;
 
     // Load saved game time
     STATE.gameTime = Storage.load(STORAGE_KEYS.GAME_TIME, 3600);

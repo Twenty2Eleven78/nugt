@@ -41,7 +41,7 @@
 
     <!-- Main Content Container-->
     <div class="container-fluid px-4 py-3">
-        <div class="content-width">
+      <div class="content-width">
         <!-- Header -->
         <div class="row mb-3">
           <div class="col-12">
@@ -151,30 +151,66 @@
             <!-- Options Tab Content -->
             <div class="tab-pane fade" id="optionstab">
               <div class="card">
-                <div class="card-body">
+                <div class="card-body p-3">
                   <h5 class="card-title"><i class="fa-solid fa-gears"></i> Options</h5><hr>
-                  <div class="mb-3">
-                    <label for="gameTimeSelect" class="form-label"><h5>Game Duration:</h5></label>
-                    <select id="gameTimeSelect" class="form-select mb-2">
-                      <option value="2400">40 minutes</option>
-                      <option value="3600" selected>60 minutes</option>
-                      <option value="4800">80 minutes</option>
-                      <option value="5400">90 minutes</option>
-                    </select>
-                    <small class="text-muted">Each half will be 50% of total time</small>
-                  </div><hr>
-                  <p><button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#rosterModal"><i class="fas fa-users"></i> My Team Management</button></p>
-                  <p><button class="btn btn-success btn-custom" id="shareButton"><i class="fas fa-share-alt me-2"></i>Send WhatsApp Report</button></p> 
+                   <!-- Game Duration Section -->
+                    <div class="mb-4">
+                      <label for="gameTimeSelect" class="form-label fw-bold mb-2">
+                         Game Duration
+                      </label>
+                      <select id="gameTimeSelect" class="form-select mb-2">
+                        <option value="2400">40 minutes</option>
+                        <option value="3600" selected>60 minutes</option>
+                        <option value="4800">80 minutes</option>
+                        <option value="5400">90 minutes</option>
+                      </select>
+                      <small class="text-muted d-block mb-2">Each half will be 50% of total time</small>
+                    </div>
+                    <hr>
+                  <!-- Team Management Section -->
+                  <div class="d-grid gap-3 mb-4">
+                    <button class="btn btn-danger d-flex align-items-center justify-content-center py-2" 
+                      data-bs-toggle="modal" 
+                      data-bs-target="#rosterModal">
+                      <i class="fas fa-users me-2"></i>
+                      My Team Management
+                    </button>
+  
+                    <button class="btn btn-success d-flex align-items-center justify-content-center py-2" 
+                      id="shareButton">
+                      <i class="fas fa-share-alt me-2"></i>
+                      Send WhatsApp Report
+                    </button>
+                  </div>
                   <hr> 
-                  <p><button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#releasenotesmodal"><i class="fa-solid fa-list"></i> Release Notes</button>
-                  <p><button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#resetConfirmModal"><i class="fa-solid fa-arrows-rotate"></i> Reset GameTime App</button></p> 
+                  <!-- App Management Section -->
+                  <div class="d-grid gap-3">
+                    <button class="btn btn-danger d-flex align-items-center justify-content-center py-2" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#releasenotesmodal">
+                      <i class="fa-solid fa-list me-2"></i>
+                      Release Notes
+                    </button>
+                    
+                    <button class="btn btn-danger d-flex align-items-center justify-content-center py-2" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#resetConfirmModal">
+                      <i class="fa-solid fa-arrows-rotate me-2"></i>
+                      Reset GameTime App
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
+            <!--END Options Tab Content-->
+
           </div>
         </div>
+        <!--END Tab Content-->
+
       </div>
     </div>
+    <!-- END Main Content Container -->
   </div>
   <!-- END MAIN CONTAINER -->
 

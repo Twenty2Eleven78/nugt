@@ -2,8 +2,8 @@
 const CACHE_NAME = "nugt-cache-v1";
 //Files to cache
 const cacheFiles = [
-  './',
-  './index.html',
+  '/',
+  '/index.html',
   './css/all.min.css',
   './css/bootstrap.min.css',
   './css/style.css',

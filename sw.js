@@ -10,6 +10,8 @@ const cacheFiles = [
   './js/bootstrap.bundle.min.js',
   './js/roster.js',
   './js/script.js',
+  './webfonts/fa-regular-400.woff2',
+  './webfonts/fa-solid-900.woff2',
   './nugt512.png',
 ];
 

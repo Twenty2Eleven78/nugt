@@ -699,7 +699,7 @@ function handleRedirectParams() {
   const feedbackStatus = urlParams.get('feedback');
   
   if (feedbackStatus === 'success') {
-      showNotification('Thank you for your feedback! We really appriciate your input.', 'success');
+      showNotification('Thank you for your feedback! Your form has been sent.', 'success');
       
       // Close the modal if it's still open
       const feedbackModal = bootstrap.Modal.getInstance(document.getElementById('feedbackModal'));

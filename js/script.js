@@ -693,6 +693,31 @@ function showNotification(message, type = 'success') {
   }, 2300);
 }
 
+// Handle URL parameters for notifications
+function handleRedirectParams() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const feedbackStatus = urlParams.get('feedback');
+  
+  if (feedbackStatus === 'success') {
+      showNotification('Thank you for your feedback! We really appriciate your input.', 'success');
+      
+      // Close the modal if it's still open
+      const feedbackModal = bootstrap.Modal.getInstance(document.getElementById('feedbackModal'));
+      if (feedbackModal) {
+          feedbackModal.hide();
+      }
+      
+      // Reset the form
+      const feedbackForm = document.getElementById('feedbackForm');
+      if (feedbackForm) {
+          feedbackForm.reset();
+      }
+  }
+  
+  // Clean up URL after showing notification
+  window.history.replaceState({}, document.title, window.location.pathname);
+}
+
 // Initialize application
 function initializeApp() {
 	

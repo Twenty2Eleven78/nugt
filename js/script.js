@@ -7,7 +7,7 @@ const STATE = {
   startTimestamp: null,
   matchEvents: [],
   gameTime: 3600, // Default 60 minutes in seconds
-  isSecondHalf: false
+  isSecondHalf: false,
 };
  
 // DOM Elements
@@ -35,17 +35,17 @@ const elements = {
 
 // Constants
 const STORAGE_KEYS = {
-  START_TIMESTAMP: 'goalTracker_startTimestamp',
-  IS_RUNNING: 'goalTracker_isRunning',
-  GOALS: 'goalTracker_goals',
-  ELAPSED_TIME: 'goalTracker_elapsedTime',
-  FIRST_SCORE: 'goalTracker_firstScore',    
-  SECOND_SCORE: 'goalTracker_secondScore',
-  TEAM1_NAME: 'goalTracker_team1name',    
-  TEAM2_NAME: 'goalTracker_team2name',
-  MATCH_EVENTS: 'goalTracker_matchEvents',
-  GAME_TIME: 'goalTracker_gameTime',
-  IS_SECOND_HALF: 'goalTracker_isSecondHalf'    
+  START_TIMESTAMP: 'nugt_startTimestamp',
+  IS_RUNNING: 'nugt_isRunning',
+  GOALS: 'nugt_goals',
+  ELAPSED_TIME: 'nugt_elapsedTime',
+  FIRST_SCORE: 'nugt_firstScore',    
+  SECOND_SCORE: 'nugt_secondScore',
+  TEAM1_NAME: 'nugt_team1name',    
+  TEAM2_NAME: 'nugt_team2name',
+  MATCH_EVENTS: 'nugt_matchEvents',
+  GAME_TIME: 'nugt_gameTime',
+  IS_SECOND_HALF: 'nugt_isSecondHalf'     
 };
 
 // Local Storage utilities
@@ -761,7 +761,6 @@ document.getElementById('FullTimeButton').addEventListener('click', () => addMat
 document.getElementById('IncidentButton').addEventListener('click', () => addMatchEvent('Incident'));
 document.getElementById('PenaltyButton').addEventListener('click', () => addMatchEvent('Penalty'));
 elements.gameTimeSelect.addEventListener('change', handleGameTimeChange);
-
 
   // Update Team 1 button click handler
   elements.updTeam1Btn.addEventListener('click', () => {

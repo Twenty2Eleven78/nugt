@@ -812,3 +812,20 @@ document.addEventListener('visibilitychange', () => {
     updateStopwatchDisplay();
   }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Check for redirect parameters
+  handleRedirectParams();
+  
+  // Set up the _next URL dynamically
+  const feedbackForm = document.querySelector('#feedbackModal form');
+  if (feedbackForm) {
+      const nextInput = feedbackForm.querySelector('input[name="_next"]');
+      if (nextInput) {
+          // Get the current URL and add the success parameter
+          const currentUrl = new URL(window.location.href);
+          currentUrl.searchParams.set('feedback', 'success');
+          nextInput.value = currentUrl.toString();
+      }
+  }
+});

@@ -740,13 +740,15 @@ function initializeApp() {
 
   // Load saved team names
   const team1Name = Storage.load(STORAGE_KEYS.TEAM1_NAME, 'Netherton');
-  const team2Name = Storage.load(STORAGE_KEYS.TEAM2_NAME, 'Opposition Team');
+  const team2Name = Storage.load(STORAGE_KEYS.TEAM2_NAME, 'Opposition');
   elements.Team1NameElement.textContent = team1Name;
   elements.Team2NameElement.textContent = team2Name;
   const icon = elements.opgoalButton.querySelector('i')
 
-  elements.goalButton.innerHTML = icon.outerHTML + "Goal " + team1Name;
-  elements.opgoalButton.innerHTML = icon.outerHTML + "Goal " + team2Name;
+ //elements.goalButton.innerHTML = icon.outerHTML + "GOAL " + team1Name;
+ //elements.opgoalButton.innerHTML = icon.outerHTML + "GOAL " + team2Name;
+  elements.goalButton.innerHTML =  "GOAL " + team1Name;
+  elements.opgoalButton.innerHTML =  "GOAL " + team2Name;
 
     // Load saved game time
     STATE.gameTime = Storage.load(STORAGE_KEYS.GAME_TIME, 3600);

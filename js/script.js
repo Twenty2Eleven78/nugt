@@ -8,6 +8,8 @@ const STATE = {
   matchEvents: [],
   gameTime: 3600, // Default 60 minutes in seconds
   isSecondHalf: false,
+  team1History: ['Netherton'], // Initialize with default name
+  team2History: ['Opposition'], // Initialize with default name
 };
  
 // DOM Elements
@@ -45,7 +47,9 @@ const STORAGE_KEYS = {
   TEAM2_NAME: 'nugt_team2name',
   MATCH_EVENTS: 'nugt_matchEvents',
   GAME_TIME: 'nugt_gameTime',
-  IS_SECOND_HALF: 'nugt_isSecondHalf'     
+  IS_SECOND_HALF: 'nugt_isSecondHalf',
+  TEAM1_HISTORY: 'nugt_team1history',
+  TEAM2_HISTORY: 'nugt_team2history',     
 };
 
 // Local Storage utilities
@@ -455,9 +459,13 @@ function updateScoreBoard(scorecard) {
   }
  }
 
-//Update Score Board Teams
+//Update team names
 function updatefixtureTeams(team,teamName) {
   if (team === 'first') {
+    if (!STATE.team1History.includes(teamName)) {
+      STATE.team1History.push(teamName);
+      Storage.save(STORAGE_KEYS.TEAM1_HISTORY, STATE.team1History);
+    }
     elements.Team1NameElement.textContent = teamName;
     elements.goalButton.innerHTML  ="GOAL " + teamName;
     Storage.save(STORAGE_KEYS.TEAM1_NAME, teamName);
@@ -466,6 +474,10 @@ function updatefixtureTeams(team,teamName) {
     if (team1Input) team1Input.placeholder = teamName;
   }
   if (team === 'second') {
+    if (!STATE.team2History.includes(teamName)) {
+      STATE.team2History.push(teamName);
+      Storage.save(STORAGE_KEYS.TEAM2_HISTORY, STATE.team2History);
+    }
     elements.Team2NameElement.textContent = teamName;
     elements.opgoalButton.innerHTML ="GOAL " + teamName;
     Storage.save(STORAGE_KEYS.TEAM2_NAME, teamName);
@@ -503,6 +515,13 @@ function resetTracker() {
   elements.firstScoreElement.textContent = '0';
   elements.secondScoreElement.textContent = '0';
 
+   // Reset team history
+   STATE.team1History = ['Netherton'];
+   STATE.team2History = ['Opposition'];
+   Storage.save(STORAGE_KEYS.TEAM1_HISTORY, STATE.team1History);
+   Storage.save(STORAGE_KEYS.TEAM2_HISTORY, STATE.team2History);
+
+
   // Clear storage
   Storage.save(STORAGE_KEYS.IS_SECOND_HALF, false);
   Storage.clear();
@@ -516,8 +535,6 @@ function formatLogForWhatsApp() {
   const team1Name = elements.Team1NameElement.textContent;
   const team2Name = elements.Team2NameElement.textContent;
   const stats = generateStats();
-  let teamGoals = stats.teamGoals;
-  let oppositionGoals = stats.oppositionGoals;
 
   let gameResult = ' '
   if (stats.teamGoals == stats.oppositionGoals) {
@@ -525,10 +542,6 @@ function formatLogForWhatsApp() {
     else if (stats.teamGoals > stats.oppositionGoals) {
       gameResult = 'WIN'}
       else {gameResult = 'LOSS'}  
-
-      console.log(gameResult)
-      console.log(stats.teamGoals)
-      console.log(stats.oppositionGoals)
 
   const header = `⚽ Match Summary: ${team1Name} vs ${team2Name}\n ⌚ Game Time: ${gameTime}\n 🔢 Result: ${gameResult} (${stats.teamGoals} - ${stats.oppositionGoals}) \n\n`;
 
@@ -556,50 +569,54 @@ function formatLogForWhatsApp() {
 // Whatsapp statistics summary 
 function generateStats() {
   const stats = new Map();
-  // Count goals
   const goalScorers = new Map();
   const assists = new Map();
-  let oppositionGoals = 0;  // Initialize opposition goals counter
-  let teamGoals = 0;       // Initialize team goals counter
-  
-// Add a check if STATE.data is empty
-if (STATE.data && STATE.data.length > 0) {
-  STATE.data.forEach(({ goalScorerName, goalAssistName }) => {
-    if (goalScorerName === "Opposition Team") {
-      oppositionGoals++;
-    } else if (goalScorerName) { // Check if goalScorerName exists
-      teamGoals++;
-      goalScorers.set(goalScorerName, (goalScorers.get(goalScorerName) || 0) + 1);
-      if (goalAssistName) {
-        assists.set(goalAssistName, (assists.get(goalAssistName) || 0) + 1);
+  let oppositionGoals = 0;
+  let teamGoals = 0;
+
+  // Add a check if STATE.data is empty
+  if (STATE.data && STATE.data.length > 0) {
+    STATE.data.forEach(({ goalScorerName, goalAssistName }) => {
+      // Check if the goal scorer matches any historical team 2 name
+      if (STATE.team2History.includes(goalScorerName)) {
+        oppositionGoals++;
+      } else if (STATE.team1History.includes(goalScorerName) || goalScorerName) {
+        // Count goals for team 1 (includes goals by individual players)
+        teamGoals++;
+        goalScorers.set(goalScorerName, (goalScorers.get(goalScorerName) || 0) + 1);
+        if (goalAssistName) {
+          assists.set(goalAssistName, (assists.get(goalAssistName) || 0) + 1);
+        }
       }
-    }
-  });
-}
-  // Calculate total team goals directly from the counter
-  const totalTeamGoals = teamGoals;
+    });
+  }
+
+    // Get current team names for the report
+    const team1Name = elements.Team1NameElement.textContent;
+    const team2Name = elements.Team2NameElement.textContent;
+
   
   const topScorers = goalScorers.size > 0 
-  ? Array.from(goalScorers.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([name, goals]) => `${name}: ${goals}`)
-      .join(', ')
-  : 'None';
+    ? Array.from(goalScorers.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([name, goals]) => `${name}: ${goals}`)
+        .join(', ')
+    : 'None';
   
-const topAssists = assists.size > 0
-  ? Array.from(assists.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([name, assists]) => `${name}: ${assists}`)
-      .join(', ')
-  : 'None';
+  const topAssists = assists.size > 0
+    ? Array.from(assists.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([name, assists]) => `${name}: ${assists}`)
+        .join(', ')
+    : 'None';
   
   return {
-        statsstring:  `📊 Stats:\nTeam Goals: ${totalTeamGoals}\nOpposition Goals: ${oppositionGoals}\nTop Scorers: ${topScorers}\nTop Assists: ${topAssists}`,
-        teamGoals: totalTeamGoals,
-        oppositionGoals: oppositionGoals
-  }
+    statsstring: `📊 Stats:\nTeam Goals: ${teamGoals}\nOpposition Goals: ${oppositionGoals}\nTop Scorers: ${topScorers}\nTop Assists: ${topAssists}`,
+    teamGoals: teamGoals,
+    oppositionGoals: oppositionGoals
+  };
 }
 
 // Share to WhatsApp function
@@ -739,12 +756,14 @@ function initializeApp() {
   // Load saved team names
   const team1Name = Storage.load(STORAGE_KEYS.TEAM1_NAME, 'Netherton');
   const team2Name = Storage.load(STORAGE_KEYS.TEAM2_NAME, 'Opposition');
+  STATE.team1History = Storage.load(STORAGE_KEYS.TEAM1_HISTORY, ['Netherton']);
+  STATE.team2History = Storage.load(STORAGE_KEYS.TEAM2_HISTORY, ['Opposition']);
   elements.Team1NameElement.textContent = team1Name;
   elements.Team2NameElement.textContent = team2Name;
   const icon = elements.opgoalButton.querySelector('i')
 
- //elements.goalButton.innerHTML = icon.outerHTML + "GOAL " + team1Name;
- //elements.opgoalButton.innerHTML = icon.outerHTML + "GOAL " + team2Name;
+ 
+
   elements.goalButton.innerHTML =  "GOAL " + team1Name;
   elements.opgoalButton.innerHTML =  "GOAL " + team2Name;
 

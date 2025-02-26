@@ -613,7 +613,7 @@ function generateStats() {
     : 'None';
   
   return {
-    statsstring: `📊 Stats:\nTeam Goals: ${teamGoals}\nOpposition Goals: ${oppositionGoals}\nTop Scorers: ${topScorers}\nTop Assists: ${topAssists}`,
+    statsstring: `📊 Stats:\nTeam Goals: ${teamGoals}\nOpposition Goals: ${oppositionGoals}\n Team Top Scorers: ${topScorers}\n Team Top Assists: ${topAssists}`,
     teamGoals: teamGoals,
     oppositionGoals: oppositionGoals
   };

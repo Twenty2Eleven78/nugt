@@ -376,6 +376,23 @@ function updateLog() {
   const allEvents = [...goalEntries, ...eventEntries]
     .sort((a, b) => a.rawTime - b.rawTime)
 
+   // Check if there are any events
+   if (allEvents.length === 0) {
+    // Display a message when there are no events
+    elements.log.innerHTML = `
+      <div class="empty-timeline-message">
+        <div class="text-center p-4">
+          <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+          <h5>No events recorded yet</h5>
+          <p class="text-muted">
+            Match events and goals will appear here as they happen.
+          </p>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
   // Create timeline HTML
   let timelineHTML = '<div class="timeline">';
 

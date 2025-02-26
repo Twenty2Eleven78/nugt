@@ -85,21 +85,54 @@ body {
     max-width: 720px;
     margin: 0 auto;
   }
+  .timeline {
+    margin-left: 0;
+  }
+
   .timeline::before {
-    left: 30px;
+    left: 50%;
+    transform: translateX(-50%);
   }
-  .timeline-item-left, .timeline-item-right {
-   padding-left: 60px;
-   padding-right: 0;
+
+  .timeline-item {
+    padding-left: 0;
   }
-    
+
+  .timeline-item-left {
+    padding-right: 50%;
+    padding-left: 0;
+  }
+
+  .timeline-item-right {
+    padding-left: 50%;
+    padding-right: 0;
+  }
+
   .timeline-marker {
-    left: 30px;
+    left: 50%;
   }
-    
-  .timeline-content {
-    margin-left: 30px !important;
-    margin-right: 0 !important;
+
+  .timeline-item-left .timeline-content {
+    margin-right: 30px;
+    margin-left: 0;
+  }
+
+  .timeline-item-right .timeline-content {
+    margin-left: 30px;
+    margin-right: 0;
+  }
+
+  .timeline-time {
+    font-size: 1rem;
+  }
+
+  .timeline-body {
+    font-size: 1rem;
+  }
+
+  .timeline-content .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
   }
 }
 .readme-content {
@@ -151,6 +184,7 @@ body {
 .timeline {
   position: relative;
   padding: 20px 0;
+  margin-left: 30px; /* Give space for the timeline on the left */
 }
 
 .timeline::before {
@@ -158,32 +192,31 @@ body {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 50%;
+  left: 0;
   width: 2px;
   background: #ddd;
-  transform: translateX(-50%);
 }
 
 .timeline-item {
   position: relative;
   margin-bottom: 20px;
   width: 100%;
+  padding-left: 20px; /* Space for the timeline marker */
 }
 
-.timeline-item-left {
-  padding-right: 50%;
-}
-
+/* Remove the left/right alternating pattern for mobile */
+.timeline-item-left,
 .timeline-item-right {
-  padding-left: 50%;
+  padding-right: 0;
+  padding-left: 20px;
 }
 
 .timeline-marker {
   position: absolute;
   top: 15px;
-  left: 50%;
-  width: 15px;
-  height: 15px;
+  left: 0;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: #007bff;
   transform: translateX(-50%);
@@ -204,23 +237,31 @@ body {
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   background: white;
-  margin: 0 15px;
+  margin-left: 10px;
+  width: calc(100% - 10px);
 }
 
-.timeline-item-left .timeline-content {
-  margin-right: 30px;
-}
-
+/* Remove the left/right specific margins */
+.timeline-item-left .timeline-content,
 .timeline-item-right .timeline-content {
-  margin-left: 30px;
+  margin-right: 0;
+  margin-left: 10px;
 }
 
 .timeline-time {
   font-weight: bold;
   color: #007bff;
   margin-bottom: 5px;
+  font-size: 0.9rem;
 }
 
 .timeline-body {
   padding: 5px 0;
+  font-size: 0.95rem;
+}
+
+/* Make buttons smaller on mobile */
+.timeline-content .btn-sm {
+  padding: 0.2rem 0.4rem;
+  font-size: 0.75rem;
 }

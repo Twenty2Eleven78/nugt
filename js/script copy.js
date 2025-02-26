@@ -375,110 +375,47 @@ function updateLog() {
 
   const allEvents = [...goalEntries, ...eventEntries]
     .sort((a, b) => a.rawTime - b.rawTime)
-
-  // Create timeline HTML
-  let timelineHTML = '<div class="timeline">';
-
-  allEvents.forEach((event, index) => {
-    const isLeft = index % 2 === 0; // Alternate sides for visual appeal
-    const timelineItemClass = isLeft ? 'timeline-item-left' : 'timeline-item-right';
-
-    if (event.updatetype === 'matchEvent') {
-      // Match event
-      const cardClass = getEventCardClass(event.type);
-      const icon = getEventIcon(event.type);
-      const scoreInfo = event.score ? ` (${event.score})` : '';
-      
-      timelineHTML += `
-        <div class="timeline-item ${timelineItemClass}">
-          <div class="timeline-marker"></div>
-          <div class="timeline-content ${cardClass}">
-            <div class="timeline-time">${event.timestamp}'</div>
-            <div class="timeline-body">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>${icon} <strong>${event.type}</strong>${scoreInfo}</div>
-                <button class="btn btn-sm btn-outline-danger" 
-                  onclick="deleteLogEntry(${event.originalIndex}, 'event')" 
-                  aria-label="Delete event">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
+    .map(event => {
+      if (event.updatetype === 'matchEvent') {
+        // Match event
+        const cardClass = getEventCardClass(event.type);
+        const icon = getEventIcon(event.type);
+        const scoreInfo = event.score ? ` (${event.score})` : '';
+        return `<div class="card mb-2 ${cardClass}">
+          <div class="card-body p-2 d-flex justify-content-between align-items-center">
+            <div>
+              <span>${event.timestamp}'</span> - ${icon} <strong>${event.type}</strong>${scoreInfo}
             </div>
+            <button class="btn btn-sm btn-outline-danger" 
+              onclick="deleteLogEntry(${event.originalIndex}, 'event')" 
+              aria-label="Delete event">
+              <i class="fas fa-trash"></i>
+            </button>
           </div>
         </div>`;
-    } else {
-       // Goal event
-       const team2Name = elements.Team2NameElement.textContent;
-       const isOppositionGoal = event.goalScorerName === team2Name || event.goalScorerName === 'Opposition Team';
-       const cardClass = isOppositionGoal ? 'border-danger border-2' : 'border-success border-2';
-       const icon = '⚽';
-       
-       timelineHTML += `
-         <div class="timeline-item ${timelineItemClass}">
-           <div class="timeline-marker ${isOppositionGoal ? 'marker-danger' : 'marker-success'}"></div>
-           <div class="timeline-content ${cardClass}">
-             <div class="timeline-time">${event.timestamp}'</div>
-             <div class="timeline-body">
-               <div class="d-flex justify-content-between align-items-center">
-                 <div>
-                   ${icon} <strong>${isOppositionGoal ? `<font color="red"> ${team2Name} Goal</font>` : 'Goal:'}</strong>
-                   ${isOppositionGoal ? '' : ` ${event.goalScorerName}, <strong>Assist:</strong> ${event.goalAssistName}`}
-                 </div>
-                 <button class="btn btn-sm btn-outline-danger" 
-                   onclick="deleteLogEntry(${event.originalIndex}, 'goal')" 
-                   aria-label="Delete goal">
-                   <i class="fas fa-trash"></i>
-                 </button>
-               </div>
-             </div>
-           </div>
-         </div>`;
-     }
-   });
-   
-   timelineHTML += '</div>';
-
-   // .map(event => {
-   //   if (event.updatetype === 'matchEvent') {
-        // Match event
-        // const cardClass = getEventCardClass(event.type);
-        // const icon = getEventIcon(event.type);
-        // const scoreInfo = event.score ? ` (${event.score})` : '';
-    //     return `<div class="card mb-2 ${cardClass}">
-    //       <div class="card-body p-2 d-flex justify-content-between align-items-center">
-    //         <div>
-    //           <span>${event.timestamp}'</span> - ${icon} <strong>${event.type}</strong>${scoreInfo}
-    //         </div>
-    //         <button class="btn btn-sm btn-outline-danger" 
-    //           onclick="deleteLogEntry(${event.originalIndex}, 'event')" 
-    //           aria-label="Delete event">
-    //           <i class="fas fa-trash"></i>
-    //         </button>
-    //       </div>
-    //     </div>`;
-    //   } else {
-    //     // Goal event (existing logic)
-    //     const team2Name = elements.Team2NameElement.textContent;
-    //     const isOppositionGoal = event.goalScorerName === team2Name || event.goalScorerName === 'Opposition Team';
-    //     const cardClass = isOppositionGoal ? 'border-danger border-2' : 'border-success border-2';
+      } else {
+        // Goal event (existing logic)
+        const team2Name = elements.Team2NameElement.textContent;
+        const isOppositionGoal = event.goalScorerName === team2Name || event.goalScorerName === 'Opposition Team';
+        const cardClass = isOppositionGoal ? 'border-danger border-2' : 'border-success border-2';
         
-    //     return `<div class="card mb-2 ${cardClass}">
-    //       <div class="card-body p-2 d-flex justify-content-between align-items-center">
-    //         <div>
-    //           <span>${event.timestamp}'</span> - 
-    //           <strong>${isOppositionGoal ? `<font color="red"> ${team2Name} Goal</font>` : 'Goal:'}</strong>
-    //           ${isOppositionGoal ? '' : ` ${event.goalScorerName}, <strong>Assist:</strong> ${event.goalAssistName}`}
-    //         </div>
-    //         <button class="btn btn-sm btn-outline-danger" 
-    //           onclick="deleteLogEntry(${event.originalIndex}, 'goal')" 
-    //           aria-label="Delete goal">
-    //           <i class="fas fa-trash"></i>
-    //         </button>
-    //       </div>
-    //     </div>`;
-    //   }
-    // })
-    // .join('');
+        return `<div class="card mb-2 ${cardClass}">
+          <div class="card-body p-2 d-flex justify-content-between align-items-center">
+            <div>
+              <span>${event.timestamp}'</span> - 
+              <strong>${isOppositionGoal ? `<font color="red"> ${team2Name} Goal</font>` : 'Goal:'}</strong>
+              ${isOppositionGoal ? '' : ` ${event.goalScorerName}, <strong>Assist:</strong> ${event.goalAssistName}`}
+            </div>
+            <button class="btn btn-sm btn-outline-danger" 
+              onclick="deleteLogEntry(${event.originalIndex}, 'goal')" 
+              aria-label="Delete goal">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>`;
+      }
+    })
+    .join('');
     
   elements.log.innerHTML = allEvents;
 }

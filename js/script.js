@@ -437,6 +437,7 @@ function updateLog() {
    });
    
    timelineHTML += '</div>';
+   elements.log.innerHTML = timelineHTML;
 
    // .map(event => {
    //   if (event.updatetype === 'matchEvent') {
@@ -480,7 +481,7 @@ function updateLog() {
     // })
     // .join('');
     
-  elements.log.innerHTML = allEvents;
+  //elements.log.innerHTML = allEvents;
 }
 
 //

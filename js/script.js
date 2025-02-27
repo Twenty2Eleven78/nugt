@@ -258,18 +258,30 @@ function formatMatchTime(seconds) {
 // Add event handlers
 function addMatchEvent(eventType) {
   const currentSeconds = getCurrentSeconds();
+  const team1Name = elements.Team1NameElement.textContent;
+  const team2Name = elements.Team2NameElement.textContent;
+
   const eventData = {
     timestamp: formatMatchTime(currentSeconds), // Use new format
     type: eventType,
     rawTime: currentSeconds
   };
 
+ // Determine if this event is related to a specific team
+ if (eventType.includes(team1Name)) {
+  eventData.team = 1;
+  eventData.teamName = team1Name;
+ } else if (eventType.includes(team2Name)) {
+  eventData.team = 2;
+  eventData.teamName = team2Name;
+ }
+
   if (eventType === 'Half Time') {
     const team1Score = elements.firstScoreElement.textContent;
     const team2Score = elements.secondScoreElement.textContent;
-    const team1Name = elements.Team1NameElement.textContent;
-    const team2Name = elements.Team2NameElement.textContent;
     eventData.score = `${team1Name} ${team1Score} - ${team2Score} ${team2Name}`;
+    eventData.team1Name = team1Name;
+    eventData.team2Name = team2Name;
 
     // Handle half time transition
     handleHalfTime();
@@ -278,10 +290,10 @@ function addMatchEvent(eventType) {
   if (eventType === 'Full Time') {
     const team1Score = elements.firstScoreElement.textContent;
     const team2Score = elements.secondScoreElement.textContent;
-    const team1Name = elements.Team1NameElement.textContent;
-    const team2Name = elements.Team2NameElement.textContent;
     eventData.score = `${team1Name} ${team1Score} - ${team2Score} ${team2Name}`;
-// Handle half time transition
+    eventData.team1Name = team1Name;
+    eventData.team2Name = team2Name;
+    // Handle half time transition
     handleFullTime()
   }
 
@@ -304,12 +316,15 @@ function addGoal(event) {
   const goalScorerName = elements.goalScorer.value;
   const goalAssistName = elements.goalAssist.value;
   const currentSeconds = getCurrentSeconds();
+  const team1Name = elements.Team1NameElement.textContent;
   
   const goalData = {
     timestamp: formatMatchTime(currentSeconds), // Use new format
     goalScorerName,
     goalAssistName,
-    rawTime: currentSeconds
+    rawTime: currentSeconds,
+    team: 1, // Indicate this is a team 1 goal
+    teamName: team1Name // Store the current team name
   };
   
   //update log
@@ -334,7 +349,9 @@ function opaddGoal() {
     timestamp: formatMatchTime(currentSeconds), // Use new format
     goalScorerName: team2Name,
     goalAssistName: team2Name,
-    rawTime: currentSeconds
+    rawTime: currentSeconds,
+    team: 2, // Indicate this is a team 2 goal
+    teamName: team2Name // Store the current team name
   };
   
   //update log
@@ -358,6 +375,10 @@ function closeGoalModal() {
 
 // Update Goal Log
 function updateLog() {
+
+  // Get current team names
+  const currentTeam1Name = elements.Team1NameElement.textContent;
+  const currentTeam2Name = elements.Team2NameElement.textContent;
 
   // Create separate arrays for each type with their original indices
   const goalEntries = STATE.data.map((event, index) => ({
@@ -405,29 +426,47 @@ function updateLog() {
       // Match event
       const cardClass = getEventCardClass(event.type);
       const icon = getEventIcon(event.type);
-      const scoreInfo = event.score ? ` (${event.score})` : '';
+      
+      // Use the stored team names if available, otherwise use current names
+      let eventText = event.type;
+      let scoreInfo = event.score ? ` (${event.score})` : '';
+
+      // If the event has team-specific information, use the stored team names
+      if (event.teamName) {
+        // Replace any occurrences of old team names with current ones
+        if (event.team === 1) {
+          eventText = event.type.replace(event.teamName, currentTeam1Name);
+        } else if (event.team === 2) {
+          eventText = event.type.replace(event.teamName, currentTeam2Name);
+        }
+      }
       
       timelineHTML += `
-        <div class="timeline-item ${timelineItemClass}">
-          <div class="timeline-marker"></div>
-          <div class="timeline-content ${cardClass}">
-            <div class="timeline-time">${event.timestamp}'</div>
-            <div class="timeline-body">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>${icon} <strong>${event.type}</strong>${scoreInfo}</div>
-                <button class="btn btn-sm btn-outline-danger" 
-                  onclick="deleteLogEntry(${event.originalIndex}, 'event')" 
-                  aria-label="Delete event">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
+      <div class="timeline-item ${timelineItemClass}">
+        <div class="timeline-marker"></div>
+        <div class="timeline-content ${cardClass}">
+          <div class="timeline-time">${event.timestamp}'</div>
+          <div class="timeline-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>${icon} <strong>${eventText}</strong>${scoreInfo}</div>
+              <button class="btn btn-sm btn-outline-danger" 
+                onclick="deleteLogEntry(${event.originalIndex}, 'event')" 
+                aria-label="Delete event">
+                <i class="fas fa-trash"></i>
+              </button>
             </div>
           </div>
-        </div>`;
-    } else {
+        </div>
+      </div>`;
+  } else {
       // Goal event
-      const team2Name = elements.Team2NameElement.textContent;
-      const isOppositionGoal = event.goalScorerName === team2Name || event.goalScorerName === 'Opposition Team';
+      // Use the stored team names from the event itself
+      const goalTeam = event.team || (event.goalScorerName === currentTeam2Name ? 2 : 1);
+      const isOppositionGoal = goalTeam === 2;
+      
+      // Get the correct team name to display
+      const displayTeamName = isOppositionGoal ? currentTeam2Name : currentTeam1Name;
+      
       const cardClass = isOppositionGoal ? 'border-danger border-2' : 'border-success border-2';
       const icon = '⚽';
       
@@ -439,7 +478,7 @@ function updateLog() {
             <div class="timeline-body">
               <div class="d-flex justify-content-between align-items-center">
                 <div>
-                  ${icon} <strong>${isOppositionGoal ? `<font color="red"> ${team2Name} Goal</font>` : 'Goal:'}</strong>
+                  ${icon} <strong>${isOppositionGoal ? `<font color="red"> Goal: ${displayTeamName} </font>` : 'Goal:'}</strong>
                   ${isOppositionGoal ? '' : `<br><small>${event.goalScorerName}, <strong>Assist:</strong> ${event.goalAssistName}</small>`}
                 </div>
                 <button class="btn btn-sm btn-outline-danger" 
@@ -523,6 +562,10 @@ function updatefixtureTeams(team,teamName) {
     const team2Input = document.getElementById('team2Name');
     if (team2Input) team2Input.placeholder = teamName;
   }
+
+  // Update the timeline to reflect the new team names
+  updateLog();
+
   showNotification(`Team name updated to ${teamName}`, 'success');
 }
 

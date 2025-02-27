@@ -19,13 +19,6 @@
 const STATE = {
   seconds: 0,
   isRunning: false,
-  // ... rest of your existing code
-
-
-// State management
-const STATE = {
-  seconds: 0,
-  isRunning: false,
   intervalId: null,
   data: [],
   startTimestamp: null,

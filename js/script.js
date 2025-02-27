@@ -1,3 +1,27 @@
+/**
+ * Netherton United Game Time App (NUGT)
+ * 
+ * @description A web application for tracking football match events, goals, and statistics
+ * @version 3.2.0
+ * @author Mark Van-Kerro
+ * @date Last Updated: 2025-02-27
+ * 
+ * This script handles all the functionality for the game time application including:
+ * - Match timer management
+ * - Goal tracking and statistics
+ * - Match event logging
+ * - Team management
+ * - Data persistence using localStorage
+ * - WhatsApp sharing functionality
+ */
+
+// State management
+const STATE = {
+  seconds: 0,
+  isRunning: false,
+  // ... rest of your existing code
+
+
 // State management
 const STATE = {
   seconds: 0,
@@ -368,43 +392,44 @@ showNotification(`Goal scored by ${team2Name}!`, 'danger');
   elements.goalForm.reset();
 }
 
+// Goal Modal Auto close
 function closeGoalModal() {
   document.getElementById('goalModalClose').click();
   return false;
 }
 
-// Update Goal Log
+// Update Match Event Log
 function updateLog() {
 
   // Get current team names
   const currentTeam1Name = elements.Team1NameElement.textContent;
   const currentTeam2Name = elements.Team2NameElement.textContent;
 
-    // Create a single array with all events at once
-    const allEvents = [
-      ...STATE.data.map((event, index) => ({
-        ...event,
-        originalIndex: index,
-        updatetype: 'goal'
-      })),
-      ...STATE.matchEvents.map((event, index) => ({
-        ...event,
-        originalIndex: index,
-        updatetype: 'matchEvent'
-      }))
-    ].sort((a, b) => a.rawTime - b.rawTime);
+  // Create a single array with all events at once
+  const allEvents = [
+    ...STATE.data.map((event, index) => ({
+      ...event,
+      originalIndex: index,
+      updatetype: 'goal'
+    })),
+    ...STATE.matchEvents.map((event, index) => ({
+      ...event,
+      originalIndex: index,
+      updatetype: 'matchEvent'
+    }))
+  ].sort((a, b) => a.rawTime - b.rawTime);
 
-   // Check if there are any events
-   if (allEvents.length === 0) {
-     elements.log.innerHTML = `
-      <div class="empty-timeline-message">
-        <div class="text-center p-4">
-          <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
-          <h5>No events recorded yet</h5>
-          <p class="text-muted">
-            Match events and goals will appear here as they happen.
-          </p>
-        </div>
+  // Check if there are any events
+  if (allEvents.length === 0) {
+    elements.log.innerHTML = `
+     <div class="empty-timeline-message">
+       <div class="text-center p-4">
+         <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+         <h5>No events recorded yet</h5>
+         <p class="text-muted">
+           Match events and goals will appear here as they happen.
+         </p>
+       </div>
       </div>
     `;
     return;
@@ -501,7 +526,7 @@ function updateLog() {
   elements.log.appendChild(fragment);
 }
 
-//
+//Delete Log Entry
 function deleteLogEntry(index, type) {
   if (type === 'goal') {
     STATE.data.splice(index, 1);

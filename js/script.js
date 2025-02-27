@@ -380,27 +380,23 @@ function updateLog() {
   const currentTeam1Name = elements.Team1NameElement.textContent;
   const currentTeam2Name = elements.Team2NameElement.textContent;
 
-  // Create separate arrays for each type with their original indices
-  const goalEntries = STATE.data.map((event, index) => ({
-    ...event,
-    originalIndex: index,
-    updatetype: 'goal'
-  }));
-  
-  const eventEntries = STATE.matchEvents.map((event, index) => ({
-    ...event,
-    originalIndex: index,
-    updatetype: 'matchEvent'
-  }));
-
-
-  const allEvents = [...goalEntries, ...eventEntries]
-    .sort((a, b) => a.rawTime - b.rawTime)
+    // Create a single array with all events at once
+    const allEvents = [
+      ...STATE.data.map((event, index) => ({
+        ...event,
+        originalIndex: index,
+        updatetype: 'goal'
+      })),
+      ...STATE.matchEvents.map((event, index) => ({
+        ...event,
+        originalIndex: index,
+        updatetype: 'matchEvent'
+      }))
+    ].sort((a, b) => a.rawTime - b.rawTime);
 
    // Check if there are any events
    if (allEvents.length === 0) {
-    // Display a message when there are no events
-    elements.log.innerHTML = `
+     elements.log.innerHTML = `
       <div class="empty-timeline-message">
         <div class="text-center p-4">
           <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
@@ -414,13 +410,15 @@ function updateLog() {
     return;
   }
 
-  // Create timeline HTML
-  let timelineHTML = '<div class="timeline">';
+  // Use DocumentFragment for better performance when building DOM
+  const fragment = document.createDocumentFragment();
+  const timelineContainer = document.createElement('div');
+  timelineContainer.className = 'timeline';
 
   allEvents.forEach((event, index) => {
-    // On mobile, we'll use a single column layout
-    // On desktop, we'll still alternate with CSS media queries
     const timelineItemClass = index % 2 === 0 ? 'timeline-item-left' : 'timeline-item-right';
+    const item = document.createElement('div');
+    item.className = `timeline-item ${timelineItemClass}`;
     
     if (event.updatetype === 'matchEvent') {
       // Match event
@@ -441,8 +439,12 @@ function updateLog() {
         }
       }
       
-      timelineHTML += `
-      <div class="timeline-item ${timelineItemClass}">
+      // If the event has score information, update team names in the score
+      if (event.score && event.team1Name && event.team2Name) {
+        scoreInfo = ` (${event.score.replace(event.team1Name, currentTeam1Name).replace(event.team2Name, currentTeam2Name)})`;
+      }
+      
+      item.innerHTML = `
         <div class="timeline-marker"></div>
         <div class="timeline-content ${cardClass}">
           <div class="timeline-time">${event.timestamp}'</div>
@@ -457,10 +459,10 @@ function updateLog() {
             </div>
           </div>
         </div>
-      </div>`;
-  } else {
+      `;
+    } else {
       // Goal event
-      // Use the stored team names from the event itself
+      // Use the stored team information if available
       const goalTeam = event.team || (event.goalScorerName === currentTeam2Name ? 2 : 1);
       const isOppositionGoal = goalTeam === 2;
       
@@ -468,33 +470,35 @@ function updateLog() {
       const displayTeamName = isOppositionGoal ? currentTeam2Name : currentTeam1Name;
       
       const cardClass = isOppositionGoal ? 'border-danger border-2' : 'border-success border-2';
-      const icon = '⚽';
+      const markerClass = isOppositionGoal ? 'marker-danger' : 'marker-success';
       
-      timelineHTML += `
-        <div class="timeline-item ${timelineItemClass}">
-          <div class="timeline-marker ${isOppositionGoal ? 'marker-danger' : 'marker-success'}"></div>
-          <div class="timeline-content ${cardClass}">
-            <div class="timeline-time">${event.timestamp}'</div>
-            <div class="timeline-body">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  ${icon} <strong>${isOppositionGoal ? `<font color="red"> Goal: ${displayTeamName} </font>` : 'Goal:'}</strong>
-                  ${isOppositionGoal ? '' : `<br><small>${event.goalScorerName}, <strong>Assist:</strong> ${event.goalAssistName}</small>`}
-                </div>
-                <button class="btn btn-sm btn-outline-danger" 
-                  onclick="deleteLogEntry(${event.originalIndex}, 'goal')" 
-                  aria-label="Delete goal">
-                  <i class="fas fa-trash"></i>
-                </button>
+      item.innerHTML = `
+        <div class="timeline-marker ${markerClass}"></div>
+        <div class="timeline-content ${cardClass}">
+          <div class="timeline-time">${event.timestamp}'</div>
+          <div class="timeline-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <strong>${isOppositionGoal ? `<font color="red"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</font>` : `<font color="green"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</font>`}</strong>
+                ${isOppositionGoal ? '' : `<br><small><strong>Scored By: </strong>${event.goalScorerName}, <strong>Assisted By:</strong> ${event.goalAssistName}</small>`}
               </div>
+              <button class="btn btn-sm btn-outline-danger" 
+                onclick="deleteLogEntry(${event.originalIndex}, 'goal')" 
+                aria-label="Delete goal">
+                <i class="fas fa-trash"></i>
+              </button>
             </div>
           </div>
-        </div>`;
+        </div>
+      `;
     }
+    
+    timelineContainer.appendChild(item);
   });
   
-  timelineHTML += '</div>';
-  elements.log.innerHTML = timelineHTML;
+  fragment.appendChild(timelineContainer);
+  elements.log.innerHTML = '';
+  elements.log.appendChild(fragment);
 }
 
 //

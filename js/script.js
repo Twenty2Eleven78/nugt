@@ -677,49 +677,56 @@ function generateStats() {
   let oppositionGoals = 0;
   let teamGoals = 0;
 
-  // Add a check if STATE.data is empty
-  if (STATE.data && STATE.data.length > 0) {
-    STATE.data.forEach(({ goalScorerName, goalAssistName }) => {
-      // Check if the goal scorer matches any historical team 2 name
-      if (STATE.team2History.includes(goalScorerName)) {
-        oppositionGoals++;
-      } else if (STATE.team1History.includes(goalScorerName) || goalScorerName) {
+// Add a check if STATE.data is empty
+if (STATE.data && STATE.data.length > 0) {
+  STATE.data.forEach(({ goalScorerName, goalAssistName }) => {
+    // Check if the goal scorer matches any historical team 2 name
+    if (STATE.team2History.includes(goalScorerName)) {
+      oppositionGoals++;
+    } else if (STATE.team1History.includes(goalScorerName) || goalScorerName) {
+      // Exclude 'N/A' and empty entries
+      if (goalScorerName && goalScorerName.trim() !== '' && goalScorerName !== 'N/A') {
         // Count goals for team 1 (includes goals by individual players)
         teamGoals++;
         goalScorers.set(goalScorerName, (goalScorers.get(goalScorerName) || 0) + 1);
-        if (goalAssistName) {
-          assists.set(goalAssistName, (assists.get(goalAssistName) || 0) + 1);
-        }
       }
-    });
-  }
 
-    // Get current team names for the report
-    const team1Name = elements.Team1NameElement.textContent;
-    const team2Name = elements.Team2NameElement.textContent;
+      // Handle assists, excluding 'N/A' and empty entries
+      if (goalAssistName && goalAssistName.trim() !== '' && goalAssistName !== 'N/A') {
+        assists.set(goalAssistName, (assists.get(goalAssistName) || 0) + 1);
+      }
+    }
+  });
+}
+
+  // Get current team names for the report
+  const team1Name = elements.Team1NameElement.textContent;
+  const team2Name = elements.Team2NameElement.textContent;
 
   
-  const topScorers = goalScorers.size > 0 
-    ? Array.from(goalScorers.entries())
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([name, goals]) => `${name}: ${goals}`)
-        .join(', ')
+  // Sort goal scorers and assists by number of goals/assists in descending order
+  const sortedScorers = Array.from(goalScorers.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, goals]) => `${name}: ${goals}`);
+  
+  const sortedAssists = Array.from(assists.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, assistCount]) => `${name}: ${assistCount}`);
+
+  // Prepare stats string with full lists
+  const scorersString = sortedScorers.length > 0 
+    ? sortedScorers.join('\n')
     : 'None';
   
-  const topAssists = assists.size > 0
-    ? Array.from(assists.entries())
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([name, assists]) => `${name}: ${assists}`)
-        .join(', ')
+  const assistsString = sortedAssists.length > 0
+    ? sortedAssists.join('\n')
     : 'None';
   
-  return {
-    statsstring: `📊 Stats:\nTeam Goals: ${teamGoals}\nOpposition Goals: ${oppositionGoals}\n Team Top Scorers: ${topScorers}\n Team Top Assists: ${topAssists}`,
-    teamGoals: teamGoals,
-    oppositionGoals: oppositionGoals
-  };
+    return {
+      statsstring: `📊 Stats:\nTeam Goals: ${teamGoals}\nOpposition Goals: ${oppositionGoals}\n\n🥅 Team Goal Scorers:\n${scorersString}\n\n🤝 Team Assists:\n${assistsString}`,
+      teamGoals: teamGoals,
+      oppositionGoals: oppositionGoals
+    };
 }
 
 // Share to WhatsApp function

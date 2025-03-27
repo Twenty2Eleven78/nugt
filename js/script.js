@@ -506,11 +506,17 @@ function updateLog() {
                 <strong>${isOppositionGoal ? `<font color="red"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</font>` : `<font color="green"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</font>`}</strong>
                 ${isOppositionGoal ? '' : `<br><small><strong>Scored By: </strong>${event.goalScorerName}, <strong>Assisted By:</strong> ${event.goalAssistName}</small>`}
               </div>
-              <button class="btn btn-sm btn-outline-danger" 
-                onclick="deleteLogEntry(${event.originalIndex}, 'goal')" 
-                aria-label="Delete goal">
-                <i class="fas fa-trash"></i>
-              </button>
+              <div>
+                <button class="btn btn-sm btn-outline-primary me-2" 
+                   onclick="openEditEventModal(${event.originalIndex}, '${event.updatetype}')">
+                  <i class="fas fa-edit"></i>
+                </button>
+               <button class="btn btn-sm btn-outline-danger" 
+                 onclick="deleteLogEntry(${event.originalIndex}, 'goal')" 
+                 aria-label="Delete goal">
+                 <i class="fas fa-trash"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>

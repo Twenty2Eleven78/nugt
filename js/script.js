@@ -52,6 +52,9 @@ const elements = {
   gameTimeSelect: document.getElementById('gameTimeSelect')
 };
 
+let editingEventIndex = null;
+let editingEventType = null;
+
 // Constants
 const STORAGE_KEYS = {
   START_TIMESTAMP: 'nugt_startTimestamp',
@@ -463,7 +466,7 @@ function updateLog() {
       }
       
       item.innerHTML = `
-        <div class="timeline-marker" ${markerClass}></div>
+        <div class="timeline-marker"></div>
         <div class="timeline-content ${cardClass}">
           <div class="timeline-time">${event.timestamp}'</div>
           <div class="timeline-body">
@@ -554,6 +557,54 @@ function deleteLogEntry(index, type) {
   
   updateLog();
   showNotification('Entry deleted', 'danger');
+}
+
+// Open the Edit Event Modal
+function openEditEventModal(index, type) {
+  editingEventIndex = index;
+  editingEventType = type;
+
+  // Get the current event time
+  const event = type === 'goal' ? STATE.data[index] : STATE.matchEvents[index];
+  const currentMinutes = Math.floor(event.rawTime / 60);
+
+  // Set the current time in the modal input
+  document.getElementById('editEventTime').value = currentMinutes;
+
+  // Show the modal
+  const editEventModal = new bootstrap.Modal(document.getElementById('editEventModal'));
+  editEventModal.show();
+}
+
+function handleEditEventFormSubmission(event) {
+  event.preventDefault();
+
+  // Get the new time from the input
+  const newMinutes = parseInt(document.getElementById('editEventTime').value, 10);
+  const newRawTime = newMinutes * 60;
+
+  // Update the event time
+  if (editingEventType === 'goal') {
+    STATE.data[editingEventIndex].rawTime = newRawTime;
+    STATE.data[editingEventIndex].timestamp = formatMatchTime(newRawTime);
+  } else if (editingEventType === 'matchEvent') {
+    STATE.matchEvents[editingEventIndex].rawTime = newRawTime;
+    STATE.matchEvents[editingEventIndex].timestamp = formatMatchTime(newRawTime);
+  }
+
+  // Save the updated state to localStorage
+  Storage.save(STORAGE_KEYS.GOALS, STATE.data);
+  Storage.save(STORAGE_KEYS.MATCH_EVENTS, STATE.matchEvents);
+
+  // Re-render the log
+  updateLog();
+
+  // Hide the modal
+  const editEventModal = bootstrap.Modal.getInstance(document.getElementById('editEventModal'));
+  editEventModal.hide();
+
+  // Show a notification
+  showNotification('Event time updated successfully!', 'success');
 }
 
 //Update Score Board Scores
@@ -927,6 +978,7 @@ document.getElementById('FullTimeButton').addEventListener('click', () => addMat
 document.getElementById('IncidentButton').addEventListener('click', () => addMatchEvent('Incident'));
 document.getElementById('PenaltyButton').addEventListener('click', () => addMatchEvent('Penalty'));
 elements.gameTimeSelect.addEventListener('change', handleGameTimeChange);
+document.getElementById('editEventForm').addEventListener('submit', handleEditEventFormSubmission);
 
   // Update Team 1 button click handler
   elements.updTeam1Btn.addEventListener('click', () => {

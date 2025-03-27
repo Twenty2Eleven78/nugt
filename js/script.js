@@ -463,17 +463,23 @@ function updateLog() {
       }
       
       item.innerHTML = `
-        <div class="timeline-marker"></div>
+        <div class="timeline-marker" ${markerClass}></div>
         <div class="timeline-content ${cardClass}">
           <div class="timeline-time">${event.timestamp}'</div>
           <div class="timeline-body">
             <div class="d-flex justify-content-between align-items-center">
               <div>${icon} <strong>${eventText}</strong>${scoreInfo}</div>
-              <button class="btn btn-sm btn-outline-danger" 
-                onclick="deleteLogEntry(${event.originalIndex}, 'event')" 
-                aria-label="Delete event">
-                <i class="fas fa-trash"></i>
-              </button>
+              <div>
+                <button class="btn btn-sm btn-outline-primary" 
+                 onclick="openEditEventModal(${event.originalIndex}, '${event.updatetype}')">
+                 <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" 
+                  onclick="deleteLogEntry(${event.originalIndex}, 'event')" 
+                  aria-label="Delete event">
+                 <i class="fas fa-trash"></i>
+                 </button>
+              </div>
             </div>
           </div>
         </div>

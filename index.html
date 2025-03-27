@@ -372,6 +372,28 @@
 </div>
 <!-- END Goal Modal -->
 
+<!-- Edit Event Modal -->
+<div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editEventModalLabel">Edit Event Time</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editEventForm">
+          <div class="mb-3">
+            <label for="editEventTime" class="form-label">Event Time (in minutes)</label>
+            <input type="number" class="form-control" id="editEventTime" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END Edit Event Modal -->
+
 <!-- Roster Modal -->
   <div class="modal fade" id="rosterModal" tabindex="-1">
     <div class="modal-dialog">

@@ -27,6 +27,7 @@ const STATE = {
   isSecondHalf: false,
   team1History: ['Netherton'], // Initialize with default name
   team2History: ['Opposition'], // Initialize with default name
+  pendingGoalTimestamp: null,
 };
  
 // DOM Elements
@@ -329,13 +330,22 @@ function addMatchEvent(eventType) {
   Storage.save(STORAGE_KEYS.MATCH_EVENTS, STATE.matchEvents);
 }
 
+function showGoalModal() {
+  // Capture the timestamp when the goal button is first clicked
+  STATE.pendingGoalTimestamp = getCurrentSeconds();
+  
+  // Show the modal
+  const goalModal = new bootstrap.Modal(document.getElementById('goalModal'));
+  goalModal.show();
+}
+
 // Add Team Goal
 function addGoal(event) {
   event.preventDefault();
   
   const goalScorerName = elements.goalScorer.value;
   const goalAssistName = elements.goalAssist.value;
-  const currentSeconds = getCurrentSeconds();
+  const currentSeconds = STATE.pendingGoalTimestamp || getCurrentSeconds(); // Use stored timestamp
   const team1Name = elements.Team1NameElement.textContent;
   
   const goalData = {
@@ -347,6 +357,9 @@ function addGoal(event) {
     teamName: team1Name // Store the current team name
   };
   
+  // Reset the pending timestamp
+  STATE.pendingGoalTimestamp = null;
+
   //update log
   STATE.data.push(goalData);
   updateLog();
@@ -414,6 +427,7 @@ function updateLog() {
       updatetype: 'matchEvent'
     }))
   ].sort((a, b) => a.rawTime - b.rawTime);
+  
 
   // Check if there are any events
   if (allEvents.length === 0) {
@@ -986,6 +1000,9 @@ document.getElementById('editEventForm').addEventListener('submit', handleEditEv
     if (newTeamName) {
       updatefixtureTeams('first', newTeamName);
       elements.team1Input.value = '';
+      // Close the modal using Bootstrap's modal instance
+      const modal = bootstrap.Modal.getInstance(document.getElementById('fixtureModalTeam1'));
+      modal.hide();
     }
   });
 
@@ -995,6 +1012,9 @@ document.getElementById('editEventForm').addEventListener('submit', handleEditEv
     if (newTeamName) {
       updatefixtureTeams('second', newTeamName);
       elements.team2Input.value = '';
+      // Close the modal using Bootstrap's modal instance
+      const modal = bootstrap.Modal.getInstance(document.getElementById('fixtureModalTeam2'));
+      modal.hide();
     }
   });
 

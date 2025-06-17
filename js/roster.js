@@ -34,8 +34,8 @@ const RosterManager = (function() {
         return getDefaultRoster();
       }
 
-      if (parsedRoster.length === 0) {
-        return []; // Valid empty roster
+      if (parsedRoster.length === 0) { // If the stored roster is empty
+        return getDefaultRoster(); // Load default roster
       }
 
       let processedRoster = [];

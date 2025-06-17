@@ -5,7 +5,7 @@ const RosterManager = (function() {
   // Private variables
   const STORAGE_KEY = 'goalTracker_roster';
   let roster = [];
-  let currentlyEditingPlayerName = null; // Track editing state
+  // let currentlyEditingPlayerName = null; // Removed for string-based roster
 
   // Save roster to local storage
   function saveRoster() {
@@ -23,48 +23,39 @@ const RosterManager = (function() {
   function loadRoster() {
     try {
       const savedRosterJSON = localStorage.getItem(STORAGE_KEY);
-      // Case 1: No roster in localStorage, use default.
-      if (savedRosterJSON === null) { // More explicit check for null
+      if (savedRosterJSON === null) {
         return getDefaultRoster();
       }
 
       const parsedRoster = JSON.parse(savedRosterJSON);
 
-      // Ensure parsedRoster is an array. If not, it's corrupted.
       if (!Array.isArray(parsedRoster)) {
         console.warn('Invalid roster format in localStorage (not an array). Using default roster.');
         return getDefaultRoster();
       }
 
-      // Case 2: localStorage has an empty array "[]". This is a valid, intentionally empty roster.
       if (parsedRoster.length === 0) {
-        return [];
+        return []; // Valid empty roster
       }
 
-      // Case 3: Migration for old format (array of strings).
-      if (typeof parsedRoster[0] === 'string') {
-        // Additional check: ensure all elements are strings for safety, though less likely if first is.
-        // For simplicity here, we trust the initial typeof check is sufficient for this migration path.
-        return parsedRoster.map(playerName => ({ name: String(playerName), shirtNumber: null })); // Ensure playerName is string
-      }
-
-      // Case 4: It's an array of objects (new format).
-      // Also check that player.name exists, otherwise it's not a valid player object.
+      let processedRoster = [];
       if (typeof parsedRoster[0] === 'object' && parsedRoster[0] !== null && parsedRoster[0].hasOwnProperty('name')) {
-        // Optional: Add more validation here to check if objects have 'name' property.
-        // For now, assume structure is correct if it's an array of objects with name property.
-        // We also ensure that all items in the array are valid objects
-        if (parsedRoster.every(player => typeof player === 'object' && player !== null && player.hasOwnProperty('name'))) {
-          return parsedRoster;
-        } else {
-          console.warn('Invalid roster items in localStorage (some items are not valid player objects). Using default roster.');
-          return getDefaultRoster();
-        }
+        // Migrate from object array to string array
+        processedRoster = parsedRoster
+          .map(player => player.name)
+          .filter(name => typeof name === 'string' && name.trim() !== '');
+      } else if (typeof parsedRoster[0] === 'string') {
+        // Already a string array
+        processedRoster = parsedRoster.filter(name => typeof name === 'string' && name.trim() !== '');
+      } else {
+        // Unrecognized format
+        console.warn('Unrecognized roster format in localStorage. Using default roster.');
+        return getDefaultRoster();
       }
 
-      // Case 5: Unrecognized array format (e.g., array of numbers, mixed types not caught above).
-      console.warn('Unrecognized roster format in localStorage. Using default roster.');
-      return getDefaultRoster();
+      // Ensure uniqueness and sort
+      const uniqueRoster = [...new Set(processedRoster)];
+      return uniqueRoster.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 
     } catch (error) {
       console.error('Error loading or parsing roster:', error);
@@ -77,31 +68,27 @@ const RosterManager = (function() {
 
   // Set a default roster if no roster is stored
   function getDefaultRoster() {
+    // Returns a sorted array of unique player name strings
     return [
-      { name: 'A-R.Obidi', shirtNumber: '1' }, { name: 'A.Seaman', shirtNumber: '1' },
-      { name: 'D.Peacock', shirtNumber: '1' }, { name: 'E.Doyle', shirtNumber: '1' },
-      { name: 'E.Van-Kerro', shirtNumber: '1' }, { name: 'E.Mutiti', shirtNumber: '1' },
-      { name: 'F.Asadi', shirtNumber: '1' }, { name: 'F.Kendall', shirtNumber: '1' },
-      { name: 'H.Strowthers', shirtNumber: '1' }, { name: 'M.Finch', shirtNumber: '1' },
-      { name: 'M.Stevens', shirtNumber: '1' }, { name: 'N.Janicka', shirtNumber: '1' },
-      { name: 'S.Smith', shirtNumber: '1' }, { name: 'T.Rushmer', shirtNumber: '1' },
-      { name: 'V.Aig-Imoru', shirtNumber: '1' }
-    ].sort((a, b) => a.name.localeCompare(b.name)); // Keep default sorted
+      'A-R.Obidi','A.Seaman','D.Peacock','E.Doyle','E.Van-Kerro','E.Mutiti',
+      'F.Asadi','F.Kendall','H.Strowthers','M.Finch','M.Stevens','N.Janicka',
+      'S.Smith','T.Rushmer','V.Aig-Imoru'
+    ].sort();
   }
 
   // Public interface
   return {
     // Initialize roster
     init() {
-      roster = loadRoster();
+      roster = loadRoster(); // roster is now an array of strings
       this.updateSelects();
       this.updateRosterList();
       this.bindEvents();
     },
 
-    // Get current roster (returns array of names for compatibility)
+    // Get current roster
     getRoster() {
-      return roster.map(player => player.name);
+      return [...roster]; // Return a copy of the string array
     },
 
     // Update select dropdowns
@@ -160,16 +147,15 @@ const RosterManager = (function() {
     updateRosterList() {
       const rosterList = document.getElementById('rosterList');
       if (rosterList) {
-        rosterList.innerHTML = roster
+        rosterList.innerHTML = roster // roster is an array of strings
           .map(player => `
             <tr>
-              <td>${player.name}</td>
-              <td>${player.shirtNumber !== null && player.shirtNumber !== undefined ? player.shirtNumber : ''}</td>
+              <td>${player}</td>
               <td class="text-end">
-                <button class="btn btn-sm btn-outline-primary me-2 edit-player" data-player="${player.name}">
+                <button class="btn btn-sm btn-outline-primary me-2 edit-player" data-player="${player}">
                   <i class="fas fa-edit"></i> Edit
                 </button>
-                <button class="btn btn-sm btn-outline-danger remove-player" data-player="${player.name}">
+                <button class="btn btn-sm btn-outline-danger remove-player" data-player="${player}">
                   <i class="fas fa-trash"></i> Remove
                 </button>
               </td>
@@ -192,8 +178,8 @@ const RosterManager = (function() {
       }
     },
 
-    // Add a new player
-    addPlayer(name, shirtNumber = null) {
+    // Add a new player (string)
+    addPlayer(name) {
       if (!name) return false;
 
       const trimmedName = name.trim();
@@ -213,16 +199,15 @@ const RosterManager = (function() {
       }
 
       const trimmedNameLower = trimmedName.toLowerCase();
-      if (roster.some(existingPlayer => existingPlayer.name.toLowerCase() === trimmedNameLower)) {
+      if (roster.some(existingPlayer => existingPlayer.toLowerCase() === trimmedNameLower)) {
         if (typeof showNotification === 'function') {
           showNotification(`Player "${trimmedName}" already exists (case-insensitive match)!`, 'warning');
         }
         return false;
       }
 
-      const newPlayer = { name: trimmedName, shirtNumber: shirtNumber };
-      roster.push(newPlayer);
-      roster.sort((a, b) => a.name.localeCompare(b.name));
+      roster.push(trimmedName);
+      roster.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
       saveRoster();
       this.updateSelects();
       this.updateRosterList();
@@ -232,9 +217,9 @@ const RosterManager = (function() {
       return true;
     },
 
-    // Remove a player
+    // Remove a player (string)
     removePlayer(name) {
-      const index = roster.findIndex(player => player.name === name);
+      const index = roster.indexOf(name);
       if (index > -1) {
         // Store current selections before modifying roster
         const goalScorerSelect = document.getElementById('goalScorer');
@@ -268,8 +253,8 @@ const RosterManager = (function() {
       return false;
     },
 
-    // Edit a player's name and shirt number
-    editPlayer(oldName, newName, newShirtNumber = null) {
+    // Edit a player's name (string)
+    editPlayer(oldName, newName) {
       if (!oldName || !newName) {
         if (typeof showNotification === 'function') {
           showNotification('Old or new player name cannot be empty.', 'warning');
@@ -293,21 +278,20 @@ const RosterManager = (function() {
         return false;
       }
 
-      const playerIndex = roster.findIndex(player => player.name === oldName);
+      const oldNameIndex = roster.indexOf(oldName);
 
-      if (playerIndex === -1) {
+      if (oldNameIndex === -1) {
         if (typeof showNotification === 'function') {
           showNotification(`Player "${oldName}" not found in the roster.`, 'warning');
         }
         return false;
       }
 
-      // Check if new name already exists (case-insensitive and not the same old name)
       const trimmedNewNameLower = trimmedNewName.toLowerCase();
-      if (trimmedNewNameLower !== oldName.toLowerCase() &&
-          roster.some(p => p.name.toLowerCase() === trimmedNewNameLower && p.name !== oldName)) { // Ensure it's not the player itself if name casing changes
+      const oldNameLower = oldName.toLowerCase();
+      if (trimmedNewNameLower !== oldNameLower && roster.some(existingPlayer => existingPlayer.toLowerCase() === trimmedNewNameLower)) {
         if (typeof showNotification === 'function') {
-          showNotification(`Another player with the name "${trimmedNewName}" already exists (case-insensitive match)!`, 'warning');
+          showNotification(`Player "${trimmedNewName}" already exists (case-insensitive match)!`, 'warning');
         }
         return false;
       }
@@ -318,9 +302,8 @@ const RosterManager = (function() {
       const scorerBeforeEdit = goalScorerSelect ? goalScorerSelect.value : null;
       const assistBeforeEdit = goalAssistSelect ? goalAssistSelect.value : null;
 
-      roster[playerIndex].name = trimmedNewName;
-      roster[playerIndex].shirtNumber = newShirtNumber;
-      roster.sort((a, b) => a.name.localeCompare(b.name));
+      roster[oldNameIndex] = trimmedNewName;
+      roster.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
       saveRoster();
       this.updateSelects();
       this.updateRosterList();
@@ -331,10 +314,10 @@ const RosterManager = (function() {
 
       // Restore selections if they were the player being edited
       if (goalScorerSelect && scorerBeforeEdit === oldName) {
-        goalScorerSelect.value = trimmedNewName; // getRoster() returns names, so this should still work
+        goalScorerSelect.value = trimmedNewName;
       }
       if (goalAssistSelect && assistBeforeEdit === oldName) {
-        goalAssistSelect.value = trimmedNewName; // getRoster() returns names, so this should still work
+        goalAssistSelect.value = trimmedNewName;
       }
 
       return true;
@@ -358,44 +341,42 @@ const RosterManager = (function() {
         return;
       }
 
-      let addedPlayersObjects = [];
+      let addedNames = [];
       let failedNames = [];
 
       namesArray.forEach(name => {
-        const trimmedName = name.trim(); // Ensure trimming here as well
-        if (!trimmedName) return; // Skip empty names resulting from split/trim
+        const trimmedName = name.trim();
+        if (!trimmedName) return;
 
         const nameLower = trimmedName.toLowerCase();
         if (trimmedName.length > MAX_PLAYER_NAME_LENGTH) {
           failedNames.push({ name: trimmedName, reason: `Name too long (max ${MAX_PLAYER_NAME_LENGTH} chars).` });
-        } else if (roster.some(existingPlayer => existingPlayer.name.toLowerCase() === nameLower)) {
+        } else if (roster.some(existingPlayer => existingPlayer.toLowerCase() === nameLower)) {
           failedNames.push({ name: trimmedName, reason: 'Player already exists (case-insensitive match).' });
         } else {
-          // Check for duplicates within the current bulk add list (case-insensitive)
-          if (addedPlayersObjects.some(addedPlayerObj => addedPlayerObj.name.toLowerCase() === nameLower)) {
+          if (addedNames.some(addedPlayer => addedPlayer.toLowerCase() === nameLower)) {
             failedNames.push({ name: trimmedName, reason: 'Duplicate in current bulk list (case-insensitive match).' });
           } else {
-            addedPlayersObjects.push({ name: trimmedName, shirtNumber: null }); // Add as object
+            addedNames.push(trimmedName); // Add string with original casing
           }
         }
       });
 
-      if (addedPlayersObjects.length > 0) {
-        roster.push(...addedPlayersObjects);
-        roster.sort((a, b) => a.name.localeCompare(b.name));
+      if (addedNames.length > 0) {
+        roster.push(...addedNames);
+        roster.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
         saveRoster();
         this.updateSelects();
         this.updateRosterList();
 
-        let successMsg = `Successfully added ${addedPlayersObjects.length} player(s): ${addedPlayersObjects.map(p => p.name).join(', ')}.`;
+        let successMsg = `Successfully added ${addedNames.length} player(s): ${addedNames.join(', ')}.`;
         if (typeof showNotification === 'function') {
           showNotification(successMsg, 'success');
         }
       } else {
-        if (namesArray.length > 0 && typeof showNotification === 'function') { // only show if there were names to process
+         if (namesArray.length > 0 && typeof showNotification === 'function') {
           showNotification('No new players were added from the list. They may already exist or were invalid.', 'info');
         } else if (namesArray.length === 0 && typeof showNotification === 'function') {
-           // This case is handled by the initial check, but as a fallback:
            showNotification('No valid player names found after parsing.', 'warning');
         }
       }
@@ -415,58 +396,24 @@ const RosterManager = (function() {
     bindEvents() {
       // Cache frequently used DOM elements
       const addPlayerBtn = document.getElementById('addPlayerBtn');
-      const newPlayerNameInput = document.getElementById('newPlayerName'); // Renamed for clarity
-      const newPlayerShirtNumberInput = document.getElementById('newPlayerShirtNumber');
+      const newPlayerNameInput = document.getElementById('newPlayerName');
+      // const newPlayerShirtNumberInput = document.getElementById('newPlayerShirtNumber'); // Removed
       const rosterList = document.getElementById('rosterList');
       const addPlayersBulkBtn = document.getElementById('addPlayersBulkBtn');
       const bulkPlayerNamesTextarea = document.getElementById('bulkPlayerNames');
       const clearRosterBtn = document.getElementById('clearRosterBtn');
       const openRosterModalBtn = document.getElementById('openRosterModalBtn');
 
-      // Function to reset add player form and button
-      function resetAddPlayerForm() {
-        newPlayerNameInput.value = '';
-        newPlayerShirtNumberInput.value = '';
-        addPlayerBtn.innerHTML = '<i class="fas fa-plus"></i> Add Player';
-        currentlyEditingPlayerName = null;
-      }
-
-      // Add player / Save Changes event listener
-      if (addPlayerBtn && newPlayerNameInput && newPlayerShirtNumberInput) {
+      // Add player event listener
+      if (addPlayerBtn && newPlayerNameInput) {
         addPlayerBtn.addEventListener('click', () => {
           const playerName = newPlayerNameInput.value.trim();
-          const shirtNumberValue = newPlayerShirtNumberInput.value.trim();
-          let shirtNumber = null;
-
-          if (shirtNumberValue !== '') {
-            shirtNumber = parseInt(shirtNumberValue, 10);
-            if (isNaN(shirtNumber)) {
-              if (typeof showNotification === 'function') {
-                showNotification('Invalid shirt number. It must be a number.', 'warning');
-              }
-              return;
-            }
-          }
-
-          if (currentlyEditingPlayerName) {
-            // Editing existing player
-            if (this.editPlayer(currentlyEditingPlayerName, playerName, shirtNumber)) {
-              resetAddPlayerForm();
-            }
-          } else {
-            // Adding new player
-            if (this.addPlayer(playerName, shirtNumber)) {
-              resetAddPlayerForm();
-            }
+          if (this.addPlayer(playerName)) {
+            newPlayerNameInput.value = ''; // Clear input on successful add
           }
         });
 
         newPlayerNameInput.addEventListener('keypress', (e) => {
-          if (e.key === 'Enter') {
-            addPlayerBtn.click();
-          }
-        });
-        newPlayerShirtNumberInput.addEventListener('keypress', (e) => {
           if (e.key === 'Enter') {
             addPlayerBtn.click();
           }
@@ -500,20 +447,12 @@ const RosterManager = (function() {
           if (targetButton.classList.contains('remove-player')) {
             if (confirm(`Are you sure you want to remove ${player}?`)) {
               this.removePlayer(player);
-              // If the removed player was being edited, reset the form
-              if (currentlyEditingPlayerName === player) {
-                resetAddPlayerForm();
-              }
             }
           } else if (targetButton.classList.contains('edit-player')) {
-            const playerNameToEdit = targetButton.dataset.player;
-            const playerToEdit = roster.find(p => p.name === playerNameToEdit);
-            if (playerToEdit) {
-              newPlayerNameInput.value = playerToEdit.name;
-              newPlayerShirtNumberInput.value = playerToEdit.shirtNumber !== null ? playerToEdit.shirtNumber : '';
-              addPlayerBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
-              currentlyEditingPlayerName = playerNameToEdit;
-              newPlayerNameInput.focus(); // Focus on name input for editing
+            const oldName = targetButton.dataset.player;
+            const newName = prompt(`Enter new name for ${oldName}:`, oldName);
+            if (newName !== null && newName.trim() !== '') {
+              this.editPlayer(oldName, newName.trim());
             }
           }
         });
@@ -522,7 +461,8 @@ const RosterManager = (function() {
       // Open roster modal event listener
       if (openRosterModalBtn) {
         openRosterModalBtn.addEventListener('click', () => {
-          resetAddPlayerForm(); // Ensure form is in "add" mode when modal opens
+          // Reset newPlayerNameInput if needed, though typically it's cleared on add
+          // newPlayerNameInput.value = ''; // Optional: clear name input when modal opens
           const rosterModalElement = document.getElementById('rosterModal');
           if (rosterModalElement) {
             const rosterModal = bootstrap.Modal.getInstance(rosterModalElement) || new bootstrap.Modal(rosterModalElement);
@@ -530,13 +470,7 @@ const RosterManager = (function() {
           }
         });
       }
-      // Also, handle modal close events to reset editing state
-      const rosterModalElement = document.getElementById('rosterModal');
-      if (rosterModalElement) {
-          rosterModalElement.addEventListener('hidden.bs.modal', function () {
-              resetAddPlayerForm();
-          });
-      }
+      // Removed modal close event listener that called resetAddPlayerForm
     }
   };
 })();

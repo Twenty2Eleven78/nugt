@@ -35,7 +35,7 @@ const RosterManager = (function() {
   // Set a default roster if not roster is stored
   function getDefaultRoster() {
     return [
-      'A.Seaman','A-R.Obidi','D.Peacock','E.Doyle','E.Van-Kerro','E.Mutiti','F.Asadi','F.Kendall','H.Strowthers','M.Finch','M.Luttwak','M.Stevens','N.Janicka','R.Azar','S.Smith'
+      'A-R.Obidi','A.Seaman','D.Peacock','E.Doyle','E.Van-Kerro','E.Mutiti','F.Asadi','F.Kendall','H.Strowthers','M.Finch','M.Stevens','N.Janicka','S.Smith'
       ,'T.Rushmer','V.Aig-Imoru'
     ];
   }

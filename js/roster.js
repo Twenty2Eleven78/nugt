@@ -23,21 +23,47 @@ const RosterManager = (function() {
   function loadRoster() {
     try {
       const savedRosterJSON = localStorage.getItem(STORAGE_KEY);
-      if (!savedRosterJSON) {
+      // Case 1: No roster in localStorage, use default.
+      if (savedRosterJSON === null) { // More explicit check for null
         return getDefaultRoster();
       }
+
       const parsedRoster = JSON.parse(savedRosterJSON);
 
-      // Migration for old format (array of strings)
-      if (Array.isArray(parsedRoster) && parsedRoster.length > 0 && typeof parsedRoster[0] === 'string') {
-        return parsedRoster.map(playerName => ({ name: playerName, shirtNumber: null }));
+      // Ensure parsedRoster is an array. If not, it's corrupted.
+      if (!Array.isArray(parsedRoster)) {
+        console.warn('Invalid roster format in localStorage (not an array). Using default roster.');
+        return getDefaultRoster();
       }
-      // If it's already in the new object format or empty
-      if (Array.isArray(parsedRoster)) {
-        return parsedRoster;
+
+      // Case 2: localStorage has an empty array "[]". This is a valid, intentionally empty roster.
+      if (parsedRoster.length === 0) {
+        return [];
       }
-      // If parsing results in non-array (e.g. corrupted data)
-      console.warn('Invalid roster format in localStorage. Using default roster.');
+
+      // Case 3: Migration for old format (array of strings).
+      if (typeof parsedRoster[0] === 'string') {
+        // Additional check: ensure all elements are strings for safety, though less likely if first is.
+        // For simplicity here, we trust the initial typeof check is sufficient for this migration path.
+        return parsedRoster.map(playerName => ({ name: String(playerName), shirtNumber: null })); // Ensure playerName is string
+      }
+
+      // Case 4: It's an array of objects (new format).
+      // Also check that player.name exists, otherwise it's not a valid player object.
+      if (typeof parsedRoster[0] === 'object' && parsedRoster[0] !== null && parsedRoster[0].hasOwnProperty('name')) {
+        // Optional: Add more validation here to check if objects have 'name' property.
+        // For now, assume structure is correct if it's an array of objects with name property.
+        // We also ensure that all items in the array are valid objects
+        if (parsedRoster.every(player => typeof player === 'object' && player !== null && player.hasOwnProperty('name'))) {
+          return parsedRoster;
+        } else {
+          console.warn('Invalid roster items in localStorage (some items are not valid player objects). Using default roster.');
+          return getDefaultRoster();
+        }
+      }
+
+      // Case 5: Unrecognized array format (e.g., array of numbers, mixed types not caught above).
+      console.warn('Unrecognized roster format in localStorage. Using default roster.');
       return getDefaultRoster();
 
     } catch (error) {

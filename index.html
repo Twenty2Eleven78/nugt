@@ -404,9 +404,18 @@
         </div>
         <div class="modal-body">
           <h5>Add New Player</h5>
-          <div class="input-group mb-3">
-            <input type="text" id="newPlayerName" class="form-control" placeholder="Enter player name">
-            <button class="btn btn-primary" id="addPlayerBtn">Add Single Player</button>
+          <div class="row mb-3">
+            <div class="col">
+                <input type="text" class="form-control" id="newPlayerName" placeholder="Enter player name">
+            </div>
+            <div class="col-auto">
+                <input type="number" class="form-control" id="newPlayerShirtNumber" placeholder="Shirt #" style="width: 100px;">
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" id="addPlayerBtn">
+                    <i class="fas fa-plus"></i> Add Player
+                </button>
+            </div>
           </div>
 
           <hr>
@@ -426,6 +435,7 @@
               <thead>
                 <tr>
                   <th>Player Name</th>
+                  <th>Shirt #</th>
                   <th class="text-end">Actions</th>
                 </tr>
               </thead>

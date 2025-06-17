@@ -1,5 +1,6 @@
 // Roster Management Module
 const RosterManager = (function() {
+  const MAX_PLAYER_NAME_LENGTH = 50; // Define character limit
   
   // Private variables
   const STORAGE_KEY = 'goalTracker_roster';
@@ -73,27 +74,25 @@ const RosterManager = (function() {
 
       // Helper function to update a single select element
       const updateSingleSelect = (selectElement, currentSelectedValue, staticOptions) => {
-        const existingPlayerOptions = Array.from(selectElement.options)
-          .map(opt => opt.value)
-          .filter(val => !staticOptions.includes(val));
+        const initialPlayerOptionElements = Array.from(selectElement.options)
+          .filter(opt => !staticOptions.includes(opt.value));
+        const initialPlayerOptionValues = initialPlayerOptionElements.map(opt => opt.value);
 
-        const playersToAdd = currentRoster.filter(player => !existingPlayerOptions.includes(player));
-        const playersToRemove = existingPlayerOptions.filter(player => !currentRoster.includes(player));
-
-        // Remove players who are no longer in the roster
-        playersToRemove.forEach(playerValue => {
-          const optionToRemove = Array.from(selectElement.options).find(opt => opt.value === playerValue);
-          if (optionToRemove) {
-            selectElement.removeChild(optionToRemove);
+        // Determine players to remove
+        initialPlayerOptionElements.forEach(optionElement => {
+          if (!currentRoster.includes(optionElement.value)) {
+            selectElement.removeChild(optionElement);
           }
         });
 
-        // Add new players from the roster
-        playersToAdd.forEach(player => {
-          const newOption = document.createElement('option');
-          newOption.value = player;
-          newOption.textContent = player;
-          selectElement.appendChild(newOption);
+        // Determine players to add
+        currentRoster.forEach(player => {
+          if (!initialPlayerOptionValues.includes(player)) {
+            const newOption = document.createElement('option');
+            newOption.value = player;
+            newOption.textContent = player;
+            selectElement.appendChild(newOption);
+          }
         });
 
         // Restore selection or set to default
@@ -145,8 +144,6 @@ const RosterManager = (function() {
 
     // Add a new player
     addPlayer(name) {
-      const MAX_PLAYER_NAME_LENGTH = 50; // Define character limit
-
       if (!name) return false; // Quick exit if original name is null/undefined
       
       // Trim and validate name
@@ -166,10 +163,11 @@ const RosterManager = (function() {
         return false;
       }
 
-      // Check for duplicates
-      if (roster.includes(trimmedName)) {
-        if (typeof showNotification === 'function') { // Ensure showNotification exists for this path too
-          showNotification('Player already exists!', 'warning');
+      // Check for duplicates (case-insensitive)
+      const trimmedNameLower = trimmedName.toLowerCase();
+      if (roster.some(existingPlayer => existingPlayer.toLowerCase() === trimmedNameLower)) {
+        if (typeof showNotification === 'function') {
+          showNotification(`Player "${trimmedName}" already exists (case-insensitive match)!`, 'warning');
         }
         return false;
       }
@@ -224,8 +222,6 @@ const RosterManager = (function() {
 
     // Edit a player's name
     editPlayer(oldName, newName) {
-      const MAX_PLAYER_NAME_LENGTH = 50; // Consistent with addPlayer
-
       if (!oldName || !newName) {
         if (typeof showNotification === 'function') {
           showNotification('Old or new player name cannot be empty.', 'warning');
@@ -258,10 +254,12 @@ const RosterManager = (function() {
         return false;
       }
 
-      // Check if new name already exists (and it's not the same player)
-      if (roster.includes(trimmedNewName) && trimmedNewName !== oldName) {
+      // Check if new name already exists (case-insensitive and not the same old name)
+      const trimmedNewNameLower = trimmedNewName.toLowerCase();
+      const oldNameLower = oldName.toLowerCase();
+      if (trimmedNewNameLower !== oldNameLower && roster.some(existingPlayer => existingPlayer.toLowerCase() === trimmedNewNameLower)) {
         if (typeof showNotification === 'function') {
-          showNotification(`Player "${trimmedNewName}" already exists in the roster.`, 'warning');
+          showNotification(`Player "${trimmedNewName}" already exists (case-insensitive match)!`, 'warning');
         }
         return false;
       }
@@ -302,7 +300,6 @@ const RosterManager = (function() {
         return;
       }
 
-      const MAX_PLAYER_NAME_LENGTH = 50; // Consistent with addPlayer
       const namesArray = namesString.split(/[,\n]+/).map(name => name.trim()).filter(name => name !== "");
 
       if (namesArray.length === 0) {
@@ -316,16 +313,17 @@ const RosterManager = (function() {
       let failedNames = [];
 
       namesArray.forEach(name => {
+        const nameLower = name.toLowerCase();
         if (name.length > MAX_PLAYER_NAME_LENGTH) {
           failedNames.push({ name: name, reason: `Name too long (max ${MAX_PLAYER_NAME_LENGTH} chars).` });
-        } else if (roster.includes(name)) {
-          failedNames.push({ name: name, reason: 'Player already exists.' });
+        } else if (roster.some(existingPlayer => existingPlayer.toLowerCase() === nameLower)) {
+          failedNames.push({ name: name, reason: 'Player already exists (case-insensitive match).' });
         } else {
-          // Check for duplicates within the current bulk add list before adding to main roster
-          if (addedNames.includes(name)) {
-            failedNames.push({ name: name, reason: 'Duplicate in current bulk list.' });
+          // Check for duplicates within the current bulk add list before adding to main roster (case-insensitive)
+          if (addedNames.some(addedPlayer => addedPlayer.toLowerCase() === nameLower)) {
+            failedNames.push({ name: name, reason: 'Duplicate in current bulk list (case-insensitive match).' });
           } else {
-            addedNames.push(name);
+            addedNames.push(name); // Add with original casing
           }
         }
       });
@@ -360,41 +358,39 @@ const RosterManager = (function() {
 
     // Bind event listeners
     bindEvents() {
+      // Cache frequently used DOM elements
       const addPlayerBtn = document.getElementById('addPlayerBtn');
       const newPlayerInput = document.getElementById('newPlayerName');
       const rosterList = document.getElementById('rosterList');
       const addPlayersBulkBtn = document.getElementById('addPlayersBulkBtn');
       const bulkPlayerNamesTextarea = document.getElementById('bulkPlayerNames');
       const clearRosterBtn = document.getElementById('clearRosterBtn');
+      const openRosterModalBtn = document.getElementById('openRosterModalBtn');
 
+      // Add player event listeners
       if (addPlayerBtn && newPlayerInput) {
-        // Add player on button click
         addPlayerBtn.addEventListener('click', () => {
           const playerName = newPlayerInput.value.trim();
           if (this.addPlayer(playerName)) {
-            newPlayerInput.value = '';
+            newPlayerInput.value = ''; // Clear input on successful add
           }
         });
 
-        // Add player on Enter key
         newPlayerInput.addEventListener('keypress', (e) => {
           if (e.key === 'Enter') {
-            const playerName = newPlayerInput.value.trim();
-            if (this.addPlayer(playerName)) {
-              newPlayerInput.value = '';
-            }
+            addPlayerBtn.click(); // Simulate button click to keep logic centralized
           }
         });
       }
 
-      // Event listener for clear roster button
+      // Clear roster event listener
       if (clearRosterBtn) {
         clearRosterBtn.addEventListener('click', () => {
           this.clearRoster();
         });
       }
 
-      // Event listener for bulk add button
+      // Bulk add players event listener
       if (addPlayersBulkBtn && bulkPlayerNamesTextarea) {
         addPlayersBulkBtn.addEventListener('click', () => {
           const namesString = bulkPlayerNamesTextarea.value;
@@ -403,41 +399,36 @@ const RosterManager = (function() {
         });
       }
 
-      // Event listener for clear roster button
-      if (clearRosterBtn) {
-        clearRosterBtn.addEventListener('click', () => {
-          this.clearRoster();
-        });
-      }
-
-      // Delegate remove player event
+      // Roster list event delegation (for edit/remove player)
       if (rosterList) {
         rosterList.addEventListener('click', (e) => {
-          const targetButton = e.target.closest('button'); // Get the button element, even if icon is clicked
+          const targetButton = e.target.closest('button');
           if (!targetButton) return;
 
+          const player = targetButton.dataset.player; // Use dataset for cleaner attribute access
+
           if (targetButton.classList.contains('remove-player')) {
-            const playerToRemove = targetButton.getAttribute('data-player');
-            // Confirmation before removing
-            if (confirm(`Are you sure you want to remove ${playerToRemove}?`)) {
-              this.removePlayer(playerToRemove);
+            if (confirm(`Are you sure you want to remove ${player}?`)) {
+              this.removePlayer(player);
             }
           } else if (targetButton.classList.contains('edit-player')) {
-            const playerToEdit = targetButton.getAttribute('data-player');
-            const newName = prompt(`Enter new name for ${playerToEdit}:`, playerToEdit);
-            if (newName !== null) { // Prompt returns null if Cancel is clicked
-              this.editPlayer(playerToEdit, newName);
+            const newName = prompt(`Enter new name for ${player}:`, player);
+            if (newName !== null && newName.trim() !== '') {
+              this.editPlayer(player, newName);
             }
           }
         });
       }
 
-      // Open roster modal button
-      const openRosterModalBtn = document.getElementById('openRosterModalBtn');
+      // Open roster modal event listener
       if (openRosterModalBtn) {
         openRosterModalBtn.addEventListener('click', () => {
-          const rosterModal = new bootstrap.Modal(document.getElementById('rosterModal'));
-          rosterModal.show();
+          // Assuming Bootstrap 5 modal handling
+          const rosterModalElement = document.getElementById('rosterModal');
+          if (rosterModalElement) {
+            const rosterModal = bootstrap.Modal.getInstance(rosterModalElement) || new bootstrap.Modal(rosterModalElement);
+            rosterModal.show();
+          }
         });
       }
     }

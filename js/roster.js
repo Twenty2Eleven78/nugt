@@ -73,7 +73,7 @@ const RosterManager = (function() {
       'A-R.Obidi','A.Seaman','D.Peacock','E.Doyle','E.Van-Kerro','E.Mutiti',
       'F.Asadi','F.Kendall','H.Strowthers','M.Finch','M.Stevens','N.Janicka',
       'S.Smith','T.Rushmer','V.Aig-Imoru'
-    ].sort();
+    ];
   }
 
   // Public interface

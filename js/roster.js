@@ -52,27 +52,56 @@ const RosterManager = (function() {
       const goalAssistSelect = document.getElementById('goalAssist');
       
       if (goalScorerSelect && goalAssistSelect) {
-        // Preserve current selections if possible
         const currentGoalScorer = goalScorerSelect.value;
         const currentGoalAssist = goalAssistSelect.value;
 
-        // set default options
-        //goalScorerSelect.innerHTML = '<option value="">Select goal scorer</option>';
-        //goalAssistSelect.innerHTML = '<option value="">Select goal assist</option>';
-        //goalAssistSelect.innerHTML += '<option value="N/A">N/A</option>';
+        // Identify static options
+        const staticScorerOptions = ['']; // "Select goal scorer"
+        if (goalScorerSelect.querySelector('option[value="Own Goal"]')) {
+            staticScorerOptions.push('Own Goal');
+        }
+
+        const staticAssistOptions = ['']; // "Select goal assist"
+        if (goalAssistSelect.querySelector('option[value="N/A"]')) {
+            staticAssistOptions.push('N/A');
+        }
+
+        // Remove only dynamic player options
+        Array.from(goalScorerSelect.options).forEach(option => {
+          if (!staticScorerOptions.includes(option.value)) {
+            goalScorerSelect.removeChild(option);
+          }
+        });
+        Array.from(goalAssistSelect.options).forEach(option => {
+          if (!staticAssistOptions.includes(option.value)) {
+            goalAssistSelect.removeChild(option);
+          }
+        });
 
         // Add roster options
         roster.forEach(player => {
-          goalScorerSelect.innerHTML += `<option value="${player}">${player}</option>`;
-          goalAssistSelect.innerHTML += `<option value="${player}">${player}</option>`;
+          const scorerOption = document.createElement('option');
+          scorerOption.value = player;
+          scorerOption.textContent = player;
+          goalScorerSelect.appendChild(scorerOption);
+
+          const assistOption = document.createElement('option');
+          assistOption.value = player;
+          assistOption.textContent = player;
+          goalAssistSelect.appendChild(assistOption);
         });
 
         // Attempt to restore previous selections
-        if (currentGoalScorer && roster.includes(currentGoalScorer)) {
+        if (currentGoalScorer && (roster.includes(currentGoalScorer) || staticScorerOptions.includes(currentGoalScorer))) {
           goalScorerSelect.value = currentGoalScorer;
+        } else {
+          goalScorerSelect.value = ""; // Default if previous selection is no longer valid
         }
-        if (currentGoalAssist && (currentGoalAssist === 'N/A' || roster.includes(currentGoalAssist))) {
+
+        if (currentGoalAssist && (roster.includes(currentGoalAssist) || staticAssistOptions.includes(currentGoalAssist))) {
           goalAssistSelect.value = currentGoalAssist;
+        } else {
+          goalAssistSelect.value = ""; // Default if previous selection is no longer valid
         }
       }
     },
@@ -106,7 +135,7 @@ const RosterManager = (function() {
 
       // Check for duplicates
       if (roster.includes(trimmedName)) {
-        M.toast({html: 'Player already exists!'});
+        showNotification('Player already exists!', 'warning');
         return false;
       }
 
@@ -172,8 +201,8 @@ const RosterManager = (function() {
       const openRosterModalBtn = document.getElementById('openRosterModalBtn');
       if (openRosterModalBtn) {
         openRosterModalBtn.addEventListener('click', () => {
-          const rosterModal = M.Modal.getInstance(document.getElementById('rosterModal'));
-          rosterModal.open();
+          const rosterModal = new bootstrap.Modal(document.getElementById('rosterModal'));
+          rosterModal.show();
         });
       }
     }

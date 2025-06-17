@@ -287,3 +287,27 @@ body {
   color: #6c757d;
   margin-bottom: 0;
 }
+
+/* Roster Table Styles */
+.roster-table th {
+  vertical-align: middle;
+  font-weight: 600; /* Slightly bolder */
+}
+
+.roster-table td {
+  vertical-align: middle;
+  padding: 0.5rem; /* Adjust padding as needed */
+}
+
+.roster-table tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+/* Ensure hover effect is prioritized over striped rows */
+.roster-table tbody tr:hover {
+  background-color: #f1f1f1; /* Or your preferred hover color */
+}
+
+.roster-actions-cell {
+  text-align: end;
+}

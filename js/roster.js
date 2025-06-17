@@ -153,7 +153,7 @@ const RosterManager = (function() {
           .map(player => `
             <tr>
               <td>${player}</td>
-              <td class="text-end">
+              <td class="text-end roster-actions-cell">
                 <button class="btn btn-sm btn-outline-primary me-2 edit-player" data-player="${player}">
                   <i class="fas fa-edit"></i> Edit
                 </button>

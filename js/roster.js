@@ -11,6 +11,10 @@ const RosterManager = (function() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(roster));
     } catch (error) {
       console.error('Error saving roster:', error);
+      // Call showNotification to display a user-friendly message
+      if (typeof showNotification === 'function') {
+        showNotification('Error saving roster. Please try again.', 'danger');
+      }
     }
   }
   // Load roster from local storage
@@ -20,6 +24,10 @@ const RosterManager = (function() {
       return savedRoster && savedRoster.length ? savedRoster : getDefaultRoster();
     } catch (error) {
       console.error('Error loading roster:', error);
+      // Call showNotification to display a user-friendly message
+      if (typeof showNotification === 'function') {
+        showNotification('Error loading roster. Default roster will be used.', 'warning');
+      }
       return getDefaultRoster();
     }
   }
@@ -50,60 +58,54 @@ const RosterManager = (function() {
     updateSelects() {
       const goalScorerSelect = document.getElementById('goalScorer');
       const goalAssistSelect = document.getElementById('goalAssist');
-      
-      if (goalScorerSelect && goalAssistSelect) {
-        const currentGoalScorer = goalScorerSelect.value;
-        const currentGoalAssist = goalAssistSelect.value;
 
-        // Identify static options
-        const staticScorerOptions = ['']; // "Select goal scorer"
-        if (goalScorerSelect.querySelector('option[value="Own Goal"]')) {
-            staticScorerOptions.push('Own Goal');
-        }
-
-        const staticAssistOptions = ['']; // "Select goal assist"
-        if (goalAssistSelect.querySelector('option[value="N/A"]')) {
-            staticAssistOptions.push('N/A');
-        }
-
-        // Remove only dynamic player options
-        Array.from(goalScorerSelect.options).forEach(option => {
-          if (!staticScorerOptions.includes(option.value)) {
-            goalScorerSelect.removeChild(option);
-          }
-        });
-        Array.from(goalAssistSelect.options).forEach(option => {
-          if (!staticAssistOptions.includes(option.value)) {
-            goalAssistSelect.removeChild(option);
-          }
-        });
-
-        // Add roster options
-        roster.forEach(player => {
-          const scorerOption = document.createElement('option');
-          scorerOption.value = player;
-          scorerOption.textContent = player;
-          goalScorerSelect.appendChild(scorerOption);
-
-          const assistOption = document.createElement('option');
-          assistOption.value = player;
-          assistOption.textContent = player;
-          goalAssistSelect.appendChild(assistOption);
-        });
-
-        // Attempt to restore previous selections
-        if (currentGoalScorer && (roster.includes(currentGoalScorer) || staticScorerOptions.includes(currentGoalScorer))) {
-          goalScorerSelect.value = currentGoalScorer;
-        } else {
-          goalScorerSelect.value = ""; // Default if previous selection is no longer valid
-        }
-
-        if (currentGoalAssist && (roster.includes(currentGoalAssist) || staticAssistOptions.includes(currentGoalAssist))) {
-          goalAssistSelect.value = currentGoalAssist;
-        } else {
-          goalAssistSelect.value = ""; // Default if previous selection is no longer valid
-        }
+      if (!goalScorerSelect || !goalAssistSelect) {
+        return;
       }
+
+      const currentGoalScorer = goalScorerSelect.value;
+      const currentGoalAssist = goalAssistSelect.value;
+      const currentRoster = this.getRoster(); // Use getter for consistency
+
+      // Define static options. These values should match the <option value="..."> in HTML.
+      const staticScorerOptions = ['', 'Own Goal']; // "" is "Select goal scorer"
+      const staticAssistOptions = ['', 'N/A'];    // "" is "Select goal assist"
+
+      // Helper function to update a single select element
+      const updateSingleSelect = (selectElement, currentSelectedValue, staticOptions) => {
+        const existingPlayerOptions = Array.from(selectElement.options)
+          .map(opt => opt.value)
+          .filter(val => !staticOptions.includes(val));
+
+        const playersToAdd = currentRoster.filter(player => !existingPlayerOptions.includes(player));
+        const playersToRemove = existingPlayerOptions.filter(player => !currentRoster.includes(player));
+
+        // Remove players who are no longer in the roster
+        playersToRemove.forEach(playerValue => {
+          const optionToRemove = Array.from(selectElement.options).find(opt => opt.value === playerValue);
+          if (optionToRemove) {
+            selectElement.removeChild(optionToRemove);
+          }
+        });
+
+        // Add new players from the roster
+        playersToAdd.forEach(player => {
+          const newOption = document.createElement('option');
+          newOption.value = player;
+          newOption.textContent = player;
+          selectElement.appendChild(newOption);
+        });
+
+        // Restore selection or set to default
+        if (currentRoster.includes(currentSelectedValue) || staticOptions.includes(currentSelectedValue)) {
+          selectElement.value = currentSelectedValue;
+        } else {
+          selectElement.value = staticOptions[0]; // Default value (e.g., "Select goal scorer")
+        }
+      };
+
+      updateSingleSelect(goalScorerSelect, currentGoalScorer, staticScorerOptions);
+      updateSingleSelect(goalAssistSelect, currentGoalAssist, staticAssistOptions);
     },
 
     // Update roster list in modal
@@ -127,15 +129,32 @@ const RosterManager = (function() {
 
     // Add a new player
     addPlayer(name) {
-      if (!name) return false;
+      const MAX_PLAYER_NAME_LENGTH = 50; // Define character limit
+
+      if (!name) return false; // Quick exit if original name is null/undefined
       
       // Trim and validate name
       const trimmedName = name.trim();
-      if (!trimmedName) return false;
+
+      if (!trimmedName) {
+        if (typeof showNotification === 'function') {
+          showNotification('Player name cannot be empty.', 'warning');
+        }
+        return false;
+      }
+
+      if (trimmedName.length > MAX_PLAYER_NAME_LENGTH) {
+        if (typeof showNotification === 'function') {
+          showNotification(`Player name is too long. Maximum ${MAX_PLAYER_NAME_LENGTH} characters allowed.`, 'warning');
+        }
+        return false;
+      }
 
       // Check for duplicates
       if (roster.includes(trimmedName)) {
-        showNotification('Player already exists!', 'warning');
+        if (typeof showNotification === 'function') { // Ensure showNotification exists for this path too
+          showNotification('Player already exists!', 'warning');
+        }
         return false;
       }
 
@@ -145,6 +164,9 @@ const RosterManager = (function() {
       saveRoster();
       this.updateSelects();
       this.updateRosterList();
+      if (typeof showNotification === 'function') {
+        showNotification(`Player ${trimmedName} added successfully.`, 'success');
+      }
       return true;
     },
 
@@ -152,10 +174,40 @@ const RosterManager = (function() {
     removePlayer(name) {
       const index = roster.indexOf(name);
       if (index > -1) {
+        const goalScorerSelect = document.getElementById('goalScorer');
+        const goalAssistSelect = document.getElementById('goalAssist');
+
+        const scorerBeforeRemove = goalScorerSelect ? goalScorerSelect.value : null;
+        const assistBeforeRemove = goalAssistSelect ? goalAssistSelect.value : null;
+
         roster.splice(index, 1);
         saveRoster();
-        this.updateSelects();
+        this.updateSelects(); // This is crucial as it might reset dropdowns
         this.updateRosterList();
+
+        if (typeof showNotification === 'function') {
+          showNotification(`Player ${name} removed successfully.`, 'success');
+        }
+
+        // Check if scorer selection was reset
+        if (goalScorerSelect && scorerBeforeRemove === name) {
+          const scorerAfterRemove = goalScorerSelect.value;
+          if (scorerAfterRemove === '') { // Default empty value
+            if (typeof showNotification === 'function') {
+              showNotification(`Goal scorer selection was reset as ${name} was removed.`, 'info');
+            }
+          }
+        }
+
+        // Check if assist selection was reset
+        if (goalAssistSelect && assistBeforeRemove === name) {
+          const assistAfterRemove = goalAssistSelect.value;
+          if (assistAfterRemove === '') { // Default empty value
+            if (typeof showNotification === 'function') {
+              showNotification(`Goal assist selection was reset as ${name} was removed.`, 'info');
+            }
+          }
+        }
         return true;
       }
       return false;

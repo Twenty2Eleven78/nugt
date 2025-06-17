@@ -116,14 +116,30 @@ const RosterManager = (function() {
           .map(player => `
             <tr>
               <td>${player}</td>
-              <td>
-                 <button class="btn btn-sm btn-outline-danger remove-player" data-player="${player}">
+              <td class="text-end">
+                <button class="btn btn-sm btn-outline-primary me-2 edit-player" data-player="${player}">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn btn-sm btn-outline-danger remove-player" data-player="${player}">
                   <i class="fas fa-trash"></i> Remove
                 </button>
               </td>
             </tr>
           `)
           .join('');
+      }
+    },
+
+    // Clear the entire roster
+    clearRoster() {
+      if (confirm('Are you sure you want to clear the entire roster? This action cannot be undone.')) {
+        roster = [];
+        saveRoster();
+        this.updateSelects();
+        this.updateRosterList();
+        if (typeof showNotification === 'function') {
+          showNotification('Roster cleared successfully.', 'success');
+        }
       }
     },
 
@@ -174,6 +190,7 @@ const RosterManager = (function() {
     removePlayer(name) {
       const index = roster.indexOf(name);
       if (index > -1) {
+        // Store current selections before modifying roster
         const goalScorerSelect = document.getElementById('goalScorer');
         const goalAssistSelect = document.getElementById('goalAssist');
 
@@ -182,30 +199,22 @@ const RosterManager = (function() {
 
         roster.splice(index, 1);
         saveRoster();
-        this.updateSelects(); // This is crucial as it might reset dropdowns
+        this.updateSelects();
         this.updateRosterList();
 
         if (typeof showNotification === 'function') {
           showNotification(`Player ${name} removed successfully.`, 'success');
         }
 
-        // Check if scorer selection was reset
-        if (goalScorerSelect && scorerBeforeRemove === name) {
-          const scorerAfterRemove = goalScorerSelect.value;
-          if (scorerAfterRemove === '') { // Default empty value
-            if (typeof showNotification === 'function') {
-              showNotification(`Goal scorer selection was reset as ${name} was removed.`, 'info');
-            }
+        // Check and notify if selections were reset
+        if (goalScorerSelect && scorerBeforeRemove === name && goalScorerSelect.value === '') {
+          if (typeof showNotification === 'function') {
+            showNotification(`Goal scorer selection was reset as ${name} was removed.`, 'info');
           }
         }
-
-        // Check if assist selection was reset
-        if (goalAssistSelect && assistBeforeRemove === name) {
-          const assistAfterRemove = goalAssistSelect.value;
-          if (assistAfterRemove === '') { // Default empty value
-            if (typeof showNotification === 'function') {
-              showNotification(`Goal assist selection was reset as ${name} was removed.`, 'info');
-            }
+        if (goalAssistSelect && assistBeforeRemove === name && goalAssistSelect.value === '') {
+          if (typeof showNotification === 'function') {
+            showNotification(`Goal assist selection was reset as ${name} was removed.`, 'info');
           }
         }
         return true;
@@ -213,11 +222,150 @@ const RosterManager = (function() {
       return false;
     },
 
+    // Edit a player's name
+    editPlayer(oldName, newName) {
+      const MAX_PLAYER_NAME_LENGTH = 50; // Consistent with addPlayer
+
+      if (!oldName || !newName) {
+        if (typeof showNotification === 'function') {
+          showNotification('Old or new player name cannot be empty.', 'warning');
+        }
+        return false;
+      }
+
+      const trimmedNewName = newName.trim();
+
+      if (!trimmedNewName) {
+        if (typeof showNotification === 'function') {
+          showNotification('New player name cannot be empty.', 'warning');
+        }
+        return false;
+      }
+
+      if (trimmedNewName.length > MAX_PLAYER_NAME_LENGTH) {
+        if (typeof showNotification === 'function') {
+          showNotification(`Player name is too long. Maximum ${MAX_PLAYER_NAME_LENGTH} characters allowed.`, 'warning');
+        }
+        return false;
+      }
+
+      const oldNameIndex = roster.indexOf(oldName);
+
+      if (oldNameIndex === -1) {
+        if (typeof showNotification === 'function') {
+          showNotification(`Player "${oldName}" not found in the roster.`, 'warning');
+        }
+        return false;
+      }
+
+      // Check if new name already exists (and it's not the same player)
+      if (roster.includes(trimmedNewName) && trimmedNewName !== oldName) {
+        if (typeof showNotification === 'function') {
+          showNotification(`Player "${trimmedNewName}" already exists in the roster.`, 'warning');
+        }
+        return false;
+      }
+
+      // Store current selections before modifying roster
+      const goalScorerSelect = document.getElementById('goalScorer');
+      const goalAssistSelect = document.getElementById('goalAssist');
+      const scorerBeforeEdit = goalScorerSelect ? goalScorerSelect.value : null;
+      const assistBeforeEdit = goalAssistSelect ? goalAssistSelect.value : null;
+
+      roster[oldNameIndex] = trimmedNewName;
+      roster.sort();
+      saveRoster();
+      this.updateSelects();
+      this.updateRosterList();
+
+      if (typeof showNotification === 'function') {
+        showNotification(`Player "${oldName}" updated to "${trimmedNewName}" successfully.`, 'success');
+      }
+
+      // Restore selections if they were the player being edited
+      if (goalScorerSelect && scorerBeforeEdit === oldName) {
+        goalScorerSelect.value = trimmedNewName;
+      }
+      if (goalAssistSelect && assistBeforeEdit === oldName) {
+        goalAssistSelect.value = trimmedNewName;
+      }
+
+      return true;
+    },
+
+    // Add multiple players from a string
+    addPlayersBulk(namesString) {
+      if (!namesString || namesString.trim() === "") {
+        if (typeof showNotification === 'function') {
+          showNotification('No player names provided for bulk add.', 'warning');
+        }
+        return;
+      }
+
+      const MAX_PLAYER_NAME_LENGTH = 50; // Consistent with addPlayer
+      const namesArray = namesString.split(/[,\n]+/).map(name => name.trim()).filter(name => name !== "");
+
+      if (namesArray.length === 0) {
+        if (typeof showNotification === 'function') {
+          showNotification('No valid player names found after parsing.', 'warning');
+        }
+        return;
+      }
+
+      let addedNames = [];
+      let failedNames = [];
+
+      namesArray.forEach(name => {
+        if (name.length > MAX_PLAYER_NAME_LENGTH) {
+          failedNames.push({ name: name, reason: `Name too long (max ${MAX_PLAYER_NAME_LENGTH} chars).` });
+        } else if (roster.includes(name)) {
+          failedNames.push({ name: name, reason: 'Player already exists.' });
+        } else {
+          // Check for duplicates within the current bulk add list before adding to main roster
+          if (addedNames.includes(name)) {
+            failedNames.push({ name: name, reason: 'Duplicate in current bulk list.' });
+          } else {
+            addedNames.push(name);
+          }
+        }
+      });
+
+      if (addedNames.length > 0) {
+        roster.push(...addedNames);
+        roster.sort();
+        saveRoster();
+        this.updateSelects();
+        this.updateRosterList();
+
+        let successMsg = `Successfully added ${addedNames.length} player(s): ${addedNames.join(', ')}.`;
+        if (typeof showNotification === 'function') {
+          showNotification(successMsg, 'success');
+        }
+      } else {
+        if (typeof showNotification === 'function') {
+          showNotification('No new players were added from the list.', 'info');
+        }
+      }
+
+      if (failedNames.length > 0) {
+        let failedMsg = `Could not add ${failedNames.length} player(s): `;
+        failedNames.forEach(item => {
+          failedMsg += `"${item.name}" (${item.reason}) `;
+        });
+        if (typeof showNotification === 'function') {
+          showNotification(failedMsg, 'warning', 10000); // Longer duration for more complex message
+        }
+      }
+    },
+
     // Bind event listeners
     bindEvents() {
       const addPlayerBtn = document.getElementById('addPlayerBtn');
       const newPlayerInput = document.getElementById('newPlayerName');
       const rosterList = document.getElementById('rosterList');
+      const addPlayersBulkBtn = document.getElementById('addPlayersBulkBtn');
+      const bulkPlayerNamesTextarea = document.getElementById('bulkPlayerNames');
+      const clearRosterBtn = document.getElementById('clearRosterBtn');
 
       if (addPlayerBtn && newPlayerInput) {
         // Add player on button click
@@ -239,12 +387,47 @@ const RosterManager = (function() {
         });
       }
 
+      // Event listener for clear roster button
+      if (clearRosterBtn) {
+        clearRosterBtn.addEventListener('click', () => {
+          this.clearRoster();
+        });
+      }
+
+      // Event listener for bulk add button
+      if (addPlayersBulkBtn && bulkPlayerNamesTextarea) {
+        addPlayersBulkBtn.addEventListener('click', () => {
+          const namesString = bulkPlayerNamesTextarea.value;
+          this.addPlayersBulk(namesString);
+          bulkPlayerNamesTextarea.value = ''; // Clear textarea after processing
+        });
+      }
+
+      // Event listener for clear roster button
+      if (clearRosterBtn) {
+        clearRosterBtn.addEventListener('click', () => {
+          this.clearRoster();
+        });
+      }
+
       // Delegate remove player event
       if (rosterList) {
         rosterList.addEventListener('click', (e) => {
-          if (e.target.classList.contains('remove-player')) {
-            const playerToRemove = e.target.getAttribute('data-player');
-            this.removePlayer(playerToRemove);
+          const targetButton = e.target.closest('button'); // Get the button element, even if icon is clicked
+          if (!targetButton) return;
+
+          if (targetButton.classList.contains('remove-player')) {
+            const playerToRemove = targetButton.getAttribute('data-player');
+            // Confirmation before removing
+            if (confirm(`Are you sure you want to remove ${playerToRemove}?`)) {
+              this.removePlayer(playerToRemove);
+            }
+          } else if (targetButton.classList.contains('edit-player')) {
+            const playerToEdit = targetButton.getAttribute('data-player');
+            const newName = prompt(`Enter new name for ${playerToEdit}:`, playerToEdit);
+            if (newName !== null) { // Prompt returns null if Cancel is clicked
+              this.editPlayer(playerToEdit, newName);
+            }
           }
         });
       }

@@ -7,6 +7,7 @@
 <li>2.0 - Added Roster/team Management feature</li>
 <li>2.1 - General application ui and function improvements</li>
 <li>2.11 - Added time rounding (round up) to Goal Log</li>
-<li><b>3.0 - UI Overhall, ScoreBoard, Nav Pills, Modals, Fixture Management</b></li>
-<li><b>3.1 - New Match Events options and Events data, ability to delete individual logs</b></li>
-<li><b>3.2 - Change Match Evensts to show as a timeline view</b></li>
+<li>3.0 - UI Overhall, ScoreBoard, Nav Pills, Modals, Fixture Management</li>
+<li>3.1 - New Match Events options and Events data, ability to delete individual logs</li>
+<li>3.2 - Change Match Events to show as a timeline view</li>
+<li><b>3.2.1 - Goal timetamp accuracy and stability improvements</b></li>

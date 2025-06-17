@@ -70,9 +70,11 @@ const RosterManager = (function() {
   function getDefaultRoster() {
     // Returns a sorted array of unique player name strings
     return [
-      'A-R.Obidi','A.Seaman','D.Peacock','E.Doyle','E.Van-Kerro','E.Mutiti',
-      'F.Asadi','F.Kendall','H.Strowthers','M.Finch','M.Stevens','N.Janicka',
-      'S.Smith','T.Rushmer','V.Aig-Imoru'
+      'Player1','Player2','Player3',
+//    return [
+//      'A-R.Obidi','A.Seaman','D.Peacock','E.Doyle','E.Van-Kerro','E.Mutiti',
+ //     'F.Asadi','F.Kendall','H.Strowthers','M.Finch','M.Stevens','N.Janicka',
+//      'S.Smith','T.Rushmer','V.Aig-Imoru'
     ];
   }
 

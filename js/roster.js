@@ -52,14 +52,14 @@ const RosterManager = (function() {
   // Set a default roster if no roster is stored
   function getDefaultRoster() {
     return [
-      { name: 'A-R.Obidi', shirtNumber: null }, { name: 'A.Seaman', shirtNumber: null },
-      { name: 'D.Peacock', shirtNumber: null }, { name: 'E.Doyle', shirtNumber: null },
-      { name: 'E.Van-Kerro', shirtNumber: null }, { name: 'E.Mutiti', shirtNumber: null },
-      { name: 'F.Asadi', shirtNumber: null }, { name: 'F.Kendall', shirtNumber: null },
-      { name: 'H.Strowthers', shirtNumber: null }, { name: 'M.Finch', shirtNumber: null },
-      { name: 'M.Stevens', shirtNumber: null }, { name: 'N.Janicka', shirtNumber: null },
-      { name: 'S.Smith', shirtNumber: null }, { name: 'T.Rushmer', shirtNumber: null },
-      { name: 'V.Aig-Imoru', shirtNumber: null }
+      { name: 'A-R.Obidi', shirtNumber: '1' }, { name: 'A.Seaman', shirtNumber: '1' },
+      { name: 'D.Peacock', shirtNumber: '1' }, { name: 'E.Doyle', shirtNumber: '1' },
+      { name: 'E.Van-Kerro', shirtNumber: '1' }, { name: 'E.Mutiti', shirtNumber: '1' },
+      { name: 'F.Asadi', shirtNumber: '1' }, { name: 'F.Kendall', shirtNumber: '1' },
+      { name: 'H.Strowthers', shirtNumber: '1' }, { name: 'M.Finch', shirtNumber: '1' },
+      { name: 'M.Stevens', shirtNumber: '1' }, { name: 'N.Janicka', shirtNumber: '1' },
+      { name: 'S.Smith', shirtNumber: '1' }, { name: 'T.Rushmer', shirtNumber: '1' },
+      { name: 'V.Aig-Imoru', shirtNumber: '1' }
     ].sort((a, b) => a.name.localeCompare(b.name)); // Keep default sorted
   }
 

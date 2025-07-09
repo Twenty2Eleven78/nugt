@@ -10,5 +10,5 @@
 <li>3.0 - UI Overhall, ScoreBoard, Nav Pills, Modals, Fixture Management</li>
 <li>3.1 - New Match Events options and Events data, ability to delete individual logs</li>
 <li>3.2 - Change Match Events to show as a timeline view</li>
-<li><b>3.2.1 - Goal timestamp accuracy and stability improvements</b></li>
-<li><b>3.2.2 - Added shirt number functionality to player roster. Improved player editing with a dedicated modal.</b></li>
+<li>3.2.1 - Goal timestamp accuracy and stability improvements</li>
+<li><b>3.2.2 - Added shirt number functionality to player roster</b></li>

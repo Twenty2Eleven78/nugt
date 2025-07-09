@@ -94,6 +94,11 @@ body {
     transform: translateX(-50%);
   }
 
+/* Darker modal backdrop */
+.modal-backdrop {
+  opacity: 0.85 !important; /* Bootstrap default is 0.5. !important might be needed to override Bootstrap's default styles */
+}
+
   .timeline-item {
     padding-left: 0;
   }

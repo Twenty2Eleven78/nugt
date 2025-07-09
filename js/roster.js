@@ -491,35 +491,40 @@ const RosterManager = (function() {
             const playerToEdit = roster.find(p => p.name === playerName);
             if (!playerToEdit) return;
 
-            const newName = prompt(`Enter new name for ${playerName}:`, playerName);
-            if (newName !== null && newName.trim() !== '') {
-              const currentShirtNumber = playerToEdit.shirtNumber !== null ? playerToEdit.shirtNumber : '';
-              const newShirtNumberStr = prompt(`Enter new shirt number for ${newName.trim()} (leave blank for no number):`, currentShirtNumber);
+            // Populate and show the edit player modal
+            document.getElementById('editPlayerOldName').value = playerToEdit.name;
+            document.getElementById('editPlayerName').value = playerToEdit.name;
+            document.getElementById('editPlayerShirtNumber').value = playerToEdit.shirtNumber !== null ? playerToEdit.shirtNumber : '';
 
-              // newShirtNumberStr could be null if user cancels prompt, or empty string
-              // parseInt will handle empty string as NaN, which is fine for validation in editPlayer
-              this.editPlayer(playerName, newName.trim(), newShirtNumberStr);
+            const editModalElement = document.getElementById('editPlayerModal');
+            if (editModalElement) {
+              const editModal = bootstrap.Modal.getInstance(editModalElement) || new bootstrap.Modal(editModalElement);
+              editModal.show();
             }
           }
         });
       }
 
-      // Open roster modal event listener
-      // This event listener might be in script.js or elsewhere if 'openRosterModalBtn' is a global button.
-      // For now, assuming it's specific to this modal's context or handled externally.
-      // If openRosterModalBtn is indeed part of this component's controlled elements:
-      // if (openRosterModalBtn) {
-      //   openRosterModalBtn.addEventListener('click', () => {
-      //     const rosterModalElement = document.getElementById('rosterModal');
-      //     if (rosterModalElement) {
-      //       const rosterModal = bootstrap.Modal.getInstance(rosterModalElement) || new bootstrap.Modal(rosterModalElement);
-      //       rosterModal.show();
-      //       // Optionally clear inputs when modal opens
-      //       if(newPlayerNameInput) newPlayerNameInput.value = '';
-      //       if(newPlayerShirtNumberInput) newPlayerShirtNumberInput.value = '';
-      //     }
-      //   });
-      // }
+      // Event listener for the edit player form submission
+      const editPlayerForm = document.getElementById('editPlayerForm');
+      if (editPlayerForm) {
+        editPlayerForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const oldName = document.getElementById('editPlayerOldName').value;
+          const newName = document.getElementById('editPlayerName').value.trim();
+          const newShirtNumber = document.getElementById('editPlayerShirtNumber').value; // string or empty
+
+          if (this.editPlayer(oldName, newName, newShirtNumber)) {
+            const editModalElement = document.getElementById('editPlayerModal');
+            const editModal = bootstrap.Modal.getInstance(editModalElement);
+            if (editModal) {
+              editModal.hide();
+            }
+          }
+          // If editPlayer returns false (due to validation failure), the modal remains open
+          // and the RosterManager.editPlayer function would have shown a notification.
+        });
+      }
     }
   };
 })();

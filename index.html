@@ -45,7 +45,7 @@
         <!-- Header -->
         <div class="row mb-3">
           <div class="col-12">
-            <h3>NUFC GameTime v3.2</h3>
+            <h3>NUFC GameTime v3.2.2</h3>
           </div>
         </div>
         <!-- END Header -->
@@ -399,7 +399,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title modal-title-enhanced">Team Roster Management</h4>
+          <h4 class="modal-title modal-title-enhanced"><i class="fas fa-users me-2"></i>Team Roster Management</h4>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
@@ -453,6 +453,36 @@
     </div>
   </div>
 <!-- END Roster Modal -->
+
+<!-- Edit Player Modal -->
+<div class="modal fade" id="editPlayerModal" tabindex="-1" aria-labelledby="editPlayerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editPlayerModalLabel"><i class="fas fa-user-edit me-2"></i>Edit Player</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editPlayerForm">
+          <input type="hidden" id="editPlayerOldName" name="editPlayerOldName">
+          <div class="mb-3">
+            <label for="editPlayerName" class="form-label">Player Name</label>
+            <input type="text" class="form-control" id="editPlayerName" name="editPlayerName" required>
+          </div>
+          <div class="mb-3">
+            <label for="editPlayerShirtNumber" class="form-label">Shirt Number (0-99, blank for none)</label>
+            <input type="number" class="form-control" id="editPlayerShirtNumber" name="editPlayerShirtNumber" min="0" max="99">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END Edit Player Modal -->
 
 <!--Confirm Reset Modal-->
 <div class="modal fade" id="resetConfirmModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
@@ -580,7 +610,7 @@
           </div>
 
           <!-- App Version -->
-          <input type="hidden" name="App Version" value="3.1">
+          <input type="hidden" name="App Version" value="3.2.2">
 
           <!-- Submit Button -->
           <div class="d-grid">

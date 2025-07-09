@@ -94,9 +94,9 @@ body {
     transform: translateX(-50%);
   }
 
-/* Darker modal backdrop */
-.modal-backdrop {
-  opacity: 0.85 !important; /* Bootstrap default is 0.5. !important might be needed to override Bootstrap's default styles */
+/* Custom shadow for Edit Player Modal */
+#editPlayerModal .modal-content {
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.25);
 }
 
   .timeline-item {

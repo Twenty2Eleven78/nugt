@@ -98,6 +98,44 @@ const Storage = {
   }
 };
 
+const UI = {
+  update() {
+    this.updateStopwatch();
+    this.updateScoreboard();
+    this.updateTeamNames();
+    this.updateLog();
+  },
+
+  updateStopwatch() {
+    const time = formatTime(STATE.seconds);
+    if (STATE.isRunning) {
+      updateStartPauseButtonUI('Game in Progress', 'btn-success', time);
+    } else if (STATE.seconds > 0) {
+      updateStartPauseButtonUI('Game is Paused', 'btn-danger', time);
+    } else {
+      updateStartPauseButtonUI('Start Game', 'btn-danger', time);
+    }
+  },
+
+  updateScoreboard() {
+    elements.firstScoreElement.textContent = Storage.load(STORAGE_KEYS.FIRST_SCORE, 0);
+    elements.secondScoreElement.textContent = Storage.load(STORAGE_KEYS.SECOND_SCORE, 0);
+  },
+
+  updateTeamNames() {
+    const team1Name = Storage.load(STORAGE_KEYS.TEAM1_NAME, 'Netherton');
+    const team2Name = Storage.load(STORAGE_KEYS.TEAM2_NAME, 'Opposition');
+    elements.Team1NameElement.textContent = team1Name;
+    elements.Team2NameElement.textContent = team2Name;
+    elements.goalButton.lastChild.nodeValue = ' ' + team1Name;
+    elements.opgoalButton.lastChild.nodeValue = ' ' + team2Name;
+    if (elements.team1Input) elements.team1Input.placeholder = team1Name;
+    if (elements.team2Input) elements.team2Input.placeholder = team2Name;
+  },
+
+  updateLog,
+};
+
 // Time formatting utility
 function formatTime(seconds) {
   const minutes = Math.floor(seconds / 60);
@@ -707,9 +745,7 @@ function resetTracker() {
   STATE.isSecondHalf = false;
   
   // Reset UI
-  updateStopwatchDisplay(); // Ensures STATE.seconds (0) is saved
-  updateLog();
-  updateStartPauseButtonUI('Start Game', 'btn-danger', formatTime(0));
+  UI.update();
 
   // Reset scoreboard
   elements.firstScoreElement.textContent = '0';
@@ -967,23 +1003,8 @@ function initializeApp() {
   STATE.seconds = Storage.load(STORAGE_KEYS.ELAPSED_TIME, 0);
   STATE.data = Storage.load(STORAGE_KEYS.GOALS, []);
   STATE.matchEvents = Storage.load(STORAGE_KEYS.MATCH_EVENTS, []);
-
-  // Load saved scores
-  const firstScore = Storage.load(STORAGE_KEYS.FIRST_SCORE, 0);
-  const secondScore = Storage.load(STORAGE_KEYS.SECOND_SCORE, 0);
-  elements.firstScoreElement.textContent = firstScore;
-  elements.secondScoreElement.textContent = secondScore;
-
-  // Load saved team names
-  const team1Name = Storage.load(STORAGE_KEYS.TEAM1_NAME, 'Netherton');
-  const team2Name = Storage.load(STORAGE_KEYS.TEAM2_NAME, 'Opposition');
   STATE.team1History = Storage.load(STORAGE_KEYS.TEAM1_HISTORY, ['Netherton']);
   STATE.team2History = Storage.load(STORAGE_KEYS.TEAM2_HISTORY, ['Opposition']);
-  elements.Team1NameElement.textContent = team1Name;
-  elements.Team2NameElement.textContent = team2Name;
-
-  elements.goalButton.lastChild.nodeValue =  ' ' + team1Name;
-  elements.opgoalButton.lastChild.nodeValue =  ' ' + team2Name;
 
     // Load saved game time
     const defaultGameTime = elements.gameTimeSelect.querySelector('option[selected]')?.value || elements.gameTimeSelect.value;
@@ -991,12 +1012,6 @@ function initializeApp() {
     STATE.isSecondHalf = Storage.load(STORAGE_KEYS.IS_SECOND_HALF, false);
     elements.gameTimeSelect.value = STATE.gameTime;
 
-  // Update input placeholders
-  const team1Input = document.getElementById('team1Name');
-  const team2Input = document.getElementById('team2Name');
-  if (team1Input) team1Input.placeholder = team1Name;
-  if (team2Input) team2Input.placeholder = team2Name;
-  
   // If timer was running, calculate elapsed time and let startStopwatch handle UI
   if (STATE.isRunning && STATE.startTimestamp) {
       const currentTime = Date.now();
@@ -1004,20 +1019,17 @@ function initializeApp() {
       STATE.seconds = elapsedSeconds;
       // startStopwatch will call updateStartPauseButtonUI with 'Game in Progress'
       startStopwatch();
-  } else {
-      // Timer is not running. STATE.seconds has its loaded value.
-      if (STATE.seconds > 0) { // Game was paused
-          updateStartPauseButtonUI('Game is Paused', 'btn-danger', formatTime(STATE.seconds));
-      } else { // Game was not started or was reset
-          updateStartPauseButtonUI('Start Game', 'btn-danger', formatTime(0));
-      }
   }
 
   // updateStopwatchDisplay will ensure the time in the span is accurate and state is saved.
-  updateStopwatchDisplay();
-  updateLog();
+  UI.update();
   fetchReadme();
 
+}
+
+function updateTheme(theme) {
+  document.body.classList.toggle('dark-mode', theme === 'dark');
+  Storage.save('theme', theme);
 }
 
 // Event Listeners
@@ -1035,26 +1047,17 @@ elements.gameTimeSelect.addEventListener('change', handleGameTimeChange);
 document.getElementById('editEventForm').addEventListener('submit', handleEditEventFormSubmission);
 
   // Update Team 1 button click handler
-  elements.updTeam1Btn.addEventListener('click', () => {
-    const newTeamName = elements.team1Input.value.trim();
+  elements.Team1NameElement.addEventListener('blur', () => {
+    const newTeamName = elements.Team1NameElement.textContent.trim();
     if (newTeamName) {
       updatefixtureTeams('first', newTeamName);
-      elements.team1Input.value = '';
-      // Close the modal using Bootstrap's modal instance
-      const modal = bootstrap.Modal.getInstance(document.getElementById('fixtureModalTeam1'));
-      modal.hide();
     }
   });
 
-  // Update Team 2 button click handler
-  elements.updTeam2Btn.addEventListener('click', () => {
-    const newTeamName = elements.team2Input.value.trim();
+  elements.Team2NameElement.addEventListener('blur', () => {
+    const newTeamName = elements.Team2NameElement.textContent.trim();
     if (newTeamName) {
       updatefixtureTeams('second', newTeamName);
-      elements.team2Input.value = '';
-      // Close the modal using Bootstrap's modal instance
-      const modal = bootstrap.Modal.getInstance(document.getElementById('fixtureModalTeam2'));
-      modal.hide();
     }
   });
 
@@ -1080,5 +1083,16 @@ document.addEventListener('DOMContentLoaded', function() {
           currentUrl.searchParams.set('feedback', 'success');
           nextInput.value = currentUrl.toString();
       }
+  }
+
+  const darkModeSwitch = document.getElementById('darkModeSwitch');
+  darkModeSwitch.addEventListener('change', () => {
+    updateTheme(darkModeSwitch.checked ? 'dark' : 'light');
+  });
+
+  const savedTheme = Storage.load('theme');
+  if (savedTheme) {
+    darkModeSwitch.checked = savedTheme === 'dark';
+    updateTheme(savedTheme);
   }
 });

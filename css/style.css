@@ -333,6 +333,30 @@ body {
   font-weight: 600; /* Slightly bolder */
 }
 
+.dark-mode {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.dark-mode .card {
+  background-color: #1e1e1e;
+  border-color: #2c2c2c;
+}
+
+.dark-mode .btn-secondary {
+  background-color: #333333;
+  border-color: #444444;
+}
+
+.dark-mode .nav-pills .nav-link {
+  color: #ffffff;
+}
+
+.dark-mode .nav-pills .nav-link.active {
+  background-color: #bb86fc;
+  color: #000000;
+}
+
 .roster-table td {
   vertical-align: middle;
   padding: 0.5rem; /* Adjust padding as needed */

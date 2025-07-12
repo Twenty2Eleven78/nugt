@@ -77,11 +77,11 @@
                   <div class="row">
                     <div class="col-6 text-center">
                       <h1 id="first-score">0</h1>
-                      <div><button id="first-team-name" class="btn btn-link btn-custom" data-bs-toggle="modal" data-bs-target="#fixtureModalTeam1">Netherton</button></div>
+                      <div><h2 id="first-team-name" contenteditable="true">Netherton</h2></div>
                     </div>
                     <div class="col-6 text-center">
                       <h1 id="second-score">0</h1>
-                      <div><button id="second-team-name" class="btn btn-link btn-custom" data-bs-toggle="modal" data-bs-target="#fixtureModalTeam2">Opposition Team</button></div>
+                      <div><h2 id="second-team-name" contenteditable="true">Opposition Team</h2></div>
                     </div>
                   </div>
                 </div>
@@ -98,12 +98,12 @@
                       <div class="row g-2 mb-3">
                         <div class="col-6">
                           <button id="goalButton" class="btn btn-success w-100 d-flex flex-column align-items-center py-2" onclick="showGoalModal()">
-                            <i class="fa-solid fa-futbol me-2"></i>Team1
+                            <i class="fa-solid fa-futbol fa-2x mb-2"></i>Team1 Goal
                           </button>
                         </div>
                         <div class="col-6">
                           <button id="opgoalButton" class="btn btn-danger w-100 d-flex flex-column align-items-center py-2" type="button">
-                            <i class="fa-solid fa-futbol me-2"></i>Team2
+                            <i class="fa-solid fa-futbol fa-2x mb-2"></i>Team2 Goal
                           </button>
                         </div>
                       </div>
@@ -189,6 +189,10 @@
                   <div class="mb-4">
                     <h6 class="fw-bold mb-3">App Management</h6>
                     <div class="d-grid gap-2">
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="darkModeSwitch">
+                        <label class="form-check-label" for="darkModeSwitch">Dark Mode</label>
+                      </div>
                       <!--Donate -->
                       <!--<button class="btn btn-warning d-flex align-items-center justify-content-center py-2" id="donateButton" data-bs-toggle="modal" data-bs-target="#donateModal">
                         <i class="fa-solid fa-heart me-2"></i>
@@ -274,63 +278,6 @@
 </div>
 <!--END Release Notes Modal-->
 
-<!-- Fixture Modal Team 1 -->
-<div class="modal fade" id="fixtureModalTeam1" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Our Team Name Management</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-12 col-md-8">
-            <div class="input-group mb-3">
-              <div>
-               <input type="text" id="team1Name" class="form-control" placeholder="Netherton">
-               <br>
-               <button class="btn btn-danger btn-custom" id="updTeam1Btn">Update Team Name</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- END Fixture Modal Team 1 -->
-
-<!-- Fixture Modal Team 2 -->
-<div class="modal fade" id="fixtureModalTeam2" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Opposition Name Management</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-12 col-md-8">
-            <div class="input-group mb-3">
-              <div>
-               <input type="text" id="team2Name" class="form-control" placeholder="Opposition Team">
-               <br>
-               <button class="btn btn-danger btn-custom" id="updTeam2Btn">Update Team Name</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- END Fixture Modal Team 2 -->
 
 <!-- Goal Modal -->
 <div class="modal fade" id="goalModal" tabindex="-1">

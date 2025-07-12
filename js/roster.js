@@ -115,6 +115,13 @@ const RosterManager = (function() {
       return roster.map(player => ({ ...player })); // Return a deep copy
     },
 
+    // Get a player by name
+    getPlayerByName(name) {
+      if (!name) return null;
+      const lowerCaseName = name.toLowerCase();
+      return roster.find(player => player.name.toLowerCase() === lowerCaseName) || null;
+    },
+
     // Update select dropdowns
     updateSelects() {
       const goalScorerSelect = document.getElementById('goalScorer');

@@ -324,10 +324,15 @@ function addGoal(event) {
   const currentSeconds = STATE.pendingGoalTimestamp || getCurrentSeconds(); // Use stored timestamp
   const team1Name = elements.Team1NameElement.textContent;
   
+  const goalScorer = RosterManager.getPlayerByName(goalScorerName);
+  const goalAssister = RosterManager.getPlayerByName(goalAssistName);
+
   const goalData = {
     timestamp: formatMatchTime(currentSeconds), // Use new format
     goalScorerName,
+    goalScorerShirtNumber: goalScorer ? goalScorer.shirtNumber : null,
     goalAssistName,
+    goalAssistShirtNumber: goalAssister ? goalAssister.shirtNumber : null,
     rawTime: currentSeconds,
     team: 1, // Indicate this is a team 1 goal
     teamName: team1Name // Store the current team name
@@ -459,15 +464,15 @@ function updateLog() {
       item.innerHTML = `
         <div class="timeline-marker"></div>
         <div class="timeline-content ${cardClass}">
-          <div class="timeline-time">${event.timestamp}'</div>
+          <div class="timeline-header">
+            <span class="timeline-time">${event.timestamp}'</span>
+            <strong class="event-title">${eventText}</strong>
+            <span class="score-info">${scoreInfo}</span>
+          </div>
           <div class="timeline-body">
             <div class="d-flex justify-content-between align-items-start">
-              <div class="event-info d-flex align-items-center">
-                <span class="event-icon me-2">${icon}</span>
-                <strong>${eventText}</strong>${scoreInfo}
-              </div>
               <div class="event-actions">
-                <button class="btn btn-sm btn-outline-primary" 
+                <button class="btn btn-sm btn-outline-primary"
                   onclick="openEditEventModal(${event.originalIndex}, '${event.updatetype}')">
                   <i class="fas fa-edit"></i>
                 </button>
@@ -495,22 +500,24 @@ function updateLog() {
       item.innerHTML = `
         <div class="timeline-marker ${disallowedMarker}"></div>
         <div class="timeline-content ${disallowedClass}">
-          <div class="timeline-time">${event.timestamp}'</div>
+          <div class="timeline-header">
+            <span class="timeline-time">${event.timestamp}'</span>
+            <strong class="event-title">
+              ${isOppositionGoal
+                ? `<span class="text-danger"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</span>`
+                : `<span class="text-success"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</span>`
+              }
+            </strong>
+          </div>
           <div class="timeline-body">
             <div class="d-flex justify-content-between align-items-start">
               <div class="event-info">
-                <strong>
-                  ${isOppositionGoal
-                    ? `<span class="text-danger"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</span>`
-                    : `<span class="text-success"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</span>`
-                  }
-                </strong>
-                ${isOppositionGoal ? '' : `<br><small><strong>Scored By: </strong>${event.goalScorerName}, <strong>Assisted By:</strong> ${event.goalAssistName}</small>`}
+                ${isOppositionGoal ? '' : `<small><strong>Scored By: </strong>${event.goalScorerName} ${event.goalScorerShirtNumber ? `(#${event.goalScorerShirtNumber})` : ''}, <strong>Assisted By:</strong> ${event.goalAssistName} ${event.goalAssistShirtNumber ? `(#${event.goalAssistShirtNumber})` : ''}</small>`}
                 ${disallowedText}
               </div>
               <div class="event-actions">
-                <button class="btn btn-sm btn-outline-warning me-2" 
-                   onclick="toggleGoalDisallowed(${event.originalIndex})" 
+                <button class="btn btn-sm btn-outline-warning me-2"
+                   onclick="toggleGoalDisallowed(${event.originalIndex})"
                    title="${event.disallowed ? 'Allow goal' : 'Disallow goal'}">
                   <i class="fas fa-${event.disallowed ? 'check' : 'ban'}"></i>
                 </button>

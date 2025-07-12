@@ -461,18 +461,21 @@ function updateLog() {
         <div class="timeline-content ${cardClass}">
           <div class="timeline-time">${event.timestamp}'</div>
           <div class="timeline-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>${icon} <strong>${eventText}</strong>${scoreInfo}</div>
-              <div>
+            <div class="d-flex justify-content-between align-items-start">
+              <div class="event-info d-flex align-items-center">
+                <span class="event-icon me-2">${icon}</span>
+                <strong>${eventText}</strong>${scoreInfo}
+              </div>
+              <div class="event-actions">
                 <button class="btn btn-sm btn-outline-primary" 
-                 onclick="openEditEventModal(${event.originalIndex}, '${event.updatetype}')">
-                 <i class="fas fa-edit"></i>
+                  onclick="openEditEventModal(${event.originalIndex}, '${event.updatetype}')">
+                  <i class="fas fa-edit"></i>
                 </button>
                 <button class="btn btn-sm btn-outline-danger" 
                   onclick="deleteLogEntry(${event.originalIndex}, 'event')" 
                   aria-label="Delete event">
-                 <i class="fas fa-trash"></i>
-                 </button>
+                  <i class="fas fa-trash"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -480,16 +483,11 @@ function updateLog() {
       `;
     } else {
       // Goal event
-      // Use the stored team information if available
       const goalTeam = event.team || (event.goalScorerName === currentTeam2Name ? 2 : 1);
       const isOppositionGoal = goalTeam === 2;
-      
-      // Get the correct team name to display
       const displayTeamName = isOppositionGoal ? currentTeam2Name : currentTeam1Name;
-      
       const cardClass = isOppositionGoal ? 'border-danger border-2' : 'border-success border-2';
       const markerClass = isOppositionGoal ? 'marker-danger' : 'marker-success';
-      
       const disallowedClass = event.disallowed ? 'border-warning border-2' : cardClass;
       const disallowedMarker = event.disallowed ? 'marker-warning' : markerClass;
       const disallowedText = event.disallowed ? `<br><small class="text-warning"><strong>DISALLOWED:</strong> ${event.disallowedReason}</small>` : '';
@@ -499,13 +497,18 @@ function updateLog() {
         <div class="timeline-content ${disallowedClass}">
           <div class="timeline-time">${event.timestamp}'</div>
           <div class="timeline-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <strong>${isOppositionGoal ? `<font color="red"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</font>` : `<font color="green"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</font>`}</strong>
+            <div class="d-flex justify-content-between align-items-start">
+              <div class="event-info">
+                <strong>
+                  ${isOppositionGoal
+                    ? `<span class="text-danger"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</span>`
+                    : `<span class="text-success"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</span>`
+                  }
+                </strong>
                 ${isOppositionGoal ? '' : `<br><small><strong>Scored By: </strong>${event.goalScorerName}, <strong>Assisted By:</strong> ${event.goalAssistName}</small>`}
                 ${disallowedText}
               </div>
-              <div>
+              <div class="event-actions">
                 <button class="btn btn-sm btn-outline-warning me-2" 
                    onclick="toggleGoalDisallowed(${event.originalIndex})" 
                    title="${event.disallowed ? 'Allow goal' : 'Disallow goal'}">
@@ -515,10 +518,10 @@ function updateLog() {
                    onclick="openEditEventModal(${event.originalIndex}, '${event.updatetype}')">
                   <i class="fas fa-edit"></i>
                 </button>
-               <button class="btn btn-sm btn-outline-danger" 
-                 onclick="deleteLogEntry(${event.originalIndex}, 'goal')" 
-                 aria-label="Delete goal">
-                 <i class="fas fa-trash"></i>
+                <button class="btn btn-sm btn-outline-danger"
+                  onclick="deleteLogEntry(${event.originalIndex}, 'goal')"
+                  aria-label="Delete goal">
+                  <i class="fas fa-trash"></i>
                 </button>
               </div>
             </div>

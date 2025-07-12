@@ -146,6 +146,34 @@ body {
     font-size: 0.875rem;
   }
 }
+
+/* Mobile-specific adjustments for the timeline */
+@media (max-width: 767.98px) {
+  .timeline-body .d-flex {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .event-info {
+    margin-bottom: 0.5rem;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .event-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .event-actions .btn {
+    margin-left: 0.5rem;
+  }
+
+  .event-icon {
+    font-size: 1.2rem;
+  }
+}
 .readme-content {
   padding: 15px;
   line-height: 1.6;

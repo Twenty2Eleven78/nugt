@@ -518,7 +518,8 @@ function updateLog() {
                   <i class="fas fa-${event.disallowed ? 'check' : 'ban'}"></i>
                 </button>
                 <button class="btn btn-sm btn-outline-primary me-2" 
-                   onclick="openEditEventModal(${event.originalIndex}, '${event.updatetype}')">
+                   onclick="openEditEventModal(${event.originalIndex}, '${event.updatetype}')"
+                   title="Edit goal">
                   <i class="fas fa-edit"></i>
                 </button>
                 <button class="btn btn-sm btn-outline-danger"

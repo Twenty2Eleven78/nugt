@@ -508,7 +508,7 @@ function updateLog() {
           <div class="timeline-body">
             <div class="d-flex justify-content-between align-items-start">
               <div class="event-info">
-                ${isOppositionGoal ? '' : `<br><small><strong>Scored By: </strong>${event.goalScorerName} ${event.goalScorerShirtNumber ? `(#${event.goalScorerShirtNumber})` : ''}, <strong>Assisted By:</strong> ${event.goalAssistName} ${event.goalAssistShirtNumber ? `(#${event.goalAssistShirtNumber})` : ''}</small>`}
+                ${isOppositionGoal ? '' : `<br><small><strong>Scored By: </strong>${event.goalScorerName} ${event.goalScorerShirtNumber ? `(#${event.goalScorerShirtNumber})` : ''}<br> <Strong>Assisted By:</strong> ${event.goalAssistName} ${event.goalAssistShirtNumber ? `(#${event.goalAssistShirtNumber})` : ''}</small>`}
                 ${disallowedText}
               </div>
               <div class="event-actions">

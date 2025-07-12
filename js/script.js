@@ -490,17 +490,27 @@ function updateLog() {
       const cardClass = isOppositionGoal ? 'border-danger border-2' : 'border-success border-2';
       const markerClass = isOppositionGoal ? 'marker-danger' : 'marker-success';
       
+      const disallowedClass = event.disallowed ? 'border-warning border-2' : cardClass;
+      const disallowedMarker = event.disallowed ? 'marker-warning' : markerClass;
+      const disallowedText = event.disallowed ? `<br><small class="text-warning"><strong>DISALLOWED:</strong> ${event.disallowedReason}</small>` : '';
+      
       item.innerHTML = `
-        <div class="timeline-marker ${markerClass}"></div>
-        <div class="timeline-content ${cardClass}">
+        <div class="timeline-marker ${disallowedMarker}"></div>
+        <div class="timeline-content ${disallowedClass}">
           <div class="timeline-time">${event.timestamp}'</div>
           <div class="timeline-body">
             <div class="d-flex justify-content-between align-items-center">
               <div>
                 <strong>${isOppositionGoal ? `<font color="red"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</font>` : `<font color="green"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</font>`}</strong>
                 ${isOppositionGoal ? '' : `<br><small><strong>Scored By: </strong>${event.goalScorerName}, <strong>Assisted By:</strong> ${event.goalAssistName}</small>`}
+                ${disallowedText}
               </div>
               <div>
+                <button class="btn btn-sm btn-outline-warning me-2" 
+                   onclick="toggleGoalDisallowed(${event.originalIndex})" 
+                   title="${event.disallowed ? 'Allow goal' : 'Disallow goal'}">
+                  <i class="fas fa-${event.disallowed ? 'check' : 'ban'}"></i>
+                </button>
                 <button class="btn btn-sm btn-outline-primary me-2" 
                    onclick="openEditEventModal(${event.originalIndex}, '${event.updatetype}')">
                   <i class="fas fa-edit"></i>
@@ -525,6 +535,38 @@ function updateLog() {
   elements.log.appendChild(fragment);
 }
 
+// Toggle goal disallowed status
+function toggleGoalDisallowed(index) {
+  const goal = STATE.data[index];
+  if (goal.disallowed) {
+    goal.disallowed = false;
+    goal.disallowedReason = null;
+  } else {
+    const reason = prompt('Reason for disallowing goal:');
+    if (reason) {
+      goal.disallowed = true;
+      goal.disallowedReason = reason;
+    } else {
+      return; // User cancelled
+    }
+  }
+  
+  // Recalculate scores
+  const team2Name = elements.Team2NameElement.textContent;
+  const teamGoals = STATE.data.filter(goal => !goal.disallowed && goal.goalScorerName !== team2Name).length;
+  const oppositionGoals = STATE.data.filter(goal => !goal.disallowed && goal.goalScorerName === team2Name).length;
+  
+  elements.firstScoreElement.textContent = teamGoals;
+  elements.secondScoreElement.textContent = oppositionGoals;
+  
+  Storage.save(STORAGE_KEYS.FIRST_SCORE, teamGoals);
+  Storage.save(STORAGE_KEYS.SECOND_SCORE, oppositionGoals);
+  Storage.save(STORAGE_KEYS.GOALS, STATE.data);
+  
+  updateLog();
+  showNotification(goal.disallowed ? 'Goal disallowed' : 'Goal allowed', goal.disallowed ? 'warning' : 'success');
+}
+
 //Delete Log Entry
 function deleteLogEntry(index, type) {
   if (type === 'goal') {
@@ -533,8 +575,8 @@ function deleteLogEntry(index, type) {
     
     // Recalculate score
     const team2Name = elements.Team2NameElement.textContent;
-    const teamGoals = STATE.data.filter(goal => goal.goalScorerName !== team2Name).length;
-    const oppositionGoals = STATE.data.filter(goal => goal.goalScorerName === team2Name).length;
+    const teamGoals = STATE.data.filter(goal => !goal.disallowed && goal.goalScorerName !== team2Name).length;
+    const oppositionGoals = STATE.data.filter(goal => !goal.disallowed && goal.goalScorerName === team2Name).length;
     
     elements.firstScoreElement.textContent = teamGoals;
     elements.secondScoreElement.textContent = oppositionGoals;
@@ -705,9 +747,10 @@ function formatLogForWhatsApp() {
       } else {
         // Goal event (existing logic)
         const isOppositionGoal = event.goalScorerName === team2Name;
+        const disallowedText = event.disallowed ? ` (DISALLOWED: ${event.disallowedReason})` : '';
         return isOppositionGoal 
-          ? `🥅 ${event.timestamp}' - ${team2Name} Goal`
-          : `🥅 ${event.timestamp}' - Goal: ${event.goalScorerName}, Assist: ${event.goalAssistName}`;
+          ? `🥅 ${event.timestamp}' - ${team2Name} Goal${disallowedText}`
+          : `🥅 ${event.timestamp}' - Goal: ${event.goalScorerName}, Assist: ${event.goalAssistName}${disallowedText}`;
       }
     })
     .join('\n');
@@ -726,7 +769,10 @@ function generateStats() {
 
 // Add a check if STATE.data is empty
 if (STATE.data && STATE.data.length > 0) {
-  STATE.data.forEach(({ goalScorerName, goalAssistName }) => {
+  STATE.data.forEach(({ goalScorerName, goalAssistName, disallowed }) => {
+    // Skip disallowed goals
+    if (disallowed) return;
+    
     // Check if the goal scorer matches any historical team 2 name
     if (STATE.team2History.includes(goalScorerName)) {
       oppositionGoals++;
@@ -816,6 +862,15 @@ function getEventCardClass(eventType) {
   }
 }
 
+// Add CSS classes for disallowed goals
+function addDisallowedStyles() {
+  const style = document.createElement('style');
+  style.textContent = `
+    .marker-warning { background-color: #ffc107 !important; }
+  `;
+  document.head.appendChild(style);
+}
+
 function getEventIcon(eventType) {
   switch(eventType) {
     case 'Half Time':
@@ -895,6 +950,7 @@ function initializeApp() {
 	
   // Initialize roster
   RosterManager.init();
+  addDisallowedStyles();
   let resetModal;
 	
   // Load saved data

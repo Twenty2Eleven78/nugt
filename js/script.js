@@ -324,10 +324,15 @@ function addGoal(event) {
   const currentSeconds = STATE.pendingGoalTimestamp || getCurrentSeconds(); // Use stored timestamp
   const team1Name = elements.Team1NameElement.textContent;
   
+  const goalScorer = RosterManager.getPlayerByName(goalScorerName);
+  const goalAssister = RosterManager.getPlayerByName(goalAssistName);
+
   const goalData = {
     timestamp: formatMatchTime(currentSeconds), // Use new format
     goalScorerName,
+    goalScorerShirtNumber: goalScorer ? goalScorer.shirtNumber : null,
     goalAssistName,
+    goalAssistShirtNumber: goalAssister ? goalAssister.shirtNumber : null,
     rawTime: currentSeconds,
     team: 1, // Indicate this is a team 1 goal
     teamName: team1Name // Store the current team name
@@ -505,7 +510,7 @@ function updateLog() {
                     : `<span class="text-success"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</span>`
                   }
                 </strong>
-                ${isOppositionGoal ? '' : `<br><small><strong>Scored By: </strong>${event.goalScorerName}, <strong>Assisted By:</strong> ${event.goalAssistName}</small>`}
+                ${isOppositionGoal ? '' : `<br><small><strong>Scored By: </strong>${event.goalScorerName} ${event.goalScorerShirtNumber ? `(#${event.goalScorerShirtNumber})` : ''}, <strong>Assisted By:</strong> ${event.goalAssistName} ${event.goalAssistShirtNumber ? `(#${event.goalAssistShirtNumber})` : ''}</small>`}
                 ${disallowedText}
               </div>
               <div class="event-actions">

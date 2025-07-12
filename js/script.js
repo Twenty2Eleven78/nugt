@@ -524,7 +524,8 @@ function updateLog() {
                 </button>
                 <button class="btn btn-sm btn-outline-danger"
                   onclick="deleteLogEntry(${event.originalIndex}, 'goal')"
-                  aria-label="Delete goal">
+                  aria-label="Delete goal"
+                  title="Delete goal">
                   <i class="fas fa-trash"></i>
                 </button>
               </div>

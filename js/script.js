@@ -23,7 +23,7 @@ const STATE = {
   data: [],
   startTimestamp: null,
   matchEvents: [],
-  gameTime: 3600, // Default 60 minutes in seconds
+  gameTime: 4200, // Default 70 minutes in seconds
   isSecondHalf: false,
   team1History: ['Netherton'], // Initialize with default name
   team2History: ['Opposition'], // Initialize with default name

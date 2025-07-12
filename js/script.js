@@ -464,12 +464,11 @@ function updateLog() {
       item.innerHTML = `
         <div class="timeline-marker"></div>
         <div class="timeline-content ${cardClass}">
-          <div class="timeline-time">${event.timestamp}'</div>
+          <div class="timeline-time">${event.timestamp}' - <strong>${eventText}</strong>${scoreInfo}</div>
           <div class="timeline-body">
             <div class="d-flex justify-content-between align-items-start">
               <div class="event-info d-flex align-items-center">
                 <span class="event-icon me-2">${icon}</span>
-                <strong>${eventText}</strong>${scoreInfo}
               </div>
               <div class="event-actions">
                 <button class="btn btn-sm btn-outline-primary" 
@@ -500,16 +499,15 @@ function updateLog() {
       item.innerHTML = `
         <div class="timeline-marker ${disallowedMarker}"></div>
         <div class="timeline-content ${disallowedClass}">
-          <div class="timeline-time">${event.timestamp}'</div>
-          <div class="timeline-body">
-            <div class="d-flex justify-content-between align-items-start">
-              <div class="event-info">
-                <strong>
+          <div class="timeline-time">${event.timestamp}' - <strong>
                   ${isOppositionGoal
                     ? `<span class="text-danger"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</span>`
                     : `<span class="text-success"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</span>`
                   }
-                </strong>
+                </strong></div>
+          <div class="timeline-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div class="event-info">
                 ${isOppositionGoal ? '' : `<br><small><strong>Scored By: </strong>${event.goalScorerName} ${event.goalScorerShirtNumber ? `(#${event.goalScorerShirtNumber})` : ''}, <strong>Assisted By:</strong> ${event.goalAssistName} ${event.goalAssistShirtNumber ? `(#${event.goalAssistShirtNumber})` : ''}</small>`}
                 ${disallowedText}
               </div>

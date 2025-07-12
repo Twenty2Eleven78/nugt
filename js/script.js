@@ -922,7 +922,8 @@ function initializeApp() {
   elements.opgoalButton.lastChild.nodeValue =  ' ' + team2Name;
 
     // Load saved game time
-    STATE.gameTime = Storage.load(STORAGE_KEYS.GAME_TIME, 3600);
+    const defaultGameTime = elements.gameTimeSelect.querySelector('option[selected]')?.value || elements.gameTimeSelect.value;
+    STATE.gameTime = Storage.load(STORAGE_KEYS.GAME_TIME, parseInt(defaultGameTime));
     STATE.isSecondHalf = Storage.load(STORAGE_KEYS.IS_SECOND_HALF, false);
     elements.gameTimeSelect.value = STATE.gameTime;
 

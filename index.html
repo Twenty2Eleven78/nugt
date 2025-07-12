@@ -6,8 +6,8 @@
   <title>NUFC GameTime App v3.2</title>
   <!-- Bootstrap CSS -->
   <link href="css/bootstrap.min.css" rel="stylesheet">
-  <!-- Optional: Font Awesome for icons -->
-  <link href="css/all.min.css" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link href="css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
   <!--custom style-->
   <link href="css/style.css" rel="stylesheet">
   <!-- PWA Manifest-->
@@ -288,7 +288,6 @@
             <div class="input-group mb-3">
               <div>
                <input type="text" id="team1Name" class="form-control" placeholder="Netherton">
-               </p></p>
                <button class="btn btn-danger btn-custom" id="updTeam1Btn">Update Team Name</button>
               </div>
             </div>
@@ -317,7 +316,6 @@
             <div class="input-group mb-3">
               <div>
                <input type="text" id="team2Name" class="form-control" placeholder="Opposition Team">
-               </p></p>
                <button class="btn btn-danger btn-custom" id="updTeam2Btn">Update Team Name</button>
               </div>
             </div>
@@ -633,9 +631,9 @@
 <!--END Feedback Modal-->
 
 <!-- Scripts -->
-<script src="js/bootstrap.bundle.min.js"></script>
-<script src="js/script.js"></script>
-<script src="js/roster.js"></script>
+<script src="js/bootstrap.bundle.min.js" defer></script>
+<script src="js/script.js" defer></script>
+<script src="js/roster.js" defer></script>
 <!-- ENDScripts -->
 </body>
 </html>

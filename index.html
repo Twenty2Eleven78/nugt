@@ -122,11 +122,10 @@
 
                       <!-- Incidents Row -->
                       <div class="row g-2">
-                        <div class="col-6">
-                          <button id="IncidentButton" class="btn btn-warning w-100" type="button"><i class="fa-solid fa-hand me-2"></i>Incident</button>
-                        </div>
-                        <div class="col-6">
-                          <button id="PenaltyButton" class="btn btn-warning w-100" type="button"><i class="fa-solid fa-circle-exclamation me-2"></i>Penalty</button>
+                        <div class="col-12">
+                          <button id="recordEventButton" class="btn btn-warning w-100" type="button" data-bs-toggle="modal" data-bs-target="#recordEventModal">
+                            <i class="fa-solid fa-hand me-2"></i>Record Event
+                          </button>
                         </div>
                       </div>
                       <!--END Incidents Row-->
@@ -396,6 +395,40 @@
   </div>
 </div>
 <!-- END Edit Event Modal -->
+
+<!-- Record Event Modal -->
+<div class="modal fade" id="recordEventModal" tabindex="-1" aria-labelledby="recordEventModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="recordEventModalLabel">Record New Event</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="recordEventForm">
+          <div class="mb-3">
+            <label for="eventTypeSelect" class="form-label">Event Type</label>
+            <select class="form-select" id="eventTypeSelect" required>
+              <option value="" disabled selected>Choose event type...</option>
+              <option value="Yellow Card">Yellow Card</option>
+              <option value="Red Card">Red Card</option>
+              <option value="Sin Bin">Sin Bin</option>
+              <option value="Foul">Foul</option>
+              <option value="Penalty">Penalty</option>
+              <option value="Incident">Incident</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="eventNotes" class="form-label">Notes (Optional)</label>
+            <textarea class="form-control" id="eventNotes" rows="3"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Record Event</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END Record Event Modal -->
 
 <!-- Roster Modal -->
   <div class="modal fade" id="rosterModal" tabindex="-1">

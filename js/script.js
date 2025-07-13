@@ -253,7 +253,7 @@ function formatMatchTime(seconds) {
 }
 
 // Add event handlers
-function addMatchEvent(eventType) {
+function addMatchEvent(eventType, notes = '') {
   const currentSeconds = getCurrentSeconds();
   const team1Name = elements.Team1NameElement.textContent;
   const team2Name = elements.Team2NameElement.textContent;
@@ -261,6 +261,7 @@ function addMatchEvent(eventType) {
   const eventData = {
     timestamp: formatMatchTime(currentSeconds), // Use new format
     type: eventType,
+    notes: notes,
     rawTime: currentSeconds
   };
 
@@ -294,16 +295,20 @@ function addMatchEvent(eventType) {
     handleFullTime()
   }
 
-  if (eventType === 'Incident' || eventType === 'Penalty') {
-  showNotification(`${eventType} recorded`, 'warning');
-  }
-  else {
-  showNotification(`${eventType} recorded`, 'info');
+  if (eventType === 'Incident' || eventType === 'Penalty' || eventType === 'Yellow Card' || eventType === 'Red Card' || eventType === 'Sin Bin' || eventType === 'Foul') {
+    showNotification(`${eventType} recorded`, 'warning');
+  } else {
+    showNotification(`${eventType} recorded`, 'info');
   }
 
   STATE.matchEvents.push(eventData);
   updateLog();
   Storage.save(STORAGE_KEYS.MATCH_EVENTS, STATE.matchEvents);
+}
+
+function showRecordEventModal() {
+  const recordEventModal = new bootstrap.Modal(document.getElementById('recordEventModal'));
+  recordEventModal.show();
 }
 
 function showGoalModal() {
@@ -469,6 +474,7 @@ function updateLog() {
             <div class="d-flex justify-content-between align-items-start">
               <div class="event-info d-flex align-items-center">
                 <span class="event-icon me-2">${icon}</span>
+                <p class="mb-0">${event.notes || ''}</p>
               </div>
               <div class="event-actions">
                 <button class="btn btn-sm btn-outline-primary" 
@@ -864,6 +870,10 @@ function getEventCardClass(eventType) {
       return 'border-secondary border-2';
     case 'Incident':
     case 'Penalty':
+    case 'Yellow Card':
+    case 'Red Card':
+    case 'Sin Bin':
+    case 'Foul':
       return 'border-warning border-2';
     default:
       return 'border-secondary border-2';
@@ -888,7 +898,13 @@ function getEventIcon(eventType) {
     case 'Foul':
       return '⚠️';
     case 'Penalty':
-      return '⚠️';
+      return '🥅';
+    case 'Yellow Card':
+      return '<div style="width: 1rem; height: 1.25rem; background-color: yellow; border: 1px solid black;"></div>';
+    case 'Red Card':
+      return '<div style="width: 1rem; height: 1.25rem; background-color: red; border: 1px solid black;"></div>';
+    case 'Sin Bin':
+      return '⏳';
     default:
       return '📝';
   }
@@ -1029,8 +1045,15 @@ elements.shareButton.addEventListener('click', shareToWhatsApp);
 document.addEventListener('DOMContentLoaded', initializeApp);
 document.getElementById('HalfTimeButton').addEventListener('click', () => addMatchEvent('Half Time'));
 document.getElementById('FullTimeButton').addEventListener('click', () => addMatchEvent('Full Time'));
-document.getElementById('IncidentButton').addEventListener('click', () => addMatchEvent('Incident'));
-document.getElementById('PenaltyButton').addEventListener('click', () => addMatchEvent('Penalty'));
+document.getElementById('recordEventForm').addEventListener('submit', (event) => {
+  event.preventDefault();
+  const eventType = document.getElementById('eventTypeSelect').value;
+  const eventNotes = document.getElementById('eventNotes').value;
+  addMatchEvent(eventType, eventNotes);
+  const recordEventModal = bootstrap.Modal.getInstance(document.getElementById('recordEventModal'));
+  recordEventModal.hide();
+  document.getElementById('recordEventForm').reset();
+});
 elements.gameTimeSelect.addEventListener('change', handleGameTimeChange);
 document.getElementById('editEventForm').addEventListener('submit', handleEditEventFormSubmission);
 

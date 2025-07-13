@@ -469,7 +469,7 @@ function updateLog() {
       item.innerHTML = `
         <div class="timeline-marker"></div>
         <div class="timeline-content ${cardClass}">
-          <div class="timeline-time">${icon} ${event.timestamp}' - <strong>${eventText}</strong>${scoreInfo}</div>
+          <div class="timeline-time">${event.timestamp}' ${icon} - <strong>${eventText}</strong>${scoreInfo}</div>
           <div class="timeline-body">
             <div class="d-flex justify-content-between align-items-start">
               <div class="event-info d-flex align-items-center">

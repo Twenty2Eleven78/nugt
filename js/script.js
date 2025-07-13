@@ -2,7 +2,7 @@
  * Netherton United Game Time App (NUGT)
  * 
  * @description A web application for tracking football match events, goals, and statistics
- * @version 3.2.2
+ * @version 3.3
  * @author Mark Van-Kerro
  * @date Last Updated: 2025-02-27
  * 

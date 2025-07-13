@@ -50,7 +50,9 @@ const elements = {
   team2Input: document.getElementById('team2Name'),
   updTeam1Btn: document.getElementById('updTeam1Btn'),
   updTeam2Btn: document.getElementById('updTeam2Btn'),
-  gameTimeSelect: document.getElementById('gameTimeSelect')
+  gameTimeSelect: document.getElementById('gameTimeSelect'),
+  gameDataContainer: document.getElementById('gameDataContainer'),
+  gameDataModal: document.getElementById('gameDataModal')
 };
 
 let editingEventIndex = null;
@@ -968,6 +970,19 @@ function handleRedirectParams() {
   window.history.replaceState({}, document.title, window.location.pathname);
 }
 
+// Function to fetch and display game data
+function displayGameData() {
+  const gameData = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.startsWith('nugt_')) {
+      gameData[key] = Storage.load(key);
+    }
+  }
+
+  elements.gameDataContainer.innerHTML = `<pre>${JSON.stringify(gameData, null, 2)}</pre>`;
+}
+
 // Initialize application
 function initializeApp() {
 	
@@ -1042,6 +1057,7 @@ elements.opgoalButton.addEventListener('click', opaddGoal);
 elements.resetButton.addEventListener('click', resetTracker);
 elements.shareButton.addEventListener('click', shareToWhatsApp);
 document.addEventListener('DOMContentLoaded', initializeApp);
+elements.gameDataModal.addEventListener('show.bs.modal', displayGameData);
 document.getElementById('HalfTimeButton').addEventListener('click', () => addMatchEvent('Half Time'));
 document.getElementById('FullTimeButton').addEventListener('click', () => addMatchEvent('Full Time'));
 document.getElementById('recordEventForm').addEventListener('submit', (event) => {

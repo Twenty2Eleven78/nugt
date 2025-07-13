@@ -202,6 +202,10 @@
                         <i class="fa-solid fa-arrows-rotate me-2"></i>
                         Reset GameTime App
                       </button>
+                      <button class="btn btn-info d-flex align-items-center justify-content-center py-2" data-bs-toggle="modal" data-bs-target="#gameDataModal">
+                        <i class="fa-solid fa-database me-2"></i>
+                        View Game Data
+                      </button>
                     </div>
                   </div>
                   <hr class="mb-4">
@@ -664,6 +668,25 @@
   </div>
 </div>
 <!--END Feedback Modal-->
+
+<!-- Game Data Modal -->
+<div class="modal fade" id="gameDataModal" tabindex="-1" aria-labelledby="gameDataModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="gameDataModalLabel">Game Data</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="gameDataContainer">
+        <!-- Game data will be loaded here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END Game Data Modal -->
 
 <!-- Scripts -->
 <script src="js/bootstrap.bundle.min.js" defer></script>

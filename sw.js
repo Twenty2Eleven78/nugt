@@ -1,5 +1,5 @@
 //Cache Name
-const CACHE_NAME = "nugt-cache-v1";
+const CACHE_NAME = "nugt-cache-v2";
 //Files to cache
 const cacheFiles = [
   './',
@@ -12,7 +12,10 @@ const cacheFiles = [
   './js/script.js',
   './webfonts/fa-regular-400.woff2',
   './webfonts/fa-solid-900.woff2',
+  './webfonts/fa-brands-400.woff2',
   './nugt512.png',
+  './favicon.ico',
+  './manifest.json'
 ];
 
 self.addEventListener('install', function(event) {
@@ -41,7 +44,7 @@ self.addEventListener('fetch', function(event) {
 });
 
 self.addEventListener('activate', function(event) {
-  var cacheWhitelist = ['pigment'];
+  var cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then(function(cacheNames) {
       return Promise.all(

@@ -4,10 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NUFC GameTime App v3.3</title>
+  <!-- Preload critical resources -->
+  <link rel="preload" href="css/bootstrap.min.css" as="style">
+  <link rel="preload" href="css/style.css" as="style">
+  <link rel="preload" href="webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+  
   <!-- Bootstrap CSS -->
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <!-- Font Awesome for icons -->
   <link href="css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="css/all.min.css" rel="stylesheet"></noscript>
   <!--custom style-->
   <link href="css/style.css" rel="stylesheet">
   <!-- PWA Manifest-->
@@ -665,10 +671,10 @@
 </div>
 <!--END Feedback Modal-->
 
-<!-- Scripts -->
-<script src="js/bootstrap.bundle.min.js" defer></script>
-<script src="js/script.js" defer></script>
+<!-- Scripts - optimized loading order -->
 <script src="js/roster.js" defer></script>
+<script src="js/script.js" defer></script>
+<script src="js/bootstrap.bundle.min.js" defer></script>
 <!-- ENDScripts -->
 </body>
 </html>

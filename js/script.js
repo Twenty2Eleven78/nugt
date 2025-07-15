@@ -30,7 +30,7 @@ const STATE = {
   pendingGoalTimestamp: null,
 };
  
-// DOM Elements
+// DOM Elements - cached for performance
 const elements = {
   stopwatch: document.getElementById('stopwatch'),
   startPauseButton: document.getElementById('startPauseButton'),
@@ -50,7 +50,11 @@ const elements = {
   team2Input: document.getElementById('team2Name'),
   updTeam1Btn: document.getElementById('updTeam1Btn'),
   updTeam2Btn: document.getElementById('updTeam2Btn'),
-  gameTimeSelect: document.getElementById('gameTimeSelect')
+  gameTimeSelect: document.getElementById('gameTimeSelect'),
+  // Cache frequently accessed modal elements
+  goalModal: document.getElementById('goalModal'),
+  recordEventModal: document.getElementById('recordEventModal'),
+  editEventModal: document.getElementById('editEventModal')
 };
 
 let editingEventIndex = null;
@@ -73,13 +77,37 @@ const STORAGE_KEYS = {
   TEAM2_HISTORY: 'nugt_team2history',     
 };
 
-// Local Storage utilities
+// Local Storage utilities with debouncing
 const Storage = {
+  _saveQueue: new Map(),
+  _saveTimeout: null,
+  
   save(key, data) {
     try {
-      localStorage.setItem(key, JSON.stringify(data));
+      // Queue the save operation
+      this._saveQueue.set(key, data);
+      
+      // Debounce saves to reduce localStorage writes
+      if (this._saveTimeout) {
+        clearTimeout(this._saveTimeout);
+      }
+      
+      this._saveTimeout = setTimeout(() => {
+        this._flushSaves();
+      }, 100); // 100ms debounce
     } catch (error) {
       console.error(`Error saving to localStorage:`, error);
+    }
+  },
+  
+  _flushSaves() {
+    try {
+      for (const [key, data] of this._saveQueue) {
+        localStorage.setItem(key, JSON.stringify(data));
+      }
+      this._saveQueue.clear();
+    } catch (error) {
+      console.error(`Error flushing saves to localStorage:`, error);
     }
   },
   

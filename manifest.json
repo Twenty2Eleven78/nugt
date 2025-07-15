@@ -5,18 +5,20 @@
     "theme_color": "#8B0000",
     "background_color": "#fff",
     "display": "standalone",
-    "description": "Netherton United Goal Time App",
+    "description": "Football match timer and event tracker",
     "icons": [
         {
-            "src": "https://nugt.netlify.app/nugt512.png",
-            "sizes": "512x512"
+            "src": "./nugt512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
         }
     ],
     "id": "NUGT",
     "lang": "en",
-    "orientation": "any",
-    "categories": ["sports"],
-    "display_override": ["window-controls-overlay"],
+    "orientation": "portrait-primary",
+    "categories": ["sports", "utilities"],
+    "display_override": ["window-controls-overlay", "standalone"],
     "launch_handler": {"client_mode": ["focus-existing", "auto"]},
     "handle_links": "preferred"
 }

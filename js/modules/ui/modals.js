@@ -19,10 +19,24 @@ export function showModal(modalId) {
 export function hideModal(modalId) {
   const modalElement = document.getElementById(modalId);
   if (modalElement) {
-    const modal = bootstrap.Modal.getInstance(modalElement);
-    if (modal) {
-      modal.hide();
+    let modal = bootstrap.Modal.getInstance(modalElement);
+    if (!modal) {
+      // If no instance exists, create one and then hide it
+      modal = new bootstrap.Modal(modalElement);
     }
+    modal.hide();
+    
+    // Force remove backdrop if it persists
+    setTimeout(() => {
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) {
+        backdrop.remove();
+      }
+      // Ensure body classes are cleaned up
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }, 300);
   } else {
     console.warn(`Modal with ID '${modalId}' not found`);
   }

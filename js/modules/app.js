@@ -20,7 +20,7 @@ import { teamManager } from './match/teams.js';
 import { rosterManager } from './match/roster.js';
 
 // UI modules
-import { bindModalEvents } from './ui/modals.js';
+import { bindModalEvents, hideModal } from './ui/modals.js';
 import { initializeTooltips } from './ui/components.js';
 
 // Services
@@ -172,8 +172,7 @@ function bindEventListeners() {
         eventsManager.addMatchEvent(eventType, notes);
         recordEventForm.reset();
 
-        const modal = bootstrap.Modal.getInstance(document.getElementById('recordEventModal'));
-        if (modal) modal.hide();
+        hideModal('recordEventModal');
       }
     });
   }

@@ -4,7 +4,7 @@
  */
 
 import { gameState, stateManager } from '../data/state.js';
-import { storageHelpers } from '../data/storage.js';
+import { storage, storageHelpers } from '../data/storage.js';
 import { domCache } from '../shared/dom.js';
 import { getCurrentSeconds, formatMatchTime } from '../shared/utils.js';
 import { EVENT_TYPES } from '../shared/constants.js';
@@ -94,19 +94,7 @@ class EventsManager {
     showModal('recordEventModal');
   }
 
-  // Delete log entry
-  deleteLogEntry(index, type) {
-    if (type === 'goal') {
-      stateManager.removeGoal(index);
-      this._recalculateScores();
-    } else if (type === 'event') {
-      stateManager.removeMatchEvent(index);
-    }
-    
-    updateMatchLog();
-    showNotification('Entry deleted', 'danger');
-    storageHelpers.saveMatchData(gameState);
-  }
+
 
   // Open edit event modal
   openEditEventModal(index, type) {
@@ -174,6 +162,10 @@ class EventsManager {
     
     if (firstScoreElement) firstScoreElement.textContent = teamGoals;
     if (secondScoreElement) secondScoreElement.textContent = oppositionGoals;
+    
+    // Update storage
+    storage.save('nugt_firstScore', teamGoals);
+    storage.save('nugt_secondScore', oppositionGoals);
   }
 }
 
@@ -355,11 +347,37 @@ function _createGoalEventHTML(event, currentTeam1Name, currentTeam2Name) {
 // Create and export singleton instance
 export const eventsManager = new EventsManager();
 
+// Standalone function for global access (HTML onclick handlers)
+export function deleteLogEntry(index, type) {
+  if (type === 'goal') {
+    stateManager.removeGoal(index);
+    // Recalculate scores after goal deletion using the manager instance
+    eventsManager._recalculateScores();
+    
+    // Update storage for scores
+    const team2Name = domCache.get('Team2NameElement')?.textContent;
+    const teamGoals = gameState.goals.filter(goal => 
+      !goal.disallowed && goal.goalScorerName !== team2Name
+    ).length;
+    const oppositionGoals = gameState.goals.filter(goal => 
+      !goal.disallowed && goal.goalScorerName === team2Name
+    ).length;
+    
+    storage.save('nugt_firstScore', teamGoals);
+    storage.save('nugt_secondScore', oppositionGoals);
+  } else if (type === 'event') {
+    stateManager.removeMatchEvent(index);
+  }
+  
+  updateMatchLog();
+  showNotification('Entry deleted', 'danger');
+  storageHelpers.saveMatchData(gameState);
+}
+
 // Export convenience methods
 export const {
   addMatchEvent,
   showRecordEventModal,
-  deleteLogEntry,
   openEditEventModal,
   handleEditEventFormSubmission
 } = eventsManager;

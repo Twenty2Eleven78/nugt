@@ -22,12 +22,12 @@ class GoalManager {
   // Add team goal
   addGoal(event) {
     event.preventDefault();
-    
+
     const goalScorerName = domCache.get('goalScorer')?.value;
     const goalAssistName = domCache.get('goalAssist')?.value;
     const currentSeconds = gameState.pendingGoalTimestamp || getCurrentSeconds();
     const team1Name = domCache.get('Team1NameElement')?.textContent;
-    
+
     if (!goalScorerName) {
       showNotification('Please select a goal scorer', 'warning');
       return;
@@ -48,7 +48,7 @@ class GoalManager {
       teamName: team1Name,
       disallowed: false
     };
-    
+
     // Reset pending timestamp
     stateManager.setPendingGoalTimestamp(null);
 
@@ -58,9 +58,9 @@ class GoalManager {
     console.log('Goals after adding:', gameState.goals);
     this._updateScoreboard('first');
     updateMatchLog();
-    
+
     showNotification(`Goal scored by ${goalScorerName}!`, 'success');
-    
+
     // Save and cleanup
     storageHelpers.saveMatchData(gameState);
     this._resetGoalForm();
@@ -71,7 +71,7 @@ class GoalManager {
   addOppositionGoal() {
     const currentSeconds = getCurrentSeconds();
     const team2Name = domCache.get('Team2NameElement')?.textContent;
-    
+
     const goalData = {
       timestamp: formatMatchTime(currentSeconds),
       goalScorerName: team2Name,
@@ -81,47 +81,22 @@ class GoalManager {
       teamName: team2Name,
       disallowed: false
     };
-    
+
     // Update state and UI
     console.log('Adding opposition goal data:', goalData);
     stateManager.addGoal(goalData);
     console.log('Goals after adding opposition goal:', gameState.goals);
     this._updateScoreboard('second');
     updateMatchLog();
-    
+
     showNotification(`Goal scored by ${team2Name}!`, 'danger');
-    
+
     // Save data
     storageHelpers.saveMatchData(gameState);
     this._resetGoalForm();
   }
 
-  // Toggle goal disallowed status
-  toggleGoalDisallowed(index) {
-    const goal = gameState.goals[index];
-    if (!goal) return;
 
-    if (goal.disallowed) {
-      stateManager.updateGoal(index, { disallowed: false, disallowedReason: null });
-    } else {
-      const reason = prompt('Reason for disallowing goal:');
-      if (reason) {
-        stateManager.updateGoal(index, { disallowed: true, disallowedReason: reason });
-      } else {
-        return; // User cancelled
-      }
-    }
-    
-    // Recalculate and update scores
-    this._recalculateScores();
-    updateMatchLog();
-    
-    const goal_updated = gameState.goals[index];
-    showNotification(
-      goal_updated.disallowed ? 'Goal disallowed' : 'Goal allowed', 
-      goal_updated.disallowed ? 'warning' : 'success'
-    );
-  }
 
   // Update scoreboard
   _updateScoreboard(team) {
@@ -130,7 +105,7 @@ class GoalManager {
 
     const newScore = parseInt(scoreElement.textContent) + 1;
     scoreElement.textContent = newScore;
-    
+
     // Save score
     const storageKey = team === 'first' ? 'nugt_firstScore' : 'nugt_secondScore';
     storage.save(storageKey, newScore);
@@ -139,22 +114,22 @@ class GoalManager {
   // Recalculate scores based on allowed goals
   _recalculateScores() {
     const team2Name = domCache.get('Team2NameElement')?.textContent;
-    
-    const teamGoals = gameState.goals.filter(goal => 
+
+    const teamGoals = gameState.goals.filter(goal =>
       !goal.disallowed && goal.goalScorerName !== team2Name
     ).length;
-    
-    const oppositionGoals = gameState.goals.filter(goal => 
+
+    const oppositionGoals = gameState.goals.filter(goal =>
       !goal.disallowed && goal.goalScorerName === team2Name
     ).length;
-    
+
     // Update UI
     const firstScoreElement = domCache.get('firstScoreElement');
     const secondScoreElement = domCache.get('secondScoreElement');
-    
+
     if (firstScoreElement) firstScoreElement.textContent = teamGoals;
     if (secondScoreElement) secondScoreElement.textContent = oppositionGoals;
-    
+
     // Save scores
     storage.save('nugt_firstScore', teamGoals);
     storage.save('nugt_secondScore', oppositionGoals);
@@ -173,10 +148,10 @@ class GoalManager {
   getGoalStats() {
     const allowedGoals = gameState.goals.filter(goal => !goal.disallowed);
     const team2Name = domCache.get('Team2NameElement')?.textContent;
-    
+
     const teamGoals = allowedGoals.filter(goal => goal.goalScorerName !== team2Name);
     const oppositionGoals = allowedGoals.filter(goal => goal.goalScorerName === team2Name);
-    
+
     return {
       total: allowedGoals.length,
       team: teamGoals.length,
@@ -189,10 +164,39 @@ class GoalManager {
 // Create and export singleton instance
 export const goalManager = new GoalManager();
 
+// Standalone function for global access (HTML onclick handlers)
+export function toggleGoalDisallowed(index) {
+  const goal = gameState.goals[index];
+  if (!goal) return;
+
+  if (goal.disallowed) {
+    stateManager.updateGoal(index, { disallowed: false, disallowedReason: null });
+  } else {
+    const reason = prompt('Reason for disallowing goal:');
+    if (reason) {
+      stateManager.updateGoal(index, { disallowed: true, disallowedReason: reason });
+    } else {
+      return; // User cancelled
+    }
+  }
+
+  // Recalculate and update scores using the manager instance
+  goalManager._recalculateScores();
+  updateMatchLog();
+
+  // Save updated goals data
+  storageHelpers.saveMatchData(gameState);
+
+  const goal_updated = gameState.goals[index];
+  showNotification(
+    goal_updated.disallowed ? 'Goal disallowed' : 'Goal allowed',
+    goal_updated.disallowed ? 'warning' : 'success'
+  );
+}
+
 // Export convenience methods
 export const {
   showGoalModal,
   addGoal,
-  addOppositionGoal,
-  toggleGoalDisallowed
+  addOppositionGoal
 } = goalManager;

@@ -19,23 +19,11 @@
   <!-- PWA Manifest-->
   <link rel="manifest" href="manifest.json">
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
-  <!-- Service Worker Invoked -->
-  <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("sw.js", {
-        scope: "./"
-        })
-          .then((registration) => {
-            console.log("Service Worker registered:", registration);
-          })
-          .catch((error) => {
-            console.error("Service Worker registration failed:", error);
-          });
-      });
-    }
-  </script>
+  <!-- Module preload for better performance -->
+  <link rel="modulepreload" href="js/main.js">
+  <link rel="modulepreload" href="js/modules/app.js">
+  <link rel="modulepreload" href="js/modules/shared/constants.js">
+  <link rel="modulepreload" href="js/modules/data/state.js">
 </head>
 <body>
   <!-- Main Container -->
@@ -671,9 +659,8 @@
 </div>
 <!--END Feedback Modal-->
 
-<!-- Scripts - optimized loading order -->
-<script src="js/roster.js" defer></script>
-<script src="js/script.js" defer></script>
+<!-- Scripts - modular architecture -->
+<script src="js/main.js" type="module"></script>
 <script src="js/bootstrap.bundle.min.js" defer></script>
 <!-- ENDScripts -->
 </body>

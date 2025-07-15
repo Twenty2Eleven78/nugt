@@ -1,6 +1,6 @@
 //Cache Name
-const CACHE_NAME = "nugt-cache-v2";
-//Files to cache
+const CACHE_NAME = "nugt-cache-v4";
+//Files to cache - Modular Architecture
 const cacheFiles = [
   './',
   './index.html',
@@ -8,8 +8,29 @@ const cacheFiles = [
   './css/bootstrap.min.css',
   './css/style.css',
   './js/bootstrap.bundle.min.js',
-  './js/roster.js',
-  './js/script.js',
+  './js/main.js',
+  // Core modules
+  './js/modules/app.js',
+  './js/modules/shared/constants.js',
+  './js/modules/shared/utils.js',
+  './js/modules/shared/dom.js',
+  // Data modules
+  './js/modules/data/state.js',
+  './js/modules/data/storage.js',
+  // Game modules
+  './js/modules/game/timer.js',
+  // Match modules
+  './js/modules/match/goals.js',
+  './js/modules/match/events.js',
+  './js/modules/match/teams.js',
+  './js/modules/match/roster.js',
+  // UI modules
+  './js/modules/ui/modals.js',
+  './js/modules/ui/components.js',
+  // Services
+  './js/modules/services/notifications.js',
+  './js/modules/services/sharing.js',
+  // Assets
   './webfonts/fa-regular-400.woff2',
   './webfonts/fa-solid-900.woff2',
   './webfonts/fa-brands-400.woff2',

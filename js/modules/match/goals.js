@@ -53,7 +53,9 @@ class GoalManager {
     stateManager.setPendingGoalTimestamp(null);
 
     // Update state and UI
+    console.log('Adding goal data:', goalData);
     stateManager.addGoal(goalData);
+    console.log('Goals after adding:', gameState.goals);
     this._updateScoreboard('first');
     updateMatchLog();
     
@@ -81,7 +83,9 @@ class GoalManager {
     };
     
     // Update state and UI
+    console.log('Adding opposition goal data:', goalData);
     stateManager.addGoal(goalData);
+    console.log('Goals after adding opposition goal:', gameState.goals);
     this._updateScoreboard('second');
     updateMatchLog();
     

@@ -47,7 +47,9 @@ class EventsManager {
     }
 
     // Add event and update UI
+    console.log('Adding match event:', eventData);
     stateManager.addMatchEvent(eventData);
+    console.log('Match events after adding:', gameState.matchEvents);
     updateMatchLog();
     
     // Show notification
@@ -177,11 +179,19 @@ class EventsManager {
 
 // Update match log display
 export function updateMatchLog() {
+  console.log('updateMatchLog called');
   const logElement = domCache.get('log');
-  if (!logElement) return;
+  if (!logElement) {
+    console.warn('Log element not found');
+    return;
+  }
 
   const currentTeam1Name = domCache.get('Team1NameElement')?.textContent;
   const currentTeam2Name = domCache.get('Team2NameElement')?.textContent;
+
+  console.log('Current team names:', currentTeam1Name, currentTeam2Name);
+  console.log('Goals data:', gameState.goals);
+  console.log('Match events data:', gameState.matchEvents);
 
   // Combine and sort all events
   const allEvents = [
@@ -196,6 +206,8 @@ export function updateMatchLog() {
       updatetype: 'matchEvent'
     }))
   ].sort((a, b) => a.rawTime - b.rawTime);
+
+  console.log('All events combined:', allEvents);
 
   // Handle empty state
   if (allEvents.length === 0) {
@@ -219,7 +231,7 @@ export function updateMatchLog() {
   timelineContainer.className = 'timeline';
 
   allEvents.forEach((event, index) => {
-    const timelineItem = this._createTimelineItem(event, index, currentTeam1Name, currentTeam2Name);
+    const timelineItem = _createTimelineItem(event, index, currentTeam1Name, currentTeam2Name);
     timelineContainer.appendChild(timelineItem);
   });
 

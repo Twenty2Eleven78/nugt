@@ -7,7 +7,7 @@ import { gameState, stateManager } from '../data/state.js';
 import { storage, storageHelpers } from '../data/storage.js';
 import { domCache } from '../shared/dom.js';
 import { STORAGE_KEYS, GAME_CONFIG } from '../shared/constants.js';
-import { showNotification } from '../services/notifications.js';
+import { notificationManager } from '../services/notifications.js';
 import { updateMatchLog } from './events.js';
 
 // Team management class
@@ -15,7 +15,7 @@ class TeamManager {
   // Update team names
   updateTeamName(team, teamName) {
     if (!teamName || !teamName.trim()) {
-      showNotification('Team name cannot be empty', 'warning');
+      notificationManager.warning('Team name cannot be empty');
       return;
     }
 
@@ -29,7 +29,7 @@ class TeamManager {
 
     // Update match log to reflect new team names
     updateMatchLog();
-    showNotification(`Team name updated to ${trimmedName}`, 'success');
+    notificationManager.success(`Team name updated to ${trimmedName}`);
   }
 
   // Update team 1

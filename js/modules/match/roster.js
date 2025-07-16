@@ -5,7 +5,7 @@
 
 import { storage } from '../data/storage.js';
 import { domCache } from '../shared/dom.js';
-import { showNotification } from '../services/notifications.js';
+import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from '../ui/modals.js';
 import { rosterUtils } from '../data/default-roster.js';
 
@@ -80,7 +80,7 @@ class RosterManager {
 
     } catch (error) {
       console.error('Error loading or parsing roster:', error);
-      showNotification('Error loading roster. Default roster will be used.', 'warning');
+      notificationManager.warning('Error loading roster. Default roster will be used.');
       return this._getDefaultRoster();
     }
   }
@@ -117,7 +117,7 @@ class RosterManager {
       storage.save(ROSTER_CONFIG.STORAGE_KEY, this.roster);
     } catch (error) {
       console.error('Error saving roster:', error);
-      showNotification('Error saving roster. Please try again.', 'danger');
+      notificationManager.error('Error saving roster. Please try again.');
     }
   }
 
@@ -223,7 +223,7 @@ class RosterManager {
 
     // Check for duplicates
     if (this._playerExists(trimmedName)) {
-      showNotification(`Player "${trimmedName}" already exists!`, 'warning');
+      notificationManager.warning(`Player "${trimmedName}" already exists!`);
       return false;
     }
 
@@ -235,7 +235,7 @@ class RosterManager {
     this.updateRosterList();
     
     const shirtText = num !== null ? ` (#${num})` : '';
-    showNotification(`Player ${trimmedName}${shirtText} added successfully.`, 'success');
+    notificationManager.success(`Player ${trimmedName}${shirtText} added successfully.`);
     return true;
   }
 
@@ -252,14 +252,14 @@ class RosterManager {
     this.updateSelects();
     this.updateRosterList();
     
-    showNotification(`Player ${playerName} removed successfully.`, 'success');
+    notificationManager.success(`Player ${playerName} removed successfully.`);
     return true;
   }
 
   // Edit a player
   editPlayer(oldName, newName, newShirtNumber) {
     if (!oldName || !newName) {
-      showNotification('Player names cannot be empty.', 'warning');
+      notificationManager.warning('Player names cannot be empty.');
       return false;
     }
 
@@ -273,13 +273,13 @@ class RosterManager {
 
     const oldPlayerIndex = this.roster.findIndex(p => p.name === oldName);
     if (oldPlayerIndex === -1) {
-      showNotification(`Player "${oldName}" not found.`, 'warning');
+      notificationManager.warning(`Player "${oldName}" not found.`);
       return false;
     }
 
     // Check for name conflicts (excluding current player)
     if (this._playerExists(trimmedNewName, oldPlayerIndex)) {
-      showNotification(`Player name "${trimmedNewName}" already exists!`, 'warning');
+      notificationManager.warning(`Player name "${trimmedNewName}" already exists!`);
       return false;
     }
 
@@ -295,14 +295,14 @@ class RosterManager {
     this._updateSelectsAfterEdit(oldName, trimmedNewName);
 
     const shirtText = num !== null ? ` (#${num})` : '';
-    showNotification(`Player updated to "${trimmedNewName}${shirtText}" successfully.`, 'success');
+    notificationManager.success(`Player updated to "${trimmedNewName}${shirtText}" successfully.`);
     return true;
   }
 
   // Add multiple players from bulk input
   addPlayersBulk(namesString) {
     if (!namesString?.trim()) {
-      showNotification('No player names provided for bulk add.', 'warning');
+      notificationManager.warning('No player names provided for bulk add.');
       return;
     }
 
@@ -312,7 +312,7 @@ class RosterManager {
       .filter(name => name !== '');
 
     if (namesArray.length === 0) {
-      showNotification('No valid player names found.', 'warning');
+      notificationManager.warning('No valid player names found.');
       return;
     }
 
@@ -326,16 +326,16 @@ class RosterManager {
       this.updateRosterList();
 
       const successMsg = `Successfully added ${results.added.length} player(s): ${results.added.map(p => p.name).join(', ')}. Shirt numbers can be added via Edit.`;
-      showNotification(successMsg, 'success');
+      notificationManager.success(successMsg);
     }
 
     if (results.failed.length > 0) {
       const failedMsg = `Could not add ${results.failed.length} player(s): ${results.failed.map(f => `"${f.name}" (${f.reason})`).join(', ')}`;
-      showNotification(failedMsg, 'warning', 10000);
+      notificationManager.warning(failedMsg, 10000);
     }
 
     if (results.added.length === 0 && results.failed.length === 0) {
-      showNotification('No new players were added from the list.', 'info');
+      notificationManager.info('No new players were added from the list.');
     }
   }
 
@@ -372,23 +372,23 @@ class RosterManager {
     this._saveRoster();
     this.updateSelects();
     this.updateRosterList();
-    showNotification('Roster cleared successfully.', 'success');
+    notificationManager.success('Roster cleared successfully.');
   }
 
   // Validation helper
   _validatePlayerData(name, shirtNumber) {
     if (!name) {
-      showNotification('Player name cannot be empty.', 'warning');
+      notificationManager.warning('Player name cannot be empty.');
       return false;
     }
 
     if (name.length > ROSTER_CONFIG.MAX_PLAYER_NAME_LENGTH) {
-      showNotification(`Player name is too long. Maximum ${ROSTER_CONFIG.MAX_PLAYER_NAME_LENGTH} characters allowed.`, 'warning');
+      notificationManager.warning(`Player name is too long. Maximum ${ROSTER_CONFIG.MAX_PLAYER_NAME_LENGTH} characters allowed.`);
       return false;
     }
 
     if (shirtNumber !== null && (isNaN(shirtNumber) || shirtNumber < 0 || shirtNumber > 99)) {
-      showNotification('Invalid shirt number. Must be between 0 and 99.', 'warning');
+      notificationManager.warning('Invalid shirt number. Must be between 0 and 99.');
       return false;
     }
 
@@ -410,12 +410,12 @@ class RosterManager {
 
     if (goalScorerSelect?.value === playerName) {
       goalScorerSelect.value = '';
-      showNotification(`Goal scorer selection was reset as ${playerName} was removed.`, 'info');
+      notificationManager.info(`Goal scorer selection was reset as ${playerName} was removed.`);
     }
 
     if (goalAssistSelect?.value === playerName) {
       goalAssistSelect.value = '';
-      showNotification(`Goal assist selection was reset as ${playerName} was removed.`, 'info');
+      notificationManager.info(`Goal assist selection was reset as ${playerName} was removed.`);
     }
   }
 

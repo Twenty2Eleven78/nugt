@@ -8,7 +8,7 @@
  * - Seamless update installation
  */
 
-import { showNotification } from './notifications.js';
+import { notificationManager } from './notifications.js';
 
 // PWA Update Manager
 class PWAUpdater {
@@ -67,7 +67,7 @@ class PWAUpdater {
           } else {
             // First time installation
             console.log('Content cached for offline use');
-            showNotification('App ready for offline use!', 'success');
+            notificationManager.success('App ready for offline use!');
           }
         }
       });
@@ -79,7 +79,7 @@ class PWAUpdater {
         console.log('Service worker updated to:', event.data.version);
         if (!this.refreshing) {
           this.refreshing = true;
-          showNotification('App updated successfully!', 'success');
+          notificationManager.success('App updated successfully!');
           // Optional: Reload the page to apply updates
           // window.location.reload();
         }
@@ -91,7 +91,7 @@ class PWAUpdater {
       if (this.refreshing) return;
       console.log('New service worker activated');
       this.refreshing = true;
-      showNotification('App updated! Refreshing...', 'info');
+      notificationManager.info('App updated! Refreshing...');
       window.location.reload();
     });
   }
@@ -134,64 +134,39 @@ class PWAUpdater {
 
   // Show update notification to user
   showUpdateNotification() {
-    // Create custom update notification
-    const updateNotification = this.createUpdateNotification();
-    document.body.appendChild(updateNotification);
-
-    // Auto-hide after 10 seconds if not interacted with
-    setTimeout(() => {
-      if (updateNotification.parentNode) {
-        updateNotification.remove();
-      }
-    }, 10000);
-  }
-
-  // Create update notification element
-  createUpdateNotification() {
-    const notification = document.createElement('div');
-    notification.className = 'update-notification';
-    notification.innerHTML = `
-      <div class="update-content">
-        <div class="update-icon">
-          <i class="fa-solid fa-download"></i>
-        </div>
-        <div class="update-text">
-          <strong>App Update Available!</strong>
-          <p>A new version is ready to install.</p>
-        </div>
-        <div class="update-actions">
-          <button class="btn btn-primary btn-sm" onclick="pwaUpdater.installUpdate()">
-            Update Now
-          </button>
-          <button class="btn btn-outline-secondary btn-sm" onclick="this.parentNode.parentNode.parentNode.remove()">
-            Later
-          </button>
-        </div>
-      </div>
-    `;
-
-    // Add styles
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: white;
-      border: 1px solid #dee2e6;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      padding: 16px;
-      max-width: 350px;
-      z-index: 9999;
-      animation: slideInRight 0.3s ease-out;
-    `;
-
-    return notification;
+    // Show persistent notification with action buttons
+    const notification = notificationManager.persistent(
+      'App Update Available! A new version is ready to install.',
+      'info'
+    );
+    
+    // Add update action buttons
+    if (notification) {
+      const buttonContainer = document.createElement('div');
+      buttonContainer.className = 'mt-2 d-flex gap-2';
+      buttonContainer.innerHTML = `
+        <button class="btn btn-primary btn-sm" onclick="pwaUpdater.installUpdate(); this.closest('.notification').remove();">
+          <i class="fa-solid fa-download me-1"></i>Update Now
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" onclick="this.closest('.notification').remove();">
+          Later
+        </button>
+      `;
+      notification.appendChild(buttonContainer);
+      
+      // Auto-hide after 15 seconds if not interacted with
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notificationManager.remove(notification);
+        }
+      }, 15000);
+    }
   }
 
   // Install available update
   async installUpdate() {
     if (!this.updateAvailable) {
-      showNotification('No update available', 'info');
+      notificationManager.info('No update available');
       return;
     }
 
@@ -199,7 +174,7 @@ class PWAUpdater {
       // Tell the service worker to skip waiting
       if (this.registration.waiting) {
         this.registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-        showNotification('Installing update...', 'info');
+        notificationManager.info('Installing update...');
       }
 
       // Remove update notification
@@ -210,7 +185,7 @@ class PWAUpdater {
 
     } catch (error) {
       console.error('Failed to install update:', error);
-      showNotification('Failed to install update', 'danger');
+      notificationManager.error('Failed to install update');
     }
   }
 
@@ -247,9 +222,9 @@ class PWAUpdater {
     console.log('Manually triggering update check...');
     const result = await this.checkForUpdates();
     if (result) {
-      showNotification('Update check completed', 'success');
+      notificationManager.success('Update check completed');
     } else {
-      showNotification('Update check failed', 'danger');
+      notificationManager.error('Update check failed');
     }
   }
 }

@@ -8,7 +8,7 @@ import { storage, storageHelpers } from '../data/storage.js';
 import { domCache } from '../shared/dom.js';
 import { getCurrentSeconds, formatMatchTime } from '../shared/utils.js';
 import { EVENT_TYPES } from '../shared/constants.js';
-import { showNotification } from '../services/notifications.js';
+import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from '../ui/modals.js';
 import { getEventIcon, getEventCardClass } from '../ui/components.js';
 import { timerController } from '../game/timer.js';
@@ -54,7 +54,11 @@ class EventsManager {
     
     // Show notification
     const notificationType = this._getNotificationType(eventType);
-    showNotification(`${eventType} recorded`, notificationType);
+    if (notificationType === 'warning') {
+      notificationManager.warning(`${eventType} recorded`);
+    } else {
+      notificationManager.info(`${eventType} recorded`);
+    }
     
     // Save data
     storageHelpers.saveMatchData(gameState);
@@ -141,7 +145,7 @@ class EventsManager {
     // Clean up and close modal
     stateManager.clearEditingEvent();
     hideModal('editEventModal');
-    showNotification('Event time updated successfully!', 'success');
+    notificationManager.success('Event time updated successfully!');
   }
 
   // Recalculate scores (helper method)
@@ -370,7 +374,7 @@ export function deleteLogEntry(index, type) {
   }
   
   updateMatchLog();
-  showNotification('Entry deleted', 'danger');
+  notificationManager.error('Entry deleted');
   storageHelpers.saveMatchData(gameState);
 }
 

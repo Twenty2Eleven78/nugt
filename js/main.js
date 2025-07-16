@@ -18,22 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
     // Page became visible, update displays
-    import('./modules/timer.js').then(({ updateStopwatchDisplay }) => {
-      updateStopwatchDisplay();
+    import('./modules/game/timer.js').then(({ timerController }) => {
+      timerController.updateDisplay();
     });
   }
 });
 
-// Service Worker registration (if supported)
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('sw.js', { scope: './' })
-      .then((registration) => {
-        console.log('Service Worker registered:', registration);
-      })
-      .catch((error) => {
-        console.error('Service Worker registration failed:', error);
-      });
-  });
-}
+// Service Worker registration is handled by PWA updater in app.js
+// This ensures proper update management and avoids conflicts

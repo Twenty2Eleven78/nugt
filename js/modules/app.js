@@ -26,6 +26,7 @@ import { initializeTooltips } from './ui/components.js';
 // Services
 import { notificationManager } from './services/notifications.js';
 import { sharingService } from './services/sharing.js';
+import { pwaUpdater } from './services/pwa-updater.js';
 
 // Initialize application
 export function initializeApp() {
@@ -50,6 +51,13 @@ export function initializeApp() {
 
   // Resume timer if needed
   timerController.resumeFromState();
+
+  // Initialize PWA updater
+  pwaUpdater.init().then(success => {
+    if (success) {
+      console.log('PWA updater initialized successfully');
+    }
+  });
 
   // Update displays
   timerController.updateDisplay();

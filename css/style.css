@@ -56,6 +56,86 @@ margin: 0;
 .bottom-nav {
   transform: translateZ(0);
 }
+
+/* PWA Update Notification Styles */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.update-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 16px;
+  max-width: 350px;
+  z-index: 9999;
+  animation: slideInRight 0.3s ease-out;
+}
+
+.update-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.update-icon {
+  color: #007bff;
+  font-size: 1.5rem;
+}
+
+.update-text {
+  flex: 1;
+}
+
+.update-text strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+.update-text p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.update-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.update-actions .btn {
+  white-space: nowrap;
+}
+
+/* Dark mode support for update notification */
+@media (prefers-color-scheme: dark) {
+  .update-notification {
+    background: #2d2d2d;
+    border-color: #444;
+    color: white;
+  }
+  
+  .update-text strong {
+    color: white;
+  }
+  
+  .update-text p {
+    color: #ccc;
+  }
+}
 body {
   min-height: 100vh;
   display: flex;

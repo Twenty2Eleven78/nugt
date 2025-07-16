@@ -7,7 +7,7 @@ import { gameState, stateManager } from '../data/state.js';
 import { storage, storageHelpers } from '../data/storage.js';
 import { domCache } from '../shared/dom.js';
 import { getCurrentSeconds, formatMatchTime } from '../shared/utils.js';
-import { showNotification } from '../services/notifications.js';
+import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from '../ui/modals.js';
 import { updateMatchLog } from './events.js';
 
@@ -29,7 +29,7 @@ class GoalManager {
     const team1Name = domCache.get('Team1NameElement')?.textContent;
 
     if (!goalScorerName) {
-      showNotification('Please select a goal scorer', 'warning');
+      notificationManager.warning('Please select a goal scorer');
       return;
     }
 
@@ -59,7 +59,7 @@ class GoalManager {
     this._updateScoreboard('first');
     updateMatchLog();
 
-    showNotification(`Goal scored by ${goalScorerName}!`, 'success');
+    notificationManager.success(`Goal scored by ${goalScorerName}!`);
 
     // Save and cleanup
     storageHelpers.saveMatchData(gameState);
@@ -89,7 +89,7 @@ class GoalManager {
     this._updateScoreboard('second');
     updateMatchLog();
 
-    showNotification(`Goal scored by ${team2Name}!`, 'danger');
+    notificationManager.error(`Goal scored by ${team2Name}!`);
 
     // Save data
     storageHelpers.saveMatchData(gameState);
@@ -188,10 +188,11 @@ export function toggleGoalDisallowed(index) {
   storageHelpers.saveMatchData(gameState);
 
   const goal_updated = gameState.goals[index];
-  showNotification(
-    goal_updated.disallowed ? 'Goal disallowed' : 'Goal allowed',
-    goal_updated.disallowed ? 'warning' : 'success'
-  );
+  if (goal_updated.disallowed) {
+    notificationManager.warning('Goal disallowed');
+  } else {
+    notificationManager.success('Goal allowed');
+  }
 }
 
 // Export convenience methods

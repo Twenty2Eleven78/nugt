@@ -57,85 +57,7 @@ margin: 0;
   transform: translateZ(0);
 }
 
-/* PWA Update Notification Styles */
-@keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
 
-.update-notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: white;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  padding: 16px;
-  max-width: 350px;
-  z-index: 9999;
-  animation: slideInRight 0.3s ease-out;
-}
-
-.update-content {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.update-icon {
-  color: #007bff;
-  font-size: 1.5rem;
-}
-
-.update-text {
-  flex: 1;
-}
-
-.update-text strong {
-  display: block;
-  margin-bottom: 4px;
-  color: #333;
-}
-
-.update-text p {
-  margin: 0;
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.update-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.update-actions .btn {
-  white-space: nowrap;
-}
-
-/* Dark mode support for update notification */
-@media (prefers-color-scheme: dark) {
-  .update-notification {
-    background: #2d2d2d;
-    border-color: #444;
-    color: white;
-  }
-  
-  .update-text strong {
-    color: white;
-  }
-  
-  .update-text p {
-    color: #ccc;
-  }
-}
 body {
   min-height: 100vh;
   display: flex;
@@ -297,6 +219,65 @@ body {
 
 .notification.info {
   background-color: #6c757d;
+}
+
+/* Enhanced notification styles for PWA updates with action buttons */
+.notification {
+  max-width: 400px;
+  word-wrap: break-word;
+  text-align: left;
+}
+
+.notification .btn {
+  font-size: 0.875rem;
+  padding: 0.375rem 0.75rem;
+  margin: 0.25rem 0.25rem 0 0;
+}
+
+.notification .mt-2 {
+  margin-top: 0.5rem !important;
+}
+
+.notification .d-flex {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.notification .gap-2 {
+  gap: 0.5rem;
+}
+
+/* Ensure buttons are visible in all notification types */
+.notification.info .btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: white;
+}
+
+.notification.info .btn-outline-secondary {
+  color: #6c757d;
+  border-color: #6c757d;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.notification.info .btn-outline-secondary:hover {
+  background-color: #6c757d;
+  color: white;
+}
+
+.notification.success .btn-primary {
+  background-color: #198754;
+  border-color: #198754;
+}
+
+.notification.warning .btn-primary {
+  background-color: #fd7e14;
+  border-color: #fd7e14;
+}
+
+.notification.danger .btn-primary {
+  background-color: #dc3545;
+  border-color: #dc3545;
 }
 
 /* Timeline styling */

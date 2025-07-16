@@ -8,7 +8,7 @@ import { storage, storageHelpers } from '../data/storage.js';
 import { domCache } from '../shared/dom.js';
 import { formatTime, getCurrentSeconds } from '../shared/utils.js';
 import { GAME_CONFIG } from '../shared/constants.js';
-import { showNotification } from '../services/notifications.js';
+import { notificationManager } from '../services/notifications.js';
 
 // Timer controller class
 class TimerController {
@@ -34,7 +34,7 @@ class TimerController {
     }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
     
     this._updateButtonUI('Game in Progress', 'btn-success', formatTime(gameState.seconds));
-    showNotification('Game Started!', 'success');
+    notificationManager.success('Game Started!');
     
     storageHelpers.saveGameState(gameState);
   }
@@ -50,7 +50,7 @@ class TimerController {
     }
     
     this._updateButtonUI('Game is Paused', 'btn-danger', formatTime(currentSeconds));
-    showNotification('Game Paused', 'danger');
+    notificationManager.error('Game Paused');
     
     storageHelpers.saveGameState(gameState);
   }
@@ -96,7 +96,7 @@ class TimerController {
     
     this._updateButtonUI('Half Time Break', 'btn-danger', formatTime(halfTimeSeconds));
     this.updateDisplay();
-    showNotification('Half Time - Game Paused', 'info');
+    notificationManager.info('Half Time - Game Paused');
     
     storageHelpers.saveGameState(gameState);
   }
@@ -115,7 +115,7 @@ class TimerController {
     
     this._updateButtonUI('Full Time', 'btn-danger', formatTime(gameState.seconds));
     this.updateDisplay();
-    showNotification('Full Time - Game Finished', 'info');
+    notificationManager.info('Full Time - Game Finished');
     
     storageHelpers.saveGameState(gameState);
   }

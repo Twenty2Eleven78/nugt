@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA Update Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .log {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>PWA Update System Test</h1>
+
+    <div class="test-section">
+        <h2>Service Worker Status</h2>
+        <div id="sw-status" class="status info">Checking...</div>
+        <div id="sw-details"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Update Testing</h2>
+        <button onclick="testUpdateCheck()">Check for Updates</button>
+        <button onclick="testForceUpdate()">Force Update</button>
+        <button onclick="testShowNotification()">Test Update Notification</button>
+        <button onclick="clearLog()">Clear Log</button>
+        <div id="update-status" class="status info">Ready to test</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Log</h2>
+        <div id="test-log" class="log"></div>
+    </div>
+
+    <script type="module">
+        import { pwaUpdater } from './js/modules/services/pwa-updater.js';
+
+        let logElement = document.getElementById('test-log');
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}\n`;
+            logElement.textContent += logEntry;
+            logElement.scrollTop = logElement.scrollHeight;
+
+            console.log(`PWA Test: ${message}`);
+        }
+
+        // Test functions
+        window.testUpdateCheck = async function () {
+            log('Testing update check...', 'info');
+            try {
+                const result = await pwaUpdater.checkForUpdates();
+                log(`Update check result: ${result}`, result ? 'success' : 'error');
+                document.getElementById('update-status').textContent = result ? 'Update check completed' : 'Update check failed';
+                document.getElementById('update-status').className = result ? 'status success' : 'status error';
+            } catch (error) {
+                log(`Update check error: ${error.message}`, 'error');
+                document.getElementById('update-status').textContent = 'Update check failed';
+                document.getElementById('update-status').className = 'status error';
+            }
+        };
+
+        window.testForceUpdate = async function () {
+            log('Testing force update...', 'info');
+            try {
+                await pwaUpdater.installUpdate();
+                log('Force update triggered', 'success');
+            } catch (error) {
+                log(`Force update error: ${error.message}`, 'error');
+            }
+        };
+
+        window.testShowNotification = function () {
+            log('Testing update notification display...', 'info');
+            pwaUpdater.showUpdateNotification();
+            log('Update notification displayed', 'success');
+        };
+
+        window.clearLog = function () {
+            logElement.textContent = '';
+        };
+
+        // Initialize PWA updater and check status
+        async function initTest() {
+            log('Initializing PWA Update Test...', 'info');
+
+            // Check service worker support
+            if (!('serviceWorker' in navigator)) {
+                document.getElementById('sw-status').textContent = 'Service Worker not supported';
+                document.getElementById('sw-status').className = 'status error';
+                log('Service Worker not supported', 'error');
+                return;
+            }
+
+            try {
+                // Initialize PWA updater
+                const success = await pwaUpdater.init();
+
+                if (success) {
+                    document.getElementById('sw-status').textContent = 'Service Worker registered successfully';
+                    document.getElementById('sw-status').className = 'status success';
+                    log('PWA updater initialized successfully', 'success');
+
+                    // Get installation status
+                    const status = pwaUpdater.getInstallationStatus();
+                    document.getElementById('sw-details').innerHTML = `
+                        <p><strong>PWA Status:</strong> ${status.isPWA ? 'Running as PWA' : 'Running in browser'}</p>
+                        <p><strong>Service Worker:</strong> ${status.hasServiceWorker ? 'Active' : 'Inactive'}</p>
+                        <p><strong>Update Available:</strong> ${status.updateAvailable ? 'Yes' : 'No'}</p>
+                        <p><strong>Version:</strong> ${status.version}</p>
+                    `;
+
+                    log(`PWA Status: ${JSON.stringify(status)}`, 'info');
+                } else {
+                    document.getElementById('sw-status').textContent = 'Service Worker registration failed';
+                    document.getElementById('sw-status').className = 'status error';
+                    log('PWA updater initialization failed', 'error');
+                }
+            } catch (error) {
+                document.getElementById('sw-status').textContent = `Error: ${error.message}`;
+                document.getElementById('sw-status').className = 'status error';
+                log(`Initialization error: ${error.message}`, 'error');
+            }
+        }
+
+        // Start the test
+        initTest();
+
+        // Listen for service worker messages
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            log(`SW Message: ${JSON.stringify(event.data)}`, 'info');
+        });
+    </script>
+</body>
+
+</html>

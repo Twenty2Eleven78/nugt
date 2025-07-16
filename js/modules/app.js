@@ -1,6 +1,6 @@
 /**
  * Main Application Module - Initialization and Coordination
- * @version 3.3
+ * @version 3.4
  */
 
 // Import restructured modules

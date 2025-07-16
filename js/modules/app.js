@@ -29,7 +29,7 @@ import { sharingService } from './services/sharing.js';
 
 // Initialize application
 export function initializeApp() {
-  console.log('Initializing NUFC GameTime App v3.3 - Modular Architecture');
+  console.log('Initializing NUFC GameTime App v3.5 - Modular Architecture');
 
   // Check storage health
   if (!storage.checkStorageHealth()) {

@@ -30,6 +30,7 @@ import { sharingService } from './services/sharing.js';
 import { pwaUpdater } from './services/pwa-updater.js';
 import { authService } from './services/auth.js';
 import { apiService } from './services/api.js';
+import { blobStorageService } from './services/blob.js';
 
 // Initialize application
 export function initializeApp() {
@@ -212,6 +213,12 @@ function bindEventListeners() {
   const shareButton = domCache.get('shareButton');
   if (shareButton) {
     shareButton.addEventListener('click', () => sharingService.shareViaWhatsApp());
+  }
+
+  // Save to cloud button
+  const saveToCloudBtn = document.getElementById('saveToCloudBtn');
+  if (saveToCloudBtn) {
+    saveToCloudBtn.addEventListener('click', () => blobStorageService.saveMatchToCloud());
   }
 
   // Reset button

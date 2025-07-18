@@ -16,6 +16,8 @@ class AuthUI {
    * Initialize the authentication UI
    */
   async init() {
+    console.log('Initializing authentication UI');
+    
     // Create auth modal if it doesn't exist
     if (!document.getElementById('authModal')) {
       this._createAuthModal();
@@ -26,13 +28,16 @@ class AuthUI {
 
     // Check if user is already authenticated
     const isAuthenticated = await authService.init();
+    console.log('User authenticated:', isAuthenticated);
     
     if (isAuthenticated) {
       this._updateAuthState(true);
       return true;
     } else {
-      // Show auth modal on first load
-      this.showAuthModal();
+      // Show auth modal on first load, with a slight delay to ensure DOM is ready
+      setTimeout(() => {
+        this.showAuthModal();
+      }, 500);
       return false;
     }
   }
@@ -43,8 +48,40 @@ class AuthUI {
   showAuthModal() {
     const authModal = document.getElementById('authModal');
     if (authModal) {
-      const bsModal = new bootstrap.Modal(authModal);
-      bsModal.show();
+      // Check if WebAuthn is supported
+      if (!window.PublicKeyCredential) {
+        const authMessage = document.getElementById('authMessage');
+        if (authMessage) {
+          authMessage.innerHTML = `
+            <div class="alert alert-warning">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              <strong>Note:</strong> Your browser doesn't support passkeys. A simplified authentication will be used instead.
+            </div>
+            <p>Welcome to NUFC GameTime! Please sign in to track your usage and save game statistics.</p>
+          `;
+        }
+      }
+      
+      try {
+        // Make sure Bootstrap is available
+        if (typeof bootstrap !== 'undefined') {
+          const bsModal = new bootstrap.Modal(authModal);
+          bsModal.show();
+        } else {
+          // Fallback if Bootstrap is not loaded yet
+          console.warn('Bootstrap not loaded, using fallback modal display');
+          authModal.classList.add('show');
+          authModal.style.display = 'block';
+          document.body.classList.add('modal-open');
+          
+          // Create backdrop
+          const backdrop = document.createElement('div');
+          backdrop.className = 'modal-backdrop fade show';
+          document.body.appendChild(backdrop);
+        }
+      } catch (error) {
+        console.error('Error showing modal:', error);
+      }
     }
   }
 
@@ -64,6 +101,7 @@ class AuthUI {
               <div class="auth-container">
                 <div id="authMessage" class="mb-3">
                   <p>Welcome to NUFC GameTime! Please sign in to track your usage and save game statistics.</p>
+                  <p class="small text-muted">Having trouble? <a href="docs/troubleshooting.md" target="_blank">View troubleshooting guide</a></p>
                 </div>
                 
                 <div id="registerForm" class="mb-3">
@@ -71,7 +109,7 @@ class AuthUI {
                     <input type="text" class="form-control" id="usernameInput" placeholder="Username">
                     <label for="usernameInput">Your Name</label>
                   </div>
-                  <button id="registerButton" class="btn btn-primary w-100 mb-2">
+                  <button type="button" id="registerButton" class="btn btn-primary w-100 mb-2">
                     <i class="fas fa-user-plus me-2"></i>Register with Passkey
                   </button>
                   <small class="text-muted">First time? Create a passkey to securely access the app.</small>
@@ -82,7 +120,7 @@ class AuthUI {
                 </div>
                 
                 <div id="loginForm">
-                  <button id="loginButton" class="btn btn-success w-100 mb-2">
+                  <button type="button" id="loginButton" class="btn btn-success w-100 mb-2">
                     <i class="fas fa-key me-2"></i>Sign in with Passkey
                   </button>
                   <small class="text-muted">Already registered? Use your passkey to sign in.</small>
@@ -91,7 +129,7 @@ class AuthUI {
             </div>
             <div class="modal-footer">
               <div id="skipAuthContainer" class="w-100 text-center">
-                <button id="skipAuthButton" class="btn btn-link">Continue without signing in</button>
+                <button type="button" id="skipAuthButton" class="btn btn-link">Continue without signing in</button>
                 <small class="d-block text-muted">Your data won't be saved between sessions</small>
               </div>
             </div>
@@ -106,6 +144,9 @@ class AuthUI {
     document.body.appendChild(modalContainer.firstElementChild);
 
     this.authModalInitialized = true;
+    
+    // Bind event listeners to the modal buttons
+    setTimeout(() => this._bindModalButtons(), 100);
   }
 
   /**
@@ -167,61 +208,87 @@ class AuthUI {
    * @private
    */
   _bindEventListeners() {
-    // Wait for DOM to be ready
-    document.addEventListener('DOMContentLoaded', () => {
-      // Register button
-      const registerButton = document.getElementById('registerButton');
-      if (registerButton) {
-        registerButton.addEventListener('click', async () => {
-          const username = document.getElementById('usernameInput').value.trim();
-          if (!username) {
-            notificationManager.warning('Please enter your name');
-            return;
-          }
-          
-          const success = await authService.register(username);
-          if (success) {
-            hideModal('authModal');
-            this._updateAuthState(true);
-          }
+    // Bind modal buttons immediately instead of waiting for DOMContentLoaded
+    this._bindModalButtons();
+    
+    // Add global event listeners for dynamically created elements
+    document.body.addEventListener('click', (e) => {
+      if (e.target && e.target.id === 'logoutButton') {
+        authService.logout();
+        this._updateAuthState(false);
+        this.showAuthModal();
+      } else if (e.target && (e.target.id === 'showStatsButton' || e.target.closest('#showStatsButton'))) {
+        // Import and show stats dashboard
+        import('../ui/stats-dashboard.js').then(module => {
+          module.statsDashboard.show();
         });
       }
-
-      // Login button
-      const loginButton = document.getElementById('loginButton');
-      if (loginButton) {
-        loginButton.addEventListener('click', async () => {
-          const success = await authService.authenticate();
-          if (success) {
-            hideModal('authModal');
-            this._updateAuthState(true);
-          }
-        });
-      }
-
-      // Skip auth button
-      const skipAuthButton = document.getElementById('skipAuthButton');
-      if (skipAuthButton) {
-        skipAuthButton.addEventListener('click', () => {
-          hideModal('authModal');
-          this._updateAuthState(false);
-        });
-      }
-
-      // Logout and stats buttons (will be created dynamically)
-      document.body.addEventListener('click', (e) => {
-        if (e.target && e.target.id === 'logoutButton') {
-          authService.logout();
-          this._updateAuthState(false);
-          this.showAuthModal();
-        } else if (e.target && (e.target.id === 'showStatsButton' || e.target.closest('#showStatsButton'))) {
-          // Import and show stats dashboard
-          import('../ui/stats-dashboard.js').then(module => {
-            module.statsDashboard.show();
-          });
-        }
-      });
     });
+  }
+  
+  /**
+   * Bind event listeners to modal buttons
+   * @private
+   */
+  _bindModalButtons() {
+    // Register button
+    const registerButton = document.getElementById('registerButton');
+    if (registerButton) {
+      registerButton.onclick = async () => {
+        const username = document.getElementById('usernameInput').value.trim();
+        if (!username) {
+          notificationManager.warning('Please enter your name');
+          return;
+        }
+        
+        try {
+          console.log('Attempting to register with username:', username);
+          const success = await authService.register(username);
+          console.log('Registration result:', success);
+          if (success) {
+            hideModal('authModal');
+            this._updateAuthState(true);
+          }
+        } catch (error) {
+          console.error('Registration error:', error);
+          notificationManager.danger('Registration failed: ' + error.message);
+        }
+      };
+    } else {
+      console.warn('Register button not found');
+    }
+
+    // Login button
+    const loginButton = document.getElementById('loginButton');
+    if (loginButton) {
+      loginButton.onclick = async () => {
+        try {
+          console.log('Attempting to authenticate');
+          const success = await authService.authenticate();
+          console.log('Authentication result:', success);
+          if (success) {
+            hideModal('authModal');
+            this._updateAuthState(true);
+          }
+        } catch (error) {
+          console.error('Authentication error:', error);
+          notificationManager.danger('Authentication failed: ' + error.message);
+        }
+      };
+    } else {
+      console.warn('Login button not found');
+    }
+
+    // Skip auth button
+    const skipAuthButton = document.getElementById('skipAuthButton');
+    if (skipAuthButton) {
+      skipAuthButton.onclick = () => {
+        hideModal('authModal');
+        this._updateAuthState(false);
+      };
+    } else {
+      console.warn('Skip auth button not found');
+    }
   }
 
   /**

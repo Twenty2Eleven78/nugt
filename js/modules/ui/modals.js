@@ -144,6 +144,44 @@ export function closeAllModals() {
   }, 350);
 }
 
+// Special handler for stats dashboard modal
+export function closeStatsDashboard() {
+  const modalElement = document.getElementById('statsDashboardModal');
+  if (modalElement) {
+    try {
+      // First try using the modal API
+      if (typeof bootstrap !== 'undefined') {
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) {
+          modal.hide();
+        }
+      }
+      
+      // Force cleanup immediately
+      modalElement.style.display = 'none';
+      modalElement.classList.remove('show');
+      
+      // Remove all backdrops
+      const backdrops = document.querySelectorAll('.modal-backdrop');
+      backdrops.forEach(backdrop => backdrop.remove());
+      
+      // Clean up body
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+      
+      // Reset modal attributes
+      modalElement.setAttribute('aria-hidden', 'true');
+      modalElement.removeAttribute('aria-modal');
+      modalElement.removeAttribute('role');
+      
+      console.log('Stats dashboard closed and cleaned up');
+    } catch (error) {
+      console.error('Error closing stats dashboard:', error);
+    }
+  }
+}
+
 // Load release notes content
 function loadReleaseNotes() {
   const readmeContainer = document.getElementById('readme');

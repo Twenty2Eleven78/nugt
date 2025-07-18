@@ -5,7 +5,7 @@
 
 import { authService } from '../services/auth.js';
 import { statsTracker } from '../services/stats-tracker.js';
-import { showModal, hideModal } from './modals.js';
+import { showModal, hideModal, closeStatsDashboard } from './modals.js';
 
 class StatsDashboard {
   constructor() {
@@ -39,6 +39,15 @@ class StatsDashboard {
     this._updateStatsDisplay();
     showModal('statsDashboardModal');
   }
+  
+  /**
+   * Close the stats dashboard modal
+   * @private
+   */
+  _closeModal() {
+    // Use the special function for closing the stats dashboard
+    closeStatsDashboard();
+  }
 
   /**
    * Create the stats modal
@@ -46,12 +55,11 @@ class StatsDashboard {
    */
   _createStatsModal() {
     const modalHtml = `
-      <div class="modal fade" id="statsDashboardModal" tabindex="-1" aria-labelledby="statsDashboardModalLabel" aria-hidden="true">
+      <div class="modal fade" id="statsDashboardModal" tabindex="-1" aria-labelledby="statsDashboardModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="statsDashboardModalLabel">Game Statistics</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div class="stats-container">
@@ -150,7 +158,9 @@ class StatsDashboard {
               <button type="button" id="addTestDataButton" class="btn btn-outline-info me-auto">
                 <i class="fas fa-vial me-1"></i> Add Test Data
               </button>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" id="closeStatsButton" class="btn btn-primary">
+                <i class="fas fa-times me-1"></i> Close
+              </button>
             </div>
           </div>
         </div>
@@ -170,6 +180,14 @@ class StatsDashboard {
           window.StatsModule.addTestData();
           this._updateStatsDisplay();
         }
+      });
+    }
+    
+    // Add event listener for close button
+    const closeStatsButton = document.getElementById('closeStatsButton');
+    if (closeStatsButton) {
+      closeStatsButton.addEventListener('click', () => {
+        this._closeModal();
       });
     }
   }

@@ -66,11 +66,30 @@ class GoalManager {
     storageHelpers.saveMatchData(gameState);
     
     // Track goal stats if authenticated
+    console.log('Adding goal stats for player:', goalScorerName, 'assist:', goalAssistName);
     statsTracker.trackEvent('goal', {
       player: goalScorerName,
       assist: goalAssistName,
       time: currentSeconds
     });
+    
+    // Import storage helpers to directly save player stats
+    import('../data/storage.js').then(({ storageHelpers }) => {
+      // Get player stats from tracker and save them directly
+      const playerStats = statsTracker.getPlayerStats();
+      if (playerStats) {
+        console.log('Directly saving player stats after goal:', playerStats);
+        storageHelpers.savePlayerStats(statsTracker.playerStats);
+      }
+    });
+    
+    // Force rebuild player stats to ensure they're updated
+    setTimeout(() => {
+      if (window.StatsModule && typeof window.StatsModule.rebuildPlayerStats === 'function') {
+        console.log('Rebuilding player stats after goal');
+        window.StatsModule.rebuildPlayerStats();
+      }
+    }, 500);
     
     this._resetGoalForm();
     hideModal('goalModal');

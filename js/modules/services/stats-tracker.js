@@ -6,13 +6,7 @@
 import { storage } from '../data/storage.js';
 import { authService } from './auth.js';
 import { apiService } from './api.js';
-
-// Constants for stats storage
-const STATS_STORAGE_KEYS = {
-  GAME_STATS: 'nugt_game_stats',
-  PLAYER_STATS: 'nugt_player_stats',
-  TEAM_STATS: 'nugt_team_stats'
-};
+import { STORAGE_KEYS } from '../shared/constants.js';
 
 class StatsTracker {
   constructor() {
@@ -29,12 +23,16 @@ class StatsTracker {
     if (this.isInitialized) return;
 
     // Load existing stats
-    this.gameStats = storage.load(STATS_STORAGE_KEYS.GAME_STATS, {});
-    this.playerStats = storage.load(STATS_STORAGE_KEYS.PLAYER_STATS, {});
-    this.teamStats = storage.load(STATS_STORAGE_KEYS.TEAM_STATS, {});
+    this.gameStats = storage.load(STORAGE_KEYS.GAME_STATS, {});
+    this.playerStats = storage.load(STORAGE_KEYS.PLAYER_STATS, {});
+    this.teamStats = storage.load(STORAGE_KEYS.TEAM_STATS, {});
 
     this.isInitialized = true;
-    console.log('Stats tracker initialized');
+    console.log('Stats tracker initialized with:', {
+      gameStats: this.gameStats,
+      playerStats: this.playerStats,
+      teamStats: this.teamStats
+    });
   }
 
   /**
@@ -157,12 +155,24 @@ class StatsTracker {
    */
   getPlayerStats() {
     if (!authService.isUserAuthenticated()) {
+      console.log('getPlayerStats: User not authenticated');
       return null;
     }
 
     const userId = authService.getCurrentUser()?.id;
-    if (!userId || !this.playerStats[userId]) {
+    console.log('getPlayerStats: userId =', userId);
+    console.log('getPlayerStats: playerStats =', this.playerStats);
+    
+    if (!userId) {
+      console.log('getPlayerStats: No userId available');
       return null;
+    }
+    
+    // Initialize player stats if needed
+    if (!this.playerStats[userId]) {
+      console.log('getPlayerStats: Creating empty player stats for user');
+      this.playerStats[userId] = {};
+      this._saveStats();
     }
 
     return this.playerStats[userId];
@@ -223,6 +233,9 @@ class StatsTracker {
     
     // Save stats immediately after update
     this._saveStats();
+    
+    // Log current player stats for debugging
+    console.log('Current player stats:', JSON.stringify(this.playerStats));
   }
 
   /**
@@ -241,9 +254,10 @@ class StatsTracker {
    * @private
    */
   _saveStats() {
-    storage.save(STATS_STORAGE_KEYS.GAME_STATS, this.gameStats);
-    storage.save(STATS_STORAGE_KEYS.PLAYER_STATS, this.playerStats);
-    storage.save(STATS_STORAGE_KEYS.TEAM_STATS, this.teamStats);
+    storage.save(STORAGE_KEYS.GAME_STATS, this.gameStats);
+    storage.save(STORAGE_KEYS.PLAYER_STATS, this.playerStats);
+    storage.save(STORAGE_KEYS.TEAM_STATS, this.teamStats);
+    console.log('Stats saved to storage');
   }
   
   /**

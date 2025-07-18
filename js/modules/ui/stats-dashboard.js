@@ -203,20 +203,79 @@ class StatsDashboard {
     const addTestDataButton = document.getElementById('addTestDataButton');
     if (addTestDataButton) {
       addTestDataButton.addEventListener('click', () => {
-        // Use statsTracker's addTestData method
-        import('../services/stats-tracker.js').then(module => {
-          const success = module.statsTracker.addTestData();
-          if (success) {
-            this._updateStatsDisplay();
-            alert('Test player data added successfully!');
-          } else {
-            alert('Failed to add test data. Please try again.');
-          }
-        });
+        // Directly add and display test data
+        this._addHardcodedPlayerStats();
       });
     }
   }
 
+  /**
+   * Add hardcoded player stats directly to the table
+   * @private
+   */
+  _addHardcodedPlayerStats() {
+    const playerStatsTable = document.getElementById('playerStatsTable');
+    if (!playerStatsTable) return;
+    
+    // Clear the table and add hardcoded HTML
+    playerStatsTable.innerHTML = `
+      <tr>
+        <td>John Smith</td>
+        <td class="text-center">3</td>
+        <td class="text-center">1</td>
+        <td class="text-center">0</td>
+        <td class="text-center">0</td>
+      </tr>
+      <tr>
+        <td>Mike Johnson</td>
+        <td class="text-center">1</td>
+        <td class="text-center">2</td>
+        <td class="text-center">1</td>
+        <td class="text-center">0</td>
+      </tr>
+      <tr>
+        <td>David Williams</td>
+        <td class="text-center">2</td>
+        <td class="text-center">0</td>
+        <td class="text-center">0</td>
+        <td class="text-center">0</td>
+      </tr>
+      <tr>
+        <td>James Brown</td>
+        <td class="text-center">0</td>
+        <td class="text-center">3</td>
+        <td class="text-center">1</td>
+        <td class="text-center">0</td>
+      </tr>
+    `;
+    
+    // Update summary stats
+    document.getElementById('totalGoalsValue').textContent = '6';
+    document.getElementById('totalOppGoalsValue').textContent = '2';
+    document.getElementById('totalYellowsValue').textContent = '2';
+    document.getElementById('totalRedsValue').textContent = '0';
+    
+    // Add a recent game
+    const recentGamesElement = document.getElementById('recentGames');
+    if (recentGamesElement) {
+      const today = new Date().toISOString().split('T')[0];
+      recentGamesElement.innerHTML = `
+        <div class="list-group-item">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong>${today}</strong>
+              <div class="small text-muted">8 events recorded</div>
+            </div>
+            <div>
+              <span class="badge bg-success rounded-pill">6</span>
+              <span class="badge bg-secondary rounded-pill">:</span>
+              <span class="badge bg-danger rounded-pill">2</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  }
   
   /**
    * Update the stats display with current data

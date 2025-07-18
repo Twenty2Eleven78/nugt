@@ -63,6 +63,7 @@ class GoalManager {
 
     // Save and cleanup
     storageHelpers.saveMatchData(gameState);
+    
     this._resetGoalForm();
     hideModal('goalModal');
   }
@@ -93,6 +94,7 @@ class GoalManager {
 
     // Save data
     storageHelpers.saveMatchData(gameState);
+    
     this._resetGoalForm();
   }
 

@@ -19,12 +19,39 @@ export function showModal(modalId) {
 export function hideModal(modalId) {
   const modalElement = document.getElementById(modalId);
   if (modalElement) {
-    let modal = bootstrap.Modal.getInstance(modalElement);
-    if (!modal) {
-      // If no instance exists, create one and then hide it
-      modal = new bootstrap.Modal(modalElement);
+    try {
+      // Check if Bootstrap is available
+      if (typeof bootstrap !== 'undefined') {
+        let modal = bootstrap.Modal.getInstance(modalElement);
+        if (!modal) {
+          // If no instance exists, create one and then hide it
+          modal = new bootstrap.Modal(modalElement);
+        }
+        modal.hide();
+      } else {
+        // Fallback if Bootstrap is not loaded yet
+        console.warn('Bootstrap not loaded, using fallback modal hide');
+        modalElement.classList.remove('show');
+        modalElement.style.display = 'none';
+        
+        // Remove backdrop
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        
+        // Clean up body
+        document.body.classList.remove('modal-open');
+      }
+    } catch (error) {
+      console.error('Error hiding modal:', error);
+      // Fallback cleanup
+      modalElement.style.display = 'none';
+      modalElement.classList.remove('show');
+      document.body.classList.remove('modal-open');
+      
+      // Remove backdrop
+      const backdrops = document.querySelectorAll('.modal-backdrop');
+      backdrops.forEach(backdrop => backdrop.remove());
     }
-    modal.hide();
     
     // Enhanced cleanup to prevent overlay issues
     setTimeout(() => {
@@ -116,6 +143,8 @@ export function closeAllModals() {
     cleanupModalOverlays();
   }, 350);
 }
+
+
 
 // Load release notes content
 function loadReleaseNotes() {

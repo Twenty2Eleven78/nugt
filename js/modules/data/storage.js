@@ -66,12 +66,39 @@ class StorageManager {
     }
   }
 
-  // Clear all app data
+  // Clear all app data (except authentication data)
   clear() {
     try {
+      // Get all keys to preserve (auth keys)
+      const authKeys = [
+        'nugt_user_id',
+        'nugt_email',
+        'nugt_display_name',
+        'nugt_credential_id',
+        'nugt_is_authenticated',
+        'nugt_auth_timestamp',
+        'nugt_usage_stats'
+      ];
+      
+      // Store auth data temporarily
+      const authData = {};
+      authKeys.forEach(key => {
+        const value = localStorage.getItem(key);
+        if (value) {
+          authData[key] = value;
+        }
+      });
+      
+      // Clear all app data
       Object.values(STORAGE_KEYS).forEach(key => {
         localStorage.removeItem(key);
       });
+      
+      // Restore auth data
+      Object.entries(authData).forEach(([key, value]) => {
+        localStorage.setItem(key, value);
+      });
+      
       this._saveQueue.clear();
     } catch (error) {
       console.error('Error clearing localStorage:', error);
@@ -158,6 +185,8 @@ export const storageHelpers = {
     storage.save(STORAGE_KEYS.FIRST_SCORE, team1Score);
     storage.save(STORAGE_KEYS.SECOND_SCORE, team2Score);
   },
+  
+
 
   // Load complete game state
   loadGameState() {

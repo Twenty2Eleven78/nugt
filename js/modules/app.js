@@ -1,6 +1,6 @@
 /**
  * Main Application Module - Initialization and Coordination
- * @version 3.4
+ * @version 3.5
  */
 
 // Import restructured modules
@@ -22,11 +22,14 @@ import { rosterManager } from './match/roster.js';
 // UI modules
 import { bindModalEvents, hideModal } from './ui/modals.js';
 import { initializeTooltips } from './ui/components.js';
+import { authUI } from './ui/auth-ui.js';
 
 // Services
 import { notificationManager } from './services/notifications.js';
 import { sharingService } from './services/sharing.js';
 import { pwaUpdater } from './services/pwa-updater.js';
+import { authService } from './services/auth.js';
+import { apiService } from './services/api.js';
 
 // Initialize application
 export function initializeApp() {
@@ -36,6 +39,17 @@ export function initializeApp() {
   if (!storage.checkStorageHealth()) {
     notificationManager.warning('Storage may not be working properly. Some features may be limited.');
   }
+
+  // Initialize authentication
+  authUI.init().then(isAuthenticated => {
+    if (isAuthenticated) {
+      console.log('User authenticated successfully');
+      // Track app usage
+      authService.trackUsage('app_start');
+    } else {
+      console.log('User not authenticated');
+    }
+  });
 
   // Load saved state
   loadAppState();
@@ -58,6 +72,9 @@ export function initializeApp() {
       console.log('PWA updater initialized successfully');
     }
   });
+  
+  // Initialize API service
+  apiService.init();
 
   // Update displays
   timerController.updateDisplay();
@@ -233,7 +250,12 @@ function resetTracker() {
   // Reset teams
   teamManager.resetTeams();
 
-  // Clear storage
+  // Track game reset if authenticated
+  if (authService.isUserAuthenticated()) {
+    authService.trackUsage('game_reset');
+  }
+
+  // Clear storage (except auth data)
   storage.clear();
 
   // Show confirmation and redirect
@@ -294,9 +316,16 @@ window.RosterModule = {
   updateRosterList: rosterManager.updateRosterList
 };
 
-window.StatisticsModule = {
-  shareViaWhatsApp: sharingService.shareViaWhatsApp
+// Statistics module removed
+
+window.AuthModule = {
+  showAuthModal: () => authUI.showAuthModal(),
+  isAuthenticated: () => authService.isUserAuthenticated(),
+  getCurrentUser: () => authService.getCurrentUser(),
+  logout: () => authService.logout()
 };
+
+
 
 // Global functions for backward compatibility
 window.showGoalModal = goalManager.showGoalModal;

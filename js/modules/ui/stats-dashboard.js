@@ -125,9 +125,14 @@ class StatsDashboard {
                   <div class="col-12">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                       <h6 class="stats-heading mb-0">Player Statistics</h6>
-                      <button id="rebuildStatsButton" class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-sync-alt me-1"></i> Rebuild Player Stats
-                      </button>
+                      <div>
+                        <button id="addTestDataButton" class="btn btn-sm btn-outline-success me-2">
+                          <i class="fas fa-plus me-1"></i> Add Test Data
+                        </button>
+                        <button id="rebuildStatsButton" class="btn btn-sm btn-outline-primary">
+                          <i class="fas fa-sync-alt me-1"></i> Rebuild Player Stats
+                        </button>
+                      </div>
                     </div>
                     <div class="table-responsive">
                       <table class="table table-striped">
@@ -194,8 +199,25 @@ class StatsDashboard {
         });
       });
     }
+    
+    const addTestDataButton = document.getElementById('addTestDataButton');
+    if (addTestDataButton) {
+      addTestDataButton.addEventListener('click', () => {
+        // Use statsTracker's addTestData method
+        import('../services/stats-tracker.js').then(module => {
+          const success = module.statsTracker.addTestData();
+          if (success) {
+            this._updateStatsDisplay();
+            alert('Test player data added successfully!');
+          } else {
+            alert('Failed to add test data. Please try again.');
+          }
+        });
+      });
+    }
   }
 
+  
   /**
    * Update the stats display with current data
    * @private

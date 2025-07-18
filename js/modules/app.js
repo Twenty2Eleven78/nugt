@@ -339,6 +339,7 @@ window.StatsModule = {
   getPlayerStats: statsTracker.getPlayerStats.bind(statsTracker),
   getTeamStats: statsTracker.getTeamStats.bind(statsTracker),
   rebuildPlayerStats: statsTracker.rebuildPlayerStats.bind(statsTracker),
+  addTestData: statsTracker.addTestData.bind(statsTracker),
   showDashboard: statsDashboard.show.bind(statsDashboard)
 };
 

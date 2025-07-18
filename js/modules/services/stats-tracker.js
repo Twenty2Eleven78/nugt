@@ -345,15 +345,18 @@ class StatsTracker {
   /**
    * Add test data for debugging purposes
    * This should only be used during development
+   * @returns {boolean} - Success status
    */
   addTestData() {
     if (!authService.isUserAuthenticated()) {
       console.warn('Cannot add test data: User not authenticated');
-      return;
+      return false;
     }
 
     const userId = authService.getCurrentUser()?.id;
-    if (!userId) return;
+    if (!userId) return false;
+    
+    console.log('Adding test data for user:', userId);
 
     const gameId = this._getCurrentGameId();
     
@@ -408,9 +411,14 @@ class StatsTracker {
     // Add opposition goals
     this.gameStats[userId][gameId].summary.oppositionGoals = 2;
 
-    // Save stats
-    this._saveStats();
+    // Save stats immediately
+    storage.saveImmediate(STORAGE_KEYS.GAME_STATS, this.gameStats);
+    storage.saveImmediate(STORAGE_KEYS.PLAYER_STATS, this.playerStats);
+    storage.saveImmediate(STORAGE_KEYS.TEAM_STATS, this.teamStats);
+    
     console.log('Test data added successfully');
+    console.log('Player stats:', this.playerStats);
+    return true;
   }
 }
 

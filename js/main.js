@@ -1,8 +1,8 @@
 /**
  * NUFC GameTime App - Main Entry Point
- * @version 3.4
+ * @version 3.5.1
  * @author Mark Van-Kerro
- * @date Last Updated: 2025-02-27
+ * @date Last Updated: 2023-06-15
  * 
  * Modular architecture for better maintainability and performance
  */
@@ -26,3 +26,7 @@ document.addEventListener('visibilitychange', () => {
 
 // Service Worker registration is handled by PWA updater in app.js
 // This ensures proper update management and avoids conflicts
+
+// Preload authentication modules for faster startup
+import('./modules/services/auth.js');
+import('./modules/ui/auth-ui.js');

@@ -1,6 +1,6 @@
 /**
  * Shared Constants
- * @version 3.3
+ * @version 3.5
  */
 
 // Storage Keys Constants
@@ -47,4 +47,11 @@ export const NOTIFICATION_TYPES = {
   WARNING: 'warning',
   DANGER: 'danger',
   INFO: 'info'
+};
+
+// Authentication Constants
+export const AUTH_CONFIG = {
+  SESSION_TIMEOUT: 86400000, // 24 hours in milliseconds
+  AUTH_REQUIRED: false, // Whether authentication is required to use the app
+  USAGE_TRACKING: true // Whether to track usage statistics
 };

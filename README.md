@@ -9,4 +9,5 @@
 <li>3.2 - Change Match Events to show as a timeline view, Goal timestamp accuracy and stability improvements, Added shirt number functionality to player roster</li>
 <li>3.3 - Added disallowed goal options and additional game time options</li>
 <li>3.4 - Refactor Javescript into modern module architecture</li>
-<li><b>3.5.0 - seperate out roster defaults from roster core code<b></li>
+<li><b>3.5.0 - seperate out roster defaults from roster core code</b></li>
+<li><b>3.5.1 - Added passkey authentication for user tracking and future game stats storage</b></li>

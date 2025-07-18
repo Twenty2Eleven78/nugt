@@ -1,0 +1,78 @@
+/**
+ * Authentication UI Styles
+ * @version 1.0
+ */
+
+/* User profile button */
+.user-profile-container {
+  display: flex;
+  align-items: center;
+}
+
+/* Auth modal styles */
+#authModal .modal-content {
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+#authModal .modal-header {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+#authModal .modal-footer {
+  border-top: none;
+  padding-top: 0;
+}
+
+.auth-container {
+  padding: 10px;
+}
+
+/* Divider */
+.auth-container .text-center {
+  position: relative;
+}
+
+.auth-container .text-center span {
+  background-color: #fff;
+  padding: 0 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.auth-container .text-center:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #dee2e6;
+}
+
+/* Skip auth button */
+#skipAuthButton {
+  color: #6c757d;
+  text-decoration: none;
+}
+
+#skipAuthButton:hover {
+  text-decoration: underline;
+}
+
+/* User profile dropdown */
+#userProfileButton {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .user-profile-container {
+    position: static !important;
+    margin-top: 10px;
+    justify-content: flex-end;
+  }
+}

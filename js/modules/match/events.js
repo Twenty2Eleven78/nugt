@@ -9,6 +9,7 @@ import { domCache } from '../shared/dom.js';
 import { getCurrentSeconds, formatMatchTime } from '../shared/utils.js';
 import { EVENT_TYPES } from '../shared/constants.js';
 import { notificationManager } from '../services/notifications.js';
+import { statsTracker } from '../services/stats-tracker.js';
 import { showModal, hideModal } from '../ui/modals.js';
 import { getEventIcon, getEventCardClass } from '../ui/components.js';
 import { timerController } from '../game/timer.js';
@@ -62,6 +63,12 @@ class EventsManager {
     
     // Save data
     storageHelpers.saveMatchData(gameState);
+    
+    // Track event stats if authenticated
+    statsTracker.trackEvent(eventType.toLowerCase().replace(' ', '_'), {
+      notes: notes,
+      time: currentSeconds
+    });
   }
 
   // Handle half time event

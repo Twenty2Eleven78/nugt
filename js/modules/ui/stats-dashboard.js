@@ -60,6 +60,7 @@ class StatsDashboard {
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="statsDashboardModalLabel">Game Statistics</h5>
+              <button type="button" class="btn-close" id="closeStatsButton" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div class="stats-container">
@@ -154,14 +155,7 @@ class StatsDashboard {
                 </div>
               </div>
             </div>
-            <div class="modal-footer">
-              <button type="button" id="addTestDataButton" class="btn btn-outline-info me-auto">
-                <i class="fas fa-vial me-1"></i> Add Test Data
-              </button>
-              <button type="button" id="closeStatsButton" class="btn btn-primary">
-                <i class="fas fa-times me-1"></i> Close
-              </button>
-            </div>
+
           </div>
         </div>
       </div>
@@ -171,17 +165,6 @@ class StatsDashboard {
     const modalContainer = document.createElement('div');
     modalContainer.innerHTML = modalHtml;
     document.body.appendChild(modalContainer.firstElementChild);
-    
-    // Add event listener for test data button
-    const addTestDataButton = document.getElementById('addTestDataButton');
-    if (addTestDataButton) {
-      addTestDataButton.addEventListener('click', () => {
-        if (window.StatsModule && window.StatsModule.addTestData) {
-          window.StatsModule.addTestData();
-          this._updateStatsDisplay();
-        }
-      });
-    }
     
     // Add event listener for close button
     const closeStatsButton = document.getElementById('closeStatsButton');

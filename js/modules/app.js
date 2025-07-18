@@ -23,14 +23,12 @@ import { rosterManager } from './match/roster.js';
 import { bindModalEvents, hideModal } from './ui/modals.js';
 import { initializeTooltips } from './ui/components.js';
 import { authUI } from './ui/auth-ui.js';
-import { statsDashboard } from './ui/stats-dashboard.js';
 
 // Services
 import { notificationManager } from './services/notifications.js';
 import { sharingService } from './services/sharing.js';
 import { pwaUpdater } from './services/pwa-updater.js';
 import { authService } from './services/auth.js';
-import { statsTracker } from './services/stats-tracker.js';
 import { apiService } from './services/api.js';
 
 // Initialize application
@@ -48,9 +46,6 @@ export function initializeApp() {
       console.log('User authenticated successfully');
       // Track app usage
       authService.trackUsage('app_start');
-      
-      // Initialize stats tracker for authenticated users
-      statsTracker.init();
     } else {
       console.log('User not authenticated');
     }
@@ -67,7 +62,6 @@ export function initializeApp() {
   bindEventListeners();
   bindModalEvents();
   initializeTooltips();
-  statsDashboard.init();
 
   // Resume timer if needed
   timerController.resumeFromState();
@@ -333,15 +327,7 @@ window.AuthModule = {
   logout: () => authService.logout()
 };
 
-window.StatsModule = {
-  trackEvent: statsTracker.trackEvent.bind(statsTracker),
-  getGameStats: statsTracker.getGameStats.bind(statsTracker),
-  getPlayerStats: statsTracker.getPlayerStats.bind(statsTracker),
-  getTeamStats: statsTracker.getTeamStats.bind(statsTracker),
-  rebuildPlayerStats: statsTracker.rebuildPlayerStats.bind(statsTracker),
-  addTestData: statsTracker.addTestData.bind(statsTracker),
-  showDashboard: statsDashboard.show.bind(statsDashboard)
-};
+// Stats module removed
 
 // Global functions for backward compatibility
 window.showGoalModal = goalManager.showGoalModal;

@@ -8,7 +8,6 @@ import { storage, storageHelpers } from '../data/storage.js';
 import { domCache } from '../shared/dom.js';
 import { getCurrentSeconds, formatMatchTime } from '../shared/utils.js';
 import { notificationManager } from '../services/notifications.js';
-import { statsTracker } from '../services/stats-tracker.js';
 import { showModal, hideModal } from '../ui/modals.js';
 import { updateMatchLog } from './events.js';
 
@@ -65,32 +64,6 @@ class GoalManager {
     // Save and cleanup
     storageHelpers.saveMatchData(gameState);
     
-    // Track goal stats if authenticated
-    console.log('Adding goal stats for player:', goalScorerName, 'assist:', goalAssistName);
-    statsTracker.trackEvent('goal', {
-      player: goalScorerName,
-      assist: goalAssistName,
-      time: currentSeconds
-    });
-    
-    // Import storage helpers to directly save player stats
-    import('../data/storage.js').then(({ storageHelpers }) => {
-      // Get player stats from tracker and save them directly
-      const playerStats = statsTracker.getPlayerStats();
-      if (playerStats) {
-        console.log('Directly saving player stats after goal:', playerStats);
-        storageHelpers.savePlayerStats(statsTracker.playerStats);
-      }
-    });
-    
-    // Force rebuild player stats to ensure they're updated
-    setTimeout(() => {
-      if (window.StatsModule && typeof window.StatsModule.rebuildPlayerStats === 'function') {
-        console.log('Rebuilding player stats after goal');
-        window.StatsModule.rebuildPlayerStats();
-      }
-    }, 500);
-    
     this._resetGoalForm();
     hideModal('goalModal');
   }
@@ -121,12 +94,6 @@ class GoalManager {
 
     // Save data
     storageHelpers.saveMatchData(gameState);
-    
-    // Track opposition goal stats if authenticated
-    statsTracker.trackEvent('opposition_goal', {
-      team: team2Name,
-      time: currentSeconds
-    });
     
     this._resetGoalForm();
   }

@@ -72,7 +72,8 @@ class StorageManager {
       // Get all keys to preserve (auth keys)
       const authKeys = [
         'nugt_user_id',
-        'nugt_username',
+        'nugt_email',
+        'nugt_display_name',
         'nugt_credential_id',
         'nugt_is_authenticated',
         'nugt_auth_timestamp',

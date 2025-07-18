@@ -44,7 +44,8 @@ If you need to reset your authentication:
 3. Select "Local Storage" in the left panel
 4. Find and delete the following keys:
    - `nugt_user_id`
-   - `nugt_username`
+   - `nugt_email`
+   - `nugt_display_name`
    - `nugt_credential_id`
    - `nugt_is_authenticated`
    - `nugt_auth_timestamp`

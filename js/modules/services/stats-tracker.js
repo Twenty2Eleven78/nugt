@@ -88,6 +88,10 @@ class StatsTracker {
       case 'goal':
         summary.goals++;
         this._updatePlayerStat(userId, eventData.player, 'goals');
+        // Track assist if available
+        if (eventData.assist) {
+          this._updatePlayerStat(userId, eventData.assist, 'assists');
+        }
         break;
       case 'opposition_goal':
         summary.oppositionGoals++;
@@ -171,11 +175,17 @@ class StatsTracker {
    * @private
    */
   _updatePlayerStat(userId, playerName, statType) {
-    if (!playerName) return;
+    if (!playerName) {
+      console.log('No player name provided for stat update');
+      return;
+    }
+
+    console.log(`Updating ${statType} for player: ${playerName}`);
 
     // Initialize player stats if needed
     if (!this.playerStats[userId]) {
       this.playerStats[userId] = {};
+      console.log(`Created player stats object for user: ${userId}`);
     }
 
     if (!this.playerStats[userId][playerName]) {
@@ -186,10 +196,12 @@ class StatsTracker {
         redCards: 0,
         appearances: 0
       };
+      console.log(`Created stats for new player: ${playerName}`);
     }
 
     // Update stat
     this.playerStats[userId][playerName][statType]++;
+    console.log(`Updated ${statType} for ${playerName}: ${this.playerStats[userId][playerName][statType]}`);
   }
 
   /**
@@ -247,6 +259,77 @@ class StatsTracker {
       });
   }
 }
+
+  /**
+   * Add test data for debugging purposes
+   * This should only be used during development
+   */
+  addTestData() {
+    if (!authService.isUserAuthenticated()) {
+      console.warn('Cannot add test data: User not authenticated');
+      return;
+    }
+
+    const userId = authService.getCurrentUser()?.id;
+    if (!userId) return;
+
+    const gameId = this._getCurrentGameId();
+    
+    // Initialize user stats if needed
+    if (!this.gameStats[userId]) {
+      this.gameStats[userId] = {};
+    }
+
+    // Initialize game stats if needed
+    if (!this.gameStats[userId][gameId]) {
+      this.gameStats[userId][gameId] = {
+        startTime: Date.now(),
+        events: [],
+        summary: {
+          goals: 0,
+          oppositionGoals: 0,
+          yellowCards: 0,
+          redCards: 0
+        }
+      };
+    }
+
+    // Add test player stats
+    const testPlayers = [
+      { name: 'John Smith', goals: 3, assists: 1, yellowCards: 0, redCards: 0 },
+      { name: 'Mike Johnson', goals: 1, assists: 2, yellowCards: 1, redCards: 0 },
+      { name: 'David Williams', goals: 2, assists: 0, yellowCards: 0, redCards: 0 },
+      { name: 'James Brown', goals: 0, assists: 3, yellowCards: 1, redCards: 0 }
+    ];
+
+    // Initialize player stats if needed
+    if (!this.playerStats[userId]) {
+      this.playerStats[userId] = {};
+    }
+
+    // Add test players
+    testPlayers.forEach(player => {
+      this.playerStats[userId][player.name] = {
+        goals: player.goals,
+        assists: player.assists,
+        yellowCards: player.yellowCards,
+        redCards: player.redCards,
+        appearances: 1
+      };
+
+      // Update game summary
+      this.gameStats[userId][gameId].summary.goals += player.goals;
+      this.gameStats[userId][gameId].summary.yellowCards += player.yellowCards;
+      this.gameStats[userId][gameId].summary.redCards += player.redCards;
+    });
+
+    // Add opposition goals
+    this.gameStats[userId][gameId].summary.oppositionGoals = 2;
+
+    // Save stats
+    this._saveStats();
+    console.log('Test data added successfully');
+  }
 
 // Create and export singleton instance
 export const statsTracker = new StatsTracker();

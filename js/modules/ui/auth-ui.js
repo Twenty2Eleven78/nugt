@@ -106,8 +106,8 @@ class AuthUI {
                 
                 <div id="registerForm" class="mb-3">
                   <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="usernameInput" placeholder="Username">
-                    <label for="usernameInput">Your Name</label>
+                    <input type="email" class="form-control" id="usernameInput" placeholder="name@example.com">
+                    <label for="usernameInput">Email Address</label>
                   </div>
                   <button type="button" id="registerButton" class="btn btn-primary w-100 mb-2">
                     <i class="fas fa-user-plus me-2"></i>Register with Passkey
@@ -235,15 +235,22 @@ class AuthUI {
     const registerButton = document.getElementById('registerButton');
     if (registerButton) {
       registerButton.onclick = async () => {
-        const username = document.getElementById('usernameInput').value.trim();
-        if (!username) {
-          notificationManager.warning('Please enter your name');
+        const email = document.getElementById('usernameInput').value.trim();
+        if (!email) {
+          notificationManager.warning('Please enter your email address');
+          return;
+        }
+        
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          notificationManager.warning('Please enter a valid email address');
           return;
         }
         
         try {
-          console.log('Attempting to register with username:', username);
-          const success = await authService.register(username);
+          console.log('Attempting to register with email:', email);
+          const success = await authService.register(email);
           console.log('Registration result:', success);
           if (success) {
             hideModal('authModal');

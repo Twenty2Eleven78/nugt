@@ -9,7 +9,8 @@ import { notificationManager } from './notifications.js';
 // Constants for auth storage
 const AUTH_STORAGE_KEYS = {
   USER_ID: 'nugt_user_id',
-  USERNAME: 'nugt_username',
+  EMAIL: 'nugt_email',
+  DISPLAY_NAME: 'nugt_display_name',
   CREDENTIAL_ID: 'nugt_credential_id',
   IS_AUTHENTICATED: 'nugt_is_authenticated',
   AUTH_TIMESTAMP: 'nugt_auth_timestamp',
@@ -39,12 +40,13 @@ class AuthService {
     // Check if user is already authenticated
     const isAuthenticated = storage.load(AUTH_STORAGE_KEYS.IS_AUTHENTICATED, false);
     const userId = storage.load(AUTH_STORAGE_KEYS.USER_ID, null);
-    const username = storage.load(AUTH_STORAGE_KEYS.USERNAME, null);
+    const email = storage.load(AUTH_STORAGE_KEYS.EMAIL, null);
+    const displayName = storage.load(AUTH_STORAGE_KEYS.DISPLAY_NAME, null);
     const authTimestamp = storage.load(AUTH_STORAGE_KEYS.AUTH_TIMESTAMP, null);
 
-    if (isAuthenticated && userId && username) {
+    if (isAuthenticated && userId && email) {
       this.isAuthenticated = true;
-      this.currentUser = { id: userId, name: username };
+      this.currentUser = { id: userId, email: email, name: displayName || email.split('@')[0] };
       this.authTimestamp = authTimestamp;
       
       // Track usage
@@ -57,15 +59,25 @@ class AuthService {
 
   /**
    * Register a new passkey
-   * @param {string} username - User's display name
+   * @param {string} email - User's email address
    * @returns {Promise<boolean>} - Success status
    */
-  async register(username) {
+  async register(email) {
     try {
-      if (!username || username.trim() === '') {
-        notificationManager.warning('Please enter a valid username');
+      if (!email || email.trim() === '') {
+        notificationManager.warning('Please enter a valid email address');
         return false;
       }
+      
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        notificationManager.warning('Please enter a valid email address');
+        return false;
+      }
+      
+      // Extract display name from email (part before @)
+      const displayName = email.split('@')[0];
 
       // Generate a random user ID
       const userId = this._generateUserId();
@@ -85,8 +97,8 @@ class AuthService {
             },
             user: {
               id: Uint8Array.from(userId, c => c.charCodeAt(0)),
-              name: username,
-              displayName: username
+              name: email,
+              displayName: displayName
             },
             pubKeyCredParams: [
               { type: 'public-key', alg: -7 }, // ES256
@@ -120,7 +132,8 @@ class AuthService {
           // In a real app, you would send this to a server
           credentialStore.set(userId, {
             credentialId,
-            username,
+            email,
+            displayName,
             publicKey: credential.response.getPublicKey ? credential.response.getPublicKey() : null
           });
           
@@ -136,18 +149,19 @@ class AuthService {
       
       // Store user data (whether WebAuthn succeeded or not)
       storage.saveImmediate(AUTH_STORAGE_KEYS.USER_ID, userId);
-      storage.saveImmediate(AUTH_STORAGE_KEYS.USERNAME, username);
+      storage.saveImmediate(AUTH_STORAGE_KEYS.EMAIL, email);
+      storage.saveImmediate(AUTH_STORAGE_KEYS.DISPLAY_NAME, displayName);
       storage.saveImmediate(AUTH_STORAGE_KEYS.IS_AUTHENTICATED, true);
       storage.saveImmediate(AUTH_STORAGE_KEYS.AUTH_TIMESTAMP, Date.now());
 
       this.isAuthenticated = true;
-      this.currentUser = { id: userId, name: username };
+      this.currentUser = { id: userId, email: email, name: displayName };
       this.authTimestamp = Date.now();
 
       // Initialize usage stats
       this._initializeUsageStats(userId);
       
-      notificationManager.success(`Welcome, ${username}! You've been registered successfully.`);
+      notificationManager.success(`Welcome, ${displayName}! You've been registered successfully.`);
       return true;
     } catch (error) {
       console.error('Registration error:', error);
@@ -164,10 +178,11 @@ class AuthService {
     try {
       // Get stored user data
       const userId = storage.load(AUTH_STORAGE_KEYS.USER_ID);
-      const username = storage.load(AUTH_STORAGE_KEYS.USERNAME);
+      const email = storage.load(AUTH_STORAGE_KEYS.EMAIL);
+      const displayName = storage.load(AUTH_STORAGE_KEYS.DISPLAY_NAME);
       const storedCredentialId = storage.load(AUTH_STORAGE_KEYS.CREDENTIAL_ID);
       
-      if (!userId || !username) {
+      if (!userId || !email) {
         throw new Error('No user found. Please register first.');
       }
       
@@ -216,13 +231,13 @@ class AuthService {
       storage.saveImmediate(AUTH_STORAGE_KEYS.AUTH_TIMESTAMP, Date.now());
 
       this.isAuthenticated = true;
-      this.currentUser = { id: userId, name: username };
+      this.currentUser = { id: userId, email: email, name: displayName };
       this.authTimestamp = Date.now();
 
       // Track usage
       this.trackUsage('login');
       
-      notificationManager.success(`Welcome back, ${username}!`);
+      notificationManager.success(`Welcome back, ${displayName}!`);
       return true;
     } catch (error) {
       console.error('Authentication error:', error);

@@ -147,6 +147,9 @@ class StatsDashboard {
               </div>
             </div>
             <div class="modal-footer">
+              <button type="button" id="addTestDataButton" class="btn btn-outline-info me-auto">
+                <i class="fas fa-vial me-1"></i> Add Test Data
+              </button>
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
           </div>
@@ -158,6 +161,17 @@ class StatsDashboard {
     const modalContainer = document.createElement('div');
     modalContainer.innerHTML = modalHtml;
     document.body.appendChild(modalContainer.firstElementChild);
+    
+    // Add event listener for test data button
+    const addTestDataButton = document.getElementById('addTestDataButton');
+    if (addTestDataButton) {
+      addTestDataButton.addEventListener('click', () => {
+        if (window.StatsModule && window.StatsModule.addTestData) {
+          window.StatsModule.addTestData();
+          this._updateStatsDisplay();
+        }
+      });
+    }
   }
 
   /**
@@ -210,7 +224,20 @@ class StatsDashboard {
     // Update player stats table
     const playerStatsTable = document.getElementById('playerStatsTable');
     if (playerStatsTable) {
-      const playerEntries = Object.entries(playerStats);
+      // Get current user ID
+      const userId = authService.getCurrentUser()?.id;
+      if (!userId || !playerStats[userId]) {
+        playerStatsTable.innerHTML = `
+          <tr>
+            <td colspan="5" class="text-center">No player statistics available</td>
+          </tr>
+        `;
+        return;
+      }
+      
+      // Get player stats for current user
+      const userPlayerStats = playerStats[userId];
+      const playerEntries = Object.entries(userPlayerStats);
       
       if (playerEntries.length === 0) {
         playerStatsTable.innerHTML = `
@@ -221,18 +248,19 @@ class StatsDashboard {
       } else {
         playerStatsTable.innerHTML = '';
         
-        playerEntries.forEach(([playerId, stats]) => {
-          Object.entries(stats).forEach(([playerName, playerStats]) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td>${playerName}</td>
-              <td class="text-center">${playerStats.goals || 0}</td>
-              <td class="text-center">${playerStats.assists || 0}</td>
-              <td class="text-center">${playerStats.yellowCards || 0}</td>
-              <td class="text-center">${playerStats.redCards || 0}</td>
-            `;
-            playerStatsTable.appendChild(row);
-          });
+        // Sort players by goals (highest first)
+        playerEntries.sort((a, b) => b[1].goals - a[1].goals);
+        
+        playerEntries.forEach(([playerName, stats]) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${playerName}</td>
+            <td class="text-center">${stats.goals || 0}</td>
+            <td class="text-center">${stats.assists || 0}</td>
+            <td class="text-center">${stats.yellowCards || 0}</td>
+            <td class="text-center">${stats.redCards || 0}</td>
+          `;
+          playerStatsTable.appendChild(row);
         });
       }
     }

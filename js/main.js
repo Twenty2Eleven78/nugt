@@ -28,5 +28,16 @@ document.addEventListener('visibilitychange', () => {
 // This ensures proper update management and avoids conflicts
 
 // Preload authentication modules for faster startup
-import('./modules/services/auth.js');
-import('./modules/ui/auth-ui.js');
+import('./modules/services/auth.js').then(module => {
+  console.log('Auth service preloaded');
+});
+
+import('./modules/ui/auth-ui.js').then(module => {
+  console.log('Auth UI preloaded');
+  // Create auth modal early
+  setTimeout(() => {
+    if (module.authUI && typeof module.authUI.init === 'function') {
+      module.authUI.init();
+    }
+  }, 1000);
+});

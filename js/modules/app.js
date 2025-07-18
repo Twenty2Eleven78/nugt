@@ -327,10 +327,10 @@ window.StatisticsModule = {
 };
 
 window.AuthModule = {
-  showAuthModal: authUI.showAuthModal,
-  isAuthenticated: authService.isUserAuthenticated,
-  getCurrentUser: authService.getCurrentUser,
-  logout: authService.logout
+  showAuthModal: () => authUI.showAuthModal(),
+  isAuthenticated: () => authService.isUserAuthenticated(),
+  getCurrentUser: () => authService.getCurrentUser(),
+  logout: () => authService.logout()
 };
 
 window.StatsModule = {

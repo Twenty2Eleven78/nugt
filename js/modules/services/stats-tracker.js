@@ -258,8 +258,6 @@ class StatsTracker {
         console.error('Error syncing stats with server:', error);
       });
   }
-}
-
   /**
    * Add test data for debugging purposes
    * This should only be used during development
@@ -330,6 +328,7 @@ class StatsTracker {
     this._saveStats();
     console.log('Test data added successfully');
   }
+}
 
 // Create and export singleton instance
 export const statsTracker = new StatsTracker();

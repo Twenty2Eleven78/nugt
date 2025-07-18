@@ -200,6 +200,19 @@
                   <!-- App Management Section -->
 
                   <div class="mb-4">
+                    <h6 class="fw-bold mb-3">User Account</h6>
+                    <div class="d-grid gap-2">
+                      <button class="btn btn-primary d-flex align-items-center justify-content-center py-2"
+                        id="showAuthButton" onclick="window.debugAuth.createAuthModal(); window.debugAuth.showAuthModal()">
+                        <i class="fas fa-user me-2"></i>
+                        Sign In / Register
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <hr class="my-4">
+                  
+                  <div class="mb-4">
                     <h6 class="fw-bold mb-3">Statistics</h6>
                     <div class="d-grid gap-2">
                       <button class="btn btn-info d-flex align-items-center justify-content-center py-2"
@@ -688,6 +701,7 @@
   <!-- Scripts - modular architecture -->
   <script src="js/main.js" type="module"></script>
   <script src="js/bootstrap.bundle.min.js" defer></script>
+  <script src="js/debug.js" type="module"></script>
   <!-- ENDScripts -->
 </body>
 

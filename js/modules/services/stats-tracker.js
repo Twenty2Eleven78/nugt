@@ -47,11 +47,15 @@ class StatsTracker {
     
     // Only track stats if user is authenticated
     if (!authService.isUserAuthenticated()) {
+      console.log('Not tracking stats: User not authenticated');
       return;
     }
 
     const userId = authService.getCurrentUser()?.id;
-    if (!userId) return;
+    if (!userId) {
+      console.log('Not tracking stats: No user ID available');
+      return;
+    }
 
     const timestamp = Date.now();
     const gameId = this._getCurrentGameId();
@@ -82,15 +86,23 @@ class StatsTracker {
       data: eventData
     });
 
+    // Initialize player stats if needed
+    if (!this.playerStats[userId]) {
+      this.playerStats[userId] = {};
+      console.log(`Created player stats object for user: ${userId}`);
+    }
+
     // Update summary stats
     const summary = this.gameStats[userId][gameId].summary;
     switch (eventType) {
       case 'goal':
         summary.goals++;
-        this._updatePlayerStat(userId, eventData.player, 'goals');
-        // Track assist if available
-        if (eventData.assist) {
-          this._updatePlayerStat(userId, eventData.assist, 'assists');
+        if (eventData.player && eventData.player !== 'Own Goal') {
+          this._updatePlayerStat(userId, eventData.player, 'goals');
+          // Track assist if available
+          if (eventData.assist && eventData.assist !== 'N/A') {
+            this._updatePlayerStat(userId, eventData.assist, 'assists');
+          }
         }
         break;
       case 'opposition_goal':
@@ -98,11 +110,15 @@ class StatsTracker {
         break;
       case 'yellow_card':
         summary.yellowCards++;
-        this._updatePlayerStat(userId, eventData.player, 'yellowCards');
+        if (eventData.player) {
+          this._updatePlayerStat(userId, eventData.player, 'yellowCards');
+        }
         break;
       case 'red_card':
         summary.redCards++;
-        this._updatePlayerStat(userId, eventData.player, 'redCards');
+        if (eventData.player) {
+          this._updatePlayerStat(userId, eventData.player, 'redCards');
+        }
         break;
     }
 
@@ -114,6 +130,8 @@ class StatsTracker {
     
     // Send to API (async, don't wait for response)
     this._syncWithServer(eventType, eventData);
+    
+    console.log(`Event tracked: ${eventType}`, eventData);
   }
 
   /**
@@ -175,8 +193,8 @@ class StatsTracker {
    * @private
    */
   _updatePlayerStat(userId, playerName, statType) {
-    if (!playerName) {
-      console.log('No player name provided for stat update');
+    if (!playerName || playerName === 'N/A' || playerName === 'Own Goal') {
+      console.log('No valid player name provided for stat update');
       return;
     }
 
@@ -202,6 +220,9 @@ class StatsTracker {
     // Update stat
     this.playerStats[userId][playerName][statType]++;
     console.log(`Updated ${statType} for ${playerName}: ${this.playerStats[userId][playerName][statType]}`);
+    
+    // Save stats immediately after update
+    this._saveStats();
   }
 
   /**
@@ -258,6 +279,55 @@ class StatsTracker {
         console.error('Error syncing stats with server:', error);
       });
   }
+  /**
+   * Rebuild player statistics from existing game data
+   * This can be used to fix player stats that weren't properly tracked
+   */
+  rebuildPlayerStats() {
+    if (!authService.isUserAuthenticated()) {
+      console.warn('Cannot rebuild player stats: User not authenticated');
+      return false;
+    }
+
+    const userId = authService.getCurrentUser()?.id;
+    if (!userId) return false;
+
+    console.log('Rebuilding player stats from game data...');
+    
+    // Reset player stats for this user
+    this.playerStats[userId] = {};
+    
+    // Go through all game events and rebuild player stats
+    if (this.gameStats[userId]) {
+      Object.values(this.gameStats[userId]).forEach(game => {
+        if (game.events && Array.isArray(game.events)) {
+          game.events.forEach(event => {
+            if (event.type === 'goal' && event.data) {
+              // Track goal
+              if (event.data.player && event.data.player !== 'Own Goal') {
+                this._updatePlayerStat(userId, event.data.player, 'goals');
+              }
+              
+              // Track assist
+              if (event.data.assist && event.data.assist !== 'N/A') {
+                this._updatePlayerStat(userId, event.data.assist, 'assists');
+              }
+            } else if (event.type === 'yellow_card' && event.data && event.data.player) {
+              this._updatePlayerStat(userId, event.data.player, 'yellowCards');
+            } else if (event.type === 'red_card' && event.data && event.data.player) {
+              this._updatePlayerStat(userId, event.data.player, 'redCards');
+            }
+          });
+        }
+      });
+    }
+    
+    // Save stats
+    this._saveStats();
+    console.log('Player stats rebuilt successfully');
+    return true;
+  }
+  
   /**
    * Add test data for debugging purposes
    * This should only be used during development

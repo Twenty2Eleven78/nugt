@@ -123,7 +123,12 @@ class StatsDashboard {
                 
                 <div class="row mb-4">
                   <div class="col-12">
-                    <h6 class="stats-heading">Player Statistics</h6>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <h6 class="stats-heading mb-0">Player Statistics</h6>
+                      <button id="rebuildStatsButton" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-sync-alt me-1"></i> Rebuild Player Stats
+                      </button>
+                    </div>
                     <div class="table-responsive">
                       <table class="table table-striped">
                         <thead>
@@ -166,11 +171,27 @@ class StatsDashboard {
     modalContainer.innerHTML = modalHtml;
     document.body.appendChild(modalContainer.firstElementChild);
     
-    // Add event listener for close button
+    // Add event listeners for buttons
     const closeStatsButton = document.getElementById('closeStatsButton');
     if (closeStatsButton) {
       closeStatsButton.addEventListener('click', () => {
         this._closeModal();
+      });
+    }
+    
+    const rebuildStatsButton = document.getElementById('rebuildStatsButton');
+    if (rebuildStatsButton) {
+      rebuildStatsButton.addEventListener('click', () => {
+        // Import statsTracker to rebuild player stats
+        import('../services/stats-tracker.js').then(module => {
+          const success = module.statsTracker.rebuildPlayerStats();
+          if (success) {
+            this._updateStatsDisplay();
+            alert('Player statistics have been rebuilt successfully!');
+          } else {
+            alert('Failed to rebuild player statistics. Please try again.');
+          }
+        });
       });
     }
   }
@@ -227,7 +248,7 @@ class StatsDashboard {
     if (playerStatsTable) {
       // Get current user ID
       const userId = authService.getCurrentUser()?.id;
-      if (!userId || !playerStats[userId]) {
+      if (!userId) {
         playerStatsTable.innerHTML = `
           <tr>
             <td colspan="5" class="text-center">No player statistics available</td>
@@ -237,6 +258,11 @@ class StatsDashboard {
       }
       
       // Get player stats for current user
+      // Initialize if it doesn't exist
+      if (!playerStats[userId]) {
+        playerStats[userId] = {};
+      }
+      
       const userPlayerStats = playerStats[userId];
       const playerEntries = Object.entries(userPlayerStats);
       

@@ -57,7 +57,7 @@ class AuthUI {
               <i class="fas fa-exclamation-triangle me-2"></i>
               <strong>Note:</strong> Your browser doesn't support passkeys. A simplified authentication will be used instead.
             </div>
-            <p>Welcome to NUFC GameTime! Please sign in to track your usage and save game statistics.</p>
+            <p>Welcome to NUFC GameTime! Please sign in to track your usage.</p>
           `;
         }
       }
@@ -100,7 +100,7 @@ class AuthUI {
             <div class="modal-body">
               <div class="auth-container">
                 <div id="authMessage" class="mb-3">
-                  <p>Welcome to NUFC GameTime! Please sign in to track your usage and save game statistics.</p>
+                  <p>Welcome to NUFC GameTime! Please sign in to track your usage.</p>
                   <p class="small text-muted">Having trouble? <a href="docs/troubleshooting.md" target="_blank">View troubleshooting guide</a></p>
                 </div>
                 
@@ -187,10 +187,6 @@ class AuthUI {
     
     // Add dropdown items
     dropdownMenu.innerHTML = `
-      <li><span class="dropdown-item-text" id="userStatsText">Sessions: 0</span></li>
-      <li><hr class="dropdown-divider"></li>
-      <li><button class="dropdown-item" id="showStatsButton"><i class="fas fa-chart-bar me-2"></i>View Statistics</button></li>
-      <li><hr class="dropdown-divider"></li>
       <li><button class="dropdown-item" id="logoutButton">Sign Out</button></li>
     `;
     
@@ -217,11 +213,6 @@ class AuthUI {
         authService.logout();
         this._updateAuthState(false);
         this.showAuthModal();
-      } else if (e.target && (e.target.id === 'showStatsButton' || e.target.closest('#showStatsButton'))) {
-        // Import and show stats dashboard
-        import('../ui/stats-dashboard.js').then(module => {
-          module.statsDashboard.show();
-        });
       }
     });
   }
@@ -309,11 +300,9 @@ class AuthUI {
     
     const profileButton = document.getElementById('userProfileButton');
     const profileUsername = document.getElementById('profileUsername');
-    const userStatsText = document.getElementById('userStatsText');
     
     if (isAuthenticated) {
       const user = authService.getCurrentUser();
-      const stats = authService.getUserStats();
       
       if (profileButton) {
         profileButton.classList.remove('btn-outline-secondary');
@@ -323,10 +312,6 @@ class AuthUI {
       if (profileUsername && user) {
         profileUsername.textContent = user.name;
       }
-      
-      if (userStatsText && stats) {
-        userStatsText.textContent = `Sessions: ${stats.sessions}`;
-      }
     } else {
       if (profileButton) {
         profileButton.classList.remove('btn-outline-primary');
@@ -335,10 +320,6 @@ class AuthUI {
       
       if (profileUsername) {
         profileUsername.textContent = 'Guest';
-      }
-      
-      if (userStatsText) {
-        userStatsText.textContent = 'Not signed in';
       }
     }
   }

@@ -186,10 +186,7 @@ export const storageHelpers = {
     storage.save(STORAGE_KEYS.SECOND_SCORE, team2Score);
   },
   
-  // Save player stats
-  savePlayerStats(playerStats) {
-    storage.saveImmediate(STORAGE_KEYS.PLAYER_STATS, playerStats);
-  },
+
 
   // Load complete game state
   loadGameState() {

@@ -316,9 +316,7 @@ window.RosterModule = {
   updateRosterList: rosterManager.updateRosterList
 };
 
-window.StatisticsModule = {
-  shareViaWhatsApp: sharingService.shareViaWhatsApp
-};
+// Statistics module removed
 
 window.AuthModule = {
   showAuthModal: () => authUI.showAuthModal(),
@@ -327,7 +325,7 @@ window.AuthModule = {
   logout: () => authService.logout()
 };
 
-// Stats module removed
+
 
 // Global functions for backward compatibility
 window.showGoalModal = goalManager.showGoalModal;

@@ -387,7 +387,7 @@ class StatsTracker {
       { name: 'James Brown', goals: 0, assists: 3, yellowCards: 1, redCards: 0 }
     ];
 
-    // Initialize player stats if needed
+    // Ensure player stats object exists
     if (!this.playerStats[userId]) {
       this.playerStats[userId] = {};
     }
@@ -406,18 +406,47 @@ class StatsTracker {
       this.gameStats[userId][gameId].summary.goals += player.goals;
       this.gameStats[userId][gameId].summary.yellowCards += player.yellowCards;
       this.gameStats[userId][gameId].summary.redCards += player.redCards;
+      
+      // Add events for each stat to ensure they're tracked properly
+      if (player.goals > 0) {
+        for (let i = 0; i < player.goals; i++) {
+          this.gameStats[userId][gameId].events.push({
+            type: 'goal',
+            timestamp: Date.now() - (i * 60000),
+            data: { player: player.name, assist: 'N/A' }
+          });
+        }
+      }
+      
+      if (player.yellowCards > 0) {
+        this.gameStats[userId][gameId].events.push({
+          type: 'yellow_card',
+          timestamp: Date.now(),
+          data: { player: player.name }
+        });
+      }
     });
 
     // Add opposition goals
     this.gameStats[userId][gameId].summary.oppositionGoals = 2;
+    
+    // Add opposition goal events
+    for (let i = 0; i < 2; i++) {
+      this.gameStats[userId][gameId].events.push({
+        type: 'opposition_goal',
+        timestamp: Date.now() - (i * 120000),
+        data: { team: 'Opposition Team' }
+      });
+    }
 
-    // Save stats immediately
+    // Save stats immediately using both methods to ensure they're saved
+    this._saveStats();
     storage.saveImmediate(STORAGE_KEYS.GAME_STATS, this.gameStats);
     storage.saveImmediate(STORAGE_KEYS.PLAYER_STATS, this.playerStats);
     storage.saveImmediate(STORAGE_KEYS.TEAM_STATS, this.teamStats);
     
     console.log('Test data added successfully');
-    console.log('Player stats:', this.playerStats);
+    console.log('Player stats:', JSON.stringify(this.playerStats));
     return true;
   }
 }

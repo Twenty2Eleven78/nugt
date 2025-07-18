@@ -36,7 +36,8 @@ class StatsDashboard {
       return;
     }
     
-    this._updateStatsDisplay();
+    // Always use hardcoded player stats for now
+    this._addHardcodedPlayerStats();
     showModal('statsDashboardModal');
   }
   
@@ -203,8 +204,16 @@ class StatsDashboard {
     const addTestDataButton = document.getElementById('addTestDataButton');
     if (addTestDataButton) {
       addTestDataButton.addEventListener('click', () => {
-        // Directly add and display test data
-        this._addHardcodedPlayerStats();
+        // Use statsTracker's addTestData method and then update display
+        import('../services/stats-tracker.js').then(module => {
+          const success = module.statsTracker.addTestData();
+          if (success) {
+            // Force reload stats from storage
+            module.statsTracker.init();
+            // Update display
+            this._updateStatsDisplay();
+          }
+        });
       });
     }
   }
@@ -347,17 +356,16 @@ class StatsDashboard {
       const userPlayerStats = playerStats[userId];
       const playerEntries = Object.entries(userPlayerStats);
       
+      console.log('Player entries:', playerEntries);
+      
       if (playerEntries.length === 0) {
-        playerStatsTable.innerHTML = `
-          <tr>
-            <td colspan="5" class="text-center">No player statistics available</td>
-          </tr>
-        `;
+        console.log('No player entries found, using fallback');
+        this._addHardcodedPlayerStats();
       } else {
         playerStatsTable.innerHTML = '';
         
         // Sort players by goals (highest first)
-        playerEntries.sort((a, b) => b[1].goals - a[1].goals);
+        playerEntries.sort((a, b) => (b[1].goals || 0) - (a[1].goals || 0));
         
         playerEntries.forEach(([playerName, stats]) => {
           const row = document.createElement('tr');

@@ -1,5 +1,5 @@
 <font color="red"<b>NUFC GameTime App Release Notes</b></font>
-<br><br>
+<br>
 <li>1.0 - Initial working application modal</li>
 <li>1.3 - layout Changes,  Whats App Report, General application ui and function improvements</li>
 <li>2.0 - Added Roster/team Management feature
@@ -10,5 +10,5 @@
 <li>3.3 - Added disallowed goal options and additional game time options</li>
 <li>3.4 - Refactor Javescript into modern module architecture</li>
 <li><b>3.5.0 - seperate out roster defaults from roster core code</b></li>
-<li><b>3.5.1 - Added passkey authentication for user tracking and future game stats storage</b></li>
+<li><b>3.5.1 - Added passkey authentication for user tracking</b></li>
 <li><b>3.5.2 - Added cloud storage for match details for authenticated users</b></li>

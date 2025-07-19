@@ -1,8 +1,0 @@
-{
-  "name": "nugt-netlify-functions",
-  "version": "1.0.0",
-  "description": "Netlify Functions for NUFC GameTime App",
-  "dependencies": {
-    "@netlify/blobs": "^6.0.0"
-  }
-}

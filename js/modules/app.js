@@ -24,8 +24,6 @@ import { bindModalEvents, hideModal } from './ui/modals.js';
 import { initializeTooltips } from './ui/components.js';
 import { authUI } from './ui/auth-ui.js';
 import { saveMatchUI } from './ui/save-match-ui.js';
-import { savedMatchesUI } from './ui/saved-matches-ui.js';
-import { matchDetailsUI } from './ui/match-details-ui.js';
 
 // Services
 import { notificationManager } from './services/notifications.js';
@@ -34,8 +32,6 @@ import { pwaUpdater } from './services/pwa-updater.js';
 import { authService } from './services/auth.js';
 import { apiService } from './services/api.js';
 import { blobStorageService } from './services/blob-storage.js';
-import { matchLoader } from './services/match-loader.js';
-import { saveTestMatchToLocalStorage } from './services/debug-helper.js';
 
 // Initialize application
 export function initializeApp() {
@@ -69,8 +65,6 @@ export function initializeApp() {
   bindModalEvents();
   initializeTooltips();
   saveMatchUI.init();
-  savedMatchesUI.init();
-  matchDetailsUI.init();
 
   // Resume timer if needed
   timerController.resumeFromState();
@@ -346,19 +340,6 @@ window.AuthModule = {
 window.SaveMatchModule = {
   showSaveMatchModal: () => saveMatchUI.showSaveMatchModal(),
   saveMatch: () => saveMatchUI.handleSaveMatch()
-};
-
-window.SavedMatchesModule = {
-  loadSavedMatches: () => savedMatchesUI.loadSavedMatches()
-};
-
-window.MatchLoaderModule = {
-  loadMatch: (matchData) => matchLoader.loadMatch(matchData)
-};
-
-// Debug helpers
-window.DebugModule = {
-  saveTestMatch: saveTestMatchToLocalStorage
 };
 
 

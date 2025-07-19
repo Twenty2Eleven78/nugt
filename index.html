@@ -197,11 +197,6 @@
                         <i class="fas fa-cloud-upload-alt me-2"></i>
                         Save Match to Cloud
                       </button>
-                      <button class="btn btn-info d-flex align-items-center justify-content-center py-2"
-                        id="viewSavedMatchesButton" data-bs-toggle="modal" data-bs-target="#savedMatchesModal">
-                        <i class="fas fa-cloud-download-alt me-2"></i>
-                        View Saved Matches
-                      </button>
                     </div>
                   </div>
                   <hr class="my-4">
@@ -749,67 +744,6 @@
     </div>
   </div>
   <!--END Save Match Modal-->
-
-  <!--Saved Matches Modal-->
-  <div class="modal fade" id="savedMatchesModal" tabindex="-1" aria-labelledby="savedMatchesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="savedMatchesModalLabel">
-            <i class="fa-solid fa-cloud-download-alt me-2"></i>Saved Matches
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div id="savedMatchesAuthRequired" class="d-none">
-            <div class="alert alert-warning">
-              <i class="fas fa-lock me-2"></i>You need to be logged in to view saved matches.
-            </div>
-            <div class="d-grid gap-2">
-              <button type="button" class="btn btn-primary" onclick="AuthModule.showAuthModal()">
-                <i class="fas fa-sign-in-alt me-2"></i>Log In / Register
-              </button>
-            </div>
-          </div>
-          
-          <div id="savedMatchesList" class="d-none">
-            <div id="savedMatchesLoading" class="text-center py-4">
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-              </div>
-              <p class="mt-2">Loading saved matches...</p>
-            </div>
-            
-            <div id="savedMatchesError" class="d-none">
-              <div class="alert alert-danger">
-                <i class="fas fa-exclamation-circle me-2"></i>
-                <span id="savedMatchesErrorText">Failed to load saved matches.</span>
-              </div>
-            </div>
-            
-            <div id="noSavedMatches" class="d-none">
-              <div class="alert alert-info">
-                <i class="fas fa-info-circle me-2"></i>You don't have any saved matches yet.
-              </div>
-            </div>
-            
-            <div id="savedMatchesContent" class="d-none">
-              <div class="list-group" id="savedMatchesListItems">
-                <!-- Saved matches will be inserted here -->
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" id="refreshSavedMatchesBtn">
-            <i class="fas fa-sync-alt me-2"></i>Refresh
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!--END Saved Matches Modal-->
 
   <!-- Scripts - modular architecture -->
   <script src="js/main.js" type="module"></script>

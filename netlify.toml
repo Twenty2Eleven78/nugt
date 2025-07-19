@@ -15,11 +15,3 @@
 
 [template.environment]
   NETLIFY_BLOB_LIMIT_MB = "100"
-
-[build.environment]
-  SITE_NAME = "nugt"
-  NETLIFY_SITE_ID = "b4a91544-9264-462c-a90e-28fde735b9f4"
-  
-# Enable Netlify Blobs
-[blobs]
-  serve_untrusted_html = false

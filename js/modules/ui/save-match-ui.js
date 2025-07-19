@@ -105,26 +105,18 @@ class SaveMatchUI {
       // Get match data
       const matchData = this.collectMatchData();
       
-      // Save match data
+      // Save to Netlify blob storage
       const result = await blobStorageService.saveMatchDetails(matchData);
       
       if (result.success) {
         if (this.saveMatchStatus) {
-          if (result.local) {
-            this.saveMatchStatus.innerHTML = '<div class="alert alert-warning">Match saved locally (cloud storage unavailable)</div>';
-          } else {
-            this.saveMatchStatus.innerHTML = '<div class="alert alert-success">Match saved successfully!</div>';
-          }
+          this.saveMatchStatus.innerHTML = '<div class="alert alert-success">Match saved successfully!</div>';
         }
         
         // Close modal after a delay
         setTimeout(() => {
           hideModal('saveMatchModal');
-          if (result.local) {
-            notificationManager.info('Match details saved locally (cloud storage unavailable)');
-          } else {
-            notificationManager.success('Match details saved to cloud storage');
-          }
+          notificationManager.success('Match details saved to cloud storage');
         }, 1500);
       } else {
         if (this.saveMatchStatus) {

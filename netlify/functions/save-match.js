@@ -2,54 +2,50 @@
 const { getStore } = require('@netlify/blobs');
 
 exports.handler = async (event, context) => {
+  // Check if user is authenticated
+  if (!context.clientContext || !context.clientContext.user) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ message: 'Unauthorized' })
+    };
+  }
+
   try {
     // Parse request body
-    const { matchId, matchData, userId } = JSON.parse(event.body);
+    const { matchId, matchData } = JSON.parse(event.body);
     
-    if (!matchId || !matchData || !userId) {
+    if (!matchId || !matchData) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: 'Missing required fields' })
       };
     }
     
-    const siteID = process.env.NETLIFY_SITE_ID;
-    const token = process.env.NETLIFY_API_TOKEN;
-
-    if (!siteID || !token) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ message: 'Netlify Blob Storage not configured. Missing NETLIFY_SITE_ID or NETLIFY_API_TOKEN environment variables.' })
-      };
-    }
-
-    // Try to use Netlify Blob Store
+    // Get user ID from context
+    const userId = context.clientContext.user.sub;
+    
+    // Create a store for this user's matches
     const store = getStore({
       name: `user-matches-${userId}`,
-      siteID,
-      token
+      siteID: context.site.id
     });
-
+    
     // Save match data to blob store
     await store.set(matchId, JSON.stringify(matchData));
-
-    console.log('Match saved to Netlify Blob Store successfully');
     
-    // Always return success to the client
     return {
       statusCode: 200,
       body: JSON.stringify({ 
         message: 'Match saved successfully',
-        timestamp: new Date().toISOString(),
-        matchId
+        timestamp: new Date().toISOString()
       })
     };
   } catch (error) {
-    console.error('Error in save-match function:', error);
+    console.error('Error saving match:', error);
     
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Server error', error: error.message })
+      body: JSON.stringify({ message: 'Error saving match data', error: error.message })
     };
   }
 };

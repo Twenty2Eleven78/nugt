@@ -2,61 +2,49 @@
 const { getStore } = require('@netlify/blobs');
 
 exports.handler = async (event, context) => {
+  // Check if user is authenticated
+  if (!context.clientContext || !context.clientContext.user) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ message: 'Unauthorized' })
+    };
+  }
+
   try {
-    // Get user ID from query parameters
-    const userId = event.queryStringParameters?.userId;
+    // Get user ID from context
+    const userId = context.clientContext.user.sub;
     
-    if (!userId) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: 'Missing userId parameter' })
-      };
-    }
-    
-    let matches = [];
-    
-    const siteID = process.env.NETLIFY_SITE_ID;
-    const token = process.env.NETLIFY_API_TOKEN;
-
-    if (!siteID || !token) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ message: 'Netlify Blob Storage not configured. Missing NETLIFY_SITE_ID or NETLIFY_API_TOKEN environment variables.' })
-      };
-    }
-
+    // Create a store for this user's matches
     const store = getStore({
       name: `user-matches-${userId}`,
-      siteID,
-      token
+      siteID: context.site.id
     });
-
+    
     // List all blobs in the store
-    const { blobs } = await store.list();
-
+    const blobs = await store.list();
+    
     // Get match data for each blob
-    for (const blob of blobs) {
-      const matchData = await store.get(blob.key);
+    const matches = [];
+    for (const blobKey of blobs) {
+      const matchData = await store.get(blobKey);
       if (matchData) {
         matches.push({
-          id: blob.key,
-          data: JSON.parse(matchData)
+          id: blobKey,
+          data: JSON.parse(matchData.toString())
         });
       }
     }
     
-    console.log(`Retrieved ${matches.length} matches from Netlify Blob Store`);
-
     return {
       statusCode: 200,
       body: JSON.stringify({ matches })
     };
   } catch (error) {
-    console.error('Error in get-matches function:', error);
+    console.error('Error retrieving matches:', error);
     
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Server error', error: error.message })
+      body: JSON.stringify({ message: 'Error retrieving match data', error: error.message })
     };
   }
 };

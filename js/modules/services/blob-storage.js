@@ -1,28 +1,36 @@
 /**
- * Match Storage Service
+ * Netlify Blob Storage Service
  * @version 1.0
  */
 
 import { authService } from './auth.js';
 import { notificationManager } from './notifications.js';
 
-class MatchStorageService {
+class BlobStorageService {
   constructor() {
     this.initialized = false;
+    this.netlifyIdentity = null;
   }
 
   /**
-   * Initialize the Match Storage service
+   * Initialize the Blob Storage service
    */
   async init() {
     if (this.initialized) return true;
     
     try {
-      console.log('Match Storage service initialized');
-      this.initialized = true;
-      return true;
+      // Check if Netlify Identity is available
+      if (window.netlifyIdentity) {
+        this.netlifyIdentity = window.netlifyIdentity;
+        console.log('Netlify Blob Storage service initialized');
+        this.initialized = true;
+        return true;
+      } else {
+        console.warn('Netlify Identity not found, blob storage will not be available');
+        return false;
+      }
     } catch (error) {
-      console.error('Failed to initialize Match Storage service:', error);
+      console.error('Failed to initialize Netlify Blob Storage service:', error);
       return false;
     }
   }
@@ -59,34 +67,40 @@ class MatchStorageService {
       // Generate a unique ID for the match
       const matchId = `match_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
       
-      // Try to save to Netlify Blob Store via serverless function
+      // Get Netlify Identity token
+      const token = await this._getAuthToken();
+      if (!token) {
+        throw new Error('Failed to get authentication token');
+      }
+      
+      // Save to Netlify Blob Store
       const response = await fetch('/.netlify/functions/save-match', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           matchId,
-          matchData: dataToSave,
-          userId: user.id,
-          userEmail: user.email
+          matchData: dataToSave
         })
       });
-
+      
       if (!response.ok) {
-        throw new Error('Server returned error: ' + response.status);
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to save match details');
       }
-
+      
       const result = await response.json();
       notificationManager.success('Match details saved successfully');
-
+      
       // Track usage
       authService.trackUsage('match_saved', { matchId });
-
+      
       return { success: true, matchId, ...result };
     } catch (error) {
       console.error('Error saving match details:', error);
-      notificationManager.error('Failed to save match details: ' + error.message);
+      notificationManager.danger('Failed to save match details: ' + error.message);
       return { success: false, error: error.message };
     }
   }
@@ -111,28 +125,51 @@ class MatchStorageService {
         throw new Error('User information not available');
       }
       
-      // Try to get saved matches from Netlify serverless function
-      const response = await fetch(`/.netlify/functions/get-matches?userId=${encodeURIComponent(user.id)}`, {
+      // Get Netlify Identity token
+      const token = await this._getAuthToken();
+      if (!token) {
+        throw new Error('Failed to get authentication token');
+      }
+      
+      // Get saved matches from Netlify Blob Store
+      const response = await fetch('/.netlify/functions/get-matches', {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
+          'Authorization': `Bearer ${token}`
         }
       });
-
+      
       if (!response.ok) {
-        throw new Error('Server returned error: ' + response.status);
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to retrieve saved matches');
       }
-
+      
       const result = await response.json();
       return { success: true, matches: result.matches };
     } catch (error) {
       console.error('Error getting saved matches:', error);
-      notificationManager.error('Failed to retrieve saved matches: ' + error.message);
+      notificationManager.danger('Failed to retrieve saved matches: ' + error.message);
       return { success: false, error: error.message };
     }
   }
-
+  
+  /**
+   * Get authentication token from Netlify Identity
+   * @returns {Promise<string>} - Authentication token
+   * @private
+   */
+  async _getAuthToken() {
+    if (!this.netlifyIdentity) {
+      return null;
+    }
+    
+    return new Promise((resolve) => {
+      this.netlifyIdentity.refresh(jwt => {
+        resolve(jwt);
+      });
+    });
+  }
 }
 
 // Create and export singleton instance
-export const blobStorageService = new MatchStorageService();
+export const blobStorageService = new BlobStorageService();

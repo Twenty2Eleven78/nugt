@@ -25,6 +25,7 @@ import { initializeTooltips } from './ui/components.js';
 import { authUI } from './ui/auth-ui.js';
 import { saveMatchUI } from './ui/save-match-ui.js';
 import { savedMatchesUI } from './ui/saved-matches-ui.js';
+import { matchDetailsUI } from './ui/match-details-ui.js';
 
 // Services
 import { notificationManager } from './services/notifications.js';
@@ -33,6 +34,7 @@ import { pwaUpdater } from './services/pwa-updater.js';
 import { authService } from './services/auth.js';
 import { apiService } from './services/api.js';
 import { blobStorageService } from './services/blob-storage.js';
+import { matchLoader } from './services/match-loader.js';
 
 // Initialize application
 export function initializeApp() {
@@ -67,6 +69,7 @@ export function initializeApp() {
   initializeTooltips();
   saveMatchUI.init();
   savedMatchesUI.init();
+  matchDetailsUI.init();
 
   // Resume timer if needed
   timerController.resumeFromState();
@@ -346,6 +349,10 @@ window.SaveMatchModule = {
 
 window.SavedMatchesModule = {
   loadSavedMatches: () => savedMatchesUI.loadSavedMatches()
+};
+
+window.MatchLoaderModule = {
+  loadMatch: (matchData) => matchLoader.loadMatch(matchData)
 };
 
 

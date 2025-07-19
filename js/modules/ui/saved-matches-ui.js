@@ -7,6 +7,8 @@ import { authService } from '../services/auth.js';
 import { blobStorageService } from '../services/blob-storage.js';
 import { notificationManager } from '../services/notifications.js';
 import { formatTime } from '../shared/utils.js';
+import { matchLoader } from '../services/match-loader.js';
+import { matchDetailsUI } from './match-details-ui.js';
 
 class SavedMatchesUI {
   constructor() {
@@ -185,15 +187,10 @@ class SavedMatchesUI {
    * @param {Object} matchData - Match data
    */
   _loadMatch(matchId, matchData) {
-    // This would be implemented to load the match data into the app
-    console.log('Loading match:', matchId, matchData);
-    notificationManager.info('Match loading functionality will be implemented in a future update');
+    console.log('Viewing match details:', matchId);
     
-    // Close the modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('savedMatchesModal'));
-    if (modal) {
-      modal.hide();
-    }
+    // Show match details first
+    matchDetailsUI.showMatchDetails(matchId, matchData);
   }
 
   /**

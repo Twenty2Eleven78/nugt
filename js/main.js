@@ -1,8 +1,8 @@
 /**
  * NUFC GameTime App - Main Entry Point
- * @version 3.5.1
+ * @version 3.5.2
  * @author Mark Van-Kerro
- * @date Last Updated: 2023-06-15
+ * @date Last Updated: 2023-07-01
  * 
  * Modular architecture for better maintainability and performance
  */

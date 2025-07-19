@@ -13,11 +13,21 @@ exports.handler = async (event, context) => {
       };
     }
     
+    const siteID = process.env.NETLIFY_SITE_ID;
+    const token = process.env.NETLIFY_API_TOKEN;
+
+    if (!siteID || !token) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ message: 'Netlify Blob Storage not configured. Missing NETLIFY_SITE_ID or NETLIFY_API_TOKEN environment variables.' })
+      };
+    }
+
     // Try to use Netlify Blob Store
     const store = getStore({
       name: `user-matches-${userId}`,
-      siteID: context.env.NETLIFY_SITE_ID,
-      token: context.env.NETLIFY_API_TOKEN
+      siteID,
+      token
     });
 
     // Save match data to blob store

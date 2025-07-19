@@ -13,22 +13,17 @@ exports.handler = async (event, context) => {
       };
     }
     
-    try {
-      // Try to use Netlify Blob Store
-      const store = getStore({
-        name: `user-matches-${userId}`,
-        siteID: process.env.NETLIFY_SITE_ID || 'b4a91544-9264-462c-a90e-28fde735b9f4'
-      });
-      
-      // Save match data to blob store
-      await store.set(matchId, JSON.stringify(matchData));
-      
-      console.log('Match saved to Netlify Blob Store successfully');
-    } catch (blobError) {
-      // Log the error but don't fail the function
-      console.error('Error saving to Netlify Blob Store:', blobError);
-      console.log('Continuing with response anyway');
-    }
+    // Try to use Netlify Blob Store
+    const store = getStore({
+      name: `user-matches-${userId}`,
+      siteID: process.env.NETLIFY_SITE_ID,
+      token: process.env.NETLIFY_API_TOKEN
+    });
+
+    // Save match data to blob store
+    await store.set(matchId, JSON.stringify(matchData));
+
+    console.log('Match saved to Netlify Blob Store successfully');
     
     // Always return success to the client
     return {

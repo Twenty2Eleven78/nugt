@@ -24,6 +24,7 @@ import { bindModalEvents, hideModal } from './ui/modals.js';
 import { initializeTooltips } from './ui/components.js';
 import { authUI } from './ui/auth-ui.js';
 import { saveMatchUI } from './ui/save-match-ui.js';
+import { savedMatchesUI } from './ui/saved-matches-ui.js';
 
 // Services
 import { notificationManager } from './services/notifications.js';
@@ -65,6 +66,7 @@ export function initializeApp() {
   bindModalEvents();
   initializeTooltips();
   saveMatchUI.init();
+  savedMatchesUI.init();
 
   // Resume timer if needed
   timerController.resumeFromState();
@@ -340,6 +342,10 @@ window.AuthModule = {
 window.SaveMatchModule = {
   showSaveMatchModal: () => saveMatchUI.showSaveMatchModal(),
   saveMatch: () => saveMatchUI.handleSaveMatch()
+};
+
+window.SavedMatchesModule = {
+  loadSavedMatches: () => savedMatchesUI.loadSavedMatches()
 };
 
 

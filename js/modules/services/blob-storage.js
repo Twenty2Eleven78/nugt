@@ -9,7 +9,6 @@ import { notificationManager } from './notifications.js';
 class BlobStorageService {
   constructor() {
     this.initialized = false;
-    this.netlifyIdentity = null;
   }
 
   /**
@@ -19,18 +18,11 @@ class BlobStorageService {
     if (this.initialized) return true;
     
     try {
-      // Check if Netlify Identity is available
-      if (window.netlifyIdentity) {
-        this.netlifyIdentity = window.netlifyIdentity;
-        console.log('Netlify Blob Storage service initialized');
-        this.initialized = true;
-        return true;
-      } else {
-        console.warn('Netlify Identity not found, blob storage will not be available');
-        return false;
-      }
+      console.log('Blob Storage service initialized');
+      this.initialized = true;
+      return true;
     } catch (error) {
-      console.error('Failed to initialize Netlify Blob Storage service:', error);
+      console.error('Failed to initialize Blob Storage service:', error);
       return false;
     }
   }
@@ -67,22 +59,17 @@ class BlobStorageService {
       // Generate a unique ID for the match
       const matchId = `match_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
       
-      // Get Netlify Identity token
-      const token = await this._getAuthToken();
-      if (!token) {
-        throw new Error('Failed to get authentication token');
-      }
-      
-      // Save to Netlify Blob Store
+      // Save to Netlify Blob Store via serverless function
       const response = await fetch('/.netlify/functions/save-match', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           matchId,
-          matchData: dataToSave
+          matchData: dataToSave,
+          userId: user.id,
+          userEmail: user.email
         })
       });
       
@@ -125,17 +112,11 @@ class BlobStorageService {
         throw new Error('User information not available');
       }
       
-      // Get Netlify Identity token
-      const token = await this._getAuthToken();
-      if (!token) {
-        throw new Error('Failed to get authentication token');
-      }
-      
-      // Get saved matches from Netlify Blob Store
-      const response = await fetch('/.netlify/functions/get-matches', {
+      // Get saved matches from Netlify Blob Store via serverless function
+      const response = await fetch(`/.netlify/functions/get-matches?userId=${encodeURIComponent(user.id)}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         }
       });
       
@@ -152,23 +133,7 @@ class BlobStorageService {
       return { success: false, error: error.message };
     }
   }
-  
-  /**
-   * Get authentication token from Netlify Identity
-   * @returns {Promise<string>} - Authentication token
-   * @private
-   */
-  async _getAuthToken() {
-    if (!this.netlifyIdentity) {
-      return null;
-    }
-    
-    return new Promise((resolve) => {
-      this.netlifyIdentity.refresh(jwt => {
-        resolve(jwt);
-      });
-    });
-  }
+
 }
 
 // Create and export singleton instance

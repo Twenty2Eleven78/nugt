@@ -1,33 +1,24 @@
 // Netlify function to save match data to Netlify Blob Store
 const { getStore } = require('@netlify/blobs');
+const { NetlifyIntegration } = require('@netlify/blobs/adapters');
 
 exports.handler = async (event, context) => {
-  // Check if user is authenticated
-  if (!context.clientContext || !context.clientContext.user) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ message: 'Unauthorized' })
-    };
-  }
-
   try {
     // Parse request body
-    const { matchId, matchData } = JSON.parse(event.body);
+    const { matchId, matchData, userId, userEmail } = JSON.parse(event.body);
     
-    if (!matchId || !matchData) {
+    if (!matchId || !matchData || !userId) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: 'Missing required fields' })
       };
     }
     
-    // Get user ID from context
-    const userId = context.clientContext.user.sub;
-    
-    // Create a store for this user's matches
+    // Create a store for this user's matches with Netlify integration
     const store = getStore({
       name: `user-matches-${userId}`,
-      siteID: context.site.id
+      siteID: context.site.id,
+      integration: NetlifyIntegration(context)
     });
     
     // Save match data to blob store

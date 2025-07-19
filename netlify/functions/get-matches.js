@@ -1,23 +1,25 @@
 // Netlify function to retrieve saved matches from Netlify Blob Store
 const { getStore } = require('@netlify/blobs');
+const { NetlifyIntegration } = require('@netlify/blobs/adapters');
 
 exports.handler = async (event, context) => {
-  // Check if user is authenticated
-  if (!context.clientContext || !context.clientContext.user) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ message: 'Unauthorized' })
-    };
-  }
-
   try {
-    // Get user ID from context
-    const userId = context.clientContext.user.sub;
+    // Get user ID from query parameters
+    const params = new URLSearchParams(event.queryStringParameters);
+    const userId = params.get('userId') || event.queryStringParameters.userId;
     
-    // Create a store for this user's matches
+    if (!userId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: 'Missing userId parameter' })
+      };
+    }
+    
+    // Create a store for this user's matches with Netlify integration
     const store = getStore({
       name: `user-matches-${userId}`,
-      siteID: context.site.id
+      siteID: context.site.id,
+      integration: NetlifyIntegration(context)
     });
     
     // List all blobs in the store

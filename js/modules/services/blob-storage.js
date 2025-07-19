@@ -59,48 +59,31 @@ class MatchStorageService {
       // Generate a unique ID for the match
       const matchId = `match_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
       
-      try {
-        // Try to save to Netlify Blob Store via serverless function
-        const response = await fetch('/.netlify/functions/save-match', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            matchId,
-            matchData: dataToSave,
-            userId: user.id,
-            userEmail: user.email
-          })
-        });
-        
-        if (!response.ok) {
-          throw new Error('Server returned error: ' + response.status);
-        }
-        
-        const result = await response.json();
-        notificationManager.success('Match details saved successfully');
-        
-        // Track usage
-        authService.trackUsage('match_saved', { matchId });
-        
-        return { success: true, matchId, ...result };
-      } catch (serverError) {
-        console.error('Server error, using local storage fallback:', serverError);
-        
-        // Fallback to local storage if server fails
-        try {
-          // Save to local storage as fallback
-          const savedMatches = JSON.parse(localStorage.getItem('nugt_saved_matches') || '{}');
-          savedMatches[matchId] = dataToSave;
-          localStorage.setItem('nugt_saved_matches', JSON.stringify(savedMatches));
-          
-          notificationManager.info('Match saved to local storage (cloud save unavailable)');
-          return { success: true, matchId, local: true };
-        } catch (localError) {
-          throw new Error('Failed to save match: ' + localError.message);
-        }
+      // Try to save to Netlify Blob Store via serverless function
+      const response = await fetch('/.netlify/functions/save-match', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          matchId,
+          matchData: dataToSave,
+          userId: user.id,
+          userEmail: user.email
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Server returned error: ' + response.status);
       }
+
+      const result = await response.json();
+      notificationManager.success('Match details saved successfully');
+
+      // Track usage
+      authService.trackUsage('match_saved', { matchId });
+
+      return { success: true, matchId, ...result };
     } catch (error) {
       console.error('Error saving match details:', error);
       notificationManager.danger('Failed to save match details: ' + error.message);
@@ -128,45 +111,20 @@ class MatchStorageService {
         throw new Error('User information not available');
       }
       
-      try {
-        // Try to get saved matches from Netlify serverless function
-        const response = await fetch(`/.netlify/functions/get-matches?userId=${encodeURIComponent(user.id)}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error('Server returned error: ' + response.status);
+      // Try to get saved matches from Netlify serverless function
+      const response = await fetch(`/.netlify/functions/get-matches?userId=${encodeURIComponent(user.id)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
         }
-        
-        const result = await response.json();
-        return { success: true, matches: result.matches };
-      } catch (serverError) {
-        console.error('Server error, using local storage fallback:', serverError);
-        
-        // Fallback to local storage
-        try {
-          // Try to get matches from local storage
-          const savedMatches = JSON.parse(localStorage.getItem('nugt_saved_matches') || '{}');
-          const matches = Object.entries(savedMatches).map(([id, data]) => ({
-            id,
-            data
-          }));
-          
-          // If no matches found, create a mock match for testing
-          if (matches.length === 0) {
-            const mockMatch = this._createMockMatch();
-            matches.push(mockMatch);
-          }
-          
-          notificationManager.info('Using locally saved matches (cloud sync unavailable)');
-          return { success: true, matches, local: true };
-        } catch (localError) {
-          throw new Error('Failed to retrieve matches: ' + localError.message);
-        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Server returned error: ' + response.status);
       }
+
+      const result = await response.json();
+      return { success: true, matches: result.matches };
     } catch (error) {
       console.error('Error getting saved matches:', error);
       notificationManager.danger('Failed to retrieve saved matches: ' + error.message);
@@ -174,92 +132,6 @@ class MatchStorageService {
     }
   }
 
-  /**
-   * Create a mock match for testing
-   * @returns {Object} - Mock match object
-   * @private
-   */
-  _createMockMatch() {
-    const now = Date.now();
-    const mockMatchId = `mock_match_${now}`;
-    
-    const mockMatchData = {
-      title: 'Example Match',
-      timestamp: now,
-      savedAt: new Date().toISOString(),
-      teams: {
-        team1: {
-          name: 'Netherton',
-          score: 3
-        },
-        team2: {
-          name: 'Opposition Team',
-          score: 1
-        }
-      },
-      gameState: {
-        seconds: 4200,
-        isSecondHalf: true,
-        gameTime: 4200
-      },
-      goals: [
-        {
-          scorer: 'Player 1',
-          assist: 'Player 2',
-          time: 1200,
-          team: 'team1'
-        },
-        {
-          scorer: 'Player 3',
-          assist: 'Player 4',
-          time: 2400,
-          team: 'team1'
-        },
-        {
-          scorer: 'Player 5',
-          assist: 'N/A',
-          time: 3000,
-          team: 'team1'
-        },
-        {
-          scorer: 'Opposition Player',
-          assist: 'N/A',
-          time: 3600,
-          team: 'opposition'
-        }
-      ],
-      events: [
-        {
-          type: 'Yellow Card',
-          time: 1800,
-          notes: 'Player 6 - Rough tackle'
-        },
-        {
-          type: 'Half Time',
-          time: 2100,
-          notes: ''
-        },
-        {
-          type: 'Full Time',
-          time: 4200,
-          notes: ''
-        }
-      ],
-      roster: [
-        { name: 'Player 1', shirtNumber: '7' },
-        { name: 'Player 2', shirtNumber: '10' },
-        { name: 'Player 3', shirtNumber: '9' },
-        { name: 'Player 4', shirtNumber: '8' },
-        { name: 'Player 5', shirtNumber: '11' },
-        { name: 'Player 6', shirtNumber: '4' }
-      ]
-    };
-    
-    return {
-      id: mockMatchId,
-      data: mockMatchData
-    };
-  }
 }
 
 // Create and export singleton instance

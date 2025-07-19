@@ -34,29 +34,64 @@ exports.handler = async (event, context) => {
     // List all blobs in the store
     const { blobs } = await store.list();
 
-    // Get match data for each blob
-    for (const blob of blobs) {
-      const matchData = await store.get(blob.key);
-      if (matchData) {
-        matches.push({
+    // Get match data for each blob with parallel processing
+    const matchPromises = blobs.map(async (blob) => {
+      try {
+        const matchData = await store.get(blob.key);
+        if (!matchData) return null;
+
+        const data = JSON.parse(matchData);
+        
+        // Basic validation of retrieved data
+        if (!data.title || !data.teams || !data.gameState) {
+          console.warn(`Invalid match data structure for ${blob.key}`);
+          return null;
+        }
+
+        return {
           id: blob.key,
-          data: JSON.parse(matchData)
-        });
+          data,
+          savedAt: data.savedAt || null,
+          version: data.version || '1.0.0'
+        };
+      } catch (e) {
+        console.warn(`Error processing match ${blob.key}:`, e);
+        return null;
       }
-    }
+    });
+
+    const results = await Promise.all(matchPromises);
+    matches = results.filter(match => match !== null);
     
-    console.log(`Retrieved ${matches.length} matches from Netlify Blob Store`);
+    // Sort matches by savedAt date, newest first
+    matches.sort((a, b) => {
+      return new Date(b.savedAt || 0) - new Date(a.savedAt || 0);
+    });
+    
+    console.log(`Retrieved ${matches.length} valid matches from Netlify Blob Store`);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ matches })
+      body: JSON.stringify({ 
+        matches,
+        totalCount: matches.length,
+        timestamp: new Date().toISOString()
+      })
     };
   } catch (error) {
     console.error('Error in get-matches function:', error);
     
+    // Return appropriate status code based on error
+    const statusCode = error.code === 'ENOENT' ? 404 :
+                      error.code === 'EACCES' ? 403 : 500;
+    
     return {
-      statusCode: 500,
-      body: JSON.stringify({ message: 'Server error', error: error.message })
+      statusCode,
+      body: JSON.stringify({ 
+        message: 'Server error', 
+        error: error.message,
+        code: error.code || 'UNKNOWN'
+      })
     };
   }
 };

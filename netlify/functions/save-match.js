@@ -3,13 +3,41 @@ const { getStore } = require('@netlify/blobs');
 
 exports.handler = async (event, context) => {
   try {
-    // Parse request body
-    const { matchId, matchData, userId } = JSON.parse(event.body);
+    // Check content length
+    const contentLength = parseInt(event.headers['content-length'] || '0');
+    if (contentLength > 5 * 1024 * 1024) { // 5MB limit
+      return {
+        statusCode: 413,
+        body: JSON.stringify({ message: 'Request too large. Match data must be under 5MB.' })
+      };
+    }
+    
+    // Parse request body with error handling
+    let matchId, matchData, userId;
+    try {
+      const body = JSON.parse(event.body);
+      matchId = body.matchId;
+      matchData = body.matchData;
+      userId = body.userId;
+    } catch (e) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: 'Invalid JSON in request body' })
+      };
+    }
     
     if (!matchId || !matchData || !userId) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: 'Missing required fields' })
+      };
+    }
+    
+    // Validate match data structure
+    if (!matchData.title || !matchData.teams || !matchData.gameState) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: 'Invalid match data structure' })
       };
     }
     

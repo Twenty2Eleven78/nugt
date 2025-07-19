@@ -32,7 +32,7 @@ class MatchStorageService {
    * @param {Object} matchData - Match data to save
    * @returns {Promise<Object>} - Result of the save operation
    */
-  async saveMatchDetails(matchData) {
+  async saveMatchDetails(matchData, retryCount = 0) {
     if (!this.initialized) {
       await this.init();
     }
@@ -48,12 +48,19 @@ class MatchStorageService {
         throw new Error('User information not available');
       }
       
+      // Validate match data before saving
+      if (!matchData.title || !matchData.teams || !matchData.gameState) {
+        throw new Error('Invalid match data structure');
+      }
+      
       // Add metadata to the match data
       const dataToSave = {
         ...matchData,
         savedBy: user.id,
         userEmail: user.email,
-        savedAt: new Date().toISOString()
+        savedAt: new Date().toISOString(),
+        version: '3.5.2', // Add version tracking
+        schema: 'v1' // Add schema version for future migrations
       };
       
       // Generate a unique ID for the match
@@ -78,14 +85,51 @@ class MatchStorageService {
       }
 
       const result = await response.json();
+      
+      if (!response.ok) {
+        // Handle specific error cases
+        if (response.status === 413) {
+          notificationManager.error('Match data too large. Try removing unnecessary data.');
+          return { success: false, error: 'Data size limit exceeded' };
+        }
+        
+        // Retry on server errors if not exceeded retry limit
+        if (response.status >= 500 && retryCount < 3) {
+          notificationManager.info('Save failed. Retrying...');
+          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+          return this.saveMatchDetails(matchData, retryCount + 1);
+        }
+        
+        throw new Error(`Server error: ${response.status}`);
+      }
+      
       notificationManager.success('Match details saved successfully');
 
       // Track usage
       authService.trackUsage('match_saved', { matchId });
+      
+      // Save a local backup
+      try {
+        const backupKey = `match_backup_${matchId}`;
+        localStorage.setItem(backupKey, JSON.stringify(dataToSave));
+      } catch (e) {
+        console.warn('Failed to save local backup:', e);
+      }
 
       return { success: true, matchId, ...result };
     } catch (error) {
       console.error('Error saving match details:', error);
+      
+      if (retryCount < 3 && (
+        error.message.includes('network') || 
+        error.message.includes('timeout') ||
+        error.message.includes('Server error')
+      )) {
+        notificationManager.info('Save failed. Retrying...');
+        await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+        return this.saveMatchDetails(matchData, retryCount + 1);
+      }
+      
       notificationManager.error('Failed to save match details: ' + error.message);
       return { success: false, error: error.message };
     }

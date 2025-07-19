@@ -86,7 +86,7 @@ class MatchStorageService {
       return { success: true, matchId, ...result };
     } catch (error) {
       console.error('Error saving match details:', error);
-      notificationManager.danger('Failed to save match details: ' + error.message);
+      notificationManager.error('Failed to save match details: ' + error.message);
       return { success: false, error: error.message };
     }
   }
@@ -127,7 +127,7 @@ class MatchStorageService {
       return { success: true, matches: result.matches };
     } catch (error) {
       console.error('Error getting saved matches:', error);
-      notificationManager.danger('Failed to retrieve saved matches: ' + error.message);
+      notificationManager.error('Failed to retrieve saved matches: ' + error.message);
       return { success: false, error: error.message };
     }
   }

@@ -28,6 +28,8 @@ class SavedMatchesUI {
    */
   init() {
     if (this.initialized) return;
+    
+    console.log('Initializing SavedMatchesUI');
 
     // Cache DOM elements
     this.refreshBtn = document.getElementById('refreshSavedMatchesBtn');
@@ -38,6 +40,14 @@ class SavedMatchesUI {
     this.savedMatchesErrorText = document.getElementById('savedMatchesErrorText');
     this.noSavedMatches = document.getElementById('noSavedMatches');
     this.savedMatchesContent = document.getElementById('savedMatchesContent');
+    
+    // Log DOM elements for debugging
+    console.log('DOM elements:', {
+      refreshBtn: this.refreshBtn,
+      savedMatchesList: this.savedMatchesList,
+      savedMatchesContent: this.savedMatchesContent,
+      savedMatchesListItems: document.getElementById('savedMatchesListItems')
+    });
     
     // Bind event listeners
     if (this.refreshBtn) {
@@ -73,7 +83,13 @@ class SavedMatchesUI {
     }
     
     if (isAuthenticated) {
-      this.loadSavedMatches();
+      // Show loading state immediately
+      this._showLoadingState();
+      
+      // Load saved matches after a short delay to ensure modal is visible
+      setTimeout(() => {
+        this.loadSavedMatches();
+      }, 300);
     }
   }
 
@@ -81,7 +97,10 @@ class SavedMatchesUI {
    * Load saved matches
    */
   async loadSavedMatches() {
+    console.log('Loading saved matches...');
+    
     if (!authService.isUserAuthenticated()) {
+      console.log('User not authenticated, cannot load matches');
       return;
     }
     
@@ -91,6 +110,7 @@ class SavedMatchesUI {
     try {
       // Get saved matches
       const result = await blobStorageService.getSavedMatches();
+      console.log('Saved matches result:', result);
       
       if (result.success) {
         this._renderSavedMatches(result.matches, result.local);
@@ -109,6 +129,8 @@ class SavedMatchesUI {
    * @param {boolean} isLocal - Whether the matches are from local storage
    */
   _renderSavedMatches(matches, isLocal) {
+    console.log('Rendering saved matches:', matches);
+    
     // Hide loading and error states
     this._hideAllStates();
     
@@ -127,6 +149,10 @@ class SavedMatchesUI {
     
     // Get the list element
     const listElement = document.getElementById('savedMatchesListItems');
+    if (!listElement) {
+      console.error('Could not find savedMatchesListItems element');
+      return;
+    }
     if (!listElement) return;
     
     // Clear existing content

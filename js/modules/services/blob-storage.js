@@ -59,48 +59,31 @@ class MatchStorageService {
       // Generate a unique ID for the match
       const matchId = `match_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
       
-      try {
-        // Try to save to Netlify Blob Store via serverless function
-        const response = await fetch('/.netlify/functions/save-match', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            matchId,
-            matchData: dataToSave,
-            userId: user.id,
-            userEmail: user.email
-          })
-        });
-        
-        if (!response.ok) {
-          throw new Error('Server returned error: ' + response.status);
-        }
-        
-        const result = await response.json();
-        notificationManager.success('Match details saved successfully');
-        
-        // Track usage
-        authService.trackUsage('match_saved', { matchId });
-        
-        return { success: true, matchId, ...result };
-      } catch (serverError) {
-        console.error('Server error, using local storage fallback:', serverError);
-        
-        // Fallback to local storage if server fails
-        try {
-          // Save to local storage as fallback
-          const savedMatches = JSON.parse(localStorage.getItem('nugt_saved_matches') || '{}');
-          savedMatches[matchId] = dataToSave;
-          localStorage.setItem('nugt_saved_matches', JSON.stringify(savedMatches));
-          
-          notificationManager.info('Match saved to local storage (cloud save unavailable)');
-          return { success: true, matchId, local: true };
-        } catch (localError) {
-          throw new Error('Failed to save match: ' + localError.message);
-        }
+      // Try to save to Netlify Blob Store via serverless function
+      const response = await fetch('/.netlify/functions/save-match', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          matchId,
+          matchData: dataToSave,
+          userId: user.id,
+          userEmail: user.email
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Server returned error: ' + response.status);
       }
+
+      const result = await response.json();
+      notificationManager.success('Match details saved successfully');
+
+      // Track usage
+      authService.trackUsage('match_saved', { matchId });
+
+      return { success: true, matchId, ...result };
     } catch (error) {
       console.error('Error saving match details:', error);
       notificationManager.danger('Failed to save match details: ' + error.message);
@@ -128,38 +111,20 @@ class MatchStorageService {
         throw new Error('User information not available');
       }
       
-      try {
-        // Try to get saved matches from Netlify serverless function
-        const response = await fetch(`/.netlify/functions/get-matches?userId=${encodeURIComponent(user.id)}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error('Server returned error: ' + response.status);
+      // Try to get saved matches from Netlify serverless function
+      const response = await fetch(`/.netlify/functions/get-matches?userId=${encodeURIComponent(user.id)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
         }
-        
-        const result = await response.json();
-        return { success: true, matches: result.matches };
-      } catch (serverError) {
-        console.error('Server error, using local storage fallback:', serverError);
-        
-        // Fallback to local storage
-        try {
-          const savedMatches = JSON.parse(localStorage.getItem('nugt_saved_matches') || '{}');
-          const matches = Object.entries(savedMatches).map(([id, data]) => ({
-            id,
-            data
-          }));
-          
-          notificationManager.info('Using locally saved matches (cloud sync unavailable)');
-          return { success: true, matches, local: true };
-        } catch (localError) {
-          throw new Error('Failed to retrieve matches: ' + localError.message);
-        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Server returned error: ' + response.status);
       }
+
+      const result = await response.json();
+      return { success: true, matches: result.matches };
     } catch (error) {
       console.error('Error getting saved matches:', error);
       notificationManager.danger('Failed to retrieve saved matches: ' + error.message);

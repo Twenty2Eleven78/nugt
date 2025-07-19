@@ -35,6 +35,7 @@ import { authService } from './services/auth.js';
 import { apiService } from './services/api.js';
 import { blobStorageService } from './services/blob-storage.js';
 import { matchLoader } from './services/match-loader.js';
+import { saveTestMatchToLocalStorage } from './services/debug-helper.js';
 
 // Initialize application
 export function initializeApp() {
@@ -353,6 +354,11 @@ window.SavedMatchesModule = {
 
 window.MatchLoaderModule = {
   loadMatch: (matchData) => matchLoader.loadMatch(matchData)
+};
+
+// Debug helpers
+window.DebugModule = {
+  saveTestMatch: saveTestMatchToLocalStorage
 };
 
 

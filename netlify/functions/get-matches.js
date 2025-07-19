@@ -17,8 +17,8 @@ exports.handler = async (event, context) => {
     
     const store = getStore({
       name: `user-matches-${userId}`,
-      siteID: process.env.NETLIFY_SITE_ID,
-      token: process.env.NETLIFY_API_TOKEN
+      siteID: context.env.NETLIFY_SITE_ID,
+      token: context.env.NETLIFY_API_TOKEN
     });
 
     // List all blobs in the store

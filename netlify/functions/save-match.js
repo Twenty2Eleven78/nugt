@@ -16,8 +16,8 @@ exports.handler = async (event, context) => {
     // Try to use Netlify Blob Store
     const store = getStore({
       name: `user-matches-${userId}`,
-      siteID: process.env.NETLIFY_SITE_ID,
-      token: process.env.NETLIFY_API_TOKEN
+      siteID: context.env.NETLIFY_SITE_ID,
+      token: context.env.NETLIFY_API_TOKEN
     });
 
     // Save match data to blob store

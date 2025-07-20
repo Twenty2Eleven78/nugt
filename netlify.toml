@@ -13,5 +13,18 @@
   to = "/index.html"
   status = 200
 
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Authorization, Content-Type"
+
+[blob]
+  [blob.user-matches]
+    reader = "private"
+    writer = "private"
+
 [template.environment]
   NETLIFY_BLOB_LIMIT_MB = "100"
+  SITE_ID = ""

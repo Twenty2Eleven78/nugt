@@ -3,36 +3,56 @@
  * @version 1.0
  */
 
-import { authService } from './auth.js';
+import { authService } from '../services/auth.js';
 import { notificationManager } from './notifications.js';
 
-class BlobStorageService {
+// Create BlobStorageService class
+const BlobStorageService = (function() {
+  function BlobStorageService() {
+    this.initialized = false;
+    this.netlifyIdentity = null;
+    this._initializationPromise = null;
+  }
   constructor() {
     this.initialized = false;
     this.netlifyIdentity = null;
+    this._initializationPromise = null;
   }
 
   /**
    * Initialize the Blob Storage service
+   * @returns {Promise<boolean>} Whether initialization was successful
    */
   async init() {
+    // If already initialized, return cached result
     if (this.initialized) return true;
-    
-    try {
-      // Check if Netlify Identity is available
-      if (window.netlifyIdentity) {
-        this.netlifyIdentity = window.netlifyIdentity;
-        console.log('Netlify Blob Storage service initialized');
-        this.initialized = true;
-        return true;
-      } else {
-        console.warn('Netlify Identity not found, blob storage will not be available');
-        return false;
-      }
-    } catch (error) {
-      console.error('Failed to initialize Netlify Blob Storage service:', error);
-      return false;
+
+    // If initialization is in progress, wait for it
+    if (this._initializationPromise) {
+      return this._initializationPromise;
     }
+
+    this._initializationPromise = (async () => {
+      try {
+        // Check if Netlify Identity is available
+        if (window.netlifyIdentity) {
+          this.netlifyIdentity = window.netlifyIdentity;
+          console.log('Netlify Blob Storage service initialized');
+          this.initialized = true;
+          return true;
+        } else {
+          console.warn('Netlify Identity not found, blob storage will not be available');
+          return false;
+        }
+      } catch (error) {
+        console.error('Failed to initialize Netlify Blob Storage service:', error);
+        return false;
+      } finally {
+        this._initializationPromise = null;
+      }
+    })();
+
+    return this._initializationPromise;
   }
 
   /**
@@ -41,14 +61,22 @@ class BlobStorageService {
    * @returns {Promise<Object>} - Result of the save operation
    */
   async saveMatchDetails(matchData) {
-    if (!this.initialized) {
-      await this.init();
-    }
-    
-    if (!authService.isUserAuthenticated()) {
-      notificationManager.warning('You must be logged in to save match details');
-      return { success: false, error: 'Not authenticated' };
-    }
+    try {
+      if (!this.initialized) {
+        await this.init();
+        if (!this.initialized) {
+          throw new Error('Failed to initialize Blob Storage service');
+        }
+      }
+      
+      if (!authService.isUserAuthenticated()) {
+        notificationManager.warning('You must be logged in to save match details');
+        return { success: false, error: 'Not authenticated' };
+      }
+      
+      if (!matchData || typeof matchData !== 'object') {
+        throw new Error('Invalid match data format');
+      }
     
     try {
       const user = authService.getCurrentUser();

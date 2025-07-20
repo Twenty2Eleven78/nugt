@@ -1,5 +1,3 @@
-const fetch = require('node-fetch');
-
 const NETLIFY_BLOBS_API = 'https://api.netlify.com/api/v1/blobs';
 const SITE_ID = process.env.NETLIFY_SITE_ID; // Set in Netlify environment variables
 const ACCESS_TOKEN = process.env.NETLIFY_API_TOKEN; // Set in Netlify environment variables

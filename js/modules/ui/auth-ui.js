@@ -259,19 +259,20 @@ class AuthUI {
     const loginButton = document.getElementById('loginButton');
     if (loginButton) {
       loginButton.onclick = async () => {
+        let success = false;
         try {
           console.log('Attempting to authenticate');
-          const success = await authService.authenticate();
+          success = await authService.authenticate();
           console.log('Authentication result:', success);
-          if (success) {
-            hideModal('authModal');
-            this._updateAuthState(true);
-          } else {
-            notificationManager.warning('No passkey found. Please register first using your email address above.');
-          }
         } catch (error) {
           console.error('Authentication error:', error);
           notificationManager.danger('Authentication failed: ' + error.message);
+        }
+        if (success) {
+          hideModal('authModal');
+          this._updateAuthState(true);
+        } else {
+          notificationManager.warning('No passkey found. Please register first using your email address above.');
         }
       };
     } else {

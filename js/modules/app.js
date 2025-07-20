@@ -131,7 +131,8 @@ function bindEventListeners() {
       const team2Name = domCache.get('Team2NameElement')?.textContent || 'Team 2';
       const score1 = domCache.get('firstScoreElement')?.textContent || '0';
       const score2 = domCache.get('secondScoreElement')?.textContent || '0';
-      const defaultTitle = `${team1Name} ${score1} - ${score2} ${team2Name}`;
+      const currentDate = new Date().toLocaleDateString();
+      const defaultTitle = `${team1Name}(${score1}):${team2Name}(${score2}) - ${currentDate}`;
       
       // Get title and notes from user
       const title = window.prompt('Enter match title:', defaultTitle);

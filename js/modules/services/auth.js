@@ -199,7 +199,6 @@ class AuthService {
       // Initialize usage stats
       this._initializeUsageStats(userId);
       
-      notificationManager.success(`Welcome, ${displayName}! You've been registered successfully.`);
       return true;
     } catch (error) {
       console.error('Registration error:', error);
@@ -276,7 +275,6 @@ class AuthService {
       // Track usage
       this.trackUsage('login');
       
-      notificationManager.success(`Welcome back, ${displayName}!`);
       return true;
     } catch (error) {
       console.error('Authentication error:', error);

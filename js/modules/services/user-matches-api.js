@@ -1,19 +1,48 @@
 // Frontend API for saving/loading user match data via Netlify Function
+import { authService } from './auth.js';
 
 export const userMatchesApi = {
   async saveMatchData(matchData) {
+    // Get user token from auth service
+    const token = await authService.getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token available');
+    }
+
     const res = await fetch('/.netlify/functions/user-matches', {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify(matchData)
     });
-    if (!res.ok) throw new Error('Failed to save match data');
+    
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(error.error || 'Failed to save match data');
+    }
     return await res.json();
   },
 
   async loadMatchData() {
-    const res = await fetch('/.netlify/functions/user-matches');
-    if (!res.ok) return null;
+    // Get user token from auth service
+    const token = await authService.getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token available');
+    }
+
+    const res = await fetch('/.netlify/functions/user-matches', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (!res.ok) {
+      if (res.status === 404) return null;
+      const error = await res.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(error.error || 'Failed to load match data');
+    }
     return await res.json();
   }
 };

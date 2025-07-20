@@ -26,6 +26,25 @@ class AuthService {
     this.currentUser = null;
     this.authTimestamp = null;
     this.authStateListeners = new Set();
+    this.authToken = null;
+  }
+
+  /**
+   * Get the current authentication token
+   * @returns {Promise<string|null>} The authentication token or null if not authenticated
+   */
+  async getAuthToken() {
+    if (!this.isAuthenticated) {
+      return null;
+    }
+    // In a production environment, this would fetch a fresh token from your auth provider
+    // For now, we'll use a simple mock token based on the user ID
+    const userId = this.currentUser?.id || storage.load(AUTH_STORAGE_KEYS.USER_ID);
+    if (!userId) return null;
+    
+    // Generate a basic token using the user ID
+    // This is just for demonstration - in production use a proper JWT or other secure token
+    return btoa(`${userId}:${Date.now()}`);
   }
 
   onAuthStateChange(callback) {

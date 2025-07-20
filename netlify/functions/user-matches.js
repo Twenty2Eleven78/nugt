@@ -3,14 +3,28 @@ const SITE_ID = process.env.NETLIFY_SITE_ID; // Set in Netlify environment varia
 const ACCESS_TOKEN = process.env.NETLIFY_API_TOKEN; // Set in Netlify environment variables
 
 exports.handler = async function(event, context) {
-  // Only allow authenticated users
-  const user = context.clientContext && context.clientContext.user;
-  if (!user) {
+  // Check for Authorization header
+  const authHeader = event.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return {
       statusCode: 401,
-      body: JSON.stringify({ error: 'Not authenticated' })
+      body: JSON.stringify({ error: 'Missing or invalid authorization token' })
     };
   }
+
+  // Get token from header
+  const token = authHeader.split(' ')[1];
+  
+  // Verify token with Netlify Identity
+  try {
+    // The user object will be available in context.clientContext.user if token is valid
+    const user = context.clientContext && context.clientContext.user;
+    if (!user) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ error: 'Invalid authentication token' })
+      };
+    }
 
   const userId = user.sub || user.email || user.id;
   const key = `user-data/${userId}/matches.json`;

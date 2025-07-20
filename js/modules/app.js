@@ -161,8 +161,8 @@ function bindEventListeners() {
   // Save match data to Netlify Blobs
   if (saveBtn) {
     saveBtn.addEventListener('click', async () => {
-      const { userMatchesApi } = await import('../services/user-matches-api.js');
-      const { authService } = await import('../services/auth.js');
+      const { userMatchesApi } = await import('./services/user-matches-api.js');
+      const { authService } = await import('./services/auth.js');
       if (!authService.isUserAuthenticated()) {
         import('../services/notifications.js').then(({ notificationManager }) => notificationManager.warning('Sign in to save your data.'));
         return;
@@ -188,8 +188,8 @@ function bindEventListeners() {
   // Load match data from Netlify Blobs
   if (loadBtn) {
     loadBtn.addEventListener('click', async () => {
-      const { userMatchesApi } = await import('../services/user-matches-api.js');
-      const { authService } = await import('../services/auth.js');
+      const { userMatchesApi } = await import('./services/user-matches-api.js');
+      const { authService } = await import('./services/auth.js');
       if (!authService.isUserAuthenticated()) {
         import('../services/notifications.js').then(({ notificationManager }) => notificationManager.warning('Sign in to load your data.'));
         return;

@@ -13,19 +13,34 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // Get token from header
+    // Get token from header and decode it
     const token = authHeader.split(' ')[1];
     
-    // Get the user from Netlify Identity context
-    const user = context.clientContext && context.clientContext.user;
-    if (!user) {
+    try {
+      // Our token is base64 encoded as userId:timestamp
+      const [userId, timestamp] = atob(token).split(':');
+      
+      // Basic validation - token shouldn't be older than 24 hours
+      const tokenAge = Date.now() - Number(timestamp);
+      if (tokenAge > 24 * 60 * 60 * 1000) {
+        return {
+          statusCode: 401,
+          body: JSON.stringify({ error: 'Token expired' })
+        };
+      }
+
+      if (!userId) {
+        return {
+          statusCode: 401,
+          body: JSON.stringify({ error: 'Invalid token format' })
+        };
+      }
+    } catch (error) {
       return {
         statusCode: 401,
-        body: JSON.stringify({ error: 'Invalid authentication token' })
+        body: JSON.stringify({ error: 'Invalid token format' })
       };
     }
-
-    const userId = user.sub || user.email || user.id;
     const key = `user-data/${userId}/matches.json`;
 
     if (event.httpMethod === 'GET') {

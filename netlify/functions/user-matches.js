@@ -60,7 +60,23 @@ exports.handler = async function(event, context) {
           };
         }
         const data = await res.text();
-        return { statusCode: 200, body: data };
+        try {
+          // Try to parse the data as JSON to ensure it's valid
+          const parsedData = data ? JSON.parse(data) : {};
+          return { 
+            statusCode: 200, 
+            body: JSON.stringify({
+              message: 'Data retrieved successfully',
+              data: parsedData
+            })
+          };
+        } catch (parseError) {
+          console.error('Error parsing data:', parseError);
+          return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Invalid data format' })
+          };
+        }
       } catch (error) {
         console.error('Error retrieving data:', error);
         return { 
@@ -89,7 +105,13 @@ exports.handler = async function(event, context) {
           };
         }
         const data = await res.text();
-        return { statusCode: 200, body: data };
+        return { 
+          statusCode: 200, 
+          body: JSON.stringify({ 
+            message: 'Data saved successfully',
+            data: data || {} 
+          })
+        };
       } catch (error) {
         console.error('Error saving data:', error);
         return { 

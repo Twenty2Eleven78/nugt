@@ -157,24 +157,32 @@ function bindEventListeners() {
       try {
         const data = await userMatchesApi.loadMatchData();
         if (data) {
-          // Update game state
-          gameState.goals = data.goals || [];
-          gameState.matchEvents = data.matchEvents || [];
-          gameState.team1History = data.team1History || [];
-          gameState.team2History = data.team2History || [];
-          gameState.gameTime = data.gameTime || 4200;
-          
-          // Update UI
-          updateMatchLog();
-          timerController.updateDisplay();
-          
-          notificationManager.success('Cloud match data loaded!');
+          try {
+            // If the data is a string, try to parse it
+            const matchData = typeof data === 'string' ? JSON.parse(data) : data;
+            
+            // Update game state with defaults if properties are missing
+            gameState.goals = matchData.goals || [];
+            gameState.matchEvents = matchData.matchEvents || [];
+            gameState.team1History = matchData.team1History || [];
+            gameState.team2History = matchData.team2History || [];
+            gameState.gameTime = matchData.gameTime || 4200;
+            
+            // Update UI
+            updateMatchLog();
+            timerController.updateDisplay();
+            
+            notificationManager.success('Cloud match data loaded!');
+          } catch (parseError) {
+            console.error('Error parsing match data:', parseError);
+            notificationManager.error('Invalid data format received from server');
+          }
         } else {
           notificationManager.info('No cloud match data found.');
         }
-      } catch (e) {
-        console.error('Error loading match data:', e);
-        notificationManager.error('Failed to load match data.');
+      } catch (error) {
+        console.error('Error loading match data:', error);
+        notificationManager.error(error.message || 'Failed to load match data.');
       }
     });
   }

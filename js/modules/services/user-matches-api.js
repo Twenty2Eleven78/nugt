@@ -22,7 +22,9 @@ export const userMatchesApi = {
       const error = await res.json().catch(() => ({ error: 'Unknown error' }));
       throw new Error(error.error || 'Failed to save match data');
     }
-    return await res.json();
+    
+    const response = await res.json();
+    return response.data;
   },
 
   async loadMatchData() {
@@ -43,7 +45,9 @@ export const userMatchesApi = {
       const error = await res.json().catch(() => ({ error: 'Unknown error' }));
       throw new Error(error.error || 'Failed to load match data');
     }
-    return await res.json();
+    
+    const response = await res.json();
+    return response.data;
   }
 };
 

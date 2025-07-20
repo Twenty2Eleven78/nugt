@@ -23,7 +23,6 @@ import { rosterManager } from './match/roster.js';
 import { bindModalEvents, hideModal } from './ui/modals.js';
 import { initializeTooltips } from './ui/components.js';
 import { authUI } from './ui/auth-ui.js';
-import { saveMatchUI } from './ui/save-match-ui.js';
 
 // Services
 import { notificationManager } from './services/notifications.js';
@@ -31,7 +30,6 @@ import { sharingService } from './services/sharing.js';
 import { pwaUpdater } from './services/pwa-updater.js';
 import { authService } from './services/auth.js';
 import { apiService } from './services/api.js';
-import { blobStorageService } from './services/blob-storage.js';
 
 // Initialize application
 export function initializeApp() {
@@ -64,7 +62,6 @@ export function initializeApp() {
   bindEventListeners();
   bindModalEvents();
   initializeTooltips();
-  saveMatchUI.init();
 
   // Resume timer if needed
   timerController.resumeFromState();
@@ -78,9 +75,6 @@ export function initializeApp() {
   
   // Initialize API service
   apiService.init();
-  
-  // Initialize blob storage service
-  blobStorageService.init();
 
   // Update displays
   timerController.updateDisplay();
@@ -123,12 +117,6 @@ function loadAppState() {
 
 // Bind all event listeners
 function bindEventListeners() {
-  // Save match button
-  const saveMatchButton = document.getElementById('saveMatchButton');
-  if (saveMatchButton) {
-    saveMatchButton.addEventListener('click', () => saveMatchUI.showSaveMatchModal());
-  }
-  
   // Timer controls
   const startPauseButton = domCache.get('startPauseButton');
   if (startPauseButton) {
@@ -335,11 +323,6 @@ window.AuthModule = {
   isAuthenticated: () => authService.isUserAuthenticated(),
   getCurrentUser: () => authService.getCurrentUser(),
   logout: () => authService.logout()
-};
-
-window.SaveMatchModule = {
-  showSaveMatchModal: () => saveMatchUI.showSaveMatchModal(),
-  saveMatch: () => saveMatchUI.handleSaveMatch()
 };
 
 

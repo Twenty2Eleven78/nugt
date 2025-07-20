@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NUFC GameTime App v3.5.2</title>
+  <title>NUFC GameTime App v3.5.1</title>
   <!-- Preload critical resources -->
   <link rel="preload" href="css/bootstrap.min.css" as="style">
   <link rel="preload" href="css/style.css" as="style">
@@ -44,7 +44,7 @@
         <!-- Header -->
         <div class="row mb-3">
           <div class="col-12">
-            <h3>NUFC GameTime v3.5.2</h3>
+            <h3>NUFC GameTime v3.5.1</h3>
           </div>
         </div>
         <!-- END Header -->
@@ -191,11 +191,6 @@
                         id="shareButton">
                         <i class="fas fa-share-alt me-2"></i>
                         Send WhatsApp Report
-                      </button>
-                      <button class="btn btn-primary d-flex align-items-center justify-content-center py-2"
-                        id="saveMatchButton" data-bs-toggle="modal" data-bs-target="#saveMatchModal">
-                        <i class="fas fa-cloud-upload-alt me-2"></i>
-                        Save Match to Cloud
                       </button>
                     </div>
                   </div>
@@ -494,7 +489,7 @@
           <hr>
 
           <h5>Current Roster</h5>
-          <di<div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+          <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
             <table class="table table-striped table-sm table-hover roster-table">
               <thead>
                 <tr>
@@ -671,7 +666,7 @@
             </div>
 
             <!-- App Version -->
-            <input type="hidden" name="App Version" value="3.5.2">
+            <input type="hidden" name="App Version" value="3.2.2">
 
             <!-- Submit Button -->
             <div class="d-grid">
@@ -688,62 +683,6 @@
     </div>
   </div>
   <!--END Feedback Modal-->
-
-  <!--Save Match Modal-->
-  <div class="modal fade" id="saveMatchModal" tabindex="-1" aria-labelledby="saveMatchModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="saveMatchModalLabel">
-            <i class="fa-solid fa-cloud-arrow-up me-2"></i>Save Match Details
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div id="saveMatchAuthRequired" class="d-none">
-            <div class="alert alert-warning">
-              <i class="fas fa-lock me-2"></i>You need to be logged in to save match details.
-            </div>
-            <div class="d-grid gap-2">
-              <button type="button" class="btn btn-primary" onclick="AuthModule.showAuthModal()">
-                <i class="fas fa-sign-in-alt me-2"></i>Log In / Register
-              </button>
-            </div>
-          </div>
-          
-          <div id="saveMatchForm" class="d-none">
-            <p>Save the current match details to your account. You can access saved matches later.</p>
-            
-            <div class="mb-3">
-              <label for="matchTitle" class="form-label">Match Title</label>
-              <input type="text" class="form-control" id="matchTitle" placeholder="e.g. Netherton vs Opposition - League Match">
-            </div>
-            
-            <div class="mb-3">
-              <label for="matchNotes" class="form-label">Notes (Optional)</label>
-              <textarea class="form-control" id="matchNotes" rows="3" placeholder="Add any notes about this match..."></textarea>
-            </div>
-            
-            <div class="form-check mb-3">
-              <input class="form-check-input" type="checkbox" id="includeRoster" checked>
-              <label class="form-check-label" for="includeRoster">
-                Include team roster
-              </label>
-            </div>
-            
-            <div id="saveMatchStatus"></div>
-          </div>
-        </div>
-        <div class="modal-footer" id="saveMatchFooter">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" id="saveMatchBtn">
-            <i class="fas fa-save me-2"></i>Save Match
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!--END Save Match Modal-->
 
   <!-- Scripts - modular architecture -->
   <script src="js/main.js" type="module"></script>

@@ -165,7 +165,7 @@ class AuthService {
       return true;
     } catch (error) {
       console.error('Registration error:', error);
-      notificationManager.danger('Registration failed: ' + (error.message || 'Unknown error'));
+      notificationManager.error('Registration failed: ' + (error.message || 'Unknown error'));
       return false;
     }
   }
@@ -241,7 +241,7 @@ class AuthService {
       return true;
     } catch (error) {
       console.error('Authentication error:', error);
-      notificationManager.danger('Authentication failed: ' + (error.message || 'Unknown error'));
+      notificationManager.error('Authentication failed: ' + (error.message || 'Unknown error'));
       return false;
     }
   }

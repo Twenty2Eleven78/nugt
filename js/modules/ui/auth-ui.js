@@ -264,16 +264,15 @@ class AuthUI {
           console.log('Attempting to authenticate');
           success = await authService.authenticate();
           console.log('Authentication result:', success);
+          if (success) {
+           hideModal('authModal');
+           this._updateAuthState(true);
+          }        
         } catch (error) {
           console.error('Authentication error:', error);
           notificationManager.warning('No passkey found. Please register first using your email address above.');
         }
-        if (success) {
-          hideModal('authModal');
-          this._updateAuthState(true);
-        } else {
-          notificationManager.warning('No passkey found. Please register first using your email address above.');
-        }
+
       };
     } else {
       console.warn('Login button not found');

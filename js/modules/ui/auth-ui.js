@@ -30,6 +30,11 @@ class AuthUI {
     const isAuthenticated = await authService.init();
     console.log('User authenticated:', isAuthenticated);
     
+    // Listen for auth state changes
+    authService.onAuthStateChange((isAuthenticated) => {
+      this._updateAuthState(isAuthenticated);
+    });
+    
     if (isAuthenticated) {
       this._updateAuthState(true);
       return true;

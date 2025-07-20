@@ -25,6 +25,17 @@ class AuthService {
     this.isAuthenticated = false;
     this.currentUser = null;
     this.authTimestamp = null;
+    this.authStateListeners = new Set();
+  }
+
+  onAuthStateChange(callback) {
+    this.authStateListeners.add(callback);
+    // Call immediately with current state
+    callback(this.isAuthenticated);
+  }
+
+  notifyAuthStateChange() {
+    this.authStateListeners.forEach(callback => callback(this.isAuthenticated));
   }
 
   /**
@@ -48,6 +59,7 @@ class AuthService {
       this.isAuthenticated = true;
       this.currentUser = { id: userId, email: email, name: displayName || email.split('@')[0] };
       this.authTimestamp = authTimestamp;
+      this.notifyAuthStateChange();
       
       // Track usage
       this.trackUsage('app_open');
@@ -233,6 +245,7 @@ class AuthService {
       this.isAuthenticated = true;
       this.currentUser = { id: userId, email: email, name: displayName };
       this.authTimestamp = Date.now();
+      this.notifyAuthStateChange();
 
       // Track usage
       this.trackUsage('login');
@@ -255,6 +268,8 @@ class AuthService {
     this.authTimestamp = null;
     
     storage.saveImmediate(AUTH_STORAGE_KEYS.IS_AUTHENTICATED, false);
+    
+    this.notifyAuthStateChange();
     
     notificationManager.info('You have been logged out');
   }
@@ -383,6 +398,23 @@ class AuthService {
     const array = new Uint8Array(32);
     window.crypto.getRandomValues(array);
     return array;
+  }
+
+  /**
+   * Update cloud save/load buttons visibility
+   * @param {boolean} isAuthenticated - Whether the user is authenticated
+   * @private
+   */
+  _updateCloudButtons(isAuthenticated) {
+    const saveBtn = document.getElementById('saveMatchDataBtn');
+    const loadBtn = document.getElementById('loadMatchDataBtn');
+    if (isAuthenticated) {
+      if (saveBtn) saveBtn.classList.remove('d-none');
+      if (loadBtn) loadBtn.classList.remove('d-none');
+    } else {
+      if (saveBtn) saveBtn.classList.add('d-none');
+      if (loadBtn) loadBtn.classList.add('d-none');
+    }
   }
 }
 

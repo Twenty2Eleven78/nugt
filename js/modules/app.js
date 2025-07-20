@@ -117,6 +117,102 @@ function loadAppState() {
 
 // Bind all event listeners
 function bindEventListeners() {
+  // Set up cloud save/load button handlers
+  const saveBtn = document.getElementById('saveMatchDataBtn');
+  const loadBtn = document.getElementById('loadMatchDataBtn');
+  
+  import('../services/auth.js').then(({ authService }) => {
+    import('../services/notifications.js').then(({ notificationManager }) => {
+      // Add click handlers for cloud buttons
+      if (saveBtn) {
+        saveBtn.addEventListener('click', async () => {
+          if (!authService.isUserAuthenticated()) {
+            notificationManager.warning('Please sign in to save match data to the cloud');
+            return;
+          }
+          // TODO: Add save functionality
+          notificationManager.info('Saving match data...');
+        });
+      }
+      
+      if (loadBtn) {
+        loadBtn.addEventListener('click', async () => {
+          if (!authService.isUserAuthenticated()) {
+            notificationManager.warning('Please sign in to load match data from the cloud');
+            return;
+          }
+          // TODO: Add load functionality
+          notificationManager.info('Loading match data...');
+        });
+      }
+    });
+  });
+
+  function updateCloudButtons(isAuthenticated) {
+    if (isAuthenticated) {
+      if (saveBtn) saveBtn.classList.remove('d-none');
+      if (loadBtn) loadBtn.classList.remove('d-none');
+    } else {
+      if (saveBtn) saveBtn.classList.add('d-none');
+      if (loadBtn) loadBtn.classList.add('d-none');
+    }
+  }
+
+  // Save match data to Netlify Blobs
+  if (saveBtn) {
+    saveBtn.addEventListener('click', async () => {
+      const { userMatchesApi } = await import('./services/user-matches-api.js');
+      const { authService } = await import('./services/auth.js');
+      if (!authService.isUserAuthenticated()) {
+        import('../services/notifications.js').then(({ notificationManager }) => notificationManager.warning('Sign in to save your data.'));
+        return;
+      }
+      // Gather match data (customize as needed)
+      const matchData = {
+        goals: window.gameState?.goals,
+        matchEvents: window.gameState?.matchEvents,
+        team1History: window.gameState?.team1History,
+        team2History: window.gameState?.team2History,
+        gameTime: window.gameState?.gameTime,
+        timestamp: Date.now()
+      };
+      try {
+        await userMatchesApi.saveMatchData(matchData);
+        import('../services/notifications.js').then(({ notificationManager }) => notificationManager.success('Match data saved to cloud!'));
+      } catch (e) {
+        import('../services/notifications.js').then(({ notificationManager }) => notificationManager.error('Failed to save match data.'));
+      }
+    });
+  }
+
+  // Load match data from Netlify Blobs
+  if (loadBtn) {
+    loadBtn.addEventListener('click', async () => {
+      const { userMatchesApi } = await import('./services/user-matches-api.js');
+      const { authService } = await import('./services/auth.js');
+      if (!authService.isUserAuthenticated()) {
+        import('../services/notifications.js').then(({ notificationManager }) => notificationManager.warning('Sign in to load your data.'));
+        return;
+      }
+      try {
+        const data = await userMatchesApi.loadMatchData();
+        if (data) {
+          // Overwrite local state (customize as needed)
+          window.gameState.goals = data.goals || [];
+          window.gameState.matchEvents = data.matchEvents || [];
+          window.gameState.team1History = data.team1History || [];
+          window.gameState.team2History = data.team2History || [];
+          window.gameState.gameTime = data.gameTime || 4200;
+          import('../services/notifications.js').then(({ notificationManager }) => notificationManager.success('Cloud match data loaded!'));
+          // Optionally refresh UI here
+        } else {
+          import('../services/notifications.js').then(({ notificationManager }) => notificationManager.info('No cloud match data found.'));
+        }
+      } catch (e) {
+        import('../services/notifications.js').then(({ notificationManager }) => notificationManager.error('Failed to load match data.'));
+      }
+    });
+  }
   // Timer controls
   const startPauseButton = domCache.get('startPauseButton');
   if (startPauseButton) {

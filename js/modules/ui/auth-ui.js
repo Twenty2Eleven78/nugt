@@ -266,7 +266,13 @@ class AuthUI {
           console.log('Authentication result:', success);
         } catch (error) {
           console.error('Authentication error:', error);
-          notificationManager.danger('Authentication failed: ' + error.message);
+          if (typeof notificationManager.error === 'function') {
+            notificationManager.error('Authentication failed: ' + error.message);
+          } else if (typeof notificationManager.danger === 'function') {
+            notificationManager.danger('Authentication failed: ' + error.message);
+          } else {
+            alert('Authentication failed: ' + error.message);
+          }
         }
         if (success) {
           hideModal('authModal');

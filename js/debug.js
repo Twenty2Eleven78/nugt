@@ -138,14 +138,18 @@ function createAuthModal() {
     registerButton.addEventListener('click', async () => {
       const email = document.getElementById('usernameInput').value.trim();
       if (!email) {
-        alert('Please enter your email address');
+        import('./modules/services/notifications.js').then(module => {
+          module.notificationManager.warning('Please enter your email address');
+        });
         return;
       }
       
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        alert('Please enter a valid email address');
+        import('./modules/services/notifications.js').then(module => {
+          module.notificationManager.warning('Please enter a valid email address');
+        });
         return;
       }
       
@@ -157,20 +161,28 @@ function createAuthModal() {
               const success = await module.authService.register(email);
               if (success) {
                 hideAuthModal();
-                alert('Registration successful!');
+                import('./modules/services/notifications.js').then(module => {
+                  module.notificationManager.success('Registration successful!');
+                });
               }
             } catch (error) {
               console.error('Registration error:', error);
-              alert('Registration failed: ' + error.message);
+              import('./modules/services/notifications.js').then(module => {
+                module.notificationManager.error('Registration failed: ' + error.message);
+              });
             }
           } else {
             console.error('Auth service module found but register method not available');
-            alert('Registration failed: Auth service not available');
+            import('./modules/services/notifications.js').then(module => {
+              module.notificationManager.error('Registration failed: Auth service not available');
+            });
           }
         })
         .catch(error => {
           console.error('Error importing auth service module:', error);
-          alert('Registration failed: Could not load auth service');
+          import('./modules/services/notifications.js').then(module => {
+            module.notificationManager.error('Registration failed: Could not load auth service');
+          });
         });
     });
   }
@@ -186,20 +198,28 @@ function createAuthModal() {
               const success = await module.authService.authenticate();
               if (success) {
                 hideAuthModal();
-                alert('Authentication successful!');
+                import('./modules/services/notifications.js').then(module => {
+                  module.notificationManager.success('Authentication successful!');
+                });
               }
             } catch (error) {
               console.error('Authentication error:', error);
-              alert('Authentication failed: ' + error.message);
+              import('./modules/services/notifications.js').then(module => {
+                module.notificationManager.error('Authentication failed: ' + error.message);
+              });
             }
           } else {
             console.error('Auth service module found but authenticate method not available');
-            alert('Authentication failed: Auth service not available');
+            import('./modules/services/notifications.js').then(module => {
+              module.notificationManager.error('Authentication failed: Auth service not available');
+            });
           }
         })
         .catch(error => {
           console.error('Error importing auth service module:', error);
-          alert('Authentication failed: Could not load auth service');
+          import('./modules/services/notifications.js').then(module => {
+            module.notificationManager.error('Authentication failed: Could not load auth service');
+          });
         });
     });
   }

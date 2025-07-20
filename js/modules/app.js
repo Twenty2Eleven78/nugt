@@ -117,15 +117,34 @@ function loadAppState() {
 
 // Bind all event listeners
 function bindEventListeners() {
-  // Show/hide cloud save/load buttons based on auth
+  // Set up cloud save/load button handlers
   const saveBtn = document.getElementById('saveMatchDataBtn');
   const loadBtn = document.getElementById('loadMatchDataBtn');
+  
   import('../services/auth.js').then(({ authService }) => {
-    // Initial state
-    updateCloudButtons(authService.isUserAuthenticated());
-    // Listen for auth changes
-    authService.onAuthStateChange((isAuthenticated) => {
-      updateCloudButtons(isAuthenticated);
+    import('../services/notifications.js').then(({ notificationManager }) => {
+      // Add click handlers for cloud buttons
+      if (saveBtn) {
+        saveBtn.addEventListener('click', async () => {
+          if (!authService.isUserAuthenticated()) {
+            notificationManager.warning('Please sign in to save match data to the cloud');
+            return;
+          }
+          // TODO: Add save functionality
+          notificationManager.info('Saving match data...');
+        });
+      }
+      
+      if (loadBtn) {
+        loadBtn.addEventListener('click', async () => {
+          if (!authService.isUserAuthenticated()) {
+            notificationManager.warning('Please sign in to load match data from the cloud');
+            return;
+          }
+          // TODO: Add load functionality
+          notificationManager.info('Loading match data...');
+        });
+      }
     });
   });
 

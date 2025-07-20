@@ -30,8 +30,15 @@ class AuthUI {
     const isAuthenticated = await authService.init();
     console.log('User authenticated:', isAuthenticated);
     
+    // Listen for auth state changes
+    authService.onAuthStateChange((isAuthenticated) => {
+      this._updateAuthState(isAuthenticated);
+      this._updateCloudButtons(isAuthenticated);
+    });
+    
     if (isAuthenticated) {
       this._updateAuthState(true);
+      this._updateCloudButtons(true);
       return true;
     } else {
       // Show auth modal on first load, with a slight delay to ensure DOM is ready

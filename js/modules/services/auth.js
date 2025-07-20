@@ -399,6 +399,23 @@ class AuthService {
     window.crypto.getRandomValues(array);
     return array;
   }
+
+  /**
+   * Update cloud save/load buttons visibility
+   * @param {boolean} isAuthenticated - Whether the user is authenticated
+   * @private
+   */
+  _updateCloudButtons(isAuthenticated) {
+    const saveBtn = document.getElementById('saveMatchDataBtn');
+    const loadBtn = document.getElementById('loadMatchDataBtn');
+    if (isAuthenticated) {
+      if (saveBtn) saveBtn.classList.remove('d-none');
+      if (loadBtn) loadBtn.classList.remove('d-none');
+    } else {
+      if (saveBtn) saveBtn.classList.add('d-none');
+      if (loadBtn) loadBtn.classList.add('d-none');
+    }
+  }
 }
 
 // Create and export singleton instance

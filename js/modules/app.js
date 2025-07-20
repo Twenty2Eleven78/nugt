@@ -29,7 +29,6 @@ import { notificationManager } from './services/notifications.js';
 import { sharingService } from './services/sharing.js';
 import { pwaUpdater } from './services/pwa-updater.js';
 import { authService } from './services/auth.js';
-import { apiService } from './services/api.js';
 
 // Initialize application
 export function initializeApp() {
@@ -72,9 +71,6 @@ export function initializeApp() {
       console.log('PWA updater initialized successfully');
     }
   });
-  
-  // Initialize API service
-  apiService.init();
 
   // Update displays
   timerController.updateDisplay();

@@ -25,6 +25,17 @@ class AuthService {
     this.isAuthenticated = false;
     this.currentUser = null;
     this.authTimestamp = null;
+    this.authStateListeners = new Set();
+  }
+
+  onAuthStateChange(callback) {
+    this.authStateListeners.add(callback);
+    // Call immediately with current state
+    callback(this.isAuthenticated);
+  }
+
+  notifyAuthStateChange() {
+    this.authStateListeners.forEach(callback => callback(this.isAuthenticated));
   }
 
   /**
@@ -48,6 +59,7 @@ class AuthService {
       this.isAuthenticated = true;
       this.currentUser = { id: userId, email: email, name: displayName || email.split('@')[0] };
       this.authTimestamp = authTimestamp;
+      this.notifyAuthStateChange();
       
       // Track usage
       this.trackUsage('app_open');
@@ -233,6 +245,7 @@ class AuthService {
       this.isAuthenticated = true;
       this.currentUser = { id: userId, email: email, name: displayName };
       this.authTimestamp = Date.now();
+      this.notifyAuthStateChange();
 
       // Track usage
       this.trackUsage('login');
@@ -255,6 +268,8 @@ class AuthService {
     this.authTimestamp = null;
     
     storage.saveImmediate(AUTH_STORAGE_KEYS.IS_AUTHENTICATED, false);
+    
+    this.notifyAuthStateChange();
     
     notificationManager.info('You have been logged out');
   }

@@ -121,14 +121,23 @@ function bindEventListeners() {
   const saveBtn = document.getElementById('saveMatchDataBtn');
   const loadBtn = document.getElementById('loadMatchDataBtn');
   import('../services/auth.js').then(({ authService }) => {
-    if (authService.isUserAuthenticated()) {
+    // Initial state
+    updateCloudButtons(authService.isUserAuthenticated());
+    // Listen for auth changes
+    authService.onAuthStateChange((isAuthenticated) => {
+      updateCloudButtons(isAuthenticated);
+    });
+  });
+
+  function updateCloudButtons(isAuthenticated) {
+    if (isAuthenticated) {
       if (saveBtn) saveBtn.classList.remove('d-none');
       if (loadBtn) loadBtn.classList.remove('d-none');
     } else {
       if (saveBtn) saveBtn.classList.add('d-none');
       if (loadBtn) loadBtn.classList.add('d-none');
     }
-  });
+  }
 
   // Save match data to Netlify Blobs
   if (saveBtn) {

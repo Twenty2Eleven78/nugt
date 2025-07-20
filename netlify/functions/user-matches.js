@@ -15,10 +15,13 @@ exports.handler = async function(event, context) {
 
     // Get token from header and decode it
     const token = authHeader.split(' ')[1];
+    let userId;
     
     try {
       // Our token is base64 encoded as userId:timestamp
-      const [userId, timestamp] = atob(token).split(':');
+      const decoded = atob(token).split(':');
+      userId = decoded[0];
+      const timestamp = decoded[1];
       
       // Basic validation - token shouldn't be older than 24 hours
       const tokenAge = Date.now() - Number(timestamp);

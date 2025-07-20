@@ -29,6 +29,7 @@ import { notificationManager } from './services/notifications.js';
 import { sharingService } from './services/sharing.js';
 import { pwaUpdater } from './services/pwa-updater.js';
 import { authService } from './services/auth.js';
+import { userMatchesApi } from './services/user-matches-api.js';
 
 // Initialize application
 export function initializeApp() {
@@ -117,66 +118,30 @@ function bindEventListeners() {
   const saveBtn = document.getElementById('saveMatchDataBtn');
   const loadBtn = document.getElementById('loadMatchDataBtn');
   
-  import('../services/auth.js').then(({ authService }) => {
-    import('../services/notifications.js').then(({ notificationManager }) => {
-      // Add click handlers for cloud buttons
-      if (saveBtn) {
-        saveBtn.addEventListener('click', async () => {
-          if (!authService.isUserAuthenticated()) {
-            notificationManager.warning('Please sign in to save match data to the cloud');
-            return;
-          }
-          // TODO: Add save functionality
-          notificationManager.info('Saving match data...');
-        });
-      }
-      
-      if (loadBtn) {
-        loadBtn.addEventListener('click', async () => {
-          if (!authService.isUserAuthenticated()) {
-            notificationManager.warning('Please sign in to load match data from the cloud');
-            return;
-          }
-          // TODO: Add load functionality
-          notificationManager.info('Loading match data...');
-        });
-      }
-    });
-  });
-
-  function updateCloudButtons(isAuthenticated) {
-    if (isAuthenticated) {
-      if (saveBtn) saveBtn.classList.remove('d-none');
-      if (loadBtn) loadBtn.classList.remove('d-none');
-    } else {
-      if (saveBtn) saveBtn.classList.add('d-none');
-      if (loadBtn) loadBtn.classList.add('d-none');
-    }
-  }
-
   // Save match data to Netlify Blobs
   if (saveBtn) {
     saveBtn.addEventListener('click', async () => {
-      const { userMatchesApi } = await import('./services/user-matches-api.js');
-      const { authService } = await import('./services/auth.js');
       if (!authService.isUserAuthenticated()) {
-        import('../services/notifications.js').then(({ notificationManager }) => notificationManager.warning('Sign in to save your data.'));
+        notificationManager.warning('Please sign in to save match data to the cloud');
         return;
       }
-      // Gather match data (customize as needed)
-      const matchData = {
-        goals: window.gameState?.goals,
-        matchEvents: window.gameState?.matchEvents,
-        team1History: window.gameState?.team1History,
-        team2History: window.gameState?.team2History,
-        gameTime: window.gameState?.gameTime,
-        timestamp: Date.now()
-      };
+      
       try {
+        // Gather match data
+        const matchData = {
+          goals: gameState.goals,
+          matchEvents: gameState.matchEvents,
+          team1History: gameState.team1History,
+          team2History: gameState.team2History,
+          gameTime: gameState.gameTime,
+          timestamp: Date.now()
+        };
+        
         await userMatchesApi.saveMatchData(matchData);
-        import('../services/notifications.js').then(({ notificationManager }) => notificationManager.success('Match data saved to cloud!'));
+        notificationManager.success('Match data saved to cloud!');
       } catch (e) {
-        import('../services/notifications.js').then(({ notificationManager }) => notificationManager.error('Failed to save match data.'));
+        console.error('Error saving match data:', e);
+        notificationManager.error('Failed to save match data.');
       }
     });
   }
@@ -184,28 +149,32 @@ function bindEventListeners() {
   // Load match data from Netlify Blobs
   if (loadBtn) {
     loadBtn.addEventListener('click', async () => {
-      const { userMatchesApi } = await import('./services/user-matches-api.js');
-      const { authService } = await import('./services/auth.js');
       if (!authService.isUserAuthenticated()) {
-        import('../services/notifications.js').then(({ notificationManager }) => notificationManager.warning('Sign in to load your data.'));
+        notificationManager.warning('Please sign in to load match data from the cloud');
         return;
       }
+      
       try {
         const data = await userMatchesApi.loadMatchData();
         if (data) {
-          // Overwrite local state (customize as needed)
-          window.gameState.goals = data.goals || [];
-          window.gameState.matchEvents = data.matchEvents || [];
-          window.gameState.team1History = data.team1History || [];
-          window.gameState.team2History = data.team2History || [];
-          window.gameState.gameTime = data.gameTime || 4200;
-          import('../services/notifications.js').then(({ notificationManager }) => notificationManager.success('Cloud match data loaded!'));
-          // Optionally refresh UI here
+          // Update game state
+          gameState.goals = data.goals || [];
+          gameState.matchEvents = data.matchEvents || [];
+          gameState.team1History = data.team1History || [];
+          gameState.team2History = data.team2History || [];
+          gameState.gameTime = data.gameTime || 4200;
+          
+          // Update UI
+          updateMatchLog();
+          timerController.updateDisplay();
+          
+          notificationManager.success('Cloud match data loaded!');
         } else {
-          import('../services/notifications.js').then(({ notificationManager }) => notificationManager.info('No cloud match data found.'));
+          notificationManager.info('No cloud match data found.');
         }
       } catch (e) {
-        import('../services/notifications.js').then(({ notificationManager }) => notificationManager.error('Failed to load match data.'));
+        console.error('Error loading match data:', e);
+        notificationManager.error('Failed to load match data.');
       }
     });
   }

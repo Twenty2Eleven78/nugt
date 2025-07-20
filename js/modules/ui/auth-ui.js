@@ -101,7 +101,6 @@ class AuthUI {
               <div class="auth-container">
                 <div id="authMessage" class="mb-3">
                   <p>Welcome to NUFC GameTime! Please sign in to track your usage.</p>
-                  <p class="small text-muted">Having trouble? <a href="docs/troubleshooting.md" target="_blank">View troubleshooting guide</a></p>
                 </div>
                 
                 <div id="registerForm" class="mb-3">

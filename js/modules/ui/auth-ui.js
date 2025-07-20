@@ -248,7 +248,7 @@ class AuthUI {
           }
         } catch (error) {
           console.error('Registration error:', error);
-          notificationManager.danger('Registration failed: ' + error.message);
+          notificationManager.error('Registration failed: ' + error.message);
         }
       };
     } else {

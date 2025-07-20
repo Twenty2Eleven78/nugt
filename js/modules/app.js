@@ -125,20 +125,39 @@ function bindEventListeners() {
         notificationManager.warning('Please sign in to save match data to the cloud');
         return;
       }
+
+      // Show save match modal
+      const team1Name = domCache.get('Team1NameElement')?.textContent || 'Team 1';
+      const team2Name = domCache.get('Team2NameElement')?.textContent || 'Team 2';
+      const score1 = domCache.get('firstScoreElement')?.textContent || '0';
+      const score2 = domCache.get('secondScoreElement')?.textContent || '0';
+      const defaultTitle = `${team1Name} ${score1} - ${score2} ${team2Name}`;
+      
+      // Get title and notes from user
+      const title = window.prompt('Enter match title:', defaultTitle);
+      if (!title) return; // User cancelled
+      
+      const notes = window.prompt('Enter any notes about the match (optional):');
       
       try {
         // Gather match data
         const matchData = {
+          title,
+          notes: notes || '',
           goals: gameState.goals,
           matchEvents: gameState.matchEvents,
           team1History: gameState.team1History,
           team2History: gameState.team2History,
           gameTime: gameState.gameTime,
-          timestamp: Date.now()
+          team1Name,
+          team2Name,
+          score1,
+          score2,
+          savedAt: Date.now()
         };
         
         await userMatchesApi.saveMatchData(matchData);
-        notificationManager.success('Match data saved to cloud!');
+        notificationManager.success('Match saved to cloud!');
       } catch (e) {
         console.error('Error saving match data:', e);
         notificationManager.error('Failed to save match data.');
@@ -155,30 +174,53 @@ function bindEventListeners() {
       }
       
       try {
-        const data = await userMatchesApi.loadMatchData();
-        if (data) {
-          try {
-            // If the data is a string, try to parse it
-            const matchData = typeof data === 'string' ? JSON.parse(data) : data;
+        const matches = await userMatchesApi.loadMatchData();
+        if (matches && matches.length > 0) {
+          // Create a select list of matches
+          const matchList = matches
+            .sort((a, b) => b.savedAt - a.savedAt)
+            .map((match, index) => 
+              `${index + 1}. ${match.title} (${new Date(match.savedAt).toLocaleDateString()})`
+            )
+            .join('\n');
             
-            // Update game state with defaults if properties are missing
-            gameState.goals = matchData.goals || [];
-            gameState.matchEvents = matchData.matchEvents || [];
-            gameState.team1History = matchData.team1History || [];
-            gameState.team2History = matchData.team2History || [];
-            gameState.gameTime = matchData.gameTime || 4200;
-            
-            // Update UI
-            updateMatchLog();
-            timerController.updateDisplay();
-            
-            notificationManager.success('Cloud match data loaded!');
-          } catch (parseError) {
-            console.error('Error parsing match data:', parseError);
-            notificationManager.error('Invalid data format received from server');
+          const selectedIndex = parseInt(window.prompt(
+            `Select a match to load (1-${matches.length}):\n\n${matchList}`
+          ));
+
+          if (isNaN(selectedIndex) || selectedIndex < 1 || selectedIndex > matches.length) {
+            return; // Invalid selection or cancelled
           }
+
+          const matchData = matches[selectedIndex - 1];
+          
+          // Update game state
+          gameState.goals = matchData.goals || [];
+          gameState.matchEvents = matchData.matchEvents || [];
+          gameState.team1History = matchData.team1History || [];
+          gameState.team2History = matchData.team2History || [];
+          gameState.gameTime = matchData.gameTime || 4200;
+          
+          // Update team names if they exist
+          if (matchData.team1Name) {
+            teamManager.updateTeamName('first', matchData.team1Name);
+          }
+          if (matchData.team2Name) {
+            teamManager.updateTeamName('second', matchData.team2Name);
+          }
+
+          // Show match notes if they exist
+          if (matchData.notes) {
+            notificationManager.info(`Match Notes: ${matchData.notes}`);
+          }
+          
+          // Update UI
+          updateMatchLog();
+          timerController.updateDisplay();
+          
+          notificationManager.success(`Loaded match: ${matchData.title}`);
         } else {
-          notificationManager.info('No cloud match data found.');
+          notificationManager.info('No saved matches found.');
         }
       } catch (error) {
         console.error('Error loading match data:', error);

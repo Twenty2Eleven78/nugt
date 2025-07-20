@@ -296,8 +296,6 @@ class AuthService {
     storage.saveImmediate(AUTH_STORAGE_KEYS.IS_AUTHENTICATED, false);
     
     this.notifyAuthStateChange();
-    
-    notificationManager.info('You have been logged out');
   }
 
   /**

@@ -266,6 +266,8 @@ class AuthUI {
           if (success) {
             hideModal('authModal');
             this._updateAuthState(true);
+          } else {
+            notificationManager.warning('No passkey found. Please register first using your email address above.');
           }
         } catch (error) {
           console.error('Authentication error:', error);

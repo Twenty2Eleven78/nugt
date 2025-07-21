@@ -135,11 +135,11 @@ class MatchSummaryModal {
   }
 
   _formatTime(seconds) {
-    if (seconds === undefined || seconds === null) {
-        return 'N/A';
+    if (typeof seconds !== 'number' || isNaN(seconds)) {
+      return '';
     }
     const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
+    const remainingSeconds = Math.floor(seconds % 60);
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 }

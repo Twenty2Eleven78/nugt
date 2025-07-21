@@ -201,6 +201,9 @@ class AuthService {
       // Initialize usage stats
       this._initializeUsageStats(userId);
       
+      // Show success notification
+      notificationManager.success('Registration successful! Welcome to NUFC GameTime!');
+      
       return true;
     } catch (error) {
       console.error('Registration error:', error);

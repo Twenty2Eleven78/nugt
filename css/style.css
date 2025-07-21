@@ -466,3 +466,12 @@ body.modal-open {
 .roster-actions-cell {
   text-align: end;
 }
+
+/* Match Load Modal */
+#matchLoadList .list-group-item {
+    cursor: pointer;
+}
+
+#matchLoadList .list-group-item:hover {
+    background-color: #f8f9fa;
+}

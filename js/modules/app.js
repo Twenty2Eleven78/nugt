@@ -24,6 +24,7 @@ import { bindModalEvents, hideModal } from './ui/modals.js';
 import { initializeTooltips } from './ui/components.js';
 import { authUI } from './ui/auth-ui.js';
 import { matchSaveModal } from './ui/match-save-modal.js';
+import { matchLoadModal } from './ui/match-load-modal.js';
 
 // Services
 import { notificationManager } from './services/notifications.js';
@@ -64,6 +65,7 @@ export function initializeApp() {
   bindModalEvents();
   initializeTooltips();
   matchSaveModal.init();
+  matchLoadModal.init();
 
   // Resume timer if needed
   timerController.resumeFromState();
@@ -177,32 +179,14 @@ function bindEventListeners() {
       
       try {
         const matches = await userMatchesApi.loadMatchData();
-        if (matches && matches.length > 0) {
-          // Create a select list of matches
-          const matchList = matches
-            .sort((a, b) => b.savedAt - a.savedAt)
-            .map((match, index) => 
-              `${index + 1}. ${match.title} (${new Date(match.savedAt).toLocaleDateString()})`
-            )
-            .join('\n');
-            
-          const selectedIndex = parseInt(window.prompt(
-            `Select a match to load (1-${matches.length}):\n\n${matchList}`
-          ));
-
-          if (isNaN(selectedIndex) || selectedIndex < 1 || selectedIndex > matches.length) {
-            return; // Invalid selection or cancelled
-          }
-
-          const matchData = matches[selectedIndex - 1];
-          
+        matchLoadModal.show(matches, (matchData) => {
           // Update game state
           gameState.goals = matchData.goals || [];
           gameState.matchEvents = matchData.matchEvents || [];
           gameState.team1History = matchData.team1History || [];
           gameState.team2History = matchData.team2History || [];
           gameState.gameTime = matchData.gameTime || 4200;
-          
+
           // Update team names if they exist
           if (matchData.team1Name) {
             teamManager.updateTeamName('first', matchData.team1Name);
@@ -215,15 +199,13 @@ function bindEventListeners() {
           if (matchData.notes) {
             notificationManager.info(`Match Notes: ${matchData.notes}`);
           }
-          
+
           // Update UI
           updateMatchLog();
           timerController.updateDisplay();
-          
+
           notificationManager.success(`Loaded match: ${matchData.title}`);
-        } else {
-          notificationManager.info('No saved matches found.');
-        }
+        });
       } catch (error) {
         console.error('Error loading match data:', error);
         notificationManager.error(error.message || 'Failed to load match data.');

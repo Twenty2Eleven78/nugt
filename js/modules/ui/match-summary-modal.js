@@ -54,7 +54,7 @@ class MatchSummaryModal {
         eventElement.innerHTML = `
           <div class="timeline-marker"></div>
           <div class="timeline-content">
-            <p class="timeline-time">${this._formatTime(event.time)}</p>
+            <p class="timeline-time">${event.time}</p>
             <p class="timeline-body">${event.type}${event.notes ? ` - ${event.notes}` : ''}</p>
           </div>
         `;
@@ -68,16 +68,34 @@ class MatchSummaryModal {
     goalsElement.innerHTML = '';
 
     if (matchData.goals && matchData.goals.length > 0) {
-      matchData.goals.forEach(goal => {
-        if (goal.scorer) {
+      const team1Goals = matchData.goals.filter(goal => goal.team === 'team1');
+      const team2Goals = matchData.goals.filter(goal => goal.team === 'team2');
+
+      if (team1Goals.length > 0) {
+        const team1Title = document.createElement('h6');
+        team1Title.textContent = matchData.team1Name;
+        goalsElement.appendChild(team1Title);
+        team1Goals.forEach(goal => {
             const goalElement = document.createElement('div');
             goalElement.className = 'goal-item';
             goalElement.innerHTML = `
-                <p><strong>${goal.scorer}</strong> (${this._formatTime(goal.time)})${goal.assist ? `, assisted by ${goal.assist}` : ''}</p>
+                <p><strong>${goal.scorer}</strong> (${goal.time})${goal.assist ? `, assisted by ${goal.assist}` : ''}</p>
             `;
             goalsElement.appendChild(goalElement);
-        }
-      });
+        });
+      }
+
+      if (team2Goals.length > 0) {
+        const team2Title = document.createElement('h6');
+        team2Title.textContent = matchData.team2Name;
+        goalsElement.appendChild(team2Title);
+        team2Goals.sort((a, b) => a.time - b.time).forEach(goal => {
+            const goalElement = document.createElement('div');
+            goalElement.className = 'goal-item';
+            goalElement.innerHTML = `<p>Goal at ${goal.time}</p>`;
+            goalsElement.appendChild(goalElement);
+        });
+      }
     } else {
       goalsElement.innerHTML = '<p>No goals recorded for this match.</p>';
     }

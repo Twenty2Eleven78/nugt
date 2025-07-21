@@ -63,6 +63,7 @@ export function initializeApp() {
   bindEventListeners();
   bindModalEvents();
   initializeTooltips();
+  matchSaveModal.init();
 
   // Resume timer if needed
   timerController.resumeFromState();
@@ -126,9 +127,6 @@ function bindEventListeners() {
         notificationManager.warning('Please sign in to save match data to the cloud');
         return;
       }
-
-      // Initialize match save modal
-      matchSaveModal.init();
 
       // Show save match modal
       const team1Name = domCache.get('Team1NameElement')?.textContent || 'Team 1';

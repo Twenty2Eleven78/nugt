@@ -27,6 +27,7 @@ class AuthService {
     this.authTimestamp = null;
     this.authStateListeners = new Set();
     this.authToken = null;
+    this.lastLogoutTime = 0;
   }
 
   /**
@@ -288,6 +289,13 @@ class AuthService {
    * Log out the current user
    */
   logout() {
+    // Prevent multiple logout calls within 500ms
+    const now = Date.now();
+    if (now - this.lastLogoutTime < 500) {
+      return;
+    }
+    this.lastLogoutTime = now;
+    
     // Update state
     this.isAuthenticated = false;
     this.currentUser = null;

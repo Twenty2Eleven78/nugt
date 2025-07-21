@@ -293,7 +293,7 @@ class AuthService {
     this.notifyAuthStateChange();
     
     // Show a gentle notification confirming the sign out
-    notificationManager.info(`${userName} has been signed out. Please come back soon!`);
+    notificationManager.info(`Signed out. Please come back soon!`);
   }
 
   /**

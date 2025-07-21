@@ -147,25 +147,25 @@ function bindEventListeners() {
           const matchData = {
             title,
             notes,
-          goals: gameState.goals,
-          matchEvents: gameState.matchEvents,
-          team1History: gameState.team1History,
-          team2History: gameState.team2History,
-          gameTime: gameState.gameTime,
-          team1Name,
-          team2Name,
-          score1,
-          score2,
-          savedAt: Date.now()
-        };
+            goals: gameState.goals,
+            matchEvents: gameState.matchEvents,
+            team1History: gameState.team1History,
+            team2History: gameState.team2History,
+            gameTime: gameState.gameTime,
+            team1Name,
+            team2Name,
+            score1,
+            score2,
+            savedAt: Date.now()
+          };
         
-        await userMatchesApi.saveMatchData(matchData);
-        notificationManager.success('Match saved to cloud!');
-      } catch (e) {
-        console.error('Error saving match data:', e);
-        notificationManager.error('Failed to save match data.');
-      }
-    });
+          await userMatchesApi.saveMatchData(matchData);
+          notificationManager.success('Match saved to cloud!');
+        } catch (e) {
+          console.error('Error saving match data:', e);
+          notificationManager.error('Failed to save match data.');
+        }
+      });
   }
 
   // Load match data from Netlify Blobs

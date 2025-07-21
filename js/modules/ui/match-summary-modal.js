@@ -69,12 +69,14 @@ class MatchSummaryModal {
 
     if (matchData.goals && matchData.goals.length > 0) {
       matchData.goals.forEach(goal => {
-        const goalElement = document.createElement('div');
-        goalElement.className = 'goal-item';
-        goalElement.innerHTML = `
-            <p><strong>${goal.scorer}</strong> (${this._formatTime(goal.time)})${goal.assist ? `, assisted by ${goal.assist}` : ''}</p>
-        `;
-        goalsElement.appendChild(goalElement);
+        if (goal.scorer) {
+            const goalElement = document.createElement('div');
+            goalElement.className = 'goal-item';
+            goalElement.innerHTML = `
+                <p><strong>${goal.scorer}</strong> (${this._formatTime(goal.time)})${goal.assist ? `, assisted by ${goal.assist}` : ''}</p>
+            `;
+            goalsElement.appendChild(goalElement);
+        }
       });
     } else {
       goalsElement.innerHTML = '<p>No goals recorded for this match.</p>';
@@ -133,6 +135,9 @@ class MatchSummaryModal {
   }
 
   _formatTime(seconds) {
+    if (seconds === undefined || seconds === null) {
+        return 'N/A';
+    }
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;

@@ -475,3 +475,54 @@ body.modal-open {
 #matchLoadList .list-group-item:hover {
     background-color: #f8f9fa;
 }
+
+/* Match Summary Modal */
+#summaryTimeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+#summaryTimeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 6px;
+    width: 2px;
+    background: #ddd;
+}
+
+#summaryTimeline .timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+    padding-left: 30px;
+}
+
+#summaryTimeline .timeline-marker {
+    position: absolute;
+    top: 5px;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #007bff;
+    transform: translateX(0);
+}
+
+#summaryTimeline .timeline-content {
+    position: relative;
+    padding: 10px 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background: white;
+}
+
+/* Raw Data Modal */
+#rawDataContent {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 15px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}

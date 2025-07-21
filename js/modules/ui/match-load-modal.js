@@ -44,6 +44,7 @@ class MatchLoadModal {
           <div>
             <strong>${match.title}</strong>
             <small class="d-block text-muted">${new Date(match.savedAt).toLocaleString()}</small>
+            <p class="mb-0 mt-2">${match.notes || ''}</p>
           </div>
           <button class="btn btn-primary btn-sm">Load</button>
         `;

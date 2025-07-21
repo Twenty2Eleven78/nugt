@@ -55,13 +55,19 @@ class AuthService {
   }
 
   onAuthStateChange(callback) {
+    // Remove any existing instances of this callback to prevent duplicates
+    this.authStateListeners.delete(callback);
+    // Add the new callback
     this.authStateListeners.add(callback);
     // Call immediately with current state
     callback(this.isAuthenticated);
   }
 
   notifyAuthStateChange() {
-    this.authStateListeners.forEach(callback => callback(this.isAuthenticated));
+    // Use Promise.resolve to ensure notifications happen on next tick
+    Promise.resolve().then(() => {
+      this.authStateListeners.forEach(callback => callback(this.isAuthenticated));
+    });
   }
 
   /**
@@ -282,19 +288,19 @@ class AuthService {
    * Log out the current user
    */
   logout() {
+    // Update state
     this.isAuthenticated = false;
     this.currentUser = null;
     this.authTimestamp = null;
     
+    // Update storage
     storage.saveImmediate(AUTH_STORAGE_KEYS.IS_AUTHENTICATED, false);
     
-    // First notify state change so UI can update
+    // Notify state change first (this now uses Promise.resolve internally)
     this.notifyAuthStateChange();
     
-    // Then show notification after a short delay to avoid conflicts with UI updates
-    setTimeout(() => {
-      notificationManager.info('Signed out. Please come back soon!');
-    }, 100);
+    // Show notification (will happen after state change due to Promise microtask queueing)
+    notificationManager.info('Signed out. Please come back soon!');
   }
 
   /**

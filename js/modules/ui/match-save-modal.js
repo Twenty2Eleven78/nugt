@@ -2,7 +2,7 @@
  * Match Save Modal UI Component
  */
 
-import { domCache } from '../data/dom-cache.js';
+import { domCache } from '../shared/dom.js';
 import { hideModal } from './modals.js';
 
 class MatchSaveModal {

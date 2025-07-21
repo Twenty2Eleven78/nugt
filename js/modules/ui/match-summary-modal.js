@@ -68,8 +68,8 @@ class MatchSummaryModal {
     goalsElement.innerHTML = '';
 
     if (matchData.goals && matchData.goals.length > 0) {
-      const team1Goals = matchData.goals.filter(goal => goal.team === 'team1');
-      const team2Goals = matchData.goals.filter(goal => goal.team === 'team2');
+      const team1Goals = matchData.goals.filter(goal => goal.team === 1);
+      const team2Goals = matchData.goals.filter(goal => goal.team === 2);
 
       if (team1Goals.length > 0) {
         const team1Title = document.createElement('h6');
@@ -79,7 +79,7 @@ class MatchSummaryModal {
             const goalElement = document.createElement('div');
             goalElement.className = 'goal-item';
             goalElement.innerHTML = `
-                <p><strong>${goal.scorer}</strong> (${goal.timestamp})${goal.assist ? `, assisted by ${goal.assist}` : ''}</p>
+                <p><strong>${goal.goalScorerName}</strong> (${goal.timestamp})${goal.goalAssistName ? `, assisted by ${goal.goalAssistName}` : ''}</p>
             `;
             goalsElement.appendChild(goalElement);
         });

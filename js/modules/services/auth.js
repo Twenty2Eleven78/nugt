@@ -282,6 +282,8 @@ class AuthService {
    * Log out the current user
    */
   logout() {
+    const userName = this.currentUser?.name || 'User';
+    
     this.isAuthenticated = false;
     this.currentUser = null;
     this.authTimestamp = null;
@@ -289,6 +291,9 @@ class AuthService {
     storage.saveImmediate(AUTH_STORAGE_KEYS.IS_AUTHENTICATED, false);
     
     this.notifyAuthStateChange();
+    
+    // Show a gentle notification confirming the sign out
+    notificationManager.info(`${userName} has been signed out. Please come back soon!`);
   }
 
   /**

@@ -54,7 +54,7 @@ class MatchSummaryModal {
         eventElement.innerHTML = `
           <div class="timeline-marker"></div>
           <div class="timeline-content">
-            <p class="timeline-time">${event.time}</p>
+            <p class="timeline-time">${event.timestamp}</p>
             <p class="timeline-body">${event.type}${event.notes ? ` - ${event.notes}` : ''}</p>
           </div>
         `;
@@ -79,7 +79,7 @@ class MatchSummaryModal {
             const goalElement = document.createElement('div');
             goalElement.className = 'goal-item';
             goalElement.innerHTML = `
-                <p><strong>${goal.scorer}</strong> (${goal.time})${goal.assist ? `, assisted by ${goal.assist}` : ''}</p>
+                <p><strong>${goal.scorer}</strong> (${goal.timestamp})${goal.assist ? `, assisted by ${goal.assist}` : ''}</p>
             `;
             goalsElement.appendChild(goalElement);
         });
@@ -89,10 +89,10 @@ class MatchSummaryModal {
         const team2Title = document.createElement('h6');
         team2Title.textContent = matchData.team2Name;
         goalsElement.appendChild(team2Title);
-        team2Goals.sort((a, b) => a.time - b.time).forEach(goal => {
+        team2Goals.sort((a, b) => a.timestamp - b.timestamp).forEach(goal => {
             const goalElement = document.createElement('div');
             goalElement.className = 'goal-item';
-            goalElement.innerHTML = `<p>Goal at ${goal.time}</p>`;
+            goalElement.innerHTML = `<p>Goal at ${goal.timestamp}</p>`;
             goalsElement.appendChild(goalElement);
         });
       }

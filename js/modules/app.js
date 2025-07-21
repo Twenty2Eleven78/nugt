@@ -164,6 +164,7 @@ function bindEventListeners() {
           notificationManager.error('Failed to save match data.');
         }
       });
+    });
   }
 
   // Load match data from Netlify Blobs

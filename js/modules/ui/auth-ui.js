@@ -216,10 +216,8 @@ class AuthUI {
     // Add global event listeners for dynamically created elements
     document.body.addEventListener('click', (e) => {
       if (e.target && e.target.id === 'logoutButton') {
-        // Let auth service handle the state change and notification
+        // Only trigger logout, state change and UI updates will be handled by listeners
         authService.logout();
-        // Just show the auth modal
-        this.showAuthModal();
       }
     });
   }

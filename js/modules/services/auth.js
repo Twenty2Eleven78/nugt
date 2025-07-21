@@ -296,11 +296,13 @@ class AuthService {
     // Update storage
     storage.saveImmediate(AUTH_STORAGE_KEYS.IS_AUTHENTICATED, false);
     
-    // Notify state change first (this now uses Promise.resolve internally)
-    this.notifyAuthStateChange();
-    
-    // Show notification (will happen after state change due to Promise microtask queueing)
-    notificationManager.info('Signed out. Please come back soon!');
+    // Use a single Promise to handle both state change and notification
+    Promise.resolve().then(() => {
+      // First notify state change
+      this.authStateListeners.forEach(callback => callback(this.isAuthenticated));
+      // Then show notification
+      notificationManager.info('Signed out. Please come back soon!');
+    });
   }
 
   /**

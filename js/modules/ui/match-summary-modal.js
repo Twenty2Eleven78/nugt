@@ -77,17 +77,40 @@ class MatchSummaryModal {
     goalsElement.innerHTML = '';
 
     if (matchData.goals && matchData.goals.length > 0) {
-        const goalSummary = matchData.goals.reduce((acc, goal) => {
+      const team1Goals = matchData.goals.filter(goal => goal.team === 1);
+      const team2Goals = matchData.goals.filter(goal => goal.team === 2);
+
+      if (team1Goals.length > 0) {
+        const team1Title = document.createElement('h6');
+        team1Title.textContent = matchData.team1Name;
+        goalsElement.appendChild(team1Title);
+        const goalSummary = team1Goals.reduce((acc, goal) => {
             acc[goal.goalScorerName] = (acc[goal.goalScorerName] || 0) + 1;
             return acc;
         }, {});
-
         Object.entries(goalSummary).forEach(([scorer, count]) => {
             const goalElement = document.createElement('div');
             goalElement.className = 'goal-item';
             goalElement.innerHTML = `<p><strong>${scorer}</strong>: ${count}</p>`;
             goalsElement.appendChild(goalElement);
         });
+      }
+
+      if (team2Goals.length > 0) {
+        const team2Title = document.createElement('h6');
+        team2Title.textContent = matchData.team2Name;
+        goalsElement.appendChild(team2Title);
+        const goalSummary = team2Goals.reduce((acc, goal) => {
+            acc[goal.goalScorerName] = (acc[goal.goalScorerName] || 0) + 1;
+            return acc;
+        }, {});
+        Object.entries(goalSummary).forEach(([scorer, count]) => {
+            const goalElement = document.createElement('div');
+            goalElement.className = 'goal-item';
+            goalElement.innerHTML = `<p><strong>${scorer}</strong>: ${count}</p>`;
+            goalsElement.appendChild(goalElement);
+        });
+      }
     } else {
       goalsElement.innerHTML = '<p>No goals recorded for this match.</p>';
     }

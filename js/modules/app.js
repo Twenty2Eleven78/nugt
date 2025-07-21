@@ -23,6 +23,7 @@ import { rosterManager } from './match/roster.js';
 import { bindModalEvents, hideModal } from './ui/modals.js';
 import { initializeTooltips } from './ui/components.js';
 import { authUI } from './ui/auth-ui.js';
+import { matchSaveModal } from './ui/match-save-modal.js';
 
 // Services
 import { notificationManager } from './services/notifications.js';
@@ -126,6 +127,9 @@ function bindEventListeners() {
         return;
       }
 
+      // Initialize match save modal
+      matchSaveModal.init();
+
       // Show save match modal
       const team1Name = domCache.get('Team1NameElement')?.textContent || 'Team 1';
       const team2Name = domCache.get('Team2NameElement')?.textContent || 'Team 2';
@@ -134,17 +138,15 @@ function bindEventListeners() {
       const currentDate = new Date().toLocaleDateString('en-GB');
       const defaultTitle = `${team1Name}(${score1}):${team2Name}(${score2}) - ${currentDate}`;
       
-      // Get title and notes from user
-      const title = window.prompt('Enter match title:', defaultTitle);
-      if (!title) return; // User cancelled
-      
-      const notes = window.prompt('Enter any notes about the match (optional):');
-      
-      try {
-        // Gather match data
-        const matchData = {
-          title,
-          notes: notes || '',
+      matchSaveModal.show({
+        defaultTitle,
+        defaultNotes: ''
+      }, async ({ title, notes }) => {
+        try {
+          // Gather match data
+          const matchData = {
+            title,
+            notes,
           goals: gameState.goals,
           matchEvents: gameState.matchEvents,
           team1History: gameState.team1History,

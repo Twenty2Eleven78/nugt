@@ -102,14 +102,9 @@ class AuthService {
    */
   async register(email) {
     try {
-      if (!email || email.trim() === '') {
-        notificationManager.warning('Please enter a valid email address');
-        return false;
-      }
-      
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
+      if (!email || email.trim() === '' || !emailRegex.test(email)) {
         notificationManager.warning('Please enter a valid email address');
         return false;
       }

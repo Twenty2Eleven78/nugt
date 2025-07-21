@@ -280,6 +280,9 @@ class AuthService {
       // Track usage
       this.trackUsage('login');
       
+      // Show success notification
+      notificationManager.success('Welcome back!');
+      
       return true;
     } catch (error) {
       console.error('Authentication error:', error);

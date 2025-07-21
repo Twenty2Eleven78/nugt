@@ -3,6 +3,7 @@
  */
 
 import { hideModal } from './modals.js';
+import { matchSummaryModal } from './match-summary-modal.js';
 
 class MatchLoadModal {
   constructor() {
@@ -46,13 +47,10 @@ class MatchLoadModal {
             <small class="d-block text-muted">${new Date(match.savedAt).toLocaleString()}</small>
             <p class="mb-0 mt-2">${match.notes || ''}</p>
           </div>
-          <button class="btn btn-primary btn-sm">Load</button>
+          <button class="btn btn-primary btn-sm">View</button>
         `;
         listItem.querySelector('button').addEventListener('click', () => {
-          if (this.onLoad) {
-            this.onLoad(match);
-          }
-          hideModal('matchLoadModal');
+          matchSummaryModal.show(match);
         });
         matchListElement.appendChild(listItem);
       });

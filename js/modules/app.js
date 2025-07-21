@@ -25,6 +25,7 @@ import { initializeTooltips } from './ui/components.js';
 import { authUI } from './ui/auth-ui.js';
 import { matchSaveModal } from './ui/match-save-modal.js';
 import { matchLoadModal } from './ui/match-load-modal.js';
+import { matchSummaryModal } from './ui/match-summary-modal.js';
 
 // Services
 import { notificationManager } from './services/notifications.js';
@@ -66,6 +67,7 @@ export function initializeApp() {
   initializeTooltips();
   matchSaveModal.init();
   matchLoadModal.init();
+  matchSummaryModal.init();
 
   // Resume timer if needed
   timerController.resumeFromState();
@@ -179,33 +181,7 @@ function bindEventListeners() {
       
       try {
         const matches = await userMatchesApi.loadMatchData();
-        matchLoadModal.show(matches, (matchData) => {
-          // Update game state
-          gameState.goals = matchData.goals || [];
-          gameState.matchEvents = matchData.matchEvents || [];
-          gameState.team1History = matchData.team1History || [];
-          gameState.team2History = matchData.team2History || [];
-          gameState.gameTime = matchData.gameTime || 4200;
-
-          // Update team names if they exist
-          if (matchData.team1Name) {
-            teamManager.updateTeamName('first', matchData.team1Name);
-          }
-          if (matchData.team2Name) {
-            teamManager.updateTeamName('second', matchData.team2Name);
-          }
-
-          // Show match notes if they exist
-          if (matchData.notes) {
-            notificationManager.info(`Match Notes: ${matchData.notes}`);
-          }
-
-          // Update UI
-          updateMatchLog();
-          timerController.updateDisplay();
-
-          notificationManager.success(`Loaded match: ${matchData.title}`);
-        });
+        matchLoadModal.show(matches);
       } catch (error) {
         console.error('Error loading match data:', error);
         notificationManager.error(error.message || 'Failed to load match data.');

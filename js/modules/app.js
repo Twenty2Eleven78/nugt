@@ -63,6 +63,7 @@ export function initializeApp() {
   bindEventListeners();
   bindModalEvents();
   initializeTooltips();
+  matchSaveModal.init();
 
   // Resume timer if needed
   timerController.resumeFromState();
@@ -127,9 +128,6 @@ function bindEventListeners() {
         return;
       }
 
-      // Initialize match save modal
-      matchSaveModal.init();
-
       // Show save match modal
       const team1Name = domCache.get('Team1NameElement')?.textContent || 'Team 1';
       const team2Name = domCache.get('Team2NameElement')?.textContent || 'Team 2';
@@ -166,6 +164,7 @@ function bindEventListeners() {
           notificationManager.error('Failed to save match data.');
         }
       });
+    });
   }
 
   // Load match data from Netlify Blobs

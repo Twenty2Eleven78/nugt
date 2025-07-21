@@ -136,7 +136,7 @@ class MatchSummaryModal {
 
   _formatTime(seconds) {
     if (typeof seconds !== 'number' || isNaN(seconds)) {
-      return '';
+      return 'N/A';
     }
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);

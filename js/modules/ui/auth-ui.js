@@ -26,25 +26,26 @@ class AuthUI {
     // Bind event listeners
     this._bindEventListeners();
 
-    // Check if user is already authenticated
+    // Initialize auth service and check authentication status
     const isAuthenticated = await authService.init();
     console.log('User authenticated:', isAuthenticated);
-    
-    // Listen for auth state changes
-    authService.onAuthStateChange((isAuthenticated) => {
+
+    // Set up auth state change listener
+    authService.onAuthStateChange(isAuthenticated => {
       this._updateAuthState(isAuthenticated);
     });
-    
+
+    // Update UI based on initial auth state
     if (isAuthenticated) {
       this._updateAuthState(true);
       return true;
-    } else {
-      // Show auth modal on first load, with a slight delay to ensure DOM is ready
-      setTimeout(() => {
-        this.showAuthModal();
-      }, 500);
-      return false;
     }
+
+    // Not authenticated - show the auth modal
+    requestAnimationFrame(() => {
+      this.showAuthModal();
+    });
+    return false;
   }
 
   /**
@@ -96,11 +97,12 @@ class AuthUI {
    */
   _createAuthModal() {
     const modalHtml = `
-      <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true" data-bs-backdrop="static">
+      <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="authModalLabel">NUFC GameTime Authentication</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div class="auth-container">
@@ -231,29 +233,24 @@ class AuthUI {
     if (registerButton) {
       registerButton.onclick = async () => {
         const email = document.getElementById('usernameInput').value.trim();
-        if (!email) {
-          notificationManager.warning('Please enter your email address');
-          return;
-        }
-        
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-          notificationManager.warning('Please enter a valid email address');
-          return;
-        }
         
         try {
           console.log('Attempting to register with email:', email);
           const success = await authService.register(email);
           console.log('Registration result:', success);
           if (success) {
+            // Clear the email input on success
+            const emailInput = document.getElementById('usernameInput');
+            if (emailInput) {
+              emailInput.value = '';
+            }
             hideModal('authModal');
             this._updateAuthState(true);
           }
         } catch (error) {
           console.error('Registration error:', error);
-          notificationManager.error('Registration failed: ' + error.message);
+          // Let the auth service handle the error notification
+          // It has more context about the specific failure reason
         }
       };
     } else {
@@ -264,20 +261,19 @@ class AuthUI {
     const loginButton = document.getElementById('loginButton');
     if (loginButton) {
       loginButton.onclick = async () => {
-        let success = false;
         try {
           console.log('Attempting to authenticate');
-          success = await authService.authenticate();
+          const success = await authService.authenticate();
           console.log('Authentication result:', success);
           if (success) {
-           hideModal('authModal');
-           this._updateAuthState(true);
-          }        
+            hideModal('authModal');
+            this._updateAuthState(true);
+          }
         } catch (error) {
           console.error('Authentication error:', error);
-          notificationManager.warning('No passkey found. Please register first using your email address above.');
+          // Let the auth service handle the error notification
+          // It has more context about the specific error
         }
-
       };
     } else {
       console.warn('Login button not found');

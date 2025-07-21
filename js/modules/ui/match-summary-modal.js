@@ -47,15 +47,24 @@ class MatchSummaryModal {
     const timelineElement = document.getElementById('summaryTimeline');
     timelineElement.innerHTML = '';
 
-    if (matchData.matchEvents && matchData.matchEvents.length > 0) {
-      matchData.matchEvents.forEach(event => {
+    const allEvents = [
+      ...(matchData.matchEvents || []),
+      ...(matchData.goals || []).map(g => ({ ...g, type: 'Goal' }))
+    ].sort((a, b) => a.rawTime - b.rawTime);
+
+    if (allEvents.length > 0) {
+      allEvents.forEach(event => {
         const eventElement = document.createElement('div');
         eventElement.className = 'timeline-item';
+        let body = `${event.type}${event.notes ? ` - ${event.notes}` : ''}`;
+        if (event.type === 'Goal') {
+          body = `Goal for ${event.teamName}: ${event.goalScorerName} (${event.timestamp})${event.goalAssistName ? `, assisted by ${event.goalAssistName}` : ''}`;
+        }
         eventElement.innerHTML = `
           <div class="timeline-marker"></div>
           <div class="timeline-content">
             <p class="timeline-time">${event.timestamp}</p>
-            <p class="timeline-body">${event.type}${event.notes ? ` - ${event.notes}` : ''}</p>
+            <p class="timeline-body">${body}</p>
           </div>
         `;
         timelineElement.appendChild(eventElement);
@@ -68,34 +77,17 @@ class MatchSummaryModal {
     goalsElement.innerHTML = '';
 
     if (matchData.goals && matchData.goals.length > 0) {
-      const team1Goals = matchData.goals.filter(goal => goal.team === 1);
-      const team2Goals = matchData.goals.filter(goal => goal.team === 2);
+        const goalSummary = matchData.goals.reduce((acc, goal) => {
+            acc[goal.goalScorerName] = (acc[goal.goalScorerName] || 0) + 1;
+            return acc;
+        }, {});
 
-      if (team1Goals.length > 0) {
-        const team1Title = document.createElement('h6');
-        team1Title.textContent = matchData.team1Name;
-        goalsElement.appendChild(team1Title);
-        team1Goals.forEach(goal => {
+        Object.entries(goalSummary).forEach(([scorer, count]) => {
             const goalElement = document.createElement('div');
             goalElement.className = 'goal-item';
-            goalElement.innerHTML = `
-                <p><strong>${goal.goalScorerName}</strong> (${goal.timestamp})${goal.goalAssistName ? `, assisted by ${goal.goalAssistName}` : ''}</p>
-            `;
+            goalElement.innerHTML = `<p><strong>${scorer}</strong>: ${count}</p>`;
             goalsElement.appendChild(goalElement);
         });
-      }
-
-      if (team2Goals.length > 0) {
-        const team2Title = document.createElement('h6');
-        team2Title.textContent = matchData.team2Name;
-        goalsElement.appendChild(team2Title);
-        team2Goals.sort((a, b) => a.timestamp - b.timestamp).forEach(goal => {
-            const goalElement = document.createElement('div');
-            goalElement.className = 'goal-item';
-            goalElement.innerHTML = `<p>Goal at ${goal.timestamp}</p>`;
-            goalsElement.appendChild(goalElement);
-        });
-      }
     } else {
       goalsElement.innerHTML = '<p>No goals recorded for this match.</p>';
     }

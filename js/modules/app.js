@@ -26,6 +26,7 @@ import { authUI } from './ui/auth-ui.js';
 import { matchSaveModal } from './ui/match-save-modal.js';
 import { matchLoadModal } from './ui/match-load-modal.js';
 import { matchSummaryModal } from './ui/match-summary-modal.js';
+import { rawDataModal } from './ui/raw-data-modal.js';
 
 // Services
 import { notificationManager } from './services/notifications.js';
@@ -68,6 +69,7 @@ export function initializeApp() {
   matchSaveModal.init();
   matchLoadModal.init();
   matchSummaryModal.init();
+  rawDataModal.init();
 
   // Resume timer if needed
   timerController.resumeFromState();

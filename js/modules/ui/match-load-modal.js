@@ -4,6 +4,7 @@
 
 import { hideModal } from './modals.js';
 import { matchSummaryModal } from './match-summary-modal.js';
+import { rawDataModal } from './raw-data-modal.js';
 
 class MatchLoadModal {
   constructor() {
@@ -47,10 +48,16 @@ class MatchLoadModal {
             <small class="d-block text-muted">${new Date(match.savedAt).toLocaleString()}</small>
             <p class="mb-0 mt-2">${match.notes || ''}</p>
           </div>
-          <button class="btn btn-primary btn-sm">View</button>
+          <div>
+            <button class="btn btn-primary btn-sm view-btn">View</button>
+            <button class="btn btn-secondary btn-sm raw-data-btn">Raw Data</button>
+          </div>
         `;
-        listItem.querySelector('button').addEventListener('click', () => {
+        listItem.querySelector('.view-btn').addEventListener('click', () => {
           matchSummaryModal.show(match);
+        });
+        listItem.querySelector('.raw-data-btn').addEventListener('click', () => {
+          rawDataModal.show(match);
         });
         matchListElement.appendChild(listItem);
       });

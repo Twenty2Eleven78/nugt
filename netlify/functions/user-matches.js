@@ -19,7 +19,7 @@ exports.handler = async function(event, context) {
     
     try {
       // Our token is base64 encoded as userId:timestamp
-      const decoded = atob(token).split(':');
+      const decoded = Buffer.from(token, 'base64').toString('binary').split(':');
       userId = decoded[0];
       const timestamp = decoded[1];
       

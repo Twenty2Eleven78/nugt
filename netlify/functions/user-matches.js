@@ -44,20 +44,22 @@ exports.handler = async function(event, context) {
         body: JSON.stringify({ error: 'Invalid token format' })
       };
     }
+    
     const key = `user-data/${userId}/matches.json`;
 
     if (event.httpMethod === 'GET') {
-      const isAdmin = event.queryStringParameters.admin === 'true';
+      const isAdmin = event.queryStringParameters?.admin === 'true';
 
       if (isAdmin) {
         // Admin request to get all matches
         try {
-          const url = `${NETLIFY_BLOBS_API}/${SITE_ID}?prefix=user-data`;
+          const url = `${NETLIFY_BLOBS_API}/${SITE_ID}?prefix=user-data/`;
           const res = await fetch(url, {
             headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
           });
 
           if (!res.ok) {
+            console.error('Failed to list blobs:', res.status, res.statusText);
             return { 
               statusCode: 500,
               body: JSON.stringify({ error: 'Failed to retrieve data' })
@@ -65,38 +67,85 @@ exports.handler = async function(event, context) {
           }
 
           const { blobs = [] } = await res.json();
-          console.log('blobs:', blobs);
+          console.log('Found blobs:', blobs.length, blobs.map(b => b.key));
+          
           const allMatches = [];
+          let processedCount = 0;
+          let errorCount = 0;
 
           for (const blob of blobs) {
-            const blobRes = await fetch(`${NETLIFY_BLOBS_API}/${SITE_ID}/${blob.key}`, {
-              headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
-            });
-            if (blobRes.ok) {
-              const data = await blobRes.text();
-              try {
-                const matches = data ? JSON.parse(data) : [];
-                const matchArray = Array.isArray(matches) ? matches : [matches];
-                allMatches.push(...matchArray.map(match => ({ ...match, userId: blob.key.split('/')[1] })));
-              } catch (e) {
-                // ignore parsing errors
+            // Only process files that match our expected pattern
+            if (!blob.key.includes('/matches.json')) {
+              console.log('Skipping non-match blob:', blob.key);
+              continue;
+            }
+
+            try {
+              const blobRes = await fetch(`${NETLIFY_BLOBS_API}/${SITE_ID}/${blob.key}`, {
+                headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
+              });
+              
+              if (blobRes.ok) {
+                const data = await blobRes.text();
+                processedCount++;
+                
+                if (data && data.trim()) {
+                  try {
+                    const matches = JSON.parse(data);
+                    const matchArray = Array.isArray(matches) ? matches : [matches];
+                    
+                    // Extract userId from the blob key (user-data/{userId}/matches.json)
+                    const keyParts = blob.key.split('/');
+                    const extractedUserId = keyParts.length >= 2 ? keyParts[1] : 'unknown';
+                    
+                    // Add userId to each match
+                    const matchesWithUserId = matchArray.map(match => ({
+                      ...match,
+                      userId: extractedUserId
+                    }));
+                    
+                    allMatches.push(...matchesWithUserId);
+                    console.log(`Processed ${matchesWithUserId.length} matches for user ${extractedUserId}`);
+                  } catch (parseError) {
+                    console.error('Error parsing matches for blob:', blob.key, parseError);
+                    errorCount++;
+                  }
+                } else {
+                  console.log('Empty data for blob:', blob.key);
+                }
+              } else {
+                console.error('Failed to fetch blob:', blob.key, blobRes.status);
+                errorCount++;
               }
+            } catch (fetchError) {
+              console.error('Error fetching blob:', blob.key, fetchError);
+              errorCount++;
             }
           }
+
+          console.log(`Admin query completed. Processed: ${processedCount}, Errors: ${errorCount}, Total matches: ${allMatches.length}`);
 
           return {
             statusCode: 200,
             body: JSON.stringify({
               message: 'All matches retrieved successfully',
-              data: allMatches
+              data: allMatches,
+              meta: {
+                totalBlobs: blobs.length,
+                processedBlobs: processedCount,
+                errors: errorCount,
+                totalMatches: allMatches.length
+              }
             })
           };
         } catch (error) {
           console.error('Error retrieving all data:', error);
-          console.log('Error:', error);
           return { 
             statusCode: 500, 
-            body: JSON.stringify({ error: 'Failed to retrieve all data' })
+            body: JSON.stringify({ 
+              error: 'Failed to retrieve all data',
+              details: error.message 
+            })
           };
         }
       } else {
@@ -107,6 +156,7 @@ exports.handler = async function(event, context) {
           const res = await fetch(url, {
             headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
           });
+          
           if (!res.ok) {
             if (res.status === 404) {
               // Return empty array for new users
@@ -123,6 +173,7 @@ exports.handler = async function(event, context) {
               body: JSON.stringify({ error: 'Failed to retrieve data' })
             };
           }
+          
           const data = await res.text();
           try {
             // Try to parse the data as JSON to ensure it's valid

@@ -52,7 +52,7 @@ exports.handler = async function(event, context) {
       if (isAdmin) {
         // Admin request to get all matches
         try {
-          const url = `${NETLIFY_BLOBS_API}/${SITE_ID}?prefix=user-data/`;
+          const url = `${NETLIFY_BLOBS_API}/${SITE_ID}?prefix=user-data`;
           const res = await fetch(url, {
             headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
           });

@@ -48,7 +48,7 @@ exports.handler = async function(event, context) {
 
     if (event.httpMethod === 'GET') {
       try {
-        const isAdmin = event.queryStringParameters.admin === 'true';
+        const isAdmin = event.queryStringParameters && event.queryStringParameters.admin === 'true';
 
         if (isAdmin) {
           // Admin user - fetch all user data

@@ -53,6 +53,8 @@ exports.handler = async function(event, context) {
       // For now, checking if the userId corresponds to admin@nugt.app
       const adminUsers = ['admin', 'admin@nugt.app'];
       return adminUsers.includes(userId) || userId.includes('admin@');
+      console.log('Extracted userId:', userId);
+console.log('isAdminUser result:', isAdminUser(userId));
     };
 
     if (event.httpMethod === 'GET') {

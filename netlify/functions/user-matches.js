@@ -64,11 +64,12 @@ exports.handler = async function(event, context) {
             };
           }
 
-          const { blobs = [] } = await res.json();
+          const response = await res.json();
+          console.log('Netlify Blobs API response:', response);
+          const { blobs = [] } = response;
           const allMatches = [];
 
           for (const blob of blobs) {
-            console.log('blob.key:', blob.key);
             const blobRes = await fetch(`${NETLIFY_BLOBS_API}/${SITE_ID}/${blob.key}`, {
               headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
             });

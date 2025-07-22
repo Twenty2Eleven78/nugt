@@ -48,30 +48,26 @@ exports.handler = async function(event, context) {
     const key = `user-data/${userId}/matches.json`;
 
     // Helper function to check if user is admin
-   const isAdminUser = (userId) => {
-  console.log('Checking admin access for userId:', userId); // Debug logging
+const isAdminUser = (userId) => {
+  console.log('Checking admin access for userId:', userId);
   
-  // List of admin identifiers
-  const adminUsers = [
-    'admin',
-    'admin@nugt.app',
-    'admin@nugt.com'
-  ];
+  // Get admin identifiers from environment variables
+  const adminEmails = process.env.ADMIN_EMAILS ? 
+    process.env.ADMIN_EMAILS.split(',').map(email => email.trim()) : 
+    [];
   
-  // Check exact matches first
-  if (adminUsers.includes(userId)) {
-    console.log('Admin access granted - exact match');
-    return true;
-  }
+  const adminUserIds = process.env.ADMIN_USER_IDS ? 
+    process.env.ADMIN_USER_IDS.split(',').map(id => id.trim()) : 
+    [];
   
-  // Check if userId contains admin pattern
-  if (userId && (userId.includes('admin@') || userId.toLowerCase().includes('admin'))) {
-    console.log('Admin access granted - pattern match');
-    return true;
-  }
+  console.log('Checking against admin emails:', adminEmails.length);
+  console.log('Checking against admin user IDs:', adminUserIds.length);
   
-  console.log('Admin access denied');
-  return false;
+  // Check if userId matches any admin email or user ID
+  const isAdmin = adminEmails.includes(userId) || adminUserIds.includes(userId);
+  
+  console.log('Admin access:', isAdmin ? 'granted' : 'denied');
+  return isAdmin;
 };
 
     if (event.httpMethod === 'GET') {

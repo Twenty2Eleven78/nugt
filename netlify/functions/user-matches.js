@@ -65,6 +65,7 @@ exports.handler = async function(event, context) {
           }
 
           const { blobs = [] } = await res.json();
+          console.log('blobs:', blobs);
           const allMatches = [];
 
           for (const blob of blobs) {

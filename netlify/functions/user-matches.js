@@ -76,7 +76,7 @@ exports.handler = async function(event, context) {
               try {
                 const matches = data ? JSON.parse(data) : [];
                 const matchArray = Array.isArray(matches) ? matches : [matches];
-                allMatches.push(...matchArray.map(match => ({ ...match, userId: blob.key.split('/')[1] })));
+                allMatches.push(...matchArray.map(match => ({ ...match, userId: blob.key.split('/')[2] })));
               } catch (e) {
                 // ignore parsing errors
               }

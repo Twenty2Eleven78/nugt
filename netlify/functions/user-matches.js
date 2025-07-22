@@ -52,69 +52,135 @@ exports.handler = async function(event, context) {
 
       if (isAdmin) {
         // Admin request to get all matches
+        console.log('=== ADMIN REQUEST STARTED ===');
+        console.log('User ID from token:', userId);
+        console.log('Site ID:', SITE_ID);
+        console.log('Access token exists:', !!ACCESS_TOKEN);
+        
         try {
-          const url = `${NETLIFY_BLOBS_API}/${SITE_ID}?prefix=user-data/`;
-          const res = await fetch(url, {
-            headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
-          });
+          // Try different approaches to list blobs
+          const attempts = [
+            `${NETLIFY_BLOBS_API}/${SITE_ID}?prefix=user-data`,
+            `${NETLIFY_BLOBS_API}/${SITE_ID}`,
+            `${NETLIFY_BLOBS_API}/${SITE_ID}?prefix=user-data/`
+          ];
+          
+          let blobs = [];
+          let successfulUrl = null;
+          
+          for (const url of attempts) {
+            console.log('Trying URL:', url);
+            const res = await fetch(url, {
+              headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
+            });
 
-          if (!res.ok) {
-            console.error('Failed to list blobs:', res.status, res.statusText);
+            console.log('Response status:', res.status);
+            console.log('Response headers:', Object.fromEntries(res.headers.entries()));
+
+            if (res.ok) {
+              const responseData = await res.json();
+              console.log('Response data:', responseData);
+              blobs = responseData.blobs || [];
+              successfulUrl = url;
+              break;
+            } else {
+              console.error(`Failed with URL ${url}:`, res.status, res.statusText);
+              const errorText = await res.text();
+              console.error('Error response:', errorText);
+            }
+          }
+          
+          if (!successfulUrl) {
+            console.error('All blob listing attempts failed');
             return { 
               statusCode: 500,
-              body: JSON.stringify({ error: 'Failed to retrieve data' })
+              body: JSON.stringify({ 
+                error: 'Failed to retrieve data - all attempts failed',
+                debug: {
+                  siteId: SITE_ID,
+                  hasToken: !!ACCESS_TOKEN,
+                  attemptsCount: attempts.length
+                }
+              })
             };
           }
 
-          const { blobs = [] } = await res.json();
-          console.log('Found blobs:', blobs.length, blobs.map(b => b.key));
+          console.log('Successful URL:', successfulUrl);
+          console.log('Total blobs found:', blobs.length);
+          console.log('All blob keys:', blobs.map(b => b.key));
+          
+          // Filter blobs that contain match data
+          const matchBlobs = blobs.filter(blob => {
+            const isMatchFile = blob.key.includes('matches.json') || 
+                               blob.key.includes('/matches') ||
+                               blob.key.startsWith('user-data/');
+            console.log(`Blob ${blob.key}: isMatchFile=${isMatchFile}`);
+            return isMatchFile;
+          });
+          
+          console.log('Match blobs after filtering:', matchBlobs.length);
+          console.log('Match blob keys:', matchBlobs.map(b => b.key));
           
           const allMatches = [];
           let processedCount = 0;
           let errorCount = 0;
 
-          for (const blob of blobs) {
-            // Only process files that match our expected pattern
-            if (!blob.key.includes('/matches.json')) {
-              console.log('Skipping non-match blob:', blob.key);
-              continue;
-            }
-
+          for (const blob of matchBlobs) {
+            console.log(`Processing blob: ${blob.key}`);
+            
             try {
               const blobRes = await fetch(`${NETLIFY_BLOBS_API}/${SITE_ID}/${blob.key}`, {
                 headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
               });
               
+              console.log(`Blob fetch status for ${blob.key}:`, blobRes.status);
+              
               if (blobRes.ok) {
                 const data = await blobRes.text();
                 processedCount++;
+                
+                console.log(`Data length for ${blob.key}:`, data?.length);
+                console.log(`First 200 chars:`, data?.substring(0, 200));
                 
                 if (data && data.trim()) {
                   try {
                     const matches = JSON.parse(data);
                     const matchArray = Array.isArray(matches) ? matches : [matches];
                     
-                    // Extract userId from the blob key (user-data/{userId}/matches.json)
+                    // Extract userId from the blob key
                     const keyParts = blob.key.split('/');
-                    const extractedUserId = keyParts.length >= 2 ? keyParts[1] : 'unknown';
+                    let extractedUserId = 'unknown';
+                    
+                    // Handle different key formats
+                    if (keyParts.length >= 3 && keyParts[0] === 'user-data') {
+                      extractedUserId = keyParts[1];
+                    } else if (keyParts.length >= 2) {
+                      extractedUserId = keyParts[0];
+                    }
+                    
+                    console.log(`Extracted userId: ${extractedUserId} from key: ${blob.key}`);
                     
                     // Add userId to each match
                     const matchesWithUserId = matchArray.map(match => ({
                       ...match,
-                      userId: extractedUserId
+                      userId: extractedUserId,
+                      blobKey: blob.key // Add for debugging
                     }));
                     
                     allMatches.push(...matchesWithUserId);
-                    console.log(`Processed ${matchesWithUserId.length} matches for user ${extractedUserId}`);
+                    console.log(`Added ${matchesWithUserId.length} matches for user ${extractedUserId}`);
                   } catch (parseError) {
                     console.error('Error parsing matches for blob:', blob.key, parseError);
+                    console.error('Raw data:', data);
                     errorCount++;
                   }
                 } else {
-                  console.log('Empty data for blob:', blob.key);
+                  console.log('Empty or whitespace-only data for blob:', blob.key);
                 }
               } else {
-                console.error('Failed to fetch blob:', blob.key, blobRes.status);
+                console.error('Failed to fetch blob:', blob.key, blobRes.status, blobRes.statusText);
+                const errorText = await blobRes.text();
+                console.error('Blob fetch error response:', errorText);
                 errorCount++;
               }
             } catch (fetchError) {
@@ -123,7 +189,8 @@ exports.handler = async function(event, context) {
             }
           }
 
-          console.log(`Admin query completed. Processed: ${processedCount}, Errors: ${errorCount}, Total matches: ${allMatches.length}`);
+          console.log(`=== ADMIN QUERY COMPLETED ===`);
+          console.log(`Processed: ${processedCount}, Errors: ${errorCount}, Total matches: ${allMatches.length}`);
 
           return {
             statusCode: 200,
@@ -132,19 +199,28 @@ exports.handler = async function(event, context) {
               data: allMatches,
               meta: {
                 totalBlobs: blobs.length,
+                matchBlobs: matchBlobs.length,
                 processedBlobs: processedCount,
                 errors: errorCount,
-                totalMatches: allMatches.length
+                totalMatches: allMatches.length,
+                successfulUrl,
+                debug: {
+                  siteId: SITE_ID,
+                  hasToken: !!ACCESS_TOKEN,
+                  userId: userId
+                }
               }
             })
           };
         } catch (error) {
-          console.error('Error retrieving all data:', error);
+          console.error('=== ADMIN ERROR ===:', error);
+          console.error('Error stack:', error.stack);
           return { 
             statusCode: 500, 
             body: JSON.stringify({ 
               error: 'Failed to retrieve all data',
-              details: error.message 
+              details: error.message,
+              stack: error.stack
             })
           };
         }

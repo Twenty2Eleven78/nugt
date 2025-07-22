@@ -47,10 +47,25 @@ exports.handler = async function(event, context) {
     
     const key = `user-data/${userId}/matches.json`;
 
+    // Helper function to check if user is admin
+    const isAdminUser = (userId) => {
+      // In production, you'd check against a proper admin list or database
+      // For now, checking if the userId corresponds to admin@nugt.app
+      return userId === 'admin' || userId.includes('admin');
+    };
+
     if (event.httpMethod === 'GET') {
       const isAdmin = event.queryStringParameters?.admin === 'true';
 
       if (isAdmin) {
+        // Verify admin permissions
+        if (!isAdminUser(userId)) {
+          return {
+            statusCode: 403,
+            body: JSON.stringify({ error: 'Insufficient permissions for admin access' })
+          };
+        }
+
         // Admin request to get all matches
         console.log('=== ADMIN REQUEST STARTED ===');
         console.log('User ID from token:', userId);
@@ -147,11 +162,13 @@ exports.handler = async function(event, context) {
                     
                     console.log(`Extracted userId: ${extractedUserId} from key: ${blob.key}`);
                     
-                    // Add userId to each match
-                    const matchesWithUserId = matchArray.map(match => ({
+                    // Add userId and other metadata to each match
+                    const matchesWithUserId = matchArray.map((match, index) => ({
                       ...match,
                       userId: extractedUserId,
-                      blobKey: blob.key // Add for debugging
+                      blobKey: blob.key,
+                      matchIndex: index, // Add index for deletion
+                      id: `${extractedUserId}_${index}_${match.savedAt || Date.now()}` // Unique ID
                     }));
                     
                     allMatches.push(...matchesWithUserId);
@@ -289,6 +306,10 @@ exports.handler = async function(event, context) {
         
         // Add new match data
         const newMatch = JSON.parse(event.body);
+        // Add timestamp if not present
+        if (!newMatch.savedAt) {
+          newMatch.savedAt = Date.now();
+        }
         matches.push(newMatch);
         
         // Keep only the latest 50 matches
@@ -325,6 +346,131 @@ exports.handler = async function(event, context) {
         return { 
           statusCode: 500, 
           body: JSON.stringify({ error: 'Failed to save data' }) 
+        };
+      }
+    }
+
+    if (event.httpMethod === 'DELETE') {
+      try {
+        const queryParams = event.queryStringParameters || {};
+        const targetUserId = queryParams.userId;
+        const matchIndex = parseInt(queryParams.matchIndex);
+
+        // Check if current user is admin or deleting their own data
+        if (!isAdminUser(userId) && userId !== targetUserId) {
+          return {
+            statusCode: 403,
+            body: JSON.stringify({ error: 'Insufficient permissions to delete this match' })
+          };
+        }
+
+        if (!targetUserId) {
+          return {
+            statusCode: 400,
+            body: JSON.stringify({ error: 'userId parameter is required for deletion' })
+          };
+        }
+
+        // Build the key for the target user's matches
+        const targetKey = `user-data/${targetUserId}/matches.json`;
+        const url = `${NETLIFY_BLOBS_API}/${SITE_ID}/${targetKey}`;
+        
+        // Get existing matches
+        const getRes = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
+        });
+        
+        if (!getRes.ok) {
+          if (getRes.status === 404) {
+            return {
+              statusCode: 404,
+              body: JSON.stringify({ error: 'No matches found for this user' })
+            };
+          }
+          return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Failed to retrieve user matches' })
+          };
+        }
+        
+        const existingData = await getRes.text();
+        let matches = [];
+        
+        try {
+          const parsed = JSON.parse(existingData);
+          matches = Array.isArray(parsed) ? parsed : [parsed];
+        } catch (parseError) {
+          return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Invalid data format' })
+          };
+        }
+
+        // Handle different deletion scenarios
+        if (!isNaN(matchIndex) && matchIndex >= 0) {
+          // Delete specific match by index
+          if (matchIndex >= matches.length) {
+            return {
+              statusCode: 404,
+              body: JSON.stringify({ error: 'Match index not found' })
+            };
+          }
+          
+          const deletedMatch = matches.splice(matchIndex, 1)[0];
+          
+          // Save updated matches array
+          const saveRes = await fetch(url, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${ACCESS_TOKEN}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(matches)
+          });
+          
+          if (!saveRes.ok) {
+            return {
+              statusCode: 500,
+              body: JSON.stringify({ error: 'Failed to save updated matches' })
+            };
+          }
+          
+          return {
+            statusCode: 200,
+            body: JSON.stringify({ 
+              message: 'Match deleted successfully',
+              deletedMatch: deletedMatch,
+              remainingMatches: matches.length
+            })
+          };
+        } else {
+          // Delete all matches for the user
+          const deleteRes = await fetch(url, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
+          });
+          
+          if (!deleteRes.ok && deleteRes.status !== 404) {
+            return {
+              statusCode: 500,
+              body: JSON.stringify({ error: 'Failed to delete user matches' })
+            };
+          }
+          
+          return {
+            statusCode: 200,
+            body: JSON.stringify({ 
+              message: 'All matches deleted successfully for user',
+              deletedCount: matches.length,
+              userId: targetUserId
+            })
+          };
+        }
+      } catch (error) {
+        console.error('Error deleting data:', error);
+        return {
+          statusCode: 500,
+          body: JSON.stringify({ error: 'Failed to delete data' })
         };
       }
     }

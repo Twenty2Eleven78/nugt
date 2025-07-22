@@ -77,5 +77,32 @@ export const userMatchesApi = {
 
     const response = await res.json();
     return response.data;
+  },
+
+  async deleteMatchData(userId, matchIndex) {
+    const token = await authService.getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token available');
+    }
+
+    const res = await fetch('/.netlify/functions/user-matches', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ 
+        userId: userId,
+        matchIndex: matchIndex 
+      })
+    });
+
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(error.error || 'Failed to delete match data');
+    }
+
+    const response = await res.json();
+    return response;
   }
 };

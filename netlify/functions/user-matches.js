@@ -65,6 +65,7 @@ exports.handler = async function(event, context) {
           }
 
           const { blobs = [], directories = [] } = await res.json();
+          console.log('Admin: Fetched directories:', JSON.stringify(directories, null, 2));
           const allMatches = [];
 
           for (const dir of directories) {
@@ -75,21 +76,28 @@ exports.handler = async function(event, context) {
 
             if (userBlobsRes.ok) {
               const { blobs: userBlobs = [] } = await userBlobsRes.json();
+              console.log(`Admin: Fetched blobs for directory ${dir}:`, JSON.stringify(userBlobs, null, 2));
               for (const blob of userBlobs) {
+                console.log(`Admin: Processing blob key: ${blob.key}`);
                 const blobRes = await fetch(`${NETLIFY_BLOBS_API}/${SITE_ID}/${blob.key}`, {
                   headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
                 });
                 if (blobRes.ok) {
                   const data = await blobRes.text();
+                  console.log(`Admin: Fetched data for key ${blob.key}:`, data);
                   try {
                     const matches = data ? JSON.parse(data) : [];
                     const matchArray = Array.isArray(matches) ? matches : [matches];
                     allMatches.push(...matchArray.map(match => ({ ...match, userId: blob.key.split('/')[1] })));
                   } catch (e) {
-                    // ignore parsing errors
+                    console.error(`Admin: Error parsing JSON for key ${blob.key}:`, e);
                   }
+                } else {
+                  console.error(`Admin: Error fetching blob content for key ${blob.key}, status: ${blobRes.status}`);
                 }
               }
+            } else {
+                console.error(`Admin: Error fetching blobs for directory ${dir}, status: ${userBlobsRes.status}`);
             }
           }
 

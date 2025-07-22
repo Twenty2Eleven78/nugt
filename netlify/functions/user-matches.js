@@ -52,7 +52,7 @@ exports.handler = async function(event, context) {
       if (isAdmin) {
         // Admin request to get all matches
         try {
-          const url = `${NETLIFY_BLOBS_API}/${SITE_ID}?prefix=user-data`;
+          const url = `${NETLIFY_BLOBS_API}/${SITE_ID}?prefix=user-data/&directories=true`;
           const res = await fetch(url, {
             headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
           });
@@ -64,22 +64,31 @@ exports.handler = async function(event, context) {
             };
           }
 
-          const { blobs = [] } = await res.json();
-          console.log('blobs:', blobs);
+          const { blobs = [], directories = [] } = await res.json();
           const allMatches = [];
 
-          for (const blob of blobs) {
-            const blobRes = await fetch(`${NETLIFY_BLOBS_API}/${SITE_ID}/${blob.key}`, {
+          for (const dir of directories) {
+            const userBlobsUrl = `${NETLIFY_BLOBS_API}/${SITE_ID}?prefix=${dir}`;
+            const userBlobsRes = await fetch(userBlobsUrl, {
               headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
             });
-            if (blobRes.ok) {
-              const data = await blobRes.text();
-              try {
-                const matches = data ? JSON.parse(data) : [];
-                const matchArray = Array.isArray(matches) ? matches : [matches];
-                allMatches.push(...matchArray.map(match => ({ ...match, userId: blob.key.split('/')[1] })));
-              } catch (e) {
-                // ignore parsing errors
+
+            if (userBlobsRes.ok) {
+              const { blobs: userBlobs = [] } = await userBlobsRes.json();
+              for (const blob of userBlobs) {
+                const blobRes = await fetch(`${NETLIFY_BLOBS_API}/${SITE_ID}/${blob.key}`, {
+                  headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
+                });
+                if (blobRes.ok) {
+                  const data = await blobRes.text();
+                  try {
+                    const matches = data ? JSON.parse(data) : [];
+                    const matchArray = Array.isArray(matches) ? matches : [matches];
+                    allMatches.push(...matchArray.map(match => ({ ...match, userId: blob.key.split('/')[1] })));
+                  } catch (e) {
+                    // ignore parsing errors
+                  }
+                }
               }
             }
           }

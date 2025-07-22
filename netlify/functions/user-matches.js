@@ -58,62 +58,46 @@ exports.handler = async function(event, context) {
         console.log('Access token exists:', !!ACCESS_TOKEN);
         
         try {
-          // Try different approaches to list blobs
-          const attempts = [
-            `${NETLIFY_BLOBS_API}/${SITE_ID}?prefix=user-data`,
-            `${NETLIFY_BLOBS_API}/${SITE_ID}`,
-            `${NETLIFY_BLOBS_API}/${SITE_ID}?prefix=user-data/`
-          ];
+          // The API returned stores, not blobs. We need to query the store directly.
+          const storeUrl = `${NETLIFY_BLOBS_API}/${SITE_ID}/user-data`;
+          console.log('Querying store directly:', storeUrl);
           
-          let blobs = [];
-          let successfulUrl = null;
-          
-          for (const url of attempts) {
-            console.log('Trying URL:', url);
-            const res = await fetch(url, {
-              headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
-            });
+          const res = await fetch(storeUrl, {
+            headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
+          });
 
-            console.log('Response status:', res.status);
-            console.log('Response headers:', Object.fromEntries(res.headers.entries()));
+          console.log('Store response status:', res.status);
+          console.log('Store response headers:', Object.fromEntries(res.headers.entries()));
 
-            if (res.ok) {
-              const responseData = await res.json();
-              console.log('Response data:', responseData);
-              blobs = responseData.blobs || [];
-              successfulUrl = url;
-              break;
-            } else {
-              console.error(`Failed with URL ${url}:`, res.status, res.statusText);
-              const errorText = await res.text();
-              console.error('Error response:', errorText);
-            }
-          }
-          
-          if (!successfulUrl) {
-            console.error('All blob listing attempts failed');
+          if (!res.ok) {
+            console.error('Failed to query store:', res.status, res.statusText);
+            const errorText = await res.text();
+            console.error('Store error response:', errorText);
             return { 
               statusCode: 500,
               body: JSON.stringify({ 
-                error: 'Failed to retrieve data - all attempts failed',
+                error: 'Failed to retrieve data from store',
                 debug: {
                   siteId: SITE_ID,
                   hasToken: !!ACCESS_TOKEN,
-                  attemptsCount: attempts.length
+                  storeUrl
                 }
               })
             };
           }
 
-          console.log('Successful URL:', successfulUrl);
-          console.log('Total blobs found:', blobs.length);
+          const storeData = await res.json();
+          console.log('Store response data:', storeData);
+          
+          const blobs = storeData.blobs || [];
+          console.log('Total blobs found in store:', blobs.length);
           console.log('All blob keys:', blobs.map(b => b.key));
           
           // Filter blobs that contain match data
           const matchBlobs = blobs.filter(blob => {
             const isMatchFile = blob.key.includes('matches.json') || 
                                blob.key.includes('/matches') ||
-                               blob.key.startsWith('user-data/');
+                               blob.key.endsWith('.json');
             console.log(`Blob ${blob.key}: isMatchFile=${isMatchFile}`);
             return isMatchFile;
           });
@@ -129,7 +113,10 @@ exports.handler = async function(event, context) {
             console.log(`Processing blob: ${blob.key}`);
             
             try {
-              const blobRes = await fetch(`${NETLIFY_BLOBS_API}/${SITE_ID}/${blob.key}`, {
+              const blobUrl = `${NETLIFY_BLOBS_API}/${SITE_ID}/user-data/${blob.key}`;
+              console.log(`Fetching blob from: ${blobUrl}`);
+              
+              const blobRes = await fetch(blobUrl, {
                 headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
               });
               
@@ -152,10 +139,10 @@ exports.handler = async function(event, context) {
                     let extractedUserId = 'unknown';
                     
                     // Handle different key formats
-                    if (keyParts.length >= 3 && keyParts[0] === 'user-data') {
-                      extractedUserId = keyParts[1];
-                    } else if (keyParts.length >= 2) {
-                      extractedUserId = keyParts[0];
+                    if (keyParts.length >= 2) {
+                      extractedUserId = keyParts[0]; // First part should be userId
+                    } else {
+                      extractedUserId = blob.key.replace(/\.json$/, '').replace(/\/.*$/, '');
                     }
                     
                     console.log(`Extracted userId: ${extractedUserId} from key: ${blob.key}`);
@@ -203,11 +190,11 @@ exports.handler = async function(event, context) {
                 processedBlobs: processedCount,
                 errors: errorCount,
                 totalMatches: allMatches.length,
-                successfulUrl,
                 debug: {
                   siteId: SITE_ID,
                   hasToken: !!ACCESS_TOKEN,
-                  userId: userId
+                  userId: userId,
+                  storeUrl
                 }
               }
             })

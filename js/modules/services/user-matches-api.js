@@ -48,6 +48,27 @@ export const userMatchesApi = {
     
     const response = await res.json();
     return response.data;
+  },
+
+  async loadAllMatchData() {
+    const token = await authService.getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token available');
+    }
+
+    const res = await fetch('/.netlify/functions/user-matches?admin=true', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(error.error || 'Failed to load all match data');
+    }
+
+    const response = await res.json();
+    return response.data;
   }
 };
 

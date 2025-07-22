@@ -51,7 +51,8 @@ exports.handler = async function(event, context) {
     const isAdminUser = (userId) => {
       // In production, you'd check against a proper admin list or database
       // For now, checking if the userId corresponds to admin@nugt.app
-      return userId === 'admin' || userId.includes('admin');
+      const adminUsers = ['admin', 'admin@nugt.app'];
+      return adminUsers.includes(userId) || userId.includes('admin@');
     };
 
     if (event.httpMethod === 'GET') {

@@ -9,13 +9,21 @@ export const userMatchesApi = {
       throw new Error('No authentication token available');
     }
 
+    // Get current user info to include with match data
+    const currentUser = authService.getCurrentUser();
+    const enhancedMatchData = {
+      ...matchData,
+      userEmail: currentUser?.email || 'unknown@example.com',
+      userName: currentUser?.name || 'Unknown User'
+    };
+
     const res = await fetch('/.netlify/functions/user-matches', {
       method: 'PUT',
       headers: { 
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify(matchData)
+      body: JSON.stringify(enhancedMatchData)
     });
     
     if (!res.ok) {
@@ -71,5 +79,3 @@ export const userMatchesApi = {
     return response.data;
   }
 };
-
-

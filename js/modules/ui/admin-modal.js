@@ -36,11 +36,17 @@ const init = () => {
     modalInstance = new bootstrap.Modal(modalElement);
 
     modalElement.addEventListener('show.bs.modal', async () => {
+        console.log('Admin modal is being shown.');
         const tableBody = document.getElementById('matches-table-body');
-        if (!tableBody) return;
+        if (!tableBody) {
+            console.error('Could not find table body for admin modal.');
+            return;
+        }
 
         try {
+            console.log('Loading all match data...');
             const matches = await userMatchesApi.loadAllMatchData();
+            console.log('Loaded match data:', matches);
             if (matches && matches.length > 0) {
                 tableBody.innerHTML = ''; // Clear existing data
                 matches.forEach(match => {
@@ -54,10 +60,11 @@ const init = () => {
                     tableBody.appendChild(row);
                 });
             } else {
+                console.log('No matches found.');
                 tableBody.innerHTML = '<tr><td colspan="4">No matches found.</td></tr>';
             }
         } catch (error) {
-            console.error('Error loading matches:', error);
+            console.error('Error loading matches in admin modal:', error);
             tableBody.innerHTML = '<tr><td colspan="4">Error loading matches.</td></tr>';
         }
     });

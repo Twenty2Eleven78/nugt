@@ -412,7 +412,7 @@ class AuthService {
 
   isAdmin() {
     // In a real application, this should be a proper role check on the server
-    return this.currentUser && this.currentUser.email === 'admin@nufc.com';
+    return this.currentUser && this.currentUser.email === 'admin@nugt.app';
   }
 
   /**

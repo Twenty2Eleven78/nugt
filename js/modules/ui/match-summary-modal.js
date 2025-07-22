@@ -38,9 +38,11 @@ class MatchSummaryModal {
    */
   _populateModal(matchData) {
     document.getElementById('summaryModalTitle').textContent = matchData.title;
-    document.getElementById('summaryTeam1Name').textContent = matchData.team1Name;
-    document.getElementById('summaryTeam2Name').textContent = matchData.team2Name;
-    document.getElementById('summaryScore').textContent = `${matchData.score1} - ${matchData.score2}`;
+    document.getElementById('summaryScore').innerHTML = `
+      <span class="team-name">${matchData.team1Name}</span>
+      <span class="score">${matchData.score1} - ${matchData.score2}</span>
+      <span class="team-name">${matchData.team2Name}</span>
+    `;
     document.getElementById('summaryGameTime').textContent = this._formatTime(matchData.gameTime);
     document.getElementById('summaryNotes').textContent = matchData.notes || 'No notes for this match.';
 
@@ -80,37 +82,28 @@ class MatchSummaryModal {
       const team1Goals = matchData.goals.filter(goal => goal.team === 1);
       const team2Goals = matchData.goals.filter(goal => goal.team === 2);
 
-      if (team1Goals.length > 0) {
-        const team1Title = document.createElement('h6');
-        team1Title.textContent = matchData.team1Name;
-        goalsElement.appendChild(team1Title);
-        const goalSummary = team1Goals.reduce((acc, goal) => {
-            acc[goal.goalScorerName] = (acc[goal.goalScorerName] || 0) + 1;
-            return acc;
-        }, {});
-        Object.entries(goalSummary).forEach(([scorer, count]) => {
-            const goalElement = document.createElement('div');
-            goalElement.className = 'goal-item';
-            goalElement.innerHTML = `<p><strong>${scorer}</strong>: ${count}</p>`;
-            goalsElement.appendChild(goalElement);
-        });
-      }
+      const goalsByTeam = matchData.goals.reduce((acc, goal) => {
+        const teamName = goal.team === 1 ? matchData.team1Name : matchData.team2Name;
+        if (!acc[teamName]) {
+          acc[teamName] = {};
+        }
+        acc[teamName][goal.goalScorerName] = (acc[teamName][goal.goalScorerName] || 0) + 1;
+        return acc;
+      }, {});
 
-      if (team2Goals.length > 0) {
-        const team2Title = document.createElement('h6');
-        team2Title.textContent = matchData.team2Name;
-        goalsElement.appendChild(team2Title);
-        const goalSummary = team2Goals.reduce((acc, goal) => {
-            acc[goal.goalScorerName] = (acc[goal.goalScorerName] || 0) + 1;
-            return acc;
-        }, {});
-        Object.entries(goalSummary).forEach(([scorer, count]) => {
-            const goalElement = document.createElement('div');
-            goalElement.className = 'goal-item';
-            goalElement.innerHTML = `<p><strong>${scorer}</strong>: ${count}</p>`;
-            goalsElement.appendChild(goalElement);
+      Object.entries(goalsByTeam).forEach(([teamName, scorers]) => {
+        const teamTitle = document.createElement('h6');
+        teamTitle.className = 'team-goal-header';
+        teamTitle.textContent = teamName;
+        goalsElement.appendChild(teamTitle);
+
+        Object.entries(scorers).forEach(([scorer, count]) => {
+          const goalElement = document.createElement('div');
+          goalElement.className = 'goal-item';
+          goalElement.innerHTML = `<p>${scorer}: <span class="goal-count">${count}</span></p>`;
+          goalsElement.appendChild(goalElement);
         });
-      }
+      });
     } else {
       goalsElement.innerHTML = '<p>No goals recorded for this match.</p>';
     }
@@ -136,8 +129,7 @@ class MatchSummaryModal {
             </div>
             <div class="modal-body">
               <div class="text-center mb-4">
-                <h2 id="summaryScore"></h2>
-                <h4 id="summaryTeam1Name" class="d-inline"></h4> vs <h4 id="summaryTeam2Name" class="d-inline"></h4>
+                <h2 id="summaryScore" class="summary-score-line"></h2>
                 <p>Game Time: <span id="summaryGameTime"></span></p>
               </div>
               <div class="mb-4">

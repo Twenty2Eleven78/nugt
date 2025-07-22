@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const adminModalButton = document.getElementById('admin-modal-button');
   if (adminModalButton) {
-      authService.onAuthStateChanged(user => {
-          if (user && authService.isAdmin()) {
+      authService.onAuthStateChange(user => {
+          if (authService.isUserAuthenticated() && authService.isAdmin()) {
               adminModalButton.classList.remove('d-none');
               adminModalButton.addEventListener('click', () => {
                   adminModal.show();

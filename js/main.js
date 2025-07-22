@@ -8,10 +8,26 @@
  */
 
 import { initializeApp } from './modules/app.js';
+import { adminModal } from './modules/ui/admin-modal.js';
+import { authService } from './modules/services/auth.js';
 
 // Initialize the application when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   initializeApp();
+
+  const adminModalButton = document.getElementById('admin-modal-button');
+  if (adminModalButton) {
+      authService.onAuthStateChanged(user => {
+          if (user && authService.isAdmin()) {
+              adminModalButton.classList.remove('d-none');
+              adminModalButton.addEventListener('click', () => {
+                  adminModal.show();
+              });
+          } else {
+              adminModalButton.classList.add('d-none');
+          }
+      });
+  }
 });
 
 // Handle page visibility changes for timer accuracy

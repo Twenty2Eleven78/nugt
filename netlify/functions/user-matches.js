@@ -48,14 +48,31 @@ exports.handler = async function(event, context) {
     const key = `user-data/${userId}/matches.json`;
 
     // Helper function to check if user is admin
-    const isAdminUser = (userId) => {
-      // In production, you'd check against a proper admin list or database
-      // For now, checking if the userId corresponds to admin@nugt.app
-      const adminUsers = ['admin', 'admin@nugt.app'];
-      return adminUsers.includes(userId) || userId.includes('admin@');
-      console.log('Extracted userId:', userId);
-console.log('isAdminUser result:', isAdminUser(userId));
-    };
+   const isAdminUser = (userId) => {
+  console.log('Checking admin access for userId:', userId); // Debug logging
+  
+  // List of admin identifiers
+  const adminUsers = [
+    'admin',
+    'admin@nugt.app',
+    'admin@nugt.com'
+  ];
+  
+  // Check exact matches first
+  if (adminUsers.includes(userId)) {
+    console.log('Admin access granted - exact match');
+    return true;
+  }
+  
+  // Check if userId contains admin pattern
+  if (userId && (userId.includes('admin@') || userId.toLowerCase().includes('admin'))) {
+    console.log('Admin access granted - pattern match');
+    return true;
+  }
+  
+  console.log('Admin access denied');
+  return false;
+};
 
     if (event.httpMethod === 'GET') {
       const isAdmin = event.queryStringParameters?.admin === 'true';

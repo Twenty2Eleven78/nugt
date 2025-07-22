@@ -48,46 +48,92 @@ exports.handler = async function(event, context) {
 
     if (event.httpMethod === 'GET') {
       try {
-        // Retrieve user data
-        const url = `${NETLIFY_BLOBS_API}/${SITE_ID}/${key}`;
-        const res = await fetch(url, {
-          headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
-        });
-        if (!res.ok) {
-          if (res.status === 404) {
-            // Return empty array for new users
+        const isAdmin = event.queryStringParameters.admin === 'true';
+
+        if (isAdmin) {
+          // Admin user - fetch all user data
+          const url = `${NETLIFY_BLOBS_API}/${SITE_ID}?prefix=user-data/`;
+          const res = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
+          });
+
+          if (!res.ok) {
             return { 
-              statusCode: 200, 
-              body: JSON.stringify({
-                message: 'No matches found',
-                data: []
-              })
+              statusCode: 500,
+              body: JSON.stringify({ error: 'Failed to retrieve data for admin' })
             };
           }
-          return { 
-            statusCode: 500, 
-            body: JSON.stringify({ error: 'Failed to retrieve data' }) 
-          };
-        }
-        const data = await res.text();
-        try {
-          // Try to parse the data as JSON to ensure it's valid
-          const matches = data ? JSON.parse(data) : [];
-          // Ensure we always return an array
-          const matchArray = Array.isArray(matches) ? matches : [matches];
-          return { 
-            statusCode: 200, 
+
+          const { blobs } = await res.json();
+          const allMatches = [];
+
+          for (const blob of blobs) {
+            const blobUrl = `${NETLIFY_BLOBS_API}/${SITE_ID}/${blob.key}`;
+            const blobRes = await fetch(blobUrl, {
+              headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
+            });
+
+            if (blobRes.ok) {
+              const data = await blobRes.text();
+              try {
+                const matches = data ? JSON.parse(data) : [];
+                const matchArray = Array.isArray(matches) ? matches : [matches];
+                allMatches.push(...matchArray);
+              } catch (parseError) {
+                console.error(`Error parsing data for blob ${blob.key}:`, parseError);
+              }
+            }
+          }
+
+          return {
+            statusCode: 200,
             body: JSON.stringify({
-              message: 'Matches retrieved successfully',
-              data: matchArray
+              message: 'All matches retrieved successfully',
+              data: allMatches
             })
           };
-        } catch (parseError) {
-          console.error('Error parsing data:', parseError);
-          return {
-            statusCode: 500,
-            body: JSON.stringify({ error: 'Invalid data format' })
-          };
+        } else {
+          // Regular user - fetch their own data
+          const url = `${NETLIFY_BLOBS_API}/${SITE_ID}/${key}`;
+          const res = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
+          });
+          if (!res.ok) {
+            if (res.status === 404) {
+              // Return empty array for new users
+              return {
+                statusCode: 200,
+                body: JSON.stringify({
+                  message: 'No matches found',
+                  data: []
+                })
+              };
+            }
+            return {
+              statusCode: 500,
+              body: JSON.stringify({ error: 'Failed to retrieve data' })
+            };
+          }
+          const data = await res.text();
+          try {
+            // Try to parse the data as JSON to ensure it's valid
+            const matches = data ? JSON.parse(data) : [];
+            // Ensure we always return an array
+            const matchArray = Array.isArray(matches) ? matches : [matches];
+            return {
+              statusCode: 200,
+              body: JSON.stringify({
+                message: 'Matches retrieved successfully',
+                data: matchArray
+              })
+            };
+          } catch (parseError) {
+            console.error('Error parsing data:', parseError);
+            return {
+              statusCode: 500,
+              body: JSON.stringify({ error: 'Invalid data format' })
+            };
+          }
         }
       } catch (error) {
         console.error('Error retrieving data:', error);

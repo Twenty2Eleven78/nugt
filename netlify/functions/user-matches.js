@@ -64,9 +64,7 @@ exports.handler = async function(event, context) {
             };
           }
 
-          const response = await res.json();
-          console.log('Netlify Blobs API response:', response);
-          const { blobs = [] } = response;
+          const { blobs = [] } = await res.json();
           const allMatches = [];
 
           for (const blob of blobs) {
@@ -94,6 +92,7 @@ exports.handler = async function(event, context) {
           };
         } catch (error) {
           console.error('Error retrieving all data:', error);
+          console.log('Error:', error);
           return { 
             statusCode: 500, 
             body: JSON.stringify({ error: 'Failed to retrieve all data' })

@@ -19,7 +19,7 @@ exports.handler = async function(event, context) {
     
     try {
       // Our token is base64 encoded as userId:timestamp
-      const decoded = atob(token).split(':');
+      const decoded = Buffer.from(token, 'base64').toString('binary').split(':');
       userId = decoded[0];
       const timestamp = decoded[1];
       
@@ -52,7 +52,7 @@ exports.handler = async function(event, context) {
       if (isAdmin) {
         // Admin request to get all matches
         try {
-          const url = `${NETLIFY_BLOBS_API}/${SITE_ID}?prefix=user-data/`;
+          const url = `${NETLIFY_BLOBS_API}/${SITE_ID}?prefix=user-data`;
           const res = await fetch(url, {
             headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
           });
@@ -64,7 +64,8 @@ exports.handler = async function(event, context) {
             };
           }
 
-          const { blobs } = await res.json();
+          const { blobs = [] } = await res.json();
+          console.log('blobs:', blobs);
           const allMatches = [];
 
           for (const blob of blobs) {
@@ -92,6 +93,7 @@ exports.handler = async function(event, context) {
           };
         } catch (error) {
           console.error('Error retrieving all data:', error);
+          console.log('Error:', error);
           return { 
             statusCode: 500, 
             body: JSON.stringify({ error: 'Failed to retrieve all data' })

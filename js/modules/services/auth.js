@@ -94,6 +94,13 @@ class AuthService {
       this.authTimestamp = authTimestamp;
       this.notifyAuthStateChange();
       
+      if (this.isAdmin()) {
+        const adminLink = document.getElementById('admin-link');
+        if (adminLink) {
+          adminLink.classList.remove('d-none');
+        }
+      }
+
       // Track usage
       this.trackUsage('app_open');
       return true;
@@ -401,6 +408,11 @@ class AuthService {
    */
   getCurrentUser() {
     return this.currentUser;
+  }
+
+  isAdmin() {
+    // In a real application, this should be a proper role check on the server
+    return this.currentUser && this.currentUser.email === 'admin@nufc.com';
   }
 
   /**

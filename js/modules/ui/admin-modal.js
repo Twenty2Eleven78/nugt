@@ -1,4 +1,4 @@
-import { Modal } from 'bootstrap';
+import { Modal } from '../../bootstrap.bundle.min.js';
 import { userMatchesApi } from '../services/user-matches-api.js';
 
 const modalHtml = `

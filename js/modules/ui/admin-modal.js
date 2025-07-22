@@ -1,4 +1,3 @@
-import { Modal } from '../../bootstrap.bundle.min.js';
 import { userMatchesApi } from '../services/user-matches-api.js';
 
 const modalHtml = `
@@ -34,7 +33,7 @@ let modalInstance = null;
 const init = () => {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
     const modalElement = document.getElementById('admin-modal');
-    modalInstance = new Modal(modalElement);
+    modalInstance = new bootstrap.Modal(modalElement);
 
     modalElement.addEventListener('show.bs.modal', async () => {
         const tableBody = document.getElementById('matches-table-body');

@@ -68,6 +68,7 @@ exports.handler = async function(event, context) {
           const allMatches = [];
 
           for (const blob of blobs) {
+            console.log('blob.key:', blob.key);
             const blobRes = await fetch(`${NETLIFY_BLOBS_API}/${SITE_ID}/${blob.key}`, {
               headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
             });
@@ -76,7 +77,7 @@ exports.handler = async function(event, context) {
               try {
                 const matches = data ? JSON.parse(data) : [];
                 const matchArray = Array.isArray(matches) ? matches : [matches];
-                allMatches.push(...matchArray.map(match => ({ ...match, userId: blob.key.split('/')[2] })));
+                allMatches.push(...matchArray.map(match => ({ ...match, userId: blob.key.split('/')[1] })));
               } catch (e) {
                 // ignore parsing errors
               }

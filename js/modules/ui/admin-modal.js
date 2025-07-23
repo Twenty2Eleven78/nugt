@@ -1,5 +1,6 @@
 import { userMatchesApi } from '../services/user-matches-api.js';
 import { notificationManager } from '../services/notifications.js';
+import { matchSummaryModal } from './match-summary-modal.js';
 
 const modalHtml = `
 <div class="modal fade" id="admin-modal" tabindex="-1" aria-labelledby="admin-modal-label" aria-hidden="true">

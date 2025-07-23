@@ -15,13 +15,14 @@ exports.handler = async function(event, context) {
 
     // Get token from header and decode it
     const token = authHeader.split(' ')[1];
-    let userId;
+    let userId, userEmail;
     
     try {
-      // Our token is base64 encoded as userId:timestamp
+      // Our token is now base64 encoded as userId:email:timestamp
       const decoded = Buffer.from(token, 'base64').toString('binary').split(':');
       userId = decoded[0];
-      const timestamp = decoded[1];
+      userEmail = decoded[1];
+      const timestamp = decoded[2];
       
       // Basic validation - token shouldn't be older than 24 hours
       const tokenAge = Date.now() - Number(timestamp);
@@ -48,26 +49,29 @@ exports.handler = async function(event, context) {
     const key = `user-data/${userId}/matches.json`;
 
     // Helper function to check if user is admin
-const isAdminUser = (userId) => {
-  console.log('Checking admin access for userId:', userId);
+    const isAdminUser = (userId, userEmail) => {
+      console.log('Checking admin access for userId:', userId, 'email:', userEmail);
   
-  // Get admin identifiers from environment variables
-  const adminEmails = process.env.ADMIN_EMAILS ? 
-    process.env.ADMIN_EMAILS.split(',').map(email => email.trim()) : 
-    [];
+      // Get admin identifiers from environment variables
+      const adminEmails = process.env.ADMIN_EMAILS ? 
+        process.env.ADMIN_EMAILS.split(',').map(email => email.trim().toLowerCase()) : 
+        [];
+      
+      const adminUserIds = process.env.ADMIN_USER_IDS ? 
+        process.env.ADMIN_USER_IDS.split(',').map(id => id.trim()) : 
+        [];
+      
+      console.log('Checking against admin emails:', adminEmails);
+      console.log('Checking against admin user IDs:', adminUserIds);
   
-  const adminUserIds = process.env.ADMIN_USER_IDS ? 
-    process.env.ADMIN_USER_IDS.split(',').map(id => id.trim()) : 
-    [];
+      // Check if userEmail matches any admin email OR userId matches any admin user ID
+      const isAdminByEmail = adminEmails.includes(userEmail.toLowerCase());
+      const isAdminByUserId = adminUserIds.includes(userId);
+      const isAdmin = isAdminByEmail || isAdminByUserId;
   
-  console.log('Checking against admin emails:', adminEmails.length);
-  console.log('Checking against admin user IDs:', adminUserIds.length);
-  
-  // Check if userId matches any admin email or user ID
-  const isAdmin = adminEmails.includes(userId) || adminUserIds.includes(userId);
-  
-  console.log('Admin access:', isAdmin ? 'granted' : 'denied');
-  return isAdmin;
+      console.log('Admin access:', isAdmin ? 'granted' : 'denied', 
+                  `(by email: ${isAdminByEmail}, by userId: ${isAdminByUserId})`);
+      return isAdmin;
 };
 
     if (event.httpMethod === 'GET') {
@@ -75,7 +79,7 @@ const isAdminUser = (userId) => {
 
       if (isAdmin) {
         // Verify admin permissions
-        if (!isAdminUser(userId)) {
+        if (!isAdminUser(userId, userEmail)) {
           return {
             statusCode: 403,
             body: JSON.stringify({ error: 'Insufficient permissions for admin access' })
@@ -85,6 +89,7 @@ const isAdminUser = (userId) => {
         // Admin request to get all matches
         console.log('=== ADMIN REQUEST STARTED ===');
         console.log('User ID from token:', userId);
+        console.log('User Email from token:', userEmail);
         console.log('Site ID:', SITE_ID);
         console.log('Access token exists:', !!ACCESS_TOKEN);
         
@@ -372,8 +377,8 @@ const isAdminUser = (userId) => {
         const targetUserId = queryParams.userId;
         const matchIndex = parseInt(queryParams.matchIndex);
 
-        // Check if current user is admin or deleting their own data
-        if (!isAdminUser(userId) && userId !== targetUserId) {
+// Check if current user is admin or deleting their own data
+        if (!isAdminUser(userId, userEmail) && userId !== targetUserId) {
           return {
             statusCode: 403,
             body: JSON.stringify({ error: 'Insufficient permissions to delete this match' })

@@ -38,19 +38,22 @@ class AuthService {
     if (!this.isAuthenticated) {
       return null;
     }
+    
     // In a production environment, this would fetch a fresh token from your auth provider
     // For now, we'll use a simple mock token based on the user ID
     const userId = this.currentUser?.id || storage.load(AUTH_STORAGE_KEYS.USER_ID);
-    if (!userId) return null;
+    const email = this.currentUser?.email || storage.load(AUTH_STORAGE_KEYS.EMAIL);
+    if (!userId || !email) return null;
     
     // Cache token for 1 hour to avoid generating new ones too frequently
     if (this.authToken && this.authTimestamp && (Date.now() - this.authTimestamp) < 3600000) {
       return this.authToken;
     }
     
-    // Generate a basic token using the user ID
-    // This is just for demonstration - in production use a proper JWT or other secure token
-    this.authToken = btoa(`${userId}:${Date.now()}`);
+  // Include both userId and email in the token
+  // Format: userId:email:timestamp
+    const tokenData = `${userId}:${email}:${Date.now()}`;
+    this.authToken = btoa(tokenData);
     this.authTimestamp = Date.now();
     return this.authToken;
   }

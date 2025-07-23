@@ -247,7 +247,6 @@ const loadMatchesData = async () => {
 
         } else {
             showNoDataMessage();
-            notificationManager.warning('No match data found.');
         }
     } catch (error) {
         console.error('Error loading matches:', error);

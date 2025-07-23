@@ -377,7 +377,7 @@ exports.handler = async function(event, context) {
         const targetUserId = queryParams.userId;
         const matchIndex = parseInt(queryParams.matchIndex);
 
-// Check if current user is admin or deleting their own data
+      // Check if current user is admin or deleting their own data
         if (!isAdminUser(userId, userEmail) && userId !== targetUserId) {
           return {
             statusCode: 403,

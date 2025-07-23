@@ -450,13 +450,54 @@ const handleDeleteConfirm = async () => {
         confirmBtn.disabled = true;
         confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
         
+        // Debug the match data
+        console.log('Attempting to delete match:', currentDeleteMatch.data);
+        console.log('Match userId:', currentDeleteMatch.data.userId);
+        console.log('Match index:', currentDeleteMatch.index);
+        console.log('Match blobKey:', currentDeleteMatch.data.blobKey);
+
+         // Validate that we have the required data
+        if (!currentDeleteMatch.data.userId || currentDeleteMatch.data.userId === 'unknown') {
+            // For matches without proper userId, we need to handle them differently
+            notificationManager.warning('This match has missing or invalid userId. It may be orphaned data that cannot be deleted through the normal API.');
+            
+            // Ask user if they want to remove it from the display only
+            const removeFromDisplay = confirm('This match appears to be orphaned data. Would you like to remove it from the display? (Note: This will only hide it from the admin panel, not delete the actual data)');
+            
+            if (removeFromDisplay) {
+                // Remove from local array and re-render
+                allMatches.splice(currentDeleteMatch.index, 1);
+                
+                // Re-render all views
+                renderDesktopTable(allMatches);
+                renderMobileCards(allMatches);
+                
+                const tableViewRadio = document.getElementById('table-view');
+                if (tableViewRadio && tableViewRadio.checked) {
+                    renderMobileTable(allMatches);
+                }
+                
+                const statsDiv = document.getElementById('admin-stats');
+                renderStats(allMatches, statsDiv);
+                
+                deleteModalInstance.hide();
+                notificationManager.info('Match removed from display. (Orphaned data may still exist in storage)');
+                currentDeleteMatch = null;
+                return;
+            } else {
+                deleteModalInstance.hide();
+                currentDeleteMatch = null;
+                return;
+            }
+        }
+
         // Call the actual delete API
         await userMatchesApi.deleteMatchData(
             currentDeleteMatch.data.userId, 
             currentDeleteMatch.index
         );
         
-        // For now, just remove from local array and re-render
+        // Remove from local array and re-render
         allMatches.splice(currentDeleteMatch.index, 1);
         
         // Re-render all views

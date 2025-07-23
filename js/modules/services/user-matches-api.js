@@ -85,16 +85,17 @@ export const userMatchesApi = {
       throw new Error('No authentication token available');
     }
 
-    const res = await fetch('/.netlify/functions/user-matches', {
+    // Build query parameters
+    const params = new URLSearchParams({ userId });
+    if (matchIndex !== null && matchIndex !== undefined) {
+      params.append('matchIndex', matchIndex.toString());
+    }
+
+     const res = await fetch(`/.netlify/functions/user-matches?${params}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ 
-        userId: userId,
-        matchIndex: matchIndex 
-      })
+      }
     });
 
     if (!res.ok) {

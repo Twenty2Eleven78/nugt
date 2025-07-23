@@ -240,12 +240,18 @@ const loadMatchesData = async () => {
             renderDesktopTable(allMatches);
             renderMobileCards(allMatches);
             renderStats(allMatches, statsDiv);
+            // Show info notification about loaded data
+            notificationManager.info(`Loaded ${allMatches.length} matches from ${new Set(allMatches.map(m => m.userEmail || m.userId)).size} users.`);
+
         } else {
             showNoDataMessage();
+            notificationManager.warning('No match data found.');
         }
     } catch (error) {
         console.error('Error loading matches:', error);
         showErrorMessage(error.message);
+        // Show error notification using notification manager
+        notificationManager.error(`Failed to load match data: ${error.message}`);
     } finally {
         // Reset refresh button
         if (refreshBtn) {
@@ -443,12 +449,11 @@ const handleDeleteConfirm = async () => {
         confirmBtn.disabled = true;
         confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
         
-        // In a real implementation, you would call an API to delete the match
-        // For now, we'll just remove it from the local array and reload
-        console.log('Deleting match:', currentDeleteMatch.data);
-        
-        // TODO: Implement actual delete API call
-        // await userMatchesApi.deleteMatchData(currentDeleteMatch.data.userId, currentDeleteMatch.index);
+        // Call the actual delete API
+        await userMatchesApi.deleteMatchData(
+            currentDeleteMatch.data.userId, 
+            currentDeleteMatch.index
+        );
         
         // For now, just remove from local array and re-render
         allMatches.splice(currentDeleteMatch.index, 1);
@@ -468,14 +473,19 @@ const handleDeleteConfirm = async () => {
         renderStats(allMatches, statsDiv);
         
         deleteModalInstance.hide();
+
+        // Show success notification using notification manager
+        const matchTitle = currentDeleteMatch.data.title || 
+                          currentDeleteMatch.data.matchTitle || 
+                          'Untitled Match';
+        notificationManager.success(`Match "${matchTitle}" has been deleted successfully.`);
+        
         currentDeleteMatch = null;
-        
-        // Show success message (you might want to use your notification system)
-        alert('Match deleted successfully!');
-        
+      
     } catch (error) {
         console.error('Error deleting match:', error);
-        alert('Failed to delete match: ' + error.message);
+        // Show error notification using notification manager
+        notificationManager.error(`Failed to delete match: ${error.message}`);
     } finally {
         // Reset button
         confirmBtn.disabled = false;
@@ -649,6 +659,8 @@ const showErrorMessage = (errorMessage) => {
     if (statsDiv) {
         statsDiv.innerHTML = '<div class="alert alert-danger">Failed to load statistics.</div>';
     }
+    // Add retry functionality
+    document.getElementById('retry-load-btn')?.addEventListener('click', loadMatchesData);
 };
 
 const showMatchDetails = (matchData) => {

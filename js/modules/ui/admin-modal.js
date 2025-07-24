@@ -1,4 +1,4 @@
-const showDeleteConfirmation = (matchData, matchIndex) => {import { userMatchesApi } from '../services/user-matches-api.js';
+import { userMatchesApi } from '../services/user-matches-api.js';
 import { notificationManager } from '../services/notifications.js';
 import { matchSummaryModal } from './match-summary-modal.js';
 
@@ -670,6 +670,8 @@ const generateUserIdFromEmail = (email) => {
     const domain = email.split('@')[1];
     return `user_${emailPart}_${domain.replace(/\./g, '_')}`;
 };
+
+const showDeleteConfirmation = (matchData, matchIndex) => {
     currentDeleteMatch = { data: matchData, index: matchIndex };
     
     const detailsDiv = document.getElementById('delete-match-details');

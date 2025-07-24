@@ -198,6 +198,9 @@ const init = () => {
     modalElement.addEventListener('show.bs.modal', async () => {
         await loadMatchesData();
     });
+
+    // Clean up when admin modal is hidden
+    modalElement.addEventListener('hidden.bs.modal', cleanupModalBackdrops);
 };
 
 const loadMatchesData = async () => {
@@ -709,33 +712,50 @@ const showMatchDetails = (matchData, matchIndex) => {
     // Initialize and show the match summary modal
     matchSummaryModal.init();
     
-    // Temporarily hide the admin modal to prevent z-index conflicts
-    if (modalInstance) {
-        modalInstance.hide();
-    }
-    
-    // Show the match summary modal
+    // Show the match summary modal without hiding admin modal
+    // Instead, we'll manage z-index with CSS
     matchSummaryModal.show(enrichedMatchData);
     
-    // Set up event listener to show admin modal again when match summary is closed
+    // Increase z-index of match summary modal to appear above admin modal
     const matchSummaryModalElement = document.getElementById('matchSummaryModal');
     if (matchSummaryModalElement) {
-        // Remove any existing listener to prevent duplicates
-        matchSummaryModalElement.removeEventListener('hidden.bs.modal', restoreAdminModal);
+        matchSummaryModalElement.style.zIndex = '1060'; // Higher than Bootstrap's default modal z-index (1055)
         
-        // Add new listener
-        matchSummaryModalElement.addEventListener('hidden.bs.modal', restoreAdminModal, { once: true });
+        // Also set backdrop z-index if it exists
+        const matchSummaryBackdrop = document.querySelector('.modal-backdrop:last-of-type');
+        if (matchSummaryBackdrop) {
+            matchSummaryBackdrop.style.zIndex = '1059';
+        }
+        
+        // Clean up z-index when modal is hidden
+        const cleanupZIndex = () => {
+            matchSummaryModalElement.style.zIndex = '';
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.style.zIndex = '';
+            }
+        };
+        
+        // Remove any existing listener to prevent duplicates
+        matchSummaryModalElement.removeEventListener('hidden.bs.modal', cleanupZIndex);
+        
+        // Add cleanup listener
+        matchSummaryModalElement.addEventListener('hidden.bs.modal', cleanupZIndex, { once: true });
     }
 };
 
-// Helper function to restore admin modal when match summary is closed
-const restoreAdminModal = () => {
-    if (modalInstance) {
-        // Small delay to ensure smooth transition
-        setTimeout(() => {
-            modalInstance.show();
-        }, 100);
-    }
+// Clean up any leftover modal backdrops when admin modal is hidden
+const cleanupModalBackdrops = () => {
+    // Remove any orphaned modal backdrops
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(backdrop => {
+        backdrop.remove();
+    });
+    
+    // Ensure body classes are cleaned up
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
 };
 
 const escapeHtml = (text) => {

@@ -708,7 +708,34 @@ const showMatchDetails = (matchData, matchIndex) => {
     
     // Initialize and show the match summary modal
     matchSummaryModal.init();
+    
+    // Temporarily hide the admin modal to prevent z-index conflicts
+    if (modalInstance) {
+        modalInstance.hide();
+    }
+    
+    // Show the match summary modal
     matchSummaryModal.show(enrichedMatchData);
+    
+    // Set up event listener to show admin modal again when match summary is closed
+    const matchSummaryModalElement = document.getElementById('matchSummaryModal');
+    if (matchSummaryModalElement) {
+        // Remove any existing listener to prevent duplicates
+        matchSummaryModalElement.removeEventListener('hidden.bs.modal', restoreAdminModal);
+        
+        // Add new listener
+        matchSummaryModalElement.addEventListener('hidden.bs.modal', restoreAdminModal, { once: true });
+    }
+};
+
+// Helper function to restore admin modal when match summary is closed
+const restoreAdminModal = () => {
+    if (modalInstance) {
+        // Small delay to ensure smooth transition
+        setTimeout(() => {
+            modalInstance.show();
+        }, 100);
+    }
 };
 
 const escapeHtml = (text) => {

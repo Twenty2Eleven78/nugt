@@ -149,6 +149,9 @@ const init = () => {
     modalInstance = new bootstrap.Modal(modalElement);
     deleteModalInstance = new bootstrap.Modal(deleteModalElement);
 
+    // Initialize match summary modal
+    matchSummaryModal.init();
+
     // Add search functionality
     const searchInput = document.getElementById('admin-search');
     if (searchInput) {
@@ -242,7 +245,6 @@ const loadMatchesData = async () => {
             renderDesktopTable(allMatches);
             renderMobileCards(allMatches);
             renderStats(allMatches, statsDiv);
-            // Show info notification about loaded data
             notificationManager.info(`Loaded ${allMatches.length} matches from ${new Set(allMatches.map(m => m.userEmail || m.userId)).size} users.`);
 
         } else {
@@ -251,7 +253,6 @@ const loadMatchesData = async () => {
     } catch (error) {
         console.error('Error loading matches:', error);
         showErrorMessage(error.message);
-        // Show error notification using notification manager
         notificationManager.error(`Failed to load match data: ${error.message}`);
     } finally {
         // Reset refresh button
@@ -402,7 +403,7 @@ const addEventListeners = () => {
         btn.addEventListener('click', (e) => {
             const matchIndex = parseInt(e.target.closest('button').getAttribute('data-match-index'));
             const matchData = allMatches[matchIndex];
-            showMatchDetails(matchData);
+            showMatchDetails(matchData, matchIndex);
         });
     });
 
@@ -446,29 +447,22 @@ const handleDeleteConfirm = async () => {
     const originalText = confirmBtn.innerHTML;
     
     try {
-        // Show loading state
         confirmBtn.disabled = true;
         confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
         
-        // Debug the match data
         console.log('Attempting to delete match:', currentDeleteMatch.data);
         console.log('Match userId:', currentDeleteMatch.data.userId);
         console.log('Match index:', currentDeleteMatch.index);
         console.log('Match blobKey:', currentDeleteMatch.data.blobKey);
 
-         // Validate that we have the required data
         if (!currentDeleteMatch.data.userId || currentDeleteMatch.data.userId === 'unknown') {
-            // For matches without proper userId, we need to handle them differently
             notificationManager.warning('This match has missing or invalid userId. It may be orphaned data that cannot be deleted through the normal API.');
             
-            // Ask user if they want to remove it from the display only
             const removeFromDisplay = confirm('This match appears to be orphaned data. Would you like to remove it from the display? (Note: This will only hide it from the admin panel, not delete the actual data)');
             
             if (removeFromDisplay) {
-                // Remove from local array and re-render
                 allMatches.splice(currentDeleteMatch.index, 1);
                 
-                // Re-render all views
                 renderDesktopTable(allMatches);
                 renderMobileCards(allMatches);
                 
@@ -491,32 +485,26 @@ const handleDeleteConfirm = async () => {
             }
         }
 
-        // Call the actual delete API
         await userMatchesApi.deleteMatchData(
             currentDeleteMatch.data.userId, 
             currentDeleteMatch.index
         );
         
-        // Remove from local array and re-render
         allMatches.splice(currentDeleteMatch.index, 1);
         
-        // Re-render all views
         renderDesktopTable(allMatches);
         renderMobileCards(allMatches);
         
-        // Update mobile table if it's visible
         const tableViewRadio = document.getElementById('table-view');
         if (tableViewRadio && tableViewRadio.checked) {
             renderMobileTable(allMatches);
         }
         
-        // Update stats
         const statsDiv = document.getElementById('admin-stats');
         renderStats(allMatches, statsDiv);
         
         deleteModalInstance.hide();
 
-        // Show success notification using notification manager
         const matchTitle = currentDeleteMatch.data.title || 
                           currentDeleteMatch.data.matchTitle || 
                           'Untitled Match';
@@ -526,10 +514,8 @@ const handleDeleteConfirm = async () => {
       
     } catch (error) {
         console.error('Error deleting match:', error);
-        // Show error notification using notification manager
         notificationManager.error(`Failed to delete match: ${error.message}`);
     } finally {
-        // Reset button
         confirmBtn.disabled = false;
         confirmBtn.innerHTML = originalText;
     }
@@ -701,20 +687,28 @@ const showErrorMessage = (errorMessage) => {
     if (statsDiv) {
         statsDiv.innerHTML = '<div class="alert alert-danger">Failed to load statistics.</div>';
     }
-    // Add retry functionality
-    document.getElementById('retry-load-btn')?.addEventListener('click', loadMatchesData);
 };
 
-const showMatchDetails = (matchData) => {
-    const details = [
-        `User Email: ${matchData.userEmail || 'N/A'}`,
-        `User ID: ${matchData.userId || 'N/A'}`,
-        `Match Title: ${matchData.title || matchData.matchTitle || 'N/A'}`,
-        `Saved At: ${matchData.savedAt ? new Date(matchData.savedAt).toLocaleString() : 'N/A'}`,
-        `\nFull Match Data:\n${JSON.stringify(matchData, null, 2)}`
-    ].join('\n');
+// Updated showMatchDetails function to use matchSummaryModal
+const showMatchDetails = (matchData, matchIndex) => {
+    console.log('Showing match details for:', matchData);
     
-    alert(details);
+    // Prepare the match data with admin information
+    const enrichedMatchData = {
+        ...matchData,
+        _adminInfo: {
+            isAdminView: true,
+            userEmail: matchData.userEmail || 'Unknown',
+            userId: matchData.userId || 'Unknown',
+            savedAt: matchData.savedAt ? new Date(matchData.savedAt).toLocaleString() : 'Unknown',
+            matchIndex: matchIndex,
+            blobKey: matchData.blobKey || 'Unknown'
+        }
+    };
+    
+    // Initialize and show the match summary modal
+    matchSummaryModal.init();
+    matchSummaryModal.show(enrichedMatchData);
 };
 
 const escapeHtml = (text) => {

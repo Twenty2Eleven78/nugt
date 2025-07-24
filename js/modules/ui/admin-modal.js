@@ -709,53 +709,28 @@ const showMatchDetails = (matchData, matchIndex) => {
         }
     };
     
-    // Initialize and show the match summary modal
+    // Initialize the match summary modal
     matchSummaryModal.init();
     
-    // Show the match summary modal without hiding admin modal
-    // Instead, we'll manage z-index with CSS
+    // Show the match summary modal directly - Bootstrap will handle the layering
     matchSummaryModal.show(enrichedMatchData);
-    
-    // Increase z-index of match summary modal to appear above admin modal
-    const matchSummaryModalElement = document.getElementById('matchSummaryModal');
-    if (matchSummaryModalElement) {
-        matchSummaryModalElement.style.zIndex = '1060'; // Higher than Bootstrap's default modal z-index (1055)
-        
-        // Also set backdrop z-index if it exists
-        const matchSummaryBackdrop = document.querySelector('.modal-backdrop:last-of-type');
-        if (matchSummaryBackdrop) {
-            matchSummaryBackdrop.style.zIndex = '1059';
-        }
-        
-        // Clean up z-index when modal is hidden
-        const cleanupZIndex = () => {
-            matchSummaryModalElement.style.zIndex = '';
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) {
-                backdrop.style.zIndex = '';
-            }
-        };
-        
-        // Remove any existing listener to prevent duplicates
-        matchSummaryModalElement.removeEventListener('hidden.bs.modal', cleanupZIndex);
-        
-        // Add cleanup listener
-        matchSummaryModalElement.addEventListener('hidden.bs.modal', cleanupZIndex, { once: true });
-    }
 };
 
 // Clean up any leftover modal backdrops when admin modal is hidden
 const cleanupModalBackdrops = () => {
-    // Remove any orphaned modal backdrops
-    const backdrops = document.querySelectorAll('.modal-backdrop');
-    backdrops.forEach(backdrop => {
-        backdrop.remove();
-    });
-    
-    // Ensure body classes are cleaned up
-    document.body.classList.remove('modal-open');
-    document.body.style.overflow = '';
-    document.body.style.paddingRight = '';
+    // Small delay to ensure Bootstrap has finished its cleanup
+    setTimeout(() => {
+        // Remove any orphaned modal backdrops
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => {
+            backdrop.remove();
+        });
+        
+        // Ensure body classes are cleaned up
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    }, 100);
 };
 
 const escapeHtml = (text) => {

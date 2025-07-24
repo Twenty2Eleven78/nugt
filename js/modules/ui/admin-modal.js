@@ -1,4 +1,4 @@
-import { userMatchesApi } from '../services/user-matches-api.js';
+const showDeleteConfirmation = (matchData, matchIndex) => {import { userMatchesApi } from '../services/user-matches-api.js';
 import { notificationManager } from '../services/notifications.js';
 import { matchSummaryModal } from './match-summary-modal.js';
 
@@ -134,20 +134,74 @@ const modalHtml = `
         </div>
     </div>
 </div>
+
+<!-- Transfer Match Modal -->
+<div class="modal fade" id="transfer-match-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">
+                    <i class="fas fa-exchange-alt"></i> Transfer Match
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <h6>Match to Transfer:</h6>
+                    <div id="transfer-match-details" class="card bg-light">
+                        <!-- Match details will be shown here -->
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="target-user-select" class="form-label">
+                        <strong>Transfer to User:</strong>
+                    </label>
+                    <select class="form-select" id="target-user-select">
+                        <option value="">Select target user...</option>
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="new-user-email" class="form-label">
+                        <strong>Or enter new user email:</strong>
+                    </label>
+                    <input type="email" class="form-control" id="new-user-email" placeholder="user@example.com">
+                    <div class="form-text">
+                        If the user doesn't exist, a new user ID will be generated based on this email.
+                    </div>
+                </div>
+                <div class="alert alert-info">
+                    <strong>Note:</strong> The match will be moved from the current user to the selected user. 
+                    This action can be reversed by transferring it back.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-warning" id="confirm-transfer-btn" disabled>
+                    <i class="fas fa-exchange-alt"></i> Transfer Match
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 `;
 
 let modalInstance = null;
 let deleteModalInstance = null;
+let transferModalInstance = null;
 let allMatches = []; // Store all matches for search functionality
 let currentDeleteMatch = null;
+let currentTransferMatch = null;
 
 const init = () => {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
     const modalElement = document.getElementById('admin-modal');
     const deleteModalElement = document.getElementById('delete-confirm-modal');
+    const transferModalElement = document.getElementById('transfer-match-modal');
     
     modalInstance = new bootstrap.Modal(modalElement);
     deleteModalInstance = new bootstrap.Modal(deleteModalElement);
+    transferModalInstance = new bootstrap.Modal(transferModalElement);
 
     // Initialize match summary modal
     matchSummaryModal.init();
@@ -193,6 +247,34 @@ const init = () => {
     const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
     if (confirmDeleteBtn) {
         confirmDeleteBtn.addEventListener('click', handleDeleteConfirm);
+    }
+
+    // Transfer confirmation and validation
+    const confirmTransferBtn = document.getElementById('confirm-transfer-btn');
+    const targetUserSelect = document.getElementById('target-user-select');
+    const newUserEmail = document.getElementById('new-user-email');
+    
+    if (confirmTransferBtn) {
+        confirmTransferBtn.addEventListener('click', handleTransferConfirm);
+    }
+
+    // Enable/disable transfer button based on selection
+    const validateTransferForm = () => {
+        const hasSelectedUser = targetUserSelect && targetUserSelect.value;
+        const hasNewEmail = newUserEmail && newUserEmail.value.trim();
+        const isValidEmail = hasNewEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newUserEmail.value.trim());
+        
+        if (confirmTransferBtn) {
+            confirmTransferBtn.disabled = !(hasSelectedUser || isValidEmail);
+        }
+    };
+
+    if (targetUserSelect) {
+        targetUserSelect.addEventListener('change', validateTransferForm);
+    }
+    
+    if (newUserEmail) {
+        newUserEmail.addEventListener('input', validateTransferForm);
     }
 
     modalElement.addEventListener('show.bs.modal', async () => {
@@ -297,6 +379,9 @@ const renderDesktopTable = (matches) => {
                     <button class="btn btn-outline-primary view-match-btn" data-match-index="${index}">
                         <i class="fas fa-eye"></i> View
                     </button>
+                    <button class="btn btn-outline-warning transfer-match-btn" data-match-index="${index}">
+                        <i class="fas fa-exchange-alt"></i> Transfer
+                    </button>
                     <button class="btn btn-outline-danger delete-match-btn" data-match-index="${index}">
                         <i class="fas fa-trash"></i> Delete
                     </button>
@@ -351,6 +436,9 @@ const renderMobileCards = (matches) => {
                             <button class="btn btn-outline-primary view-match-btn" data-match-index="${index}">
                                 <i class="fas fa-eye"></i>
                             </button>
+                            <button class="btn btn-outline-warning transfer-match-btn" data-match-index="${index}">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
                             <button class="btn btn-outline-danger delete-match-btn" data-match-index="${index}">
                                 <i class="fas fa-trash"></i>
                             </button>
@@ -387,6 +475,9 @@ const renderMobileTable = (matches) => {
                     <button class="btn btn-outline-primary view-match-btn" data-match-index="${index}">
                         <i class="fas fa-eye"></i>
                     </button>
+                    <button class="btn btn-outline-warning transfer-match-btn" data-match-index="${index}">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
                     <button class="btn btn-outline-danger delete-match-btn" data-match-index="${index}">
                         <i class="fas fa-trash"></i>
                     </button>
@@ -410,6 +501,15 @@ const addEventListeners = () => {
         });
     });
 
+    // Transfer buttons
+    document.querySelectorAll('.transfer-match-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const matchIndex = parseInt(e.target.closest('button').getAttribute('data-match-index'));
+            const matchData = allMatches[matchIndex];
+            showTransferModal(matchData, matchIndex);
+        });
+    });
+
     // Delete buttons
     document.querySelectorAll('.delete-match-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -420,7 +520,156 @@ const addEventListeners = () => {
     });
 };
 
-const showDeleteConfirmation = (matchData, matchIndex) => {
+const showTransferModal = (matchData, matchIndex) => {
+    currentTransferMatch = { data: matchData, index: matchIndex };
+    
+    // Populate match details
+    const detailsDiv = document.getElementById('transfer-match-details');
+    if (detailsDiv) {
+        const userEmail = matchData.userEmail || 'unknown@example.com';
+        const matchTitle = matchData.title || matchData.matchTitle || 'Untitled Match';
+        const savedDate = matchData.savedAt ? new Date(matchData.savedAt).toLocaleString() : 'Unknown';
+        
+        detailsDiv.innerHTML = `
+            <div class="card-body">
+                <h6 class="card-title">${escapeHtml(matchTitle)}</h6>
+                <p class="card-text mb-1"><strong>Current Owner:</strong> ${escapeHtml(userEmail)}</p>
+                <p class="card-text mb-0"><strong>Saved:</strong> ${savedDate}</p>
+            </div>
+        `;
+    }
+    
+    // Populate user dropdown with unique users (excluding current owner)
+    const targetUserSelect = document.getElementById('target-user-select');
+    if (targetUserSelect) {
+        const uniqueUsers = [...new Set(allMatches
+            .map(m => m.userEmail || m.userId)
+            .filter(user => user && user !== 'unknown' && user !== (matchData.userEmail || matchData.userId))
+        )];
+        
+        targetUserSelect.innerHTML = '<option value="">Select target user...</option>';
+        uniqueUsers.forEach(user => {
+            const option = document.createElement('option');
+            option.value = user;
+            option.textContent = user;
+            targetUserSelect.appendChild(option);
+        });
+    }
+    
+    // Clear new user email field
+    const newUserEmail = document.getElementById('new-user-email');
+    if (newUserEmail) {
+        newUserEmail.value = '';
+    }
+    
+    // Reset transfer button state
+    const confirmTransferBtn = document.getElementById('confirm-transfer-btn');
+    if (confirmTransferBtn) {
+        confirmTransferBtn.disabled = true;
+    }
+    
+    transferModalInstance.show();
+};
+
+const handleTransferConfirm = async () => {
+    if (!currentTransferMatch) return;
+
+    const confirmBtn = document.getElementById('confirm-transfer-btn');
+    const targetUserSelect = document.getElementById('target-user-select');
+    const newUserEmail = document.getElementById('new-user-email');
+    const originalText = confirmBtn.innerHTML;
+    
+    try {
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Transferring...';
+        
+        // Determine target user
+        let targetUser = targetUserSelect?.value;
+        const emailInput = newUserEmail?.value?.trim();
+        
+        if (!targetUser && emailInput) {
+            // Generate new user ID from email
+            targetUser = emailInput;
+        }
+        
+        if (!targetUser) {
+            notificationManager.error('Please select a target user or enter an email address.');
+            return;
+        }
+        
+        console.log('Transferring match from', currentTransferMatch.data.userId, 'to', targetUser);
+        
+        // Create the match data for the new user
+        const transferredMatch = {
+            ...currentTransferMatch.data,
+            userEmail: emailInput || targetUser,
+            userId: generateUserIdFromEmail(emailInput || targetUser),
+            transferredAt: Date.now(),
+            transferredFrom: {
+                userId: currentTransferMatch.data.userId,
+                userEmail: currentTransferMatch.data.userEmail,
+                transferredAt: Date.now()
+            }
+        };
+        
+        // Remove admin-specific properties that shouldn't be transferred
+        delete transferredMatch.blobKey;
+        delete transferredMatch.matchIndex;
+        delete transferredMatch.id;
+        
+        // Save to new user (this will be handled by the API)
+        await userMatchesApi.saveMatchData(transferredMatch);
+        
+        // Delete from original user
+        await userMatchesApi.deleteMatchData(
+            currentTransferMatch.data.userId, 
+            currentTransferMatch.index
+        );
+        
+        // Update local data
+        allMatches.splice(currentTransferMatch.index, 1);
+        
+        // Re-render all views
+        renderDesktopTable(allMatches);
+        renderMobileCards(allMatches);
+        
+        const tableViewRadio = document.getElementById('table-view');
+        if (tableViewRadio && tableViewRadio.checked) {
+            renderMobileTable(allMatches);
+        }
+        
+        const statsDiv = document.getElementById('admin-stats');
+        renderStats(allMatches, statsDiv);
+        
+        transferModalInstance.hide();
+
+        const matchTitle = currentTransferMatch.data.title || 
+                          currentTransferMatch.data.matchTitle || 
+                          'Untitled Match';
+        notificationManager.success(`Match "${matchTitle}" has been transferred to ${targetUser} successfully.`);
+        
+        currentTransferMatch = null;
+      
+    } catch (error) {
+        console.error('Error transferring match:', error);
+        notificationManager.error(`Failed to transfer match: ${error.message}`);
+    } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = originalText;
+    }
+};
+
+// Helper function to generate user ID from email
+const generateUserIdFromEmail = (email) => {
+    if (!email || !email.includes('@')) {
+        return 'user_' + Math.random().toString(36).substring(2, 15);
+    }
+    
+    // Create a consistent user ID based on email
+    const emailPart = email.split('@')[0];
+    const domain = email.split('@')[1];
+    return `user_${emailPart}_${domain.replace(/\./g, '_')}`;
+};
     currentDeleteMatch = { data: matchData, index: matchIndex };
     
     const detailsDiv = document.getElementById('delete-match-details');

@@ -712,8 +712,36 @@ const showMatchDetails = (matchData, matchIndex) => {
     // Initialize the match summary modal
     matchSummaryModal.init();
     
-    // Show the match summary modal directly - Bootstrap will handle the layering
+    // Get the admin modal element to determine its z-index
+    const adminModalElement = document.getElementById('admin-modal');
+    let targetZIndex = 1060; // Default higher z-index
+    
+    if (adminModalElement) {
+        const adminZIndex = parseInt(window.getComputedStyle(adminModalElement).zIndex) || 1055;
+        targetZIndex = adminZIndex + 10; // Ensure it's higher than admin modal
+    }
+    
+    // Show the match summary modal
     matchSummaryModal.show(enrichedMatchData);
+    
+    // Force the z-index after a brief delay to ensure the modal is rendered
+    setTimeout(() => {
+        const matchSummaryModalElement = document.getElementById('matchSummaryModal');
+        if (matchSummaryModalElement) {
+            matchSummaryModalElement.style.zIndex = targetZIndex.toString();
+            matchSummaryModalElement.style.display = 'block'; // Ensure it's visible
+            
+            // Also handle the backdrop
+            const allBackdrops = document.querySelectorAll('.modal-backdrop');
+            if (allBackdrops.length > 0) {
+                // Set the most recent backdrop to a high z-index
+                const lastBackdrop = allBackdrops[allBackdrops.length - 1];
+                lastBackdrop.style.zIndex = (targetZIndex - 1).toString();
+            }
+            
+            console.log(`Set match summary modal z-index to ${targetZIndex}`);
+        }
+    }, 50);
 };
 
 // Clean up any leftover modal backdrops when admin modal is hidden

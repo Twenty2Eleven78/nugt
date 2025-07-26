@@ -174,6 +174,7 @@ export const storageHelpers = {
   saveMatchData(gameState) {
     storage.save(STORAGE_KEYS.GOALS, gameState.goals);
     storage.save(STORAGE_KEYS.MATCH_EVENTS, gameState.matchEvents);
+    // Note: Attendance is saved separately by roster manager
   },
 
   // Save team data

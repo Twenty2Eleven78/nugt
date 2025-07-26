@@ -8,6 +8,7 @@ import { domCache } from '../shared/dom.js';
 import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from '../ui/modals.js';
 import { rosterUtils } from '../data/default-roster.js';
+import { STORAGE_KEYS } from '../shared/constants.js';
 
 // Configuration constants
 const ROSTER_CONFIG = {
@@ -191,22 +192,48 @@ class RosterManager {
     const rosterList = document.getElementById('rosterList');
     if (!rosterList) return;
 
+    const attendance = this.getMatchAttendance();
+    const attendanceMap = new Map();
+    attendance.forEach(record => {
+      attendanceMap.set(record.playerName.toLowerCase(), record.attending);
+    });
+
     rosterList.innerHTML = this.roster
-      .map(player => `
-        <tr>
-          <td>${player.name}</td>
+      .map(player => {
+        const isAttending = attendanceMap.get(player.name.toLowerCase()) ?? true;
+        const attendanceClass = isAttending ? 'text-success' : 'text-danger';
+        const attendanceIcon = isAttending ? 'fa-check-circle' : 'fa-times-circle';
+        const attendanceText = isAttending ? 'Present' : 'Absent';
+        
+        return `
+        <tr class="${isAttending ? '' : 'table-secondary'}">
+          <td>
+            ${player.name}
+            <small class="d-block ${attendanceClass}">
+              <i class="fas ${attendanceIcon} me-1"></i>${attendanceText}
+            </small>
+          </td>
           <td>${player.shirtNumber !== null ? player.shirtNumber : '-'}</td>
           <td class="text-end roster-actions-cell">
-            <button class="btn btn-sm btn-outline-primary me-2 edit-player" data-player-name="${player.name}">
-              <i class="fas fa-edit"></i> Edit
+            <button class="btn btn-sm ${isAttending ? 'btn-outline-warning' : 'btn-outline-success'} me-1 toggle-attendance" 
+                    data-player-name="${player.name}" 
+                    title="${isAttending ? 'Mark as absent' : 'Mark as present'}">
+              <i class="fas ${isAttending ? 'fa-user-times' : 'fa-user-check'}"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-primary me-1 edit-player" data-player-name="${player.name}">
+              <i class="fas fa-edit"></i>
             </button>
             <button class="btn btn-sm btn-outline-danger remove-player" data-player-name="${player.name}">
-              <i class="fas fa-trash"></i> Remove
+              <i class="fas fa-trash"></i>
             </button>
           </td>
         </tr>
-      `)
+      `;
+      })
       .join('');
+    
+    // Update attendance summary whenever roster list is updated
+    this.updateAttendanceSummary();
   }
 
   // Add a new player
@@ -440,6 +467,7 @@ class RosterManager {
     this._bindRosterListEvents();
     this._bindEditPlayerEvents();
     this._bindClearRosterEvents();
+    this._bindAttendanceEvents();
   }
 
   // Bind add player events
@@ -501,6 +529,8 @@ class RosterManager {
         }
       } else if (targetButton.classList.contains('edit-player')) {
         this._showEditPlayerModal(playerName);
+      } else if (targetButton.classList.contains('toggle-attendance')) {
+        this.togglePlayerAttendance(playerName);
       }
     });
   }
@@ -551,16 +581,179 @@ class RosterManager {
     }
   }
 
+  // Bind attendance management events
+  _bindAttendanceEvents() {
+    const markAllAttendingBtn = document.getElementById('markAllAttendingBtn');
+    const markAllAbsentBtn = document.getElementById('markAllAbsentBtn');
+    const clearAttendanceBtn = document.getElementById('clearAttendanceBtn');
+
+    if (markAllAttendingBtn) {
+      markAllAttendingBtn.addEventListener('click', () => {
+        this.markAllAttending();
+        this.updateAttendanceSummary();
+      });
+    }
+
+    if (markAllAbsentBtn) {
+      markAllAbsentBtn.addEventListener('click', () => {
+        this.markAllAbsent();
+        this.updateAttendanceSummary();
+      });
+    }
+
+    if (clearAttendanceBtn) {
+      clearAttendanceBtn.addEventListener('click', () => {
+        this.clearAttendance();
+        this.updateAttendanceSummary();
+      });
+    }
+  }
+
+  // Update attendance summary display
+  updateAttendanceSummary() {
+    const summaryElement = document.getElementById('attendanceSummary');
+    if (!summaryElement) return;
+
+    const summary = this.getAttendanceSummary();
+    summaryElement.innerHTML = `
+      <i class="fas fa-users me-1"></i>
+      <strong>${summary.attending}/${summary.total}</strong> players attending 
+      <span class="text-success">(${summary.attendanceRate}%)</span>
+      ${summary.absent > 0 ? `<span class="text-danger ms-2">${summary.absent} absent</span>` : ''}
+    `;
+  }
+
   // Get roster statistics
   getStats() {
+    const attendance = this.getMatchAttendance();
     return {
       totalPlayers: this.roster.length,
       playersWithShirtNumbers: this.roster.filter(p => p.shirtNumber !== null).length,
       playersWithoutShirtNumbers: this.roster.filter(p => p.shirtNumber === null).length,
+      attendingPlayers: attendance.filter(p => p.attending).length,
+      absentPlayers: attendance.filter(p => !p.attending).length,
       shirtNumbers: this.roster
         .filter(p => p.shirtNumber !== null)
         .map(p => p.shirtNumber)
         .sort((a, b) => a - b)
+    };
+  }
+
+  // === ATTENDANCE MANAGEMENT ===
+
+  // Get current match attendance
+  getMatchAttendance() {
+    const savedAttendance = storage.load(STORAGE_KEYS.MATCH_ATTENDANCE, []);
+    
+    // Create attendance records for all current roster players
+    const attendanceMap = new Map();
+    savedAttendance.forEach(record => {
+      attendanceMap.set(record.playerName.toLowerCase(), record.attending);
+    });
+
+    return this.roster.map(player => ({
+      playerName: player.name,
+      shirtNumber: player.shirtNumber,
+      attending: attendanceMap.get(player.name.toLowerCase()) ?? true // Default to attending
+    }));
+  }
+
+  // Set player attendance
+  setPlayerAttendance(playerName, attending) {
+    const currentAttendance = this.getMatchAttendance();
+    const updatedAttendance = currentAttendance.map(record => 
+      record.playerName.toLowerCase() === playerName.toLowerCase() 
+        ? { ...record, attending }
+        : record
+    );
+    
+    this._saveAttendance(updatedAttendance);
+    this.updateRosterList();
+    
+    const status = attending ? 'attending' : 'absent';
+    notificationManager.success(`${playerName} marked as ${status}`);
+  }
+
+  // Toggle player attendance
+  togglePlayerAttendance(playerName) {
+    const attendance = this.getMatchAttendance();
+    const playerRecord = attendance.find(p => p.playerName.toLowerCase() === playerName.toLowerCase());
+    
+    if (playerRecord) {
+      this.setPlayerAttendance(playerName, !playerRecord.attending);
+    }
+  }
+
+  // Mark all players as attending
+  markAllAttending() {
+    const attendance = this.getMatchAttendance().map(record => ({
+      ...record,
+      attending: true
+    }));
+    
+    this._saveAttendance(attendance);
+    this.updateRosterList();
+    notificationManager.success('All players marked as attending');
+  }
+
+  // Mark all players as absent
+  markAllAbsent() {
+    const attendance = this.getMatchAttendance().map(record => ({
+      ...record,
+      attending: false
+    }));
+    
+    this._saveAttendance(attendance);
+    this.updateRosterList();
+    notificationManager.success('All players marked as absent');
+  }
+
+  // Get attending players only
+  getAttendingPlayers() {
+    return this.getMatchAttendance().filter(record => record.attending);
+  }
+
+  // Get absent players only
+  getAbsentPlayers() {
+    return this.getMatchAttendance().filter(record => !record.attending);
+  }
+
+  // Clear attendance (reset all to attending)
+  clearAttendance() {
+    storage.remove(STORAGE_KEYS.MATCH_ATTENDANCE);
+    this.updateRosterList();
+    notificationManager.success('Attendance cleared - all players marked as attending');
+  }
+
+  // Save attendance to storage
+  _saveAttendance(attendanceData) {
+    try {
+      // Only save the essential data
+      const attendanceToSave = attendanceData.map(record => ({
+        playerName: record.playerName,
+        attending: record.attending
+      }));
+      
+      storage.save(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceToSave);
+    } catch (error) {
+      console.error('Error saving attendance:', error);
+      notificationManager.error('Error saving attendance. Please try again.');
+    }
+  }
+
+  // Get attendance summary for match reports
+  getAttendanceSummary() {
+    const attendance = this.getMatchAttendance();
+    const attending = attendance.filter(p => p.attending);
+    const absent = attendance.filter(p => !p.attending);
+    
+    return {
+      total: attendance.length,
+      attending: attending.length,
+      absent: absent.length,
+      attendingPlayers: attending.map(p => p.playerName),
+      absentPlayers: absent.map(p => p.playerName),
+      attendanceRate: attendance.length > 0 ? Math.round((attending.length / attendance.length) * 100) : 0
     };
   }
 }

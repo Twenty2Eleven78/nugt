@@ -17,7 +17,8 @@ export const STORAGE_KEYS = {
   GAME_TIME: 'nugt_gameTime',
   IS_SECOND_HALF: 'nugt_isSecondHalf',
   TEAM1_HISTORY: 'nugt_team1history',
-  TEAM2_HISTORY: 'nugt_team2history'
+  TEAM2_HISTORY: 'nugt_team2history',
+  MATCH_ATTENDANCE: 'nugt_matchAttendance'
 };
 
 // Game Configuration

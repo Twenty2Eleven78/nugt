@@ -335,6 +335,69 @@ body.modal-open {
   border-top: 1px solid #dee2e6;
 }
 
+/* Player Attendance Styles */
+.roster-table tr.table-secondary {
+  opacity: 0.7;
+}
+
+.roster-table .toggle-attendance {
+  transition: all 0.2s ease;
+}
+
+.roster-table .toggle-attendance:hover {
+  transform: scale(1.05);
+}
+
+.attendance-summary {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.attendance-controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.attendance-controls .btn {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* Attendance status indicators */
+.text-success {
+  color: #198754 !important;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
+
+/* Responsive attendance controls */
+@media (max-width: 576px) {
+  .attendance-controls {
+    flex-direction: column;
+  }
+  
+  .attendance-controls .btn {
+    flex: none;
+    width: 100%;
+  }
+  
+  .roster-actions-cell {
+    min-width: 120px;
+  }
+  
+  .roster-actions-cell .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
 /* Timeline styling */
 .timeline {
   position: relative;

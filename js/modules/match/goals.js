@@ -11,6 +11,7 @@ import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from '../ui/modals.js';
 import { updateMatchLog } from './events.js';
 import { attendanceManager } from '../services/attendance.js';
+import { enhancedEventsManager } from '../ui/enhanced-events.js';
 
 // Goal management class
 class GoalManager {
@@ -65,6 +66,9 @@ class GoalManager {
     // Save and cleanup
     storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
     
+    // Update enhanced events manager
+    enhancedEventsManager.onEventsUpdated();
+    
     this._resetGoalForm();
     hideModal('goalModal');
   }
@@ -95,6 +99,9 @@ class GoalManager {
 
     // Save data
     storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
+    
+    // Update enhanced events manager
+    enhancedEventsManager.onEventsUpdated();
     
     this._resetGoalForm();
   }
@@ -189,6 +196,9 @@ export function toggleGoalDisallowed(index) {
 
   // Save updated goals data
   storageHelpers.saveMatchData(gameState);
+
+  // Update enhanced events manager
+  enhancedEventsManager.onEventsUpdated();
 
   const goal_updated = gameState.goals[index];
   if (goal_updated.disallowed) {

@@ -147,11 +147,74 @@
 
             <!-- Event Tab Content -->
             <div class="tab-pane fade" id="gamelogtab">
-              <div class="card">
-                <div class="card-body">
-                  <h5 class="card-title"><i class="fa-solid fa-list"></i> Match Events</h5>
-                  <hr>
-                  <div id="log" role="log" aria-live="polite" class="border rounded p-2"></div>
+              <div class="events-container">
+                <!-- Event Statistics Cards -->
+                <div class="row mb-4">
+                  <div class="col-6 col-md-3">
+                    <div class="event-stat-card">
+                      <i class="fas fa-futbol fa-2x mb-2 text-success"></i>
+                      <div class="stat-number" id="goals-count">0</div>
+                      <div class="stat-label">Goals</div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="event-stat-card">
+                      <i class="fas fa-flag fa-2x mb-2 text-warning"></i>
+                      <div class="stat-number" id="cards-count">0</div>
+                      <div class="stat-label">Cards</div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="event-stat-card">
+                      <i class="fas fa-whistle fa-2x mb-2 text-info"></i>
+                      <div class="stat-number" id="fouls-count">0</div>
+                      <div class="stat-label">Fouls</div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="event-stat-card">
+                      <i class="fas fa-clock fa-2x mb-2 text-secondary"></i>
+                      <div class="stat-number" id="total-events-count">0</div>
+                      <div class="stat-label">Total Events</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Event Controls -->
+                <div class="event-controls mb-3">
+                  <div class="row align-items-center">
+                    <div class="col-md-6 mb-2 mb-md-0">
+                      <div class="input-group">
+                        <span class="input-group-text">
+                          <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="event-search" placeholder="Search events...">
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="d-flex gap-2">
+                        <select class="form-select form-select-sm" id="event-filter">
+                          <option value="all">All Events</option>
+                          <option value="goals">Goals Only</option>
+                          <option value="cards">Cards Only</option>
+                          <option value="fouls">Fouls Only</option>
+                          <option value="penalties">Penalties Only</option>
+                          <option value="incidents">Incidents Only</option>
+                        </select>
+                        <button class="btn btn-outline-primary btn-sm" id="clear-filters" title="Clear filters">
+                          <i class="fas fa-times"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" id="export-events" title="Export events">
+                          <i class="fas fa-download"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Enhanced Timeline Container -->
+                <div class="enhanced-timeline-container">
+                  <div id="log" role="log" aria-live="polite" class="enhanced-timeline"></div>
                 </div>
               </div>
             </div>

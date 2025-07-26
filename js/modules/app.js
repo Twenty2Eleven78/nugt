@@ -22,6 +22,7 @@ import { rosterManager } from './match/roster.js';
 // UI modules
 import { bindModalEvents, hideModal } from './ui/modals.js';
 import { initializeTooltips } from './ui/components.js';
+import { enhancedEventsManager } from './ui/enhanced-events.js';
 import { authUI } from './ui/auth-ui.js';
 import { matchSaveModal } from './ui/match-save-modal.js';
 import { matchLoadModal } from './ui/match-load-modal.js';
@@ -68,6 +69,7 @@ export function initializeApp() {
   bindEventListeners();
   bindModalEvents();
   initializeTooltips();
+  enhancedEventsManager.init();
   matchSaveModal.init();
   matchLoadModal.init();
   matchSummaryModal.init();

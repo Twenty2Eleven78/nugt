@@ -450,6 +450,120 @@ body.modal-open {
   color: #6c757d;
 }
 
+/* Enhanced Events Tab - Suggestion 1 */
+.events-container {
+  padding: 1rem;
+}
+
+.event-stat-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.event-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-color: #007bff;
+}
+
+.event-stat-card i {
+  margin-bottom: 0.5rem;
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #495057;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.event-controls {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+}
+
+.enhanced-timeline-container {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  min-height: 200px;
+}
+
+.enhanced-timeline {
+  padding: 1rem;
+}
+
+.enhanced-timeline .timeline-item {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.enhanced-timeline .timeline-item:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-color: #007bff;
+}
+
+.enhanced-timeline .timeline-content {
+  margin-left: 0;
+  border-radius: 8px;
+  border: none;
+  box-shadow: none;
+}
+
+.enhanced-timeline .timeline-marker {
+  background: #007bff;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.enhanced-timeline .marker-success {
+  background: #28a745;
+}
+
+.enhanced-timeline .marker-danger {
+  background: #dc3545;
+}
+
+.enhanced-timeline .timeline-time {
+  font-size: 0.95rem;
+  padding: 0.5rem 0;
+}
+
+.enhanced-timeline .timeline-body {
+  font-size: 0.9rem;
+}
+
+/* Event filtering states */
+.timeline-item.filtered-out {
+  display: none;
+}
+
+.timeline-item.search-highlight {
+  border-color: #ffc107;
+  background-color: #fff3cd;
+}
+
 /* Options Layout Suggestion 1 - Card-Based Grid Layout */
 .options-container {
   padding: 1rem;

@@ -13,6 +13,7 @@ import { showModal, hideModal } from '../ui/modals.js';
 import { getEventIcon, getEventCardClass } from '../ui/components.js';
 import { timerController } from '../game/timer.js';
 import { attendanceManager } from '../services/attendance.js';
+import { enhancedEventsManager } from '../ui/enhanced-events.js';
 
 // Match events management class
 class EventsManager {
@@ -235,6 +236,9 @@ export function updateMatchLog() {
   fragment.appendChild(timelineContainer);
   logElement.innerHTML = '';
   logElement.appendChild(fragment);
+  
+  // Update enhanced events manager
+  enhancedEventsManager.onEventsUpdated();
 }
 
 // Create timeline item (helper method)

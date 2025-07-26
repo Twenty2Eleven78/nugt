@@ -7,7 +7,7 @@ import { gameState } from '../data/state.js';
 import { domCache } from '../shared/dom.js';
 import { formatTime } from '../shared/utils.js';
 import { getEventIcon } from '../ui/components.js';
-import { rosterManager } from '../match/roster.js';
+import { attendanceManager } from './attendance.js';
 
 // Statistics and sharing service
 class SharingService {
@@ -57,7 +57,7 @@ class SharingService {
       .map(([name, assistCount]) => `${name}: ${assistCount}`);
 
     // Get attendance data
-    const attendanceSummary = rosterManager.getAttendanceSummary();
+    const attendanceSummary = attendanceManager.getAttendanceSummary();
     const attendingPlayers = attendanceSummary.attendingPlayers.join(', ');
     const absentPlayers = attendanceSummary.absentPlayers.length > 0 ?
       attendanceSummary.absentPlayers.join(', ') : 'None';
@@ -181,8 +181,8 @@ class SharingService {
         team1History: gameState.team1History,
         team2History: gameState.team2History
       },
-      attendance: rosterManager.getMatchAttendance(),
-      roster: rosterManager.getRoster(),
+      attendance: attendanceManager.getMatchAttendance(),
+      roster: attendanceManager.getMatchAttendance(), // Using attendance data which includes roster info
       stats: this.generateStats()
     };
 

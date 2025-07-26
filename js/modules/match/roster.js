@@ -26,7 +26,7 @@ class RosterManager {
   // Initialize roster
   init() {
     if (this.isInitialized) return;
-    
+
     this.roster = this._loadRoster();
     this.updateSelects();
     this.updateRosterList();
@@ -38,7 +38,7 @@ class RosterManager {
   _loadRoster() {
     try {
       const savedRosterJSON = storage.load(ROSTER_CONFIG.STORAGE_KEY);
-      
+
       if (!savedRosterJSON) {
         return this._getDefaultRoster();
       }
@@ -100,7 +100,7 @@ class RosterManager {
   _removeDuplicates(roster) {
     const uniqueRoster = [];
     const namesSeen = new Set();
-    
+
     for (const player of roster) {
       const lowerName = player.name.toLowerCase();
       if (!namesSeen.has(lowerName)) {
@@ -108,7 +108,7 @@ class RosterManager {
         namesSeen.add(lowerName);
       }
     }
-    
+
     return uniqueRoster;
   }
 
@@ -192,34 +192,12 @@ class RosterManager {
     const rosterList = document.getElementById('rosterList');
     if (!rosterList) return;
 
-    const attendance = this.getMatchAttendance();
-    const attendanceMap = new Map();
-    attendance.forEach(record => {
-      attendanceMap.set(record.playerName.toLowerCase(), record.attending);
-    });
-
     rosterList.innerHTML = this.roster
-      .map(player => {
-        const isAttending = attendanceMap.get(player.name.toLowerCase()) ?? true;
-        const attendanceClass = isAttending ? 'text-success' : 'text-danger';
-        const attendanceIcon = isAttending ? 'fa-check-circle' : 'fa-times-circle';
-        const attendanceText = isAttending ? 'Present' : 'Absent';
-        
-        return `
-        <tr class="${isAttending ? '' : 'table-secondary'}">
-          <td>
-            ${player.name}
-            <small class="d-block ${attendanceClass}">
-              <i class="fas ${attendanceIcon} me-1"></i>${attendanceText}
-            </small>
-          </td>
+      .map(player => `
+        <tr>
+          <td>${player.name}</td>
           <td>${player.shirtNumber !== null ? player.shirtNumber : '-'}</td>
           <td class="text-end roster-actions-cell">
-            <button class="btn btn-sm ${isAttending ? 'btn-outline-warning' : 'btn-outline-success'} me-1 toggle-attendance" 
-                    data-player-name="${player.name}" 
-                    title="${isAttending ? 'Mark as absent' : 'Mark as present'}">
-              <i class="fas ${isAttending ? 'fa-user-times' : 'fa-user-check'}"></i>
-            </button>
             <button class="btn btn-sm btn-outline-primary me-1 edit-player" data-player-name="${player.name}">
               <i class="fas fa-edit"></i>
             </button>
@@ -228,12 +206,8 @@ class RosterManager {
             </button>
           </td>
         </tr>
-      `;
-      })
+      `)
       .join('');
-    
-    // Update attendance summary whenever roster list is updated
-    this.updateAttendanceSummary();
   }
 
   // Add a new player
@@ -260,7 +234,7 @@ class RosterManager {
     this._saveRoster();
     this.updateSelects();
     this.updateRosterList();
-    
+
     const shirtText = num !== null ? ` (#${num})` : '';
     notificationManager.success(`Player ${trimmedName}${shirtText} added successfully.`);
     return true;
@@ -278,7 +252,7 @@ class RosterManager {
     this._saveRoster();
     this.updateSelects();
     this.updateRosterList();
-    
+
     notificationManager.success(`Player ${playerName} removed successfully.`);
     return true;
   }
@@ -344,7 +318,7 @@ class RosterManager {
     }
 
     const results = this._processBulkAdd(namesArray);
-    
+
     if (results.added.length > 0) {
       this.roster.push(...results.added);
       this.roster = this._sortRoster(this.roster);
@@ -425,7 +399,7 @@ class RosterManager {
   // Check if player exists
   _playerExists(name, excludeIndex = -1) {
     const lowerName = name.toLowerCase();
-    return this.roster.some((player, index) => 
+    return this.roster.some((player, index) =>
       index !== excludeIndex && player.name.toLowerCase() === lowerName
     );
   }
@@ -467,7 +441,6 @@ class RosterManager {
     this._bindRosterListEvents();
     this._bindEditPlayerEvents();
     this._bindClearRosterEvents();
-    this._bindAttendanceEvents();
   }
 
   // Bind add player events
@@ -480,7 +453,7 @@ class RosterManager {
       addPlayerBtn.addEventListener('click', () => {
         const playerName = newPlayerNameInput.value.trim();
         const playerShirtNumber = newPlayerShirtNumberInput.value;
-        
+
         if (this.addPlayer(playerName, playerShirtNumber)) {
           newPlayerNameInput.value = '';
           newPlayerShirtNumberInput.value = '';
@@ -521,14 +494,14 @@ class RosterManager {
       // Prevent multiple rapid clicks
       e.preventDefault();
       e.stopPropagation();
-      
+
       const targetButton = e.target.closest('button');
       if (!targetButton) return;
 
       // Prevent double-clicking by temporarily disabling the button
       if (targetButton.disabled) return;
       targetButton.disabled = true;
-      
+
       const playerName = targetButton.dataset.playerName;
 
       if (targetButton.classList.contains('remove-player')) {
@@ -544,34 +517,11 @@ class RosterManager {
         setTimeout(() => {
           targetButton.disabled = false;
         }, 100);
-      } else if (targetButton.classList.contains('toggle-attendance')) {
-        this._handleAttendanceToggle(playerName, targetButton);
       }
     });
   }
 
-  // Handle attendance toggle with proper event management
-  _handleAttendanceToggle(playerName, button) {
-    // Get current attendance status
-    const attendance = this.getMatchAttendance();
-    const playerRecord = attendance.find(p => p.playerName.toLowerCase() === playerName.toLowerCase());
-    
-    if (!playerRecord) {
-      button.disabled = false;
-      return;
-    }
 
-    // Toggle the attendance
-    const newStatus = !playerRecord.attending;
-    
-    // Update attendance immediately
-    this.setPlayerAttendance(playerName, newStatus);
-    
-    // Re-enable button after a short delay to prevent double-clicks
-    setTimeout(() => {
-      button.disabled = false;
-    }, 200);
-  }
 
   // Show edit player modal
   _showEditPlayerModal(playerName) {
@@ -598,7 +548,7 @@ class RosterManager {
 
     editPlayerForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      
+
       const oldName = document.getElementById('editPlayerOldName')?.value;
       const newName = document.getElementById('editPlayerName')?.value.trim();
       const newShirtNumber = document.getElementById('editPlayerShirtNumber')?.value;
@@ -619,233 +569,16 @@ class RosterManager {
     }
   }
 
-  // Bind attendance management events
-  _bindAttendanceEvents() {
-    const markAllAttendingBtn = document.getElementById('markAllAttendingBtn');
-    const markAllAbsentBtn = document.getElementById('markAllAbsentBtn');
-    const clearAttendanceBtn = document.getElementById('clearAttendanceBtn');
-
-    if (markAllAttendingBtn) {
-      markAllAttendingBtn.addEventListener('click', () => {
-        this.markAllAttending();
-        this.updateAttendanceSummary();
-      });
-    }
-
-    if (markAllAbsentBtn) {
-      markAllAbsentBtn.addEventListener('click', () => {
-        this.markAllAbsent();
-        this.updateAttendanceSummary();
-      });
-    }
-
-    if (clearAttendanceBtn) {
-      clearAttendanceBtn.addEventListener('click', () => {
-        this.clearAttendance();
-        this.updateAttendanceSummary();
-      });
-    }
-  }
-
-  // Update attendance summary display
-  updateAttendanceSummary() {
-    const summaryElement = document.getElementById('attendanceSummary');
-    if (!summaryElement) return;
-
-    const summary = this.getAttendanceSummary();
-    summaryElement.innerHTML = `
-      <i class="fas fa-users me-1"></i>
-      <strong>${summary.attending}/${summary.total}</strong> players attending 
-      <span class="text-success">(${summary.attendanceRate}%)</span>
-      ${summary.absent > 0 ? `<span class="text-danger ms-2">${summary.absent} absent</span>` : ''}
-    `;
-  }
-
   // Get roster statistics
   getStats() {
-    const attendance = this.getMatchAttendance();
     return {
       totalPlayers: this.roster.length,
       playersWithShirtNumbers: this.roster.filter(p => p.shirtNumber !== null).length,
       playersWithoutShirtNumbers: this.roster.filter(p => p.shirtNumber === null).length,
-      attendingPlayers: attendance.filter(p => p.attending).length,
-      absentPlayers: attendance.filter(p => !p.attending).length,
       shirtNumbers: this.roster
         .filter(p => p.shirtNumber !== null)
         .map(p => p.shirtNumber)
         .sort((a, b) => a - b)
-    };
-  }
-
-  // === ATTENDANCE MANAGEMENT ===
-
-  // Get current match attendance
-  getMatchAttendance() {
-    const savedAttendance = storage.load(STORAGE_KEYS.MATCH_ATTENDANCE, []);
-    
-    // Create attendance records for all current roster players
-    const attendanceMap = new Map();
-    savedAttendance.forEach(record => {
-      attendanceMap.set(record.playerName.toLowerCase(), record.attending);
-    });
-
-    return this.roster.map(player => ({
-      playerName: player.name,
-      shirtNumber: player.shirtNumber,
-      attending: attendanceMap.get(player.name.toLowerCase()) ?? true // Default to attending
-    }));
-  }
-
-  // Set player attendance
-  setPlayerAttendance(playerName, attending) {
-    const currentAttendance = this.getMatchAttendance();
-    const updatedAttendance = currentAttendance.map(record => 
-      record.playerName.toLowerCase() === playerName.toLowerCase() 
-        ? { ...record, attending }
-        : record
-    );
-    
-    this._saveAttendance(updatedAttendance);
-    
-    // Update UI immediately without regenerating entire list
-    this._updatePlayerAttendanceUI(playerName, attending);
-    
-    const status = attending ? 'attending' : 'absent';
-    notificationManager.success(`${playerName} marked as ${status}`);
-  }
-
-  // Update individual player attendance UI without full roster regeneration
-  _updatePlayerAttendanceUI(playerName, attending) {
-    const rosterList = document.getElementById('rosterList');
-    if (!rosterList) return;
-
-    // Find the player's row
-    const playerButtons = rosterList.querySelectorAll(`[data-player-name="${playerName}"]`);
-    
-    playerButtons.forEach(button => {
-      const row = button.closest('tr');
-      if (!row) return;
-
-      // Update row styling
-      if (attending) {
-        row.classList.remove('table-secondary');
-      } else {
-        row.classList.add('table-secondary');
-      }
-
-      // Update attendance status text and icon
-      const statusElement = row.querySelector('small');
-      if (statusElement) {
-        const attendanceClass = attending ? 'text-success' : 'text-danger';
-        const attendanceIcon = attending ? 'fa-check-circle' : 'fa-times-circle';
-        const attendanceText = attending ? 'Present' : 'Absent';
-        
-        statusElement.className = `d-block ${attendanceClass}`;
-        statusElement.innerHTML = `<i class="fas ${attendanceIcon} me-1"></i>${attendanceText}`;
-      }
-
-      // Update toggle button if it's the attendance button
-      if (button.classList.contains('toggle-attendance')) {
-        const newButtonClass = attending ? 'btn-outline-warning' : 'btn-outline-success';
-        const newIcon = attending ? 'fa-user-times' : 'fa-user-check';
-        const newTitle = attending ? 'Mark as absent' : 'Mark as present';
-        
-        // Update button classes
-        button.className = `btn btn-sm ${newButtonClass} me-1 toggle-attendance`;
-        button.title = newTitle;
-        
-        // Update button icon
-        const icon = button.querySelector('i');
-        if (icon) {
-          icon.className = `fas ${newIcon}`;
-        }
-      }
-    });
-
-    // Update attendance summary
-    this.updateAttendanceSummary();
-  }
-
-  // Toggle player attendance
-  togglePlayerAttendance(playerName) {
-    const attendance = this.getMatchAttendance();
-    const playerRecord = attendance.find(p => p.playerName.toLowerCase() === playerName.toLowerCase());
-    
-    if (playerRecord) {
-      this.setPlayerAttendance(playerName, !playerRecord.attending);
-    }
-  }
-
-  // Mark all players as attending
-  markAllAttending() {
-    const attendance = this.getMatchAttendance().map(record => ({
-      ...record,
-      attending: true
-    }));
-    
-    this._saveAttendance(attendance);
-    this.updateRosterList();
-    notificationManager.success('All players marked as attending');
-  }
-
-  // Mark all players as absent
-  markAllAbsent() {
-    const attendance = this.getMatchAttendance().map(record => ({
-      ...record,
-      attending: false
-    }));
-    
-    this._saveAttendance(attendance);
-    this.updateRosterList();
-    notificationManager.success('All players marked as absent');
-  }
-
-  // Get attending players only
-  getAttendingPlayers() {
-    return this.getMatchAttendance().filter(record => record.attending);
-  }
-
-  // Get absent players only
-  getAbsentPlayers() {
-    return this.getMatchAttendance().filter(record => !record.attending);
-  }
-
-  // Clear attendance (reset all to attending)
-  clearAttendance() {
-    storage.remove(STORAGE_KEYS.MATCH_ATTENDANCE);
-    this.updateRosterList();
-    notificationManager.success('Attendance cleared - all players marked as attending');
-  }
-
-  // Save attendance to storage
-  _saveAttendance(attendanceData) {
-    try {
-      // Only save the essential data
-      const attendanceToSave = attendanceData.map(record => ({
-        playerName: record.playerName,
-        attending: record.attending
-      }));
-      
-      storage.save(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceToSave);
-    } catch (error) {
-      console.error('Error saving attendance:', error);
-      notificationManager.error('Error saving attendance. Please try again.');
-    }
-  }
-
-  // Get attendance summary for match reports
-  getAttendanceSummary() {
-    const attendance = this.getMatchAttendance();
-    const attending = attendance.filter(p => p.attending);
-    const absent = attendance.filter(p => !p.attending);
-    
-    return {
-      total: attendance.length,
-      attending: attending.length,
-      absent: absent.length,
-      attendingPlayers: attending.map(p => p.playerName),
-      absentPlayers: absent.map(p => p.playerName),
-      attendanceRate: attendance.length > 0 ? Math.round((attending.length / attendance.length) * 100) : 0
     };
   }
 }

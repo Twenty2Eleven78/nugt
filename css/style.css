@@ -377,6 +377,68 @@ body.modal-open {
   color: #dc3545 !important;
 }
 
+/* Attendance Modal Styles */
+.attendance-summary {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.attendance-controls {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.attendance-controls .btn {
+  min-width: 140px;
+  font-weight: 500;
+}
+
+#attendanceList .toggle-attendance-btn {
+  transition: all 0.2s ease;
+  min-width: 40px;
+}
+
+#attendanceList .toggle-attendance-btn:hover {
+  transform: scale(1.1);
+}
+
+#attendanceList .toggle-attendance-btn:disabled {
+  opacity: 0.6;
+  transform: none;
+}
+
+#attendanceList tr.table-secondary {
+  opacity: 0.7;
+  background-color: #f8f9fa;
+}
+
+#attendanceList td {
+  vertical-align: middle;
+}
+
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* No players message styling */
+#noPlayersMessage {
+  background: #f8f9fa;
+  border-radius: 0.5rem;
+  border: 2px dashed #dee2e6;
+}
+
+#noPlayersMessage .fa-users {
+  color: #6c757d;
+}
+
 /* Responsive attendance controls */
 @media (max-width: 576px) {
   .attendance-controls {
@@ -386,6 +448,7 @@ body.modal-open {
   .attendance-controls .btn {
     flex: none;
     width: 100%;
+    min-width: auto;
   }
   
   .roster-actions-cell {
@@ -395,6 +458,11 @@ body.modal-open {
   .roster-actions-cell .btn {
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
+  }
+
+  #attendanceList .toggle-attendance-btn {
+    min-width: 35px;
+    padding: 0.25rem 0.5rem;
   }
 }
 

@@ -32,6 +32,7 @@ import { rawDataModal } from './ui/raw-data-modal.js';
 import { notificationManager } from './services/notifications.js';
 import { sharingService } from './services/sharing.js';
 import { pwaUpdater } from './services/pwa-updater.js';
+import { attendanceManager } from './services/attendance.js';
 import { authService } from './services/auth.js';
 import { userMatchesApi } from './services/user-matches-api.js';
 
@@ -61,6 +62,7 @@ export function initializeApp() {
   // Initialize components
   teamManager.initializeTeams();
   rosterManager.init();
+  attendanceManager.init();
 
   // Initialize UI components
   bindEventListeners();

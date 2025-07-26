@@ -52,10 +52,13 @@ class AttendanceManager {
     );
     
     this._saveAttendance(updatedAttendance);
-    this.updateAttendanceList();
     
-    const status = attending ? 'present' : 'absent';
-    notificationManager.success(`${playerName} marked as ${status}`);
+    // Use setTimeout to ensure storage is complete before UI update
+    setTimeout(() => {
+      this.updateAttendanceList();
+      const status = attending ? 'present' : 'absent';
+      notificationManager.success(`${playerName} marked as ${status}`);
+    }, 100);
   }
 
   // Toggle player attendance
@@ -292,6 +295,10 @@ class AttendanceManager {
       const button = e.target.closest('.toggle-attendance-btn');
       if (!button) return;
 
+      // Prevent event bubbling and default behavior
+      e.preventDefault();
+      e.stopPropagation();
+
       // Prevent double-clicking
       if (button.disabled) return;
       button.disabled = true;
@@ -299,10 +306,10 @@ class AttendanceManager {
       const playerName = button.dataset.playerName;
       this.togglePlayerAttendance(playerName);
 
-      // Re-enable button after a short delay
+      // Re-enable button after processing is complete
       setTimeout(() => {
         button.disabled = false;
-      }, 300);
+      }, 500);
     });
   }
 }

@@ -450,6 +450,129 @@ body.modal-open {
   color: #6c757d;
 }
 
+/* Enhanced Release Notes */
+.release-notes-content {
+  line-height: 1.6;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.release-notes-h1 {
+  color: #dc3545;
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin: 1.5rem 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #dc3545;
+}
+
+.release-notes-h2 {
+  color: #007bff;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.75rem 0;
+  padding: 0.5rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-left: 4px solid #007bff;
+  border-radius: 4px;
+}
+
+.release-notes-h3 {
+  color: #28a745;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem 0;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.release-notes-p {
+  margin-bottom: 0.75rem;
+  color: #495057;
+}
+
+.release-notes-ul {
+  margin: 0.5rem 0 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.release-notes-li {
+  margin-bottom: 0.25rem;
+  color: #495057;
+}
+
+.release-notes-code {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  color: #e83e8c;
+}
+
+.release-notes-hr {
+  margin: 2rem 0;
+  border: none;
+  border-top: 2px solid #dee2e6;
+}
+
+.release-notes-tooltip {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Version badges */
+.release-notes-h2 .badge {
+  font-size: 0.7em;
+  vertical-align: middle;
+}
+
+.release-notes-h3 .badge {
+  font-size: 0.6em;
+  vertical-align: middle;
+}
+
+/* Interactive features */
+.release-notes-h2:hover,
+.release-notes-h3:hover {
+  background-color: #f1f3f4;
+  transition: background-color 0.2s ease;
+}
+
+.release-notes-code:hover {
+  background-color: #e9ecef;
+  transition: background-color 0.2s ease;
+}
+
+/* Feature icons */
+.release-notes-content .text-primary {
+  color: #007bff !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 576px) {
+  .release-notes-h1 {
+    font-size: 1.5rem;
+  }
+  
+  .release-notes-h2 {
+    font-size: 1.2rem;
+    padding: 0.4rem;
+  }
+  
+  .release-notes-h3 {
+    font-size: 1.1rem;
+  }
+  
+  .release-notes-ul {
+    padding-left: 1rem;
+  }
+}
+
 /* Enhanced Events Tab - Suggestion 1 */
 .events-container {
   padding: 1rem;

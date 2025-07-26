@@ -23,6 +23,7 @@ import { rosterManager } from './match/roster.js';
 import { bindModalEvents, hideModal } from './ui/modals.js';
 import { initializeTooltips } from './ui/components.js';
 import { enhancedEventsManager } from './ui/enhanced-events.js';
+import { releaseNotesManager } from './ui/release-notes.js';
 import { authUI } from './ui/auth-ui.js';
 import { matchSaveModal } from './ui/match-save-modal.js';
 import { matchLoadModal } from './ui/match-load-modal.js';
@@ -70,6 +71,7 @@ export function initializeApp() {
   bindModalEvents();
   initializeTooltips();
   enhancedEventsManager.init();
+  releaseNotesManager.init();
   matchSaveModal.init();
   matchLoadModal.init();
   matchSummaryModal.init();
@@ -351,21 +353,7 @@ function resetTracker() {
   }, 1000);
 }
 
-// Load release notes
-function loadReleaseNotes() {
-  const readmeContainer = document.getElementById('readme');
-  if (readmeContainer) {
-    fetch('README.md')
-      .then(response => response.text())
-      .then(text => {
-        readmeContainer.innerHTML = text.replace(/\n/g, '<br>');
-      })
-      .catch(error => {
-        console.error('Error loading release notes:', error);
-        readmeContainer.innerHTML = '<p>Error loading release notes.</p>';
-      });
-  }
-}
+
 
 // Expose modules to global scope for onclick handlers
 window.AppModule = {

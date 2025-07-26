@@ -86,12 +86,8 @@ export function getModalInstance(modalId) {
 
 // Modal event handlers
 export function bindModalEvents() {
-  // Release notes modal
-  const releaseNotesModal = document.getElementById('releasenotesmodal');
-  if (releaseNotesModal) {
-    releaseNotesModal.addEventListener('show.bs.modal', loadReleaseNotes);
-  }
-
+  // Release notes modal is now handled by releaseNotesManager
+  
   // Add cleanup event listeners to all modals
   const allModals = document.querySelectorAll('.modal');
   allModals.forEach(modal => {
@@ -146,18 +142,3 @@ export function closeAllModals() {
 
 
 
-// Load release notes content
-function loadReleaseNotes() {
-  const readmeContainer = document.getElementById('readme');
-  if (readmeContainer) {
-    fetch('README.md')
-      .then(response => response.text())
-      .then(text => {
-        readmeContainer.innerHTML = text.replace(/\n/g, '<br>');
-      })
-      .catch(error => {
-        console.error('Error loading release notes:', error);
-        readmeContainer.innerHTML = '<p>Error loading release notes.</p>';
-      });
-  }
-}

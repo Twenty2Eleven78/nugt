@@ -1,13 +1,137 @@
-<font color="red"<b>NUFC GameTime App Release Notes</b></font>
-<br><br>
-<li>1.0 - Initial working application modal</li>
-<li>1.3 - layout Changes,  Whats App Report, General application ui and function improvements</li>
-<li>2.0 - Added Roster/team Management feature
-<li>2.1 - General application ui and function improvements, Added time rounding (round up) to Goal Log</li>
-<li>3.0 - UI Overhall, ScoreBoard, Nav Pills, Modals, Fixture Management</li>
-<li>3.1 - New Match Events options and Events data, ability to delete individual logs</li>
-<li>3.2 - Change Match Events to show as a timeline view, Goal timestamp accuracy and stability improvements, Added shirt number functionality to player roster</li>
-<li>3.3 - Added disallowed goal options and additional game time options</li>
-<li>3.4 - Refactor Javescript into modern module architecture</li>
-<li><b>3.5.0 - seperate out roster defaults from roster core code</b></li>
-<li><b>3.5.1 - Added passkey authentication for user tracking and future game stats storage</b></li>
+# NUFC GameTime App - Release Notes
+
+## 🚀 Version 3.6 - Enhanced Events & Attendance System
+**Released: January 2025**
+
+### ✨ New Features
+- **Enhanced Events Tab**: Statistics dashboard with real-time event counting
+- **Advanced Filtering**: Search and filter events by type (Goals, Cards, Fouls)
+- **Event Statistics**: Visual cards showing Goals, Cards, Fouls, and Total Events
+- **CSV Export**: Professional event data export functionality
+- **Player Attendance System**: Complete attendance tracking with dedicated modal
+- **Modern Options Layout**: Card-based interface with quick actions
+- **Consistent Notifications**: Unified notification system across the app
+
+### 🎨 UI/UX Improvements
+- **Statistics Cards**: Visual event counters with hover effects
+- **Search & Filter Controls**: Professional search interface with clear filters
+- **Enhanced Timeline**: Improved event timeline with card-based design
+- **Quick Actions**: Fast access to most-used features
+- **Responsive Design**: Optimized for mobile and desktop
+
+### 🔧 Technical Enhancements
+- **PWA Updates**: Enhanced service worker with automatic updates
+- **Modular Architecture**: Separated attendance and enhanced events systems
+- **Performance**: Optimized event rendering and filtering
+- **Data Integration**: Attendance data included in cloud saves and exports
+
+---
+
+## 📋 Previous Versions
+
+### Version 3.5.1 - Authentication & Cloud Storage
+**Released: 2024**
+- **Passkey Authentication**: Secure user authentication system
+- **Cloud Data Storage**: Save and load match data to/from cloud
+- **User Management**: Personal match history and data management
+
+### Version 3.5.0 - Code Architecture
+**Released: 2024**
+- **Modular JavaScript**: Modern ES6 module architecture
+- **Separated Roster Defaults**: Cleaner code organization
+- **Performance Improvements**: Faster loading and better maintainability
+
+### Version 3.4 - Modern Architecture
+**Released: 2024**
+- **JavaScript Refactor**: Complete rewrite using modern module architecture
+- **Improved Performance**: Better code organization and loading times
+- **Enhanced Maintainability**: Cleaner, more maintainable codebase
+
+### Version 3.3 - Enhanced Gameplay
+**Released: 2023**
+- **Disallowed Goals**: Option to mark goals as disallowed with reasons
+- **Additional Game Times**: More match duration options for different age groups
+- **Improved Goal Management**: Better goal tracking and modification
+
+### Version 3.2 - Timeline & Player Management
+**Released: 2023**
+- **Timeline View**: Events displayed in chronological timeline format
+- **Goal Timestamp Accuracy**: Improved timing precision for goals
+- **Shirt Numbers**: Added shirt number functionality to player roster
+- **Stability Improvements**: Enhanced app reliability and performance
+
+### Version 3.1 - Match Events System
+**Released: 2023**
+- **Match Events**: Comprehensive event tracking (Cards, Fouls, Penalties)
+- **Event Management**: Ability to edit and delete individual log entries
+- **Enhanced Logging**: Detailed match event recording system
+
+### Version 3.0 - Major UI Overhaul
+**Released: 2023**
+- **Complete UI Redesign**: Modern, professional interface
+- **Dynamic Scoreboard**: Real-time score display
+- **Navigation Pills**: Improved tab-based navigation
+- **Modal System**: Professional modal dialogs
+- **Fixture Management**: Team name and fixture management
+
+### Version 2.1 - UI & Functionality
+**Released: 2022**
+- **UI Improvements**: General interface enhancements
+- **Time Rounding**: Automatic time rounding for goal timestamps
+- **Function Improvements**: Enhanced app functionality and reliability
+
+### Version 2.0 - Team Management
+**Released: 2022**
+- **Roster Management**: Complete team roster system
+- **Player Tracking**: Individual player management
+- **Team Organization**: Structured team data management
+
+### Version 1.3 - Reports & UI
+**Released: 2022**
+- **WhatsApp Reports**: Share match reports via WhatsApp
+- **Layout Changes**: Improved app layout and design
+- **UI Enhancements**: General user interface improvements
+
+### Version 1.0 - Initial Release
+**Released: 2022**
+- **Core Functionality**: Basic match timing and goal tracking
+- **Initial Modal System**: Basic modal dialogs
+- **Foundation**: Core app architecture and functionality
+
+---
+
+## 🎯 App Features Overview
+
+### ⚽ Match Management
+- **Timer System**: Accurate match timing with pause/resume
+- **Goal Tracking**: Comprehensive goal recording with scorer and assist
+- **Event Logging**: Cards, fouls, penalties, and incidents
+- **Team Management**: Dynamic team names and fixture management
+
+### 📊 Statistics & Analytics
+- **Real-time Stats**: Live event counting and statistics
+- **Event Filtering**: Search and filter by event type
+- **Data Export**: Professional CSV export functionality
+- **Match Reports**: Comprehensive WhatsApp match reports
+
+### 👥 Team Features
+- **Player Roster**: Complete team roster management
+- **Attendance Tracking**: Match-by-match attendance recording
+- **Player Statistics**: Individual player performance tracking
+- **Shirt Numbers**: Player identification system
+
+### 💾 Data Management
+- **Cloud Storage**: Secure cloud-based data storage
+- **Offline Support**: Full offline functionality with PWA
+- **Auto-Updates**: Seamless app updates with new features
+- **Data Export**: Multiple export formats for record keeping
+
+### 📱 Modern Experience
+- **PWA Support**: Install as native app on any device
+- **Responsive Design**: Optimized for mobile and desktop
+- **Modern UI**: Card-based interface with smooth animations
+- **Accessibility**: Full keyboard and screen reader support
+
+---
+
+*For support or feedback, use the in-app feedback system or contact the development team.*

@@ -1,0 +1,190 @@
+<!-- SUGGESTION 1: Card-Based Grid Layout -->
+<div class="options-container">
+    <!-- Quick Actions Row -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h6 class="fw-bold mb-3 text-center">
+                <i class="fas fa-bolt me-2 text-warning"></i>Quick Actions
+            </h6>
+            <div class="row g-3">
+                <div class="col-6 col-md-3">
+                    <div class="quick-action-card" data-bs-toggle="modal" data-bs-target="#attendanceModal">
+                        <i class="fas fa-user-check fa-2x mb-2 text-primary"></i>
+                        <span>Attendance</span>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="quick-action-card" id="shareButton">
+                        <i class="fas fa-share-alt fa-2x mb-2 text-success"></i>
+                        <span>Share Report</span>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="quick-action-card" id="saveMatchDataBtn">
+                        <i class="fas fa-cloud-arrow-up fa-2x mb-2 text-info"></i>
+                        <span>Save to Cloud</span>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="quick-action-card" onclick="pwaUpdater.triggerUpdate()">
+                        <i class="fas fa-sync fa-2x mb-2 text-secondary"></i>
+                        <span>Check Updates</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Options Cards -->
+    <div class="row g-4">
+        <!-- Game Settings Card -->
+        <div class="col-12 col-lg-6">
+            <div class="option-card">
+                <div class="option-card-header">
+                    <i class="fas fa-cog me-2"></i>Game Settings
+                </div>
+                <div class="option-card-body">
+                    <label for="gameTimeSelect" class="form-label">Match Duration</label>
+                    <select id="gameTimeSelect" class="form-select mb-2">
+                        <option value="2400">40 minutes (7v7)</option>
+                        <option value="3000">50 minutes (7v7)</option>
+                        <option value="3600">60 minutes (U11/12 9v9)</option>
+                        <option value="4200" selected>70 minutes (U13/14 11v11)</option>
+                        <option value="4800">80 minutes (U15/16 11v11)</option>
+                        <option value="5400">90 minutes (11v11)</option>
+                    </select>
+                    <small class="text-muted">Each half will be 50% of total time</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Management Card -->
+        <div class="col-12 col-lg-6">
+            <div class="option-card">
+                <div class="option-card-header">
+                    <i class="fas fa-users me-2"></i>Team Management
+                </div>
+                <div class="option-card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#rosterModal">
+                            <i class="fas fa-users me-2"></i>Manage Roster
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#attendanceModal">
+                            <i class="fas fa-user-check me-2"></i>Match Attendance
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account & Data Card -->
+        <div class="col-12 col-lg-6">
+            <div class="option-card">
+                <div class="option-card-header">
+                    <i class="fas fa-cloud me-2"></i>Account & Data
+                </div>
+                <div class="option-card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary btn-sm" id="showAuthButton">
+                            <i class="fas fa-user me-2"></i>Sign In / Register
+                        </button>
+                        <button class="btn btn-outline-success btn-sm" id="saveMatchDataBtn">
+                            <i class="fas fa-cloud-arrow-up me-2"></i>Save to Cloud
+                        </button>
+                        <button class="btn btn-outline-info btn-sm" id="loadMatchDataBtn">
+                            <i class="fas fa-cloud-arrow-down me-2"></i>Load from Cloud
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Management Card -->
+        <div class="col-12 col-lg-6">
+            <div class="option-card">
+                <div class="option-card-header">
+                    <i class="fas fa-tools me-2"></i>App Management
+                </div>
+                <div class="option-card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#releasenotesmodal">
+                            <i class="fas fa-list me-2"></i>Release Notes
+                        </button>
+                        <button class="btn btn-outline-info btn-sm" onclick="pwaUpdater.triggerUpdate()">
+                            <i class="fas fa-sync me-2"></i>Check Updates
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#feedbackModal">
+                            <i class="fas fa-comments me-2"></i>Feedback
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#resetConfirmModal">
+                            <i class="fas fa-arrows-rotate me-2"></i>Reset App
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .options-container {
+        padding: 1rem;
+    }
+
+    .quick-action-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        height: 100px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .quick-action-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-color: #007bff;
+    }
+
+    .quick-action-card span {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #495057;
+    }
+
+    .option-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .option-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .option-card-header {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        padding: 0.75rem 1rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .option-card-body {
+        padding: 1rem;
+    }
+</style>

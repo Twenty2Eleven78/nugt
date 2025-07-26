@@ -159,119 +159,131 @@
 
             <!-- Options Tab Content -->
             <div class="tab-pane fade" id="optionstab">
-              <div class="card">
-                <div class="card-body p-3">
-                  <h5 class="card-title"><i class="fa-solid fa-gears"></i> Options</h5>
-                  <hr>
-                  <!-- Game Duration Section -->
-                  <div class="mb-4">
-                    <label for="gameTimeSelect" class="form-label fw-bold mb-3">Game Duration </label>
-                    <select id="gameTimeSelect" class="form-select mb-2">
-                      <option value="2400">40 minutes (7v7)</option>
-                      <option value="3000">50 minutes (7v7)</option>
-                      <option value="3600">60 minutes (U11/12 9v9)</option>
-                      <option value="4200" selected>70 minutes (U13/14 11v11)</option>
-                      <option value="4800">80 minutes (U15/16 11v11)</option>
-                      <option value="5400">90 minutes (11v11)</option>
-                    </select>
-                    <small class="text-muted d-block mb-2">Each half will be 50% of total time</small>
-                  </div>
-                  <hr class="my-4">
-
-                  <!-- Team Management Section -->
-                  <div class="mb-4">
-                    <h6 class="fw-bold mb-3">Team Management</h6>
-                    <div class="d-grid gap-2">
-                      <button class="btn btn-danger d-flex align-items-center justify-content-center py-2"
-                        data-bs-toggle="modal" data-bs-target="#rosterModal">
-                        <i class="fas fa-users me-2"></i>
-                        My Team Management
-                      </button>
-                      <button class="btn btn-primary d-flex align-items-center justify-content-center py-2"
-                        data-bs-toggle="modal" data-bs-target="#attendanceModal">
-                        <i class="fas fa-user-check me-2"></i>
-                        Match Attendance
-                      </button>
-                      <button class="btn btn-success d-flex align-items-center justify-content-center py-2"
-                        id="shareButton">
-                        <i class="fas fa-share-alt me-2"></i>
-                        Send WhatsApp Report
-                      </button>
+              <div class="options-container">
+                <!-- Quick Actions Row -->
+                <div class="row mb-4">
+                  <div class="col-12">
+                    <h6 class="fw-bold mb-3 text-center">
+                      <i class="fas fa-bolt me-2 text-warning"></i>Quick Actions
+                    </h6>
+                    <div class="row g-3">
+                      <div class="col-6 col-md-3">
+                        <div class="quick-action-card" data-bs-toggle="modal" data-bs-target="#attendanceModal">
+                          <i class="fas fa-user-check fa-2x mb-2 text-primary"></i>
+                          <span>Attendance</span>
+                        </div>
+                      </div>
+                      <div class="col-6 col-md-3">
+                        <div class="quick-action-card" id="shareButton">
+                          <i class="fas fa-share-alt fa-2x mb-2 text-success"></i>
+                          <span>Share Report</span>
+                        </div>
+                      </div>
+                      <div class="col-6 col-md-3">
+                        <div class="quick-action-card" id="saveMatchDataBtn">
+                          <i class="fas fa-cloud-arrow-up fa-2x mb-2 text-info"></i>
+                          <span>Save to Cloud</span>
+                        </div>
+                      </div>
+                      <div class="col-6 col-md-3">
+                        <div class="quick-action-card" onclick="pwaUpdater.triggerUpdate()">
+                          <i class="fas fa-sync fa-2x mb-2 text-secondary"></i>
+                          <span>Check Updates</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <hr class="my-4">
+                </div>
 
-                  <!-- User Account Section -->
-                  <div class="mb-4">
-                    <h6 class="fw-bold mb-3">User Account</h6>
-                    <div class="d-grid gap-2">
-                      <button class="btn btn-primary d-flex align-items-center justify-content-center py-2"
-                        id="showAuthButton" onclick="window.debugAuth.createAuthModal(); window.debugAuth.showAuthModal();">
-                        <i class="fas fa-user me-2"></i>
-                        Sign In / Register
-                      </button>
-                      <button id="admin-modal-button" class="btn btn-secondary d-none d-flex align-items-center justify-content-center py-2">
-                        <i class="fas fa-user-shield me-2"></i>
-                        Admin Dashboard
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <hr class="my-4">
-
-                  <!-- Data Management Section -->
-                  <div class="mb-4">
-                    <h6 class="fw-bold mb-3">Data Management</h6>
-                    <div class="d-grid gap-2">
-                      <button class="btn btn-success d-flex align-items-center justify-content-center py-2" id="saveMatchDataBtn">
-                        <i class="fa-solid fa-cloud-arrow-up me-2"></i>
-                        Save Match Data to Cloud
-                      </button>
-                      <button class="btn btn-info d-flex align-items-center justify-content-center py-2" id="loadMatchDataBtn">
-                        <i class="fa-solid fa-cloud-arrow-down me-2"></i>
-                        Load My Cloud Match Data
-                      </button>
+                <!-- Main Options Cards -->
+                <div class="row g-4">
+                  <!-- Game Settings Card -->
+                  <div class="col-12 col-lg-6">
+                    <div class="option-card">
+                      <div class="option-card-header">
+                        <i class="fas fa-cog me-2"></i>Game Settings
+                      </div>
+                      <div class="option-card-body">
+                        <label for="gameTimeSelect" class="form-label">Match Duration</label>
+                        <select id="gameTimeSelect" class="form-select mb-2">
+                          <option value="2400">40 minutes (7v7)</option>
+                          <option value="3000">50 minutes (7v7)</option>
+                          <option value="3600">60 minutes (U11/12 9v9)</option>
+                          <option value="4200" selected>70 minutes (U13/14 11v11)</option>
+                          <option value="4800">80 minutes (U15/16 11v11)</option>
+                          <option value="5400">90 minutes (11v11)</option>
+                        </select>
+                        <small class="text-muted">Each half will be 50% of total time</small>
+                      </div>
                     </div>
                   </div>
 
-                  <hr class="my-4">
-                  
-                  <div class="mb-4">
-                    <h6 class="fw-bold mb-3">App Management</h6>
-                    <div class="d-grid gap-2">
-                      <!--Donate -->
-                      <!--<button class="btn btn-warning d-flex align-items-center justify-content-center py-2" id="donateButton" data-bs-toggle="modal" data-bs-target="#donateModal">
-                        <i class="fa-solid fa-heart me-2"></i>
-                        Support Netherton United U12 Girls Black
-                      </button>
-                      -->
-                      <button class="btn btn-danger d-flex align-items-center justify-content-center py-2"
-                        data-bs-toggle="modal" data-bs-target="#releasenotesmodal">
-                        <i class="fa-solid fa-list me-2"></i>
-                        Release Notes
-                      </button>
-                      <button class="btn btn-outline-info d-flex align-items-center justify-content-center py-2"
-                        id="checkForUpdatesBtn" onclick="pwaUpdater.triggerUpdate()">
-                        <i class="fa-solid fa-sync me-2"></i>
-                        Check for App Updates
-                      </button>
-                      <button class="btn btn-danger d-flex align-items-center justify-content-center py-2"
-                        data-bs-toggle="modal" data-bs-target="#resetConfirmModal">
-                        <i class="fa-solid fa-arrows-rotate me-2"></i>
-                        Reset GameTime App
-                      </button>
+                  <!-- Team Management Card -->
+                  <div class="col-12 col-lg-6">
+                    <div class="option-card">
+                      <div class="option-card-header">
+                        <i class="fas fa-users me-2"></i>Team Management
+                      </div>
+                      <div class="option-card-body">
+                        <div class="d-grid gap-2">
+                          <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rosterModal">
+                            <i class="fas fa-users me-2"></i>Manage Roster
+                          </button>
+                          <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#attendanceModal">
+                            <i class="fas fa-user-check me-2"></i>Match Attendance
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <hr class="mb-4">
 
-                  <!-- Feedback Section -->
-                  <div class="mb-4">
-                    <div class="d-grid">
-                      <button class="btn btn-primary d-flex align-items-center justify-content-center py-2"
-                        data-bs-toggle="modal" data-bs-target="#feedbackModal">
-                        <i class="fa-solid fa-comments me-2"></i>
-                        Provide Feedback
-                      </button>
+                  <!-- Account & Data Card -->
+                  <div class="col-12 col-lg-6">
+                    <div class="option-card">
+                      <div class="option-card-header">
+                        <i class="fas fa-cloud me-2"></i>Account & Data
+                      </div>
+                      <div class="option-card-body">
+                        <div class="d-grid gap-2">
+                          <button class="btn btn-outline-primary btn-sm" id="showAuthButton" onclick="window.debugAuth.createAuthModal(); window.debugAuth.showAuthModal();">
+                            <i class="fas fa-user me-2"></i>Sign In / Register
+                          </button>
+                          <button class="btn btn-outline-success btn-sm" id="saveMatchDataBtnCard">
+                            <i class="fas fa-cloud-arrow-up me-2"></i>Save to Cloud
+                          </button>
+                          <button class="btn btn-outline-info btn-sm" id="loadMatchDataBtn">
+                            <i class="fas fa-cloud-arrow-down me-2"></i>Load from Cloud
+                          </button>
+                          <button id="admin-modal-button" class="btn btn-outline-secondary btn-sm d-none">
+                            <i class="fas fa-user-shield me-2"></i>Admin Dashboard
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- App Management Card -->
+                  <div class="col-12 col-lg-6">
+                    <div class="option-card">
+                      <div class="option-card-header">
+                        <i class="fas fa-tools me-2"></i>App Management
+                      </div>
+                      <div class="option-card-body">
+                        <div class="d-grid gap-2">
+                          <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#releasenotesmodal">
+                            <i class="fas fa-list me-2"></i>Release Notes
+                          </button>
+                          <button class="btn btn-outline-info btn-sm" id="checkForUpdatesBtn" onclick="pwaUpdater.triggerUpdate()">
+                            <i class="fas fa-sync me-2"></i>Check Updates
+                          </button>
+                          <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#feedbackModal">
+                            <i class="fas fa-comments me-2"></i>Feedback
+                          </button>
+                          <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#resetConfirmModal">
+                            <i class="fas fa-arrows-rotate me-2"></i>Reset App
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

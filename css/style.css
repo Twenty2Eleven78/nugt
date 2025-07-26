@@ -450,6 +450,64 @@ body.modal-open {
   color: #6c757d;
 }
 
+/* Options Layout Suggestion 1 - Card-Based Grid Layout */
+.options-container {
+  padding: 1rem;
+}
+
+.quick-action-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.quick-action-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-color: #007bff;
+}
+
+.quick-action-card span {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.option-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.option-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.option-card-header {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.option-card-body {
+  padding: 1rem;
+}
+
 /* Responsive attendance controls */
 @media (max-width: 576px) {
   .attendance-controls {
@@ -474,6 +532,19 @@ body.modal-open {
   #attendanceList .toggle-attendance-btn {
     min-width: 35px;
     padding: 0.25rem 0.5rem;
+  }
+
+  .quick-action-card {
+    height: 80px;
+    padding: 0.75rem;
+  }
+
+  .quick-action-card i {
+    font-size: 1.5rem !important;
+  }
+
+  .quick-action-card span {
+    font-size: 0.75rem;
   }
 }
 

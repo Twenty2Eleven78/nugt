@@ -76,8 +76,12 @@ class AttendanceManager {
     }));
     
     this._saveAttendance(attendance);
-    this.updateAttendanceList();
-    notificationManager.success('All players marked as present');
+    
+    // Use setTimeout to ensure storage is complete before UI update
+    setTimeout(() => {
+      this.updateAttendanceList();
+      notificationManager.success('All players marked as present');
+    }, 100);
   }
 
   // Mark all players as absent
@@ -88,15 +92,23 @@ class AttendanceManager {
     }));
     
     this._saveAttendance(attendance);
-    this.updateAttendanceList();
-    notificationManager.success('All players marked as absent');
+    
+    // Use setTimeout to ensure storage is complete before UI update
+    setTimeout(() => {
+      this.updateAttendanceList();
+      notificationManager.success('All players marked as absent');
+    }, 100);
   }
 
   // Clear attendance (reset all to attending)
   clearAttendance() {
     storage.remove(STORAGE_KEYS.MATCH_ATTENDANCE);
-    this.updateAttendanceList();
-    notificationManager.success('Attendance reset - all players marked as present');
+    
+    // Use setTimeout to ensure storage is complete before UI update
+    setTimeout(() => {
+      this.updateAttendanceList();
+      notificationManager.success('Attendance reset - all players marked as present');
+    }, 100);
   }
 
   // Update attendance list in modal
@@ -223,20 +235,50 @@ class AttendanceManager {
     const clearAttendanceBtn = document.getElementById('clearAttendanceBtnMain');
 
     if (markAllAttendingBtn) {
-      markAllAttendingBtn.addEventListener('click', () => {
+      markAllAttendingBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (markAllAttendingBtn.disabled) return;
+        markAllAttendingBtn.disabled = true;
+        
         this.markAllAttending();
+        
+        setTimeout(() => {
+          markAllAttendingBtn.disabled = false;
+        }, 500);
       });
     }
 
     if (markAllAbsentBtn) {
-      markAllAbsentBtn.addEventListener('click', () => {
+      markAllAbsentBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (markAllAbsentBtn.disabled) return;
+        markAllAbsentBtn.disabled = true;
+        
         this.markAllAbsent();
+        
+        setTimeout(() => {
+          markAllAbsentBtn.disabled = false;
+        }, 500);
       });
     }
 
     if (clearAttendanceBtn) {
-      clearAttendanceBtn.addEventListener('click', () => {
+      clearAttendanceBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (clearAttendanceBtn.disabled) return;
+        clearAttendanceBtn.disabled = true;
+        
         this.clearAttendance();
+        
+        setTimeout(() => {
+          clearAttendanceBtn.disabled = false;
+        }, 500);
       });
     }
   }

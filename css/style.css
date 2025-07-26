@@ -413,6 +413,17 @@ body.modal-open {
   transform: none;
 }
 
+/* Bulk attendance button disabled states */
+.attendance-controls .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.attendance-controls .btn:disabled:hover {
+  transform: none;
+}
+
 #attendanceList tr.table-secondary {
   opacity: 0.7;
   background-color: #f8f9fa;

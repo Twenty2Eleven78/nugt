@@ -12,6 +12,7 @@ import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from '../ui/modals.js';
 import { getEventIcon, getEventCardClass } from '../ui/components.js';
 import { timerController } from '../game/timer.js';
+import { attendanceManager } from '../services/attendance.js';
 
 // Match events management class
 class EventsManager {
@@ -61,7 +62,7 @@ class EventsManager {
     }
     
     // Save data
-    storageHelpers.saveMatchData(gameState);
+    storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
   }
 
   // Handle half time event
@@ -140,7 +141,7 @@ class EventsManager {
 
     // Update UI and save
     updateMatchLog();
-    storageHelpers.saveMatchData(gameState);
+    storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
     
     // Clean up and close modal
     stateManager.clearEditingEvent();
@@ -375,7 +376,7 @@ export function deleteLogEntry(index, type) {
   
   updateMatchLog();
   notificationManager.error('Entry deleted');
-  storageHelpers.saveMatchData(gameState);
+  storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
 }
 
 // Export convenience methods

@@ -10,6 +10,7 @@ import { getCurrentSeconds, formatMatchTime } from '../shared/utils.js';
 import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from '../ui/modals.js';
 import { updateMatchLog } from './events.js';
+import { attendanceManager } from '../services/attendance.js';
 
 // Goal management class
 class GoalManager {
@@ -62,7 +63,7 @@ class GoalManager {
     notificationManager.success(`Goal scored by ${goalScorerName}!`);
 
     // Save and cleanup
-    storageHelpers.saveMatchData(gameState);
+    storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
     
     this._resetGoalForm();
     hideModal('goalModal');
@@ -93,7 +94,7 @@ class GoalManager {
     notificationManager.error(`Goal scored by ${team2Name}!`);
 
     // Save data
-    storageHelpers.saveMatchData(gameState);
+    storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
     
     this._resetGoalForm();
   }

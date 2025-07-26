@@ -174,7 +174,18 @@ export const storageHelpers = {
   saveMatchData(gameState) {
     storage.save(STORAGE_KEYS.GOALS, gameState.goals);
     storage.save(STORAGE_KEYS.MATCH_EVENTS, gameState.matchEvents);
-    // Note: Attendance is saved separately by roster manager
+    // Attendance is saved automatically when changed, but ensure it's included in match data
+  },
+
+  // Save complete match data including attendance
+  saveCompleteMatchData(gameState, attendanceData = null) {
+    storage.save(STORAGE_KEYS.GOALS, gameState.goals);
+    storage.save(STORAGE_KEYS.MATCH_EVENTS, gameState.matchEvents);
+    
+    // Save attendance data if provided
+    if (attendanceData) {
+      storage.save(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
+    }
   },
 
   // Save team data
@@ -200,7 +211,8 @@ export const storageHelpers = {
       goals: storage.load(STORAGE_KEYS.GOALS, []),
       matchEvents: storage.load(STORAGE_KEYS.MATCH_EVENTS, []),
       team1History: storage.load(STORAGE_KEYS.TEAM1_HISTORY, [GAME_CONFIG.DEFAULT_TEAM1_NAME]),
-      team2History: storage.load(STORAGE_KEYS.TEAM2_HISTORY, [GAME_CONFIG.DEFAULT_TEAM2_NAME])
+      team2History: storage.load(STORAGE_KEYS.TEAM2_HISTORY, [GAME_CONFIG.DEFAULT_TEAM2_NAME]),
+      attendance: storage.load(STORAGE_KEYS.MATCH_ATTENDANCE, [])
     };
   }
 };

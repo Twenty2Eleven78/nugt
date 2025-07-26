@@ -162,6 +162,8 @@ function bindEventListeners() {
             team2Name,
             score1,
             score2,
+            attendance: attendanceManager.getMatchAttendance(),
+            roster: rosterManager.getRoster(),
             savedAt: Date.now()
           };
         

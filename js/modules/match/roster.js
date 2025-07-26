@@ -518,21 +518,59 @@ class RosterManager {
     if (!rosterList) return;
 
     rosterList.addEventListener('click', (e) => {
+      // Prevent multiple rapid clicks
+      e.preventDefault();
+      e.stopPropagation();
+      
       const targetButton = e.target.closest('button');
       if (!targetButton) return;
 
+      // Prevent double-clicking by temporarily disabling the button
+      if (targetButton.disabled) return;
+      targetButton.disabled = true;
+      
       const playerName = targetButton.dataset.playerName;
 
       if (targetButton.classList.contains('remove-player')) {
         if (confirm(`Are you sure you want to remove ${playerName}?`)) {
           this.removePlayer(playerName);
+        } else {
+          // Re-enable button if user cancels
+          targetButton.disabled = false;
         }
       } else if (targetButton.classList.contains('edit-player')) {
         this._showEditPlayerModal(playerName);
+        // Re-enable button after modal opens
+        setTimeout(() => {
+          targetButton.disabled = false;
+        }, 100);
       } else if (targetButton.classList.contains('toggle-attendance')) {
-        this.togglePlayerAttendance(playerName);
+        this._handleAttendanceToggle(playerName, targetButton);
       }
     });
+  }
+
+  // Handle attendance toggle with proper event management
+  _handleAttendanceToggle(playerName, button) {
+    // Get current attendance status
+    const attendance = this.getMatchAttendance();
+    const playerRecord = attendance.find(p => p.playerName.toLowerCase() === playerName.toLowerCase());
+    
+    if (!playerRecord) {
+      button.disabled = false;
+      return;
+    }
+
+    // Toggle the attendance
+    const newStatus = !playerRecord.attending;
+    
+    // Update attendance immediately
+    this.setPlayerAttendance(playerName, newStatus);
+    
+    // Re-enable button after a short delay to prevent double-clicks
+    setTimeout(() => {
+      button.disabled = false;
+    }, 200);
   }
 
   // Show edit player modal
@@ -668,10 +706,64 @@ class RosterManager {
     );
     
     this._saveAttendance(updatedAttendance);
-    this.updateRosterList();
+    
+    // Update UI immediately without regenerating entire list
+    this._updatePlayerAttendanceUI(playerName, attending);
     
     const status = attending ? 'attending' : 'absent';
     notificationManager.success(`${playerName} marked as ${status}`);
+  }
+
+  // Update individual player attendance UI without full roster regeneration
+  _updatePlayerAttendanceUI(playerName, attending) {
+    const rosterList = document.getElementById('rosterList');
+    if (!rosterList) return;
+
+    // Find the player's row
+    const playerButtons = rosterList.querySelectorAll(`[data-player-name="${playerName}"]`);
+    
+    playerButtons.forEach(button => {
+      const row = button.closest('tr');
+      if (!row) return;
+
+      // Update row styling
+      if (attending) {
+        row.classList.remove('table-secondary');
+      } else {
+        row.classList.add('table-secondary');
+      }
+
+      // Update attendance status text and icon
+      const statusElement = row.querySelector('small');
+      if (statusElement) {
+        const attendanceClass = attending ? 'text-success' : 'text-danger';
+        const attendanceIcon = attending ? 'fa-check-circle' : 'fa-times-circle';
+        const attendanceText = attending ? 'Present' : 'Absent';
+        
+        statusElement.className = `d-block ${attendanceClass}`;
+        statusElement.innerHTML = `<i class="fas ${attendanceIcon} me-1"></i>${attendanceText}`;
+      }
+
+      // Update toggle button if it's the attendance button
+      if (button.classList.contains('toggle-attendance')) {
+        const newButtonClass = attending ? 'btn-outline-warning' : 'btn-outline-success';
+        const newIcon = attending ? 'fa-user-times' : 'fa-user-check';
+        const newTitle = attending ? 'Mark as absent' : 'Mark as present';
+        
+        // Update button classes
+        button.className = `btn btn-sm ${newButtonClass} me-1 toggle-attendance`;
+        button.title = newTitle;
+        
+        // Update button icon
+        const icon = button.querySelector('i');
+        if (icon) {
+          icon.className = `fas ${newIcon}`;
+        }
+      }
+    });
+
+    // Update attendance summary
+    this.updateAttendanceSummary();
   }
 
   // Toggle player attendance

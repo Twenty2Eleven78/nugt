@@ -22,6 +22,7 @@ import { rosterManager } from './match/roster.js';
 // UI modules
 import { bindModalEvents, hideModal } from './ui/modals.js';
 import { initializeTooltips } from './ui/components.js';
+import { enhancedEventsManager } from './ui/enhanced-events.js';
 import { authUI } from './ui/auth-ui.js';
 import { matchSaveModal } from './ui/match-save-modal.js';
 import { matchLoadModal } from './ui/match-load-modal.js';
@@ -32,6 +33,7 @@ import { rawDataModal } from './ui/raw-data-modal.js';
 import { notificationManager } from './services/notifications.js';
 import { sharingService } from './services/sharing.js';
 import { pwaUpdater } from './services/pwa-updater.js';
+import { attendanceManager } from './services/attendance.js';
 import { authService } from './services/auth.js';
 import { userMatchesApi } from './services/user-matches-api.js';
 
@@ -61,11 +63,13 @@ export function initializeApp() {
   // Initialize components
   teamManager.initializeTeams();
   rosterManager.init();
+  attendanceManager.init();
 
   // Initialize UI components
   bindEventListeners();
   bindModalEvents();
   initializeTooltips();
+  enhancedEventsManager.init();
   matchSaveModal.init();
   matchLoadModal.init();
   matchSummaryModal.init();
@@ -124,53 +128,62 @@ function loadAppState() {
 function bindEventListeners() {
   // Set up cloud save/load button handlers
   const saveBtn = document.getElementById('saveMatchDataBtn');
+  const saveBtnCard = document.getElementById('saveMatchDataBtnCard');
   const loadBtn = document.getElementById('loadMatchDataBtn');
   
-  // Save match data to Netlify Blobs
-  if (saveBtn) {
-    saveBtn.addEventListener('click', async () => {
-      if (!authService.isUserAuthenticated()) {
-        notificationManager.warning('Please sign in to save match data to the cloud');
-        return;
-      }
+  // Save match data to Netlify Blobs - function for both buttons
+  const handleSaveMatch = async () => {
+    if (!authService.isUserAuthenticated()) {
+      notificationManager.warning('Please sign in to save match data to the cloud');
+      return;
+    }
 
-      // Show save match modal
-      const team1Name = domCache.get('Team1NameElement')?.textContent || 'Team 1';
-      const team2Name = domCache.get('Team2NameElement')?.textContent || 'Team 2';
-      const score1 = domCache.get('firstScoreElement')?.textContent || '0';
-      const score2 = domCache.get('secondScoreElement')?.textContent || '0';
-      const currentDate = new Date().toLocaleDateString('en-GB');
-      const defaultTitle = `${team1Name}(${score1}):${team2Name}(${score2}) - ${currentDate}`;
+    // Show save match modal
+    const team1Name = domCache.get('Team1NameElement')?.textContent || 'Team 1';
+    const team2Name = domCache.get('Team2NameElement')?.textContent || 'Team 2';
+    const score1 = domCache.get('firstScoreElement')?.textContent || '0';
+    const score2 = domCache.get('secondScoreElement')?.textContent || '0';
+    const currentDate = new Date().toLocaleDateString('en-GB');
+    const defaultTitle = `${team1Name}(${score1}):${team2Name}(${score2}) - ${currentDate}`;
+    
+    matchSaveModal.show({
+      defaultTitle,
+      defaultNotes: ''
+    }, async ({ title, notes }) => {
+      try {
+        // Gather match data
+        const matchData = {
+          title,
+          notes,
+          goals: gameState.goals,
+          matchEvents: gameState.matchEvents,
+          team1History: gameState.team1History,
+          team2History: gameState.team2History,
+          gameTime: gameState.gameTime,
+          team1Name,
+          team2Name,
+          score1,
+          score2,
+          attendance: attendanceManager.getMatchAttendance(),
+          savedAt: Date.now()
+        };
       
-      matchSaveModal.show({
-        defaultTitle,
-        defaultNotes: ''
-      }, async ({ title, notes }) => {
-        try {
-          // Gather match data
-          const matchData = {
-            title,
-            notes,
-            goals: gameState.goals,
-            matchEvents: gameState.matchEvents,
-            team1History: gameState.team1History,
-            team2History: gameState.team2History,
-            gameTime: gameState.gameTime,
-            team1Name,
-            team2Name,
-            score1,
-            score2,
-            savedAt: Date.now()
-          };
-        
-          await userMatchesApi.saveMatchData(matchData);
-          notificationManager.success('Match saved to cloud!');
-        } catch (e) {
-          console.error('Error saving match data:', e);
-          notificationManager.error('Failed to save match data.');
-        }
-      });
+        await userMatchesApi.saveMatchData(matchData);
+        notificationManager.success('Match saved to cloud!');
+      } catch (e) {
+        console.error('Error saving match data:', e);
+        notificationManager.error('Failed to save match data.');
+      }
     });
+  };
+
+  // Bind both save buttons to the same functionality
+  if (saveBtn) {
+    saveBtn.addEventListener('click', handleSaveMatch);
+  }
+  
+  if (saveBtnCard) {
+    saveBtnCard.addEventListener('click', handleSaveMatch);
   }
 
   // Load match data from Netlify Blobs

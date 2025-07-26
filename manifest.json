@@ -5,7 +5,7 @@
     "theme_color": "#8B0000",
     "background_color": "#fff",
     "display": "standalone",
-    "description": "Football match timer and event tracker",
+    "description": "Advanced football match tracker with attendance, statistics, and enhanced event management",
     "icons": [
         {
             "src": "./nugt512.png",

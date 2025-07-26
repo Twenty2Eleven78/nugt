@@ -8,6 +8,7 @@ import { domCache } from '../shared/dom.js';
 import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from '../ui/modals.js';
 import { rosterUtils } from '../data/default-roster.js';
+import { STORAGE_KEYS } from '../shared/constants.js';
 
 // Configuration constants
 const ROSTER_CONFIG = {
@@ -25,7 +26,7 @@ class RosterManager {
   // Initialize roster
   init() {
     if (this.isInitialized) return;
-    
+
     this.roster = this._loadRoster();
     this.updateSelects();
     this.updateRosterList();
@@ -37,7 +38,7 @@ class RosterManager {
   _loadRoster() {
     try {
       const savedRosterJSON = storage.load(ROSTER_CONFIG.STORAGE_KEY);
-      
+
       if (!savedRosterJSON) {
         return this._getDefaultRoster();
       }
@@ -99,7 +100,7 @@ class RosterManager {
   _removeDuplicates(roster) {
     const uniqueRoster = [];
     const namesSeen = new Set();
-    
+
     for (const player of roster) {
       const lowerName = player.name.toLowerCase();
       if (!namesSeen.has(lowerName)) {
@@ -107,7 +108,7 @@ class RosterManager {
         namesSeen.add(lowerName);
       }
     }
-    
+
     return uniqueRoster;
   }
 
@@ -197,11 +198,11 @@ class RosterManager {
           <td>${player.name}</td>
           <td>${player.shirtNumber !== null ? player.shirtNumber : '-'}</td>
           <td class="text-end roster-actions-cell">
-            <button class="btn btn-sm btn-outline-primary me-2 edit-player" data-player-name="${player.name}">
-              <i class="fas fa-edit"></i> Edit
+            <button class="btn btn-sm btn-outline-primary me-1 edit-player" data-player-name="${player.name}">
+              <i class="fas fa-edit"></i>
             </button>
             <button class="btn btn-sm btn-outline-danger remove-player" data-player-name="${player.name}">
-              <i class="fas fa-trash"></i> Remove
+              <i class="fas fa-trash"></i>
             </button>
           </td>
         </tr>
@@ -233,7 +234,7 @@ class RosterManager {
     this._saveRoster();
     this.updateSelects();
     this.updateRosterList();
-    
+
     const shirtText = num !== null ? ` (#${num})` : '';
     notificationManager.success(`Player ${trimmedName}${shirtText} added successfully.`);
     return true;
@@ -251,7 +252,7 @@ class RosterManager {
     this._saveRoster();
     this.updateSelects();
     this.updateRosterList();
-    
+
     notificationManager.success(`Player ${playerName} removed successfully.`);
     return true;
   }
@@ -317,7 +318,7 @@ class RosterManager {
     }
 
     const results = this._processBulkAdd(namesArray);
-    
+
     if (results.added.length > 0) {
       this.roster.push(...results.added);
       this.roster = this._sortRoster(this.roster);
@@ -398,7 +399,7 @@ class RosterManager {
   // Check if player exists
   _playerExists(name, excludeIndex = -1) {
     const lowerName = name.toLowerCase();
-    return this.roster.some((player, index) => 
+    return this.roster.some((player, index) =>
       index !== excludeIndex && player.name.toLowerCase() === lowerName
     );
   }
@@ -452,7 +453,7 @@ class RosterManager {
       addPlayerBtn.addEventListener('click', () => {
         const playerName = newPlayerNameInput.value.trim();
         const playerShirtNumber = newPlayerShirtNumberInput.value;
-        
+
         if (this.addPlayer(playerName, playerShirtNumber)) {
           newPlayerNameInput.value = '';
           newPlayerShirtNumberInput.value = '';
@@ -490,20 +491,37 @@ class RosterManager {
     if (!rosterList) return;
 
     rosterList.addEventListener('click', (e) => {
+      // Prevent multiple rapid clicks
+      e.preventDefault();
+      e.stopPropagation();
+
       const targetButton = e.target.closest('button');
       if (!targetButton) return;
+
+      // Prevent double-clicking by temporarily disabling the button
+      if (targetButton.disabled) return;
+      targetButton.disabled = true;
 
       const playerName = targetButton.dataset.playerName;
 
       if (targetButton.classList.contains('remove-player')) {
         if (confirm(`Are you sure you want to remove ${playerName}?`)) {
           this.removePlayer(playerName);
+        } else {
+          // Re-enable button if user cancels
+          targetButton.disabled = false;
         }
       } else if (targetButton.classList.contains('edit-player')) {
         this._showEditPlayerModal(playerName);
+        // Re-enable button after modal opens
+        setTimeout(() => {
+          targetButton.disabled = false;
+        }, 100);
       }
     });
   }
+
+
 
   // Show edit player modal
   _showEditPlayerModal(playerName) {
@@ -530,7 +548,7 @@ class RosterManager {
 
     editPlayerForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      
+
       const oldName = document.getElementById('editPlayerOldName')?.value;
       const newName = document.getElementById('editPlayerName')?.value.trim();
       const newShirtNumber = document.getElementById('editPlayerShirtNumber')?.value;

@@ -7,6 +7,7 @@ import { gameState } from '../data/state.js';
 import { domCache } from '../shared/dom.js';
 import { formatTime } from '../shared/utils.js';
 import { getEventIcon } from '../ui/components.js';
+import { attendanceManager } from './attendance.js';
 
 // Statistics and sharing service
 class SharingService {
@@ -22,7 +23,7 @@ class SharingService {
       gameState.goals.forEach(({ goalScorerName, goalAssistName, disallowed }) => {
         // Skip disallowed goals
         if (disallowed) return;
-        
+
         // Check if the goal scorer matches any historical team 2 name
         if (gameState.team2History.includes(goalScorerName)) {
           oppositionGoals++;
@@ -50,10 +51,16 @@ class SharingService {
     const sortedScorers = Array.from(goalScorers.entries())
       .sort((a, b) => b[1] - a[1])
       .map(([name, goals]) => `${name}: ${goals}`);
-    
+
     const sortedAssists = Array.from(assists.entries())
       .sort((a, b) => b[1] - a[1])
       .map(([name, assistCount]) => `${name}: ${assistCount}`);
+
+    // Get attendance data
+    const attendanceSummary = attendanceManager.getAttendanceSummary();
+    const attendingPlayers = attendanceSummary.attendingPlayers.join(', ');
+    const absentPlayers = attendanceSummary.absentPlayers.length > 0 ?
+      attendanceSummary.absentPlayers.join(', ') : 'None';
 
     // Prepare stats string
     const scorersString = sortedScorers.length > 0 ? sortedScorers.join(', ') : 'None';
@@ -63,13 +70,17 @@ class SharingService {
       `⚽ ${team1Name} Goals: ${teamGoals}\n` +
       `⚽ ${team2Name} Goals: ${oppositionGoals}\n` +
       `🥅 Goal Scorers: ${scorersString}\n` +
-      `🎯 Assists: ${assistsString}`;
+      `🎯 Assists: ${assistsString}\n` +
+      `👥 Attendance: ${attendanceSummary.attending}/${attendanceSummary.total} (${attendanceSummary.attendanceRate}%)\n` +
+      `✅ Present: ${attendingPlayers}\n` +
+      `❌ Absent: ${absentPlayers}`;
 
     return {
       teamGoals,
       oppositionGoals,
       goalScorers: sortedScorers,
       assists: sortedAssists,
+      attendance: attendanceSummary,
       statsstring: statsString,
       team1Name,
       team2Name
@@ -101,13 +112,13 @@ class SharingService {
           // Goal event
           const isOppositionGoal = event.goalScorerName === stats.team2Name;
           const disallowedText = event.disallowed ? ` (DISALLOWED: ${event.disallowedReason})` : '';
-          return isOppositionGoal 
+          return isOppositionGoal
             ? `🥅 ${event.timestamp}' - ${stats.team2Name} Goal${disallowedText}`
             : `🥅 ${event.timestamp}' - Goal: ${event.goalScorerName}, Assist: ${event.goalAssistName}${disallowedText}`;
         }
       })
       .join('\n');
-      
+
     return encodeURIComponent(`${header}${allEvents}\n\n${stats.statsstring}`);
   }
 
@@ -132,7 +143,7 @@ class SharingService {
     try {
       const stats = this.generateStats();
       const gameTime = formatTime(gameState.seconds);
-      
+
       await navigator.share({
         title: `${stats.team1Name} vs ${stats.team2Name} - Match Report`,
         text: `Match finished ${stats.teamGoals}-${stats.oppositionGoals} after ${gameTime}`,
@@ -170,17 +181,19 @@ class SharingService {
         team1History: gameState.team1History,
         team2History: gameState.team2History
       },
+      attendance: attendanceManager.getMatchAttendance(),
+      roster: attendanceManager.getMatchAttendance(), // Using attendance data which includes roster info
       stats: this.generateStats()
     };
 
     const dataStr = JSON.stringify(exportData, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    
+
     const link = document.createElement('a');
     link.href = URL.createObjectURL(dataBlob);
     link.download = `match-report-${new Date().toISOString().split('T')[0]}.json`;
     link.click();
-    
+
     URL.revokeObjectURL(link.href);
   }
 }

@@ -1,5 +1,5 @@
 //Cache Name
-const CACHE_NAME = "nugt-cache-v11";
+const CACHE_NAME = "nugt-cache-v12";
 //Files to cache - Modular Architecture
 const cacheFiles = [
   './',
@@ -28,10 +28,12 @@ const cacheFiles = [
   // UI modules
   './js/modules/ui/modals.js',
   './js/modules/ui/components.js',
+  './js/modules/ui/enhanced-events.js',
   // Services
   './js/modules/services/notifications.js',
   './js/modules/services/sharing.js',
   './js/modules/services/pwa-updater.js',
+  './js/modules/services/attendance.js',
   // Assets
   './webfonts/fa-regular-400.woff2',
   './webfonts/fa-solid-900.woff2',
@@ -41,15 +43,15 @@ const cacheFiles = [
   './manifest.json'
 ];
 
-self.addEventListener('install', function(event) {
+self.addEventListener('install', function (event) {
   console.log('Service Worker installing...');
   // Skip waiting to activate immediately
   self.skipWaiting();
-  
+
   // Perform install steps
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(function(cache) {
+      .then(function (cache) {
         console.log('Opened cache:', CACHE_NAME);
         return cache.addAll(cacheFiles);
       })
@@ -62,30 +64,30 @@ self.addEventListener('install', function(event) {
   );
 });
 
-self.addEventListener('fetch', function(event) {
+self.addEventListener('fetch', function (event) {
   event.respondWith(
     caches.match(event.request)
-      .then(function(response) {
+      .then(function (response) {
         // Cache hit - return response
         if (response) {
           return response;
         }
         return fetch(event.request);
       }
-    )
+      )
   );
 });
 
-self.addEventListener('activate', function(event) {
+self.addEventListener('activate', function (event) {
   console.log('Service Worker activating...');
-  
+
   // Take control of all clients immediately
   event.waitUntil(
     Promise.all([
       // Clean up old caches
-      caches.keys().then(function(cacheNames) {
+      caches.keys().then(function (cacheNames) {
         return Promise.all(
-          cacheNames.map(function(cacheName) {
+          cacheNames.map(function (cacheName) {
             if (cacheName !== CACHE_NAME) {
               console.log('Deleting old cache:', cacheName);
               return caches.delete(cacheName);
@@ -111,7 +113,7 @@ self.addEventListener('activate', function(event) {
 });
 
 // Handle messages from clients
-self.addEventListener('message', function(event) {
+self.addEventListener('message', function (event) {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     console.log('Received SKIP_WAITING message');
     self.skipWaiting();
@@ -119,7 +121,7 @@ self.addEventListener('message', function(event) {
 });
 
 // Enhanced fetch handler with update-first strategy for HTML
-self.addEventListener('fetch', function(event) {
+self.addEventListener('fetch', function (event) {
   // For HTML requests, try network first to get updates
   if (event.request.destination === 'document') {
     event.respondWith(
@@ -143,7 +145,7 @@ self.addEventListener('fetch', function(event) {
     // For other resources, use cache-first strategy
     event.respondWith(
       caches.match(event.request)
-        .then(function(response) {
+        .then(function (response) {
           if (response) {
             return response;
           }

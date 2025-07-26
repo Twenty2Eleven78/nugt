@@ -335,6 +335,333 @@ body.modal-open {
   border-top: 1px solid #dee2e6;
 }
 
+/* Player Attendance Styles */
+.roster-table tr.table-secondary {
+  opacity: 0.7;
+}
+
+.roster-table .toggle-attendance {
+  transition: all 0.2s ease;
+}
+
+.roster-table .toggle-attendance:hover {
+  transform: scale(1.05);
+}
+
+.attendance-summary {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.attendance-controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.attendance-controls .btn {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* Attendance status indicators */
+.text-success {
+  color: #198754 !important;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
+
+/* Attendance Modal Styles */
+.attendance-summary {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.attendance-controls {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.attendance-controls .btn {
+  min-width: 140px;
+  font-weight: 500;
+}
+
+#attendanceList .toggle-attendance-btn {
+  transition: all 0.2s ease;
+  min-width: 40px;
+}
+
+#attendanceList .toggle-attendance-btn:hover {
+  transform: scale(1.1);
+}
+
+#attendanceList .toggle-attendance-btn:disabled {
+  opacity: 0.6;
+  transform: none;
+}
+
+/* Bulk attendance button disabled states */
+.attendance-controls .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.attendance-controls .btn:disabled:hover {
+  transform: none;
+}
+
+#attendanceList tr.table-secondary {
+  opacity: 0.7;
+  background-color: #f8f9fa;
+}
+
+#attendanceList td {
+  vertical-align: middle;
+}
+
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* No players message styling */
+#noPlayersMessage {
+  background: #f8f9fa;
+  border-radius: 0.5rem;
+  border: 2px dashed #dee2e6;
+}
+
+#noPlayersMessage .fa-users {
+  color: #6c757d;
+}
+
+/* Enhanced Events Tab - Suggestion 1 */
+.events-container {
+  padding: 1rem;
+}
+
+.event-stat-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.event-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-color: #007bff;
+}
+
+.event-stat-card i {
+  margin-bottom: 0.5rem;
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #495057;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.event-controls {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+}
+
+.enhanced-timeline-container {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  min-height: 200px;
+}
+
+.enhanced-timeline {
+  padding: 1rem;
+}
+
+.enhanced-timeline .timeline-item {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.enhanced-timeline .timeline-item:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-color: #007bff;
+}
+
+.enhanced-timeline .timeline-content {
+  margin-left: 0;
+  border-radius: 8px;
+  border: none;
+  box-shadow: none;
+}
+
+.enhanced-timeline .timeline-marker {
+  background: #007bff;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.enhanced-timeline .marker-success {
+  background: #28a745;
+}
+
+.enhanced-timeline .marker-danger {
+  background: #dc3545;
+}
+
+.enhanced-timeline .timeline-time {
+  font-size: 0.95rem;
+  padding: 0.5rem 0;
+}
+
+.enhanced-timeline .timeline-body {
+  font-size: 0.9rem;
+}
+
+/* Event filtering states */
+.timeline-item.filtered-out {
+  display: none;
+}
+
+.timeline-item.search-highlight {
+  border-color: #ffc107;
+  background-color: #fff3cd;
+}
+
+/* Options Layout Suggestion 1 - Card-Based Grid Layout */
+.options-container {
+  padding: 1rem;
+}
+
+.quick-action-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.quick-action-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-color: #007bff;
+}
+
+.quick-action-card span {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.option-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.option-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.option-card-header {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.option-card-body {
+  padding: 1rem;
+}
+
+/* Responsive attendance controls */
+@media (max-width: 576px) {
+  .attendance-controls {
+    flex-direction: column;
+  }
+  
+  .attendance-controls .btn {
+    flex: none;
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .roster-actions-cell {
+    min-width: 120px;
+  }
+  
+  .roster-actions-cell .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  #attendanceList .toggle-attendance-btn {
+    min-width: 35px;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .quick-action-card {
+    height: 80px;
+    padding: 0.75rem;
+  }
+
+  .quick-action-card i {
+    font-size: 1.5rem !important;
+  }
+
+  .quick-action-card span {
+    font-size: 0.75rem;
+  }
+}
+
 /* Timeline styling */
 .timeline {
   position: relative;

@@ -1,10 +1,10 @@
 /**
  * NUFC GameTime App - Main Entry Point
- * @version 3.5.1
+ * @version 3.6
  * @author Mark Van-Kerro
- * @date Last Updated: 2023-06-15
+ * @date Last Updated: 2025-01-26
  * 
- * Modular architecture for better maintainability and performance
+ * Enhanced modular architecture with attendance tracking, advanced events, and modern UI
  */
 
 import { initializeApp } from './modules/app.js';

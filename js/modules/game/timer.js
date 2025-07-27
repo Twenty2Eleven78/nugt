@@ -31,7 +31,7 @@ class TimerController {
     // Calculate the correct start timestamp based on current elapsed time
     const startTimestamp = Date.now() - (gameState.seconds * 1000);
     stateManager.setTimerState(gameState.seconds, true, startTimestamp);
-    
+
     this.updateInterval = setInterval(() => {
       this.updateDisplay();
       // Save state every 5 seconds while running to prevent data loss
@@ -40,11 +40,11 @@ class TimerController {
         storageHelpers.saveGameStateImmediate(gameState);
       }
     }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
-    
+
     const buttonText = gameState.seconds > 0 ? 'Game Resumed' : 'Game Started';
     this._updateButtonUI('Game in Progress', 'btn-success', formatTime(gameState.seconds));
     notificationManager.success(buttonText + '!');
-    
+
     // Save immediately when starting/resuming
     storageHelpers.saveGameStateImmediate(gameState);
     console.log('Timer started/resumed - Current time:', formatTime(gameState.seconds), 'Start timestamp:', startTimestamp);
@@ -54,15 +54,15 @@ class TimerController {
   _pauseTimer() {
     const currentSeconds = getCurrentSeconds();
     stateManager.setTimerState(currentSeconds, false, null);
-    
+
     if (this.updateInterval) {
       clearInterval(this.updateInterval);
       this.updateInterval = null;
     }
-    
+
     this._updateButtonUI('Resume Game', 'btn-danger', formatTime(currentSeconds));
     notificationManager.error('Game Paused');
-    
+
     // Save paused state immediately
     storageHelpers.saveGameStateImmediate(gameState);
     console.log('Timer paused at:', formatTime(currentSeconds));
@@ -72,11 +72,11 @@ class TimerController {
   updateDisplay() {
     const currentSeconds = getCurrentSeconds();
     const timeDisplay = domCache.get('startPauseButton')?.querySelector('#stopwatch');
-    
+
     if (timeDisplay) {
       timeDisplay.textContent = formatTime(currentSeconds);
     }
-    
+
     stateManager.setTimerState(currentSeconds, gameState.isRunning, gameState.startTimestamp);
     storage.save('nugt_elapsedTime', currentSeconds);
   }
@@ -85,7 +85,7 @@ class TimerController {
   handleGameTimeChange(newGameTime) {
     stateManager.setGameTime(parseInt(newGameTime));
     storageHelpers.saveGameState(gameState);
-    
+
     // If game hasn't started, update display
     if (!gameState.isRunning && gameState.seconds === 0) {
       this.updateDisplay();
@@ -95,7 +95,7 @@ class TimerController {
   // Handle half time
   handleHalfTime() {
     const halfTimeSeconds = gameState.gameTime / 2;
-    
+
     // Stop timer if running
     if (gameState.isRunning) {
       if (this.updateInterval) {
@@ -103,14 +103,14 @@ class TimerController {
         this.updateInterval = null;
       }
     }
-    
+
     stateManager.setTimerState(halfTimeSeconds, false, null);
     stateManager.setHalfState(true);
-    
+
     this._updateButtonUI('Half Time Break', 'btn-danger', formatTime(halfTimeSeconds));
     this.updateDisplay();
     notificationManager.info('Half Time - Game Paused');
-    
+
     storageHelpers.saveGameState(gameState);
   }
 
@@ -123,13 +123,13 @@ class TimerController {
         this.updateInterval = null;
       }
     }
-    
+
     stateManager.setTimerState(gameState.seconds, false, null);
-    
+
     this._updateButtonUI('Full Time', 'btn-danger', formatTime(gameState.seconds));
     this.updateDisplay();
     notificationManager.info('Full Time - Game Finished');
-    
+
     storageHelpers.saveGameState(gameState);
   }
 
@@ -137,23 +137,23 @@ class TimerController {
   _updateButtonUI(text, newStatusClass, time) {
     const button = domCache.get('startPauseButton');
     if (!button) return;
-    
+
     const oldStatusClass = newStatusClass === 'btn-success' ? 'btn-danger' : 'btn-success';
     button.classList.remove(oldStatusClass);
-    
+
     if (button.classList.contains(newStatusClass)) {
       button.classList.remove(newStatusClass);
     }
     button.classList.add(newStatusClass);
-    
+
     // Update the button content while preserving the timer display structure
     const timerText = button.querySelector('.timer-text');
     const timerDisplay = button.querySelector('#stopwatch');
-    
+
     if (timerText) {
       timerText.textContent = text;
     }
-    
+
     if (timerDisplay) {
       timerDisplay.textContent = time;
     } else {
@@ -168,11 +168,11 @@ class TimerController {
       // Calculate current time to ensure accuracy after page refresh
       const currentSeconds = getCurrentSeconds();
       stateManager.setTimerState(currentSeconds, gameState.isRunning, gameState.startTimestamp);
-      
+
       this.updateInterval = setInterval(() => {
         this.updateDisplay();
       }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
-      
+
       // Update button UI to reflect running state
       this._updateButtonUI('Game in Progress', 'btn-success', formatTime(currentSeconds));
     }
@@ -184,14 +184,14 @@ class TimerController {
       // Recalculate time and resume if timer should be running
       const currentSeconds = getCurrentSeconds();
       stateManager.setTimerState(currentSeconds, gameState.isRunning, gameState.startTimestamp);
-      
+
       // Restart interval if it's not running
       if (!this.updateInterval) {
         this.updateInterval = setInterval(() => {
           this.updateDisplay();
         }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
       }
-      
+
       // Update display immediately
       this.updateDisplay();
       this._updateButtonUI('Game in Progress', 'btn-success', formatTime(currentSeconds));
@@ -211,22 +211,22 @@ class TimerController {
     // Similar to visibility change but with additional safety checks
     if (gameState.isRunning && gameState.startTimestamp) {
       const currentSeconds = getCurrentSeconds();
-      
+
       // Ensure we have the correct state
       stateManager.setTimerState(currentSeconds, gameState.isRunning, gameState.startTimestamp);
-      
+
       // Clear any existing interval and restart
       if (this.updateInterval) {
         clearInterval(this.updateInterval);
       }
-      
+
       this.updateInterval = setInterval(() => {
         this.updateDisplay();
       }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
-      
+
       this.updateDisplay();
       this._updateButtonUI('Game in Progress', 'btn-success', formatTime(currentSeconds));
-      
+
       console.log('Timer resumed after page focus - Current time:', formatTime(currentSeconds));
     } else {
       // Handle paused state - update display and button UI
@@ -259,25 +259,25 @@ class TimerController {
   initialize() {
     // Load saved state and resume if needed
     const savedState = storageHelpers.loadGameState();
-    
+
     console.log('Timer initialization - Saved state:', {
       isRunning: savedState.isRunning,
       startTimestamp: savedState.startTimestamp,
       seconds: savedState.seconds
     });
-    
+
     if (savedState.isRunning && savedState.startTimestamp) {
       // Calculate accurate current time based on saved timestamp
       const now = Date.now();
       const elapsedMs = now - savedState.startTimestamp;
       const currentSeconds = Math.floor(elapsedMs / 1000);
-      
+
       // Ensure we don't go negative
       const actualSeconds = Math.max(0, currentSeconds);
-      
+
       // Update state with calculated time
       stateManager.setTimerState(actualSeconds, true, savedState.startTimestamp);
-      
+
       // Start the timer interval
       this.updateInterval = setInterval(() => {
         this.updateDisplay();
@@ -287,11 +287,11 @@ class TimerController {
           storageHelpers.saveGameStateImmediate(gameState);
         }
       }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
-      
+
       // Update UI
       this._updateButtonUI('Game in Progress', 'btn-success', formatTime(actualSeconds));
       this.updateDisplay();
-      
+
       console.log('Timer initialized and resumed - Current time:', formatTime(actualSeconds));
       console.log('Timer interval started with ID:', this.updateInterval);
     } else if (savedState.seconds > 0) {

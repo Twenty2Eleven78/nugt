@@ -320,6 +320,11 @@ function bindEventListeners() {
       if (teamName) {
         teamManager.updateTeamName('first', teamName);
         teamInput.value = '';
+        // Close the modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('fixtureModalTeam1'));
+        if (modal) {
+          modal.hide();
+        }
       }
     });
   }
@@ -332,6 +337,11 @@ function bindEventListeners() {
       if (teamName) {
         teamManager.updateTeamName('second', teamName);
         teamInput.value = '';
+        // Close the modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('fixtureModalTeam2'));
+        if (modal) {
+          modal.hide();
+        }
       }
     });
   }

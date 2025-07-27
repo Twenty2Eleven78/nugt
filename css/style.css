@@ -650,41 +650,57 @@ body.modal-open {
   margin: 0 auto;
 }
 
-.timer-btn-compact:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+/* Complete Bootstrap override for timer button with maximum specificity */
+button#startPauseButton.timer-btn-compact.btn.btn-danger:hover,
+button#startPauseButton.timer-btn-compact.btn.btn-danger:focus,
+button#startPauseButton.timer-btn-compact.btn.btn-danger:active,
+button#startPauseButton.timer-btn-compact.btn.btn-danger:focus-visible {
+  background-color: #dc3545 !important;
+  background-image: none !important;
   border: 2px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3) !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+  outline: none !important;
 }
 
-/* Ensure timer button text remains visible on hover */
-.timer-btn-compact:hover .timer-text,
-.timer-btn-compact:hover .timer-display {
+button#startPauseButton.timer-btn-compact.btn.btn-success:hover,
+button#startPauseButton.timer-btn-compact.btn.btn-success:focus,
+button#startPauseButton.timer-btn-compact.btn.btn-success:active,
+button#startPauseButton.timer-btn-compact.btn.btn-success:focus-visible {
+  background-color: #28a745 !important;
+  background-image: none !important;
+  border: 2px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3) !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+  outline: none !important;
+}
+
+/* Force text visibility with ID selector for maximum specificity */
+button#startPauseButton.timer-btn-compact:hover .timer-text,
+button#startPauseButton.timer-btn-compact:focus .timer-text,
+button#startPauseButton.timer-btn-compact:active .timer-text {
   color: white !important;
   opacity: 1 !important;
+  visibility: visible !important;
+  text-shadow: none !important;
 }
 
-/* Success state hover */
-.timer-btn-compact.btn-success:hover {
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-  border: 2px solid rgba(255, 255, 255, 0.8) !important;
-}
-
-.timer-btn-compact.btn-success:hover .timer-text,
-.timer-btn-compact.btn-success:hover .timer-display {
-  color: white !important;
+/* Force timer display visibility with ID selector */
+button#startPauseButton.timer-btn-compact:hover .timer-display,
+button#startPauseButton.timer-btn-compact:focus .timer-display,
+button#startPauseButton.timer-btn-compact:active .timer-display {
+  background: rgba(255, 255, 255, 1) !important;
+  color: #dc3545 !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
   opacity: 1 !important;
+  visibility: visible !important;
 }
 
-/* Danger state hover */
-.timer-btn-compact.btn-danger:hover {
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-  border: 2px solid rgba(255, 255, 255, 0.8) !important;
-}
-
-.timer-btn-compact.btn-danger:hover .timer-text,
-.timer-btn-compact.btn-danger:hover .timer-display {
-  color: white !important;
-  opacity: 1 !important;
+/* Success state timer display */
+button#startPauseButton.timer-btn-compact.btn-success:hover .timer-display {
+  color: #28a745 !important;
 }
 
 .timer-display {
@@ -695,6 +711,26 @@ body.modal-open {
   font-weight: bold;
   color: #dc3545;
   border: 1px solid rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+/* Timer display hover states - more specific selectors */
+.timer-btn-compact:hover .timer-display {
+  background: rgba(255, 255, 255, 1) !important;
+  color: #dc3545 !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+}
+
+.timer-btn-compact.btn-success:hover .timer-display {
+  background: rgba(255, 255, 255, 1) !important;
+  color: #28a745 !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+}
+
+.timer-btn-compact.btn-danger:hover .timer-display {
+  background: rgba(255, 255, 255, 1) !important;
+  color: #dc3545 !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
 }
 
 .scoreboard-compact {

@@ -111,8 +111,35 @@ self.addEventListener('message', function (event) {
   }
 });
 
+// Helper function to check if request can be cached
+function isRequestCacheable(request) {
+  // Only cache HTTP/HTTPS requests
+  if (!request.url.startsWith('http')) {
+    return false;
+  }
+  
+  // Don't cache extension requests
+  if (request.url.startsWith('chrome-extension://') || 
+      request.url.startsWith('moz-extension://') || 
+      request.url.startsWith('safari-extension://')) {
+    return false;
+  }
+  
+  // Don't cache requests with non-GET methods
+  if (request.method !== 'GET') {
+    return false;
+  }
+  
+  return true;
+}
+
 // Enhanced fetch handler with update-first strategy for HTML
 self.addEventListener('fetch', function (event) {
+  // Skip non-cacheable requests
+  if (!isRequestCacheable(event.request)) {
+    return;
+  }
+
   // For HTML requests, try network first to get updates
   if (event.request.destination === 'document') {
     event.respondWith(
@@ -122,7 +149,9 @@ self.addEventListener('fetch', function (event) {
           if (response.ok) {
             const responseClone = response.clone();
             caches.open(CACHE_NAME).then(cache => {
-              cache.put(event.request, responseClone);
+              cache.put(event.request, responseClone).catch(error => {
+                console.warn('Failed to cache document request:', error);
+              });
             });
           }
           return response;
@@ -145,7 +174,9 @@ self.addEventListener('fetch', function (event) {
             if (fetchResponse.ok) {
               const responseClone = fetchResponse.clone();
               caches.open(CACHE_NAME).then(cache => {
-                cache.put(event.request, responseClone);
+                cache.put(event.request, responseClone).catch(error => {
+                  console.warn('Failed to cache resource request:', error);
+                });
               });
             }
             return fetchResponse;

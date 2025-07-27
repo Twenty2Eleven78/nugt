@@ -79,7 +79,7 @@ class StorageManager {
         'nugt_auth_timestamp',
         'nugt_usage_stats'
       ];
-      
+
       // Store auth data temporarily
       const authData = {};
       authKeys.forEach(key => {
@@ -88,17 +88,17 @@ class StorageManager {
           authData[key] = value;
         }
       });
-      
+
       // Clear all app data
       Object.values(STORAGE_KEYS).forEach(key => {
         localStorage.removeItem(key);
       });
-      
+
       // Restore auth data
       Object.entries(authData).forEach(([key, value]) => {
         localStorage.setItem(key, value);
       });
-      
+
       this._saveQueue.clear();
     } catch (error) {
       console.error('Error clearing localStorage:', error);
@@ -113,7 +113,7 @@ class StorageManager {
       localStorage.setItem(testKey, testData);
       const retrieved = localStorage.getItem(testKey);
       localStorage.removeItem(testKey);
-      
+
       return retrieved === testData;
     } catch (error) {
       console.error('Storage health check failed:', error);
@@ -131,29 +131,7 @@ class StorageManager {
     }
   }
 
-  // Get storage usage info
-  getStorageInfo() {
-    try {
-      let totalSize = 0;
-      const keys = Object.values(STORAGE_KEYS);
-      
-      for (const key of keys) {
-        const item = localStorage.getItem(key);
-        if (item) {
-          totalSize += item.length;
-        }
-      }
-      
-      return {
-        totalKeys: keys.length,
-        totalSize: totalSize,
-        formattedSize: `${(totalSize / 1024).toFixed(2)} KB`
-      };
-    } catch (error) {
-      console.error('Error getting storage info:', error);
-      return null;
-    }
-  }
+
 }
 
 // Create and export singleton instance
@@ -161,52 +139,43 @@ export const storage = new StorageManager();
 
 // Convenience methods for common operations
 export const storageHelpers = {
+  // Helper to save timer state data
+  _saveTimerState(gameState, saveMethod) {
+    saveMethod(STORAGE_KEYS.ELAPSED_TIME, gameState.seconds);
+    saveMethod(STORAGE_KEYS.IS_RUNNING, gameState.isRunning);
+    saveMethod(STORAGE_KEYS.START_TIMESTAMP, gameState.startTimestamp);
+    saveMethod(STORAGE_KEYS.GAME_TIME, gameState.gameTime);
+    saveMethod(STORAGE_KEYS.IS_SECOND_HALF, gameState.isSecondHalf);
+  },
+
   // Save game state
   saveGameState(gameState) {
-    storage.save(STORAGE_KEYS.ELAPSED_TIME, gameState.seconds);
-    storage.save(STORAGE_KEYS.IS_RUNNING, gameState.isRunning);
-    storage.save(STORAGE_KEYS.START_TIMESTAMP, gameState.startTimestamp);
-    storage.save(STORAGE_KEYS.GAME_TIME, gameState.gameTime);
-    storage.save(STORAGE_KEYS.IS_SECOND_HALF, gameState.isSecondHalf);
+    this._saveTimerState(gameState, (key, data) => storage.save(key, data));
   },
 
   // Save game state immediately (for critical saves like before page unload)
   saveGameStateImmediate(gameState) {
-    storage.saveImmediate(STORAGE_KEYS.ELAPSED_TIME, gameState.seconds);
-    storage.saveImmediate(STORAGE_KEYS.IS_RUNNING, gameState.isRunning);
-    storage.saveImmediate(STORAGE_KEYS.START_TIMESTAMP, gameState.startTimestamp);
-    storage.saveImmediate(STORAGE_KEYS.GAME_TIME, gameState.gameTime);
-    storage.saveImmediate(STORAGE_KEYS.IS_SECOND_HALF, gameState.isSecondHalf);
+    this._saveTimerState(gameState, (key, data) => storage.saveImmediate(key, data));
   },
 
-  // Save match data
-  saveMatchData(gameState) {
+  // Save match data with optional attendance
+  saveMatchData(gameState, attendanceData = null) {
     storage.save(STORAGE_KEYS.GOALS, gameState.goals);
     storage.save(STORAGE_KEYS.MATCH_EVENTS, gameState.matchEvents);
-    // Attendance is saved automatically when changed, but ensure it's included in match data
-  },
 
-  // Save complete match data including attendance
-  saveCompleteMatchData(gameState, attendanceData = null) {
-    storage.save(STORAGE_KEYS.GOALS, gameState.goals);
-    storage.save(STORAGE_KEYS.MATCH_EVENTS, gameState.matchEvents);
-    
     // Save attendance data if provided
     if (attendanceData) {
       storage.save(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
     }
   },
 
-  // Save team data
-  saveTeamData(gameState, team1Name, team2Name, team1Score, team2Score) {
-    storage.save(STORAGE_KEYS.TEAM1_NAME, team1Name);
-    storage.save(STORAGE_KEYS.TEAM2_NAME, team2Name);
-    storage.save(STORAGE_KEYS.TEAM1_HISTORY, gameState.team1History);
-    storage.save(STORAGE_KEYS.TEAM2_HISTORY, gameState.team2History);
-    storage.save(STORAGE_KEYS.FIRST_SCORE, team1Score);
-    storage.save(STORAGE_KEYS.SECOND_SCORE, team2Score);
+  // Alias for backward compatibility
+  saveCompleteMatchData(gameState, attendanceData = null) {
+    return this.saveMatchData(gameState, attendanceData);
   },
-  
+
+
+
 
 
   // Load complete game state

@@ -21,6 +21,43 @@ class GoalManager {
     showModal('goalModal');
   }
 
+  // Helper method to create goal data
+  _createGoalData(currentSeconds, team, teamName, scorerName, assistName = null) {
+    const goalScorer = window.RosterManager?.getPlayerByName(scorerName);
+    const goalAssister = assistName ? window.RosterManager?.getPlayerByName(assistName) : null;
+
+    return {
+      timestamp: formatMatchTime(currentSeconds),
+      goalScorerName: scorerName,
+      goalScorerShirtNumber: goalScorer?.shirtNumber || null,
+      goalAssistName: assistName || teamName,
+      goalAssistShirtNumber: goalAssister?.shirtNumber || null,
+      rawTime: currentSeconds,
+      team,
+      teamName,
+      disallowed: false
+    };
+  }
+
+  // Helper method to process goal after adding
+  _processGoalAddition(goalData, team, scorerName, isOpposition = false) {
+    console.log(`Adding ${isOpposition ? 'opposition ' : ''}goal data:`, goalData);
+    stateManager.addGoal(goalData);
+    console.log('Goals after adding:', gameState.goals);
+
+    this._updateScoreboard(team === 1 ? 'first' : 'second');
+    updateMatchLog();
+
+    // Show appropriate notification
+    const notificationType = isOpposition ? 'error' : 'success';
+    notificationManager[notificationType](`Goal scored by ${scorerName}!`);
+
+    // Save and cleanup
+    storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
+    enhancedEventsManager.onEventsUpdated();
+    this._resetGoalForm();
+  }
+
   // Add team goal
   addGoal(event) {
     event.preventDefault();
@@ -35,41 +72,12 @@ class GoalManager {
       return;
     }
 
-    // Get player details from roster if available
-    const goalScorer = window.RosterManager?.getPlayerByName(goalScorerName);
-    const goalAssister = window.RosterManager?.getPlayerByName(goalAssistName);
-
-    const goalData = {
-      timestamp: formatMatchTime(currentSeconds),
-      goalScorerName,
-      goalScorerShirtNumber: goalScorer?.shirtNumber || null,
-      goalAssistName,
-      goalAssistShirtNumber: goalAssister?.shirtNumber || null,
-      rawTime: currentSeconds,
-      team: 1,
-      teamName: team1Name,
-      disallowed: false
-    };
+    const goalData = this._createGoalData(currentSeconds, 1, team1Name, goalScorerName, goalAssistName);
 
     // Reset pending timestamp
     stateManager.setPendingGoalTimestamp(null);
 
-    // Update state and UI
-    console.log('Adding goal data:', goalData);
-    stateManager.addGoal(goalData);
-    console.log('Goals after adding:', gameState.goals);
-    this._updateScoreboard('first');
-    updateMatchLog();
-
-    notificationManager.success(`Goal scored by ${goalScorerName}!`);
-
-    // Save and cleanup
-    storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
-    
-    // Update enhanced events manager
-    enhancedEventsManager.onEventsUpdated();
-    
-    this._resetGoalForm();
+    this._processGoalAddition(goalData, 1, goalScorerName, false);
     hideModal('goalModal');
   }
 
@@ -78,32 +86,8 @@ class GoalManager {
     const currentSeconds = getCurrentSeconds();
     const team2Name = domCache.get('Team2NameElement')?.textContent;
 
-    const goalData = {
-      timestamp: formatMatchTime(currentSeconds),
-      goalScorerName: team2Name,
-      goalAssistName: team2Name,
-      rawTime: currentSeconds,
-      team: 2,
-      teamName: team2Name,
-      disallowed: false
-    };
-
-    // Update state and UI
-    console.log('Adding opposition goal data:', goalData);
-    stateManager.addGoal(goalData);
-    console.log('Goals after adding opposition goal:', gameState.goals);
-    this._updateScoreboard('second');
-    updateMatchLog();
-
-    notificationManager.error(`Goal scored by ${team2Name}!`);
-
-    // Save data
-    storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
-    
-    // Update enhanced events manager
-    enhancedEventsManager.onEventsUpdated();
-    
-    this._resetGoalForm();
+    const goalData = this._createGoalData(currentSeconds, 2, team2Name, team2Name);
+    this._processGoalAddition(goalData, 2, team2Name, true);
   }
 
 
@@ -124,14 +108,7 @@ class GoalManager {
   // Recalculate scores based on allowed goals
   _recalculateScores() {
     const team2Name = domCache.get('Team2NameElement')?.textContent;
-
-    const teamGoals = gameState.goals.filter(goal =>
-      !goal.disallowed && goal.goalScorerName !== team2Name
-    ).length;
-
-    const oppositionGoals = gameState.goals.filter(goal =>
-      !goal.disallowed && goal.goalScorerName === team2Name
-    ).length;
+    const { teamGoals, oppositionGoals } = this._getGoalCounts(team2Name);
 
     // Update UI
     const firstScoreElement = domCache.get('firstScoreElement');
@@ -154,18 +131,28 @@ class GoalManager {
     }
   }
 
-  // Get goal statistics
-  getGoalStats() {
+  // Helper method to get team classification for goals
+  _getGoalCounts(team2Name) {
     const allowedGoals = gameState.goals.filter(goal => !goal.disallowed);
-    const team2Name = domCache.get('Team2NameElement')?.textContent;
-
     const teamGoals = allowedGoals.filter(goal => goal.goalScorerName !== team2Name);
     const oppositionGoals = allowedGoals.filter(goal => goal.goalScorerName === team2Name);
 
     return {
+      teamGoals: teamGoals.length,
+      oppositionGoals: oppositionGoals.length,
+      allowedGoals
+    };
+  }
+
+  // Get goal statistics
+  getGoalStats() {
+    const team2Name = domCache.get('Team2NameElement')?.textContent;
+    const { teamGoals, oppositionGoals, allowedGoals } = this._getGoalCounts(team2Name);
+
+    return {
       total: allowedGoals.length,
-      team: teamGoals.length,
-      opposition: oppositionGoals.length,
+      team: teamGoals,
+      opposition: oppositionGoals,
       disallowed: gameState.goals.filter(goal => goal.disallowed).length
     };
   }

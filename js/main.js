@@ -17,27 +17,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const adminModalButton = document.getElementById('admin-modal-button');
   if (adminModalButton) {
-      authService.onAuthStateChange(user => {
-          if (authService.isUserAuthenticated() && authService.isAdmin()) {
-              adminModalButton.classList.remove('d-none');
-              adminModalButton.addEventListener('click', () => {
-                  adminModal.show();
-              });
-          } else {
-              adminModalButton.classList.add('d-none');
-          }
-      });
+    authService.onAuthStateChange(user => {
+      if (authService.isUserAuthenticated() && authService.isAdmin()) {
+        adminModalButton.classList.remove('d-none');
+        adminModalButton.addEventListener('click', () => {
+          adminModal.show();
+        });
+      } else {
+        adminModalButton.classList.add('d-none');
+      }
+    });
   }
 });
 
 // Handle page visibility changes for timer accuracy
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
-    // Page became visible, update displays
+    // Page became visible, update displays and resume timer if needed
     import('./modules/game/timer.js').then(({ timerController }) => {
-      timerController.updateDisplay();
+      timerController.handlePageVisibilityChange();
     });
   }
+});
+
+// Handle page refresh/reload events
+window.addEventListener('beforeunload', () => {
+  // Save current timer state before page unloads
+  import('./modules/game/timer.js').then(({ timerController }) => {
+    timerController.saveCurrentState();
+  });
+});
+
+// Handle page focus events (additional safety net)
+window.addEventListener('focus', () => {
+  // Ensure timer is properly resumed when window regains focus
+  import('./modules/game/timer.js').then(({ timerController }) => {
+    timerController.handlePageFocus();
+  });
 });
 
 // Service Worker registration is handled by PWA updater in app.js

@@ -77,8 +77,8 @@ export function initializeApp() {
   matchSummaryModal.init();
   rawDataModal.init();
 
-  // Resume timer if needed
-  timerController.resumeFromState();
+  // Initialize timer with enhanced state recovery
+  timerController.initialize();
 
   // Initialize PWA updater
   pwaUpdater.init().then(success => {

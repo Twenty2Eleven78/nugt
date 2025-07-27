@@ -138,9 +138,107 @@ class TimerController {
   // Resume timer from saved state
   resumeFromState() {
     if (gameState.isRunning && gameState.startTimestamp) {
+      // Calculate current time to ensure accuracy after page refresh
+      const currentSeconds = getCurrentSeconds();
+      stateManager.setTimerState(currentSeconds, gameState.isRunning, gameState.startTimestamp);
+      
       this.updateInterval = setInterval(() => {
         this.updateDisplay();
       }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
+      
+      // Update button UI to reflect running state
+      this._updateButtonUI('Game in Progress', 'btn-success', formatTime(currentSeconds));
+    }
+  }
+
+  // Handle page visibility changes
+  handlePageVisibilityChange() {
+    if (gameState.isRunning && gameState.startTimestamp) {
+      // Recalculate time and resume if timer should be running
+      const currentSeconds = getCurrentSeconds();
+      stateManager.setTimerState(currentSeconds, gameState.isRunning, gameState.startTimestamp);
+      
+      // Restart interval if it's not running
+      if (!this.updateInterval) {
+        this.updateInterval = setInterval(() => {
+          this.updateDisplay();
+        }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
+      }
+      
+      // Update display immediately
+      this.updateDisplay();
+      this._updateButtonUI('Game in Progress', 'btn-success', formatTime(currentSeconds));
+    } else {
+      // Just update display for paused state
+      this.updateDisplay();
+    }
+  }
+
+  // Handle page focus events
+  handlePageFocus() {
+    // Similar to visibility change but with additional safety checks
+    if (gameState.isRunning && gameState.startTimestamp) {
+      const currentSeconds = getCurrentSeconds();
+      
+      // Ensure we have the correct state
+      stateManager.setTimerState(currentSeconds, gameState.isRunning, gameState.startTimestamp);
+      
+      // Clear any existing interval and restart
+      if (this.updateInterval) {
+        clearInterval(this.updateInterval);
+      }
+      
+      this.updateInterval = setInterval(() => {
+        this.updateDisplay();
+      }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
+      
+      this.updateDisplay();
+      this._updateButtonUI('Game in Progress', 'btn-success', formatTime(currentSeconds));
+      
+      console.log('Timer resumed after page focus - Current time:', formatTime(currentSeconds));
+    }
+  }
+
+  // Save current state (called before page unload)
+  saveCurrentState() {
+    if (gameState.isRunning) {
+      const currentSeconds = getCurrentSeconds();
+      stateManager.setTimerState(currentSeconds, gameState.isRunning, gameState.startTimestamp);
+      storageHelpers.saveGameState(gameState);
+      console.log('Timer state saved before page unload - Time:', formatTime(currentSeconds));
+    }
+  }
+
+  // Enhanced initialization method
+  initialize() {
+    // Load saved state and resume if needed
+    const savedState = storageHelpers.loadGameState();
+    
+    if (savedState.isRunning && savedState.startTimestamp) {
+      // Calculate accurate current time based on saved timestamp
+      const now = Date.now();
+      const elapsedMs = now - savedState.startTimestamp;
+      const currentSeconds = Math.floor(elapsedMs / 1000);
+      
+      // Update state with calculated time
+      stateManager.setTimerState(currentSeconds, true, savedState.startTimestamp);
+      
+      // Start the timer interval
+      this.updateInterval = setInterval(() => {
+        this.updateDisplay();
+      }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
+      
+      // Update UI
+      this._updateButtonUI('Game in Progress', 'btn-success', formatTime(currentSeconds));
+      this.updateDisplay();
+      
+      console.log('Timer initialized and resumed - Current time:', formatTime(currentSeconds));
+    } else {
+      // Timer is paused or stopped
+      this.updateDisplay();
+      if (savedState.seconds > 0) {
+        this._updateButtonUI('Game is Paused', 'btn-danger', formatTime(savedState.seconds));
+      }
     }
   }
 

@@ -10,20 +10,19 @@ export const gameState = {
   // Timer state
   seconds: 0,
   isRunning: false,
-  intervalId: null,
   startTimestamp: null,
   gameTime: GAME_CONFIG.DEFAULT_GAME_TIME,
   isSecondHalf: false,
-  
+
   // Match data
   goals: [],
   matchEvents: [],
   pendingGoalTimestamp: null,
-  
+
   // Team data
   team1History: [GAME_CONFIG.DEFAULT_TEAM1_NAME],
   team2History: [GAME_CONFIG.DEFAULT_TEAM2_NAME],
-  
+
   // UI state
   editingEventIndex: null,
   editingEventType: null
@@ -31,6 +30,15 @@ export const gameState = {
 
 // State mutation methods with validation
 export const stateManager = {
+  // Helper functions for validation
+  _isValidIndex(index, array) {
+    return index >= 0 && index < array.length;
+  },
+
+  _isValidData(data) {
+    return data && typeof data === 'object';
+  },
+
   // Timer state mutations
   setTimerState(seconds, isRunning, startTimestamp = null) {
     gameState.seconds = Math.max(0, seconds);
@@ -48,37 +56,37 @@ export const stateManager = {
 
   // Match data mutations
   addGoal(goalData) {
-    if (goalData && typeof goalData === 'object') {
+    if (this._isValidData(goalData)) {
       gameState.goals.push({ ...goalData });
     }
   },
 
   removeGoal(index) {
-    if (index >= 0 && index < gameState.goals.length) {
+    if (this._isValidIndex(index, gameState.goals)) {
       gameState.goals.splice(index, 1);
     }
   },
 
   updateGoal(index, updates) {
-    if (index >= 0 && index < gameState.goals.length) {
+    if (this._isValidIndex(index, gameState.goals)) {
       Object.assign(gameState.goals[index], updates);
     }
   },
 
   addMatchEvent(eventData) {
-    if (eventData && typeof eventData === 'object') {
+    if (this._isValidData(eventData)) {
       gameState.matchEvents.push({ ...eventData });
     }
   },
 
   removeMatchEvent(index) {
-    if (index >= 0 && index < gameState.matchEvents.length) {
+    if (this._isValidIndex(index, gameState.matchEvents)) {
       gameState.matchEvents.splice(index, 1);
     }
   },
 
   updateMatchEvent(index, updates) {
-    if (index >= 0 && index < gameState.matchEvents.length) {
+    if (this._isValidIndex(index, gameState.matchEvents)) {
       Object.assign(gameState.matchEvents[index], updates);
     }
   },
@@ -109,12 +117,8 @@ export const stateManager = {
 
   // Reset methods
   resetTimer() {
-    if (gameState.intervalId) {
-      clearInterval(gameState.intervalId);
-    }
     gameState.seconds = 0;
     gameState.isRunning = false;
-    gameState.intervalId = null;
     gameState.startTimestamp = null;
     gameState.isSecondHalf = false;
   },

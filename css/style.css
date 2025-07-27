@@ -578,7 +578,7 @@ body.modal-open {
   padding: 0.75rem;
 }
 
-.game-header-card {
+.scoreboard-card {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   border: 1px solid #dee2e6;
   border-radius: 12px;
@@ -587,8 +587,16 @@ body.modal-open {
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
+.timer-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
 .timer-section {
-  margin-bottom: 1rem;
   text-align: center;
 }
 
@@ -1043,13 +1051,14 @@ body.modal-open {
     padding: 0.5rem;
   }
 
-  .game-header-card {
+  .scoreboard-card {
     padding: 0.75rem;
     margin-bottom: 0.75rem;
   }
 
-  .timer-section {
-    margin-bottom: 0.75rem;
+  .timer-card {
+    padding: 0.75rem;
+    margin-top: 0.75rem;
   }
 
   .timer-btn-compact {

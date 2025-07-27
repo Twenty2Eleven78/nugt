@@ -57,17 +57,8 @@
             <div class="tab-pane fade show active" id="gametab">
               <div class="game-container">
 
-                <!-- Compact Game Header -->
-                <div class="game-header-card">
-                  <div class="timer-section">
-                    <button class="btn btn-danger timer-btn-compact" id="startPauseButton">
-                      <i class="fa-regular fa-clock me-2"></i>
-                      <span class="timer-text">Start Game</span>
-                      <span id="stopwatch" role="timer" class="timer-display">00:00</span>
-                    </button>
-                  </div>
-                  
-                  <!-- Compact Score Board -->
+                <!-- Compact Score Board -->
+                <div class="scoreboard-card">
                   <div class="scoreboard-compact" id="scoreboard">
                     <div class="team-score-section">
                       <button id="first-team-name" class="team-name-btn" data-bs-toggle="modal" data-bs-target="#fixtureModalTeam1">
@@ -84,7 +75,7 @@
                     </div>
                   </div>
                 </div>
-                <!--END Compact Game Header-->
+                <!--END Compact Score Board-->
 
                 <!-- Game Actions -->
                 <div class="game-actions-card">
@@ -125,8 +116,18 @@
                     </button>
                   </div>
                 </div>
+
+                <!-- Game Timer Section -->
+                <div class="timer-card">
+                  <div class="timer-section">
+                    <button class="btn btn-danger timer-btn-compact" id="startPauseButton">
+                      <i class="fa-regular fa-clock me-2"></i>
+                      <span class="timer-text">Start Game</span>
+                      <span id="stopwatch" role="timer" class="timer-display">00:00</span>
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
             </div>
             <!--END Game Tab Content-->
 

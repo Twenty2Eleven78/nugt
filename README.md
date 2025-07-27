@@ -56,7 +56,8 @@
 
 ---
 
-## 📋 Previous Versions
+<details>
+<summary><strong>📚 Version History (2022-2024)</strong> - Click to expand</summary>
 
 ### Version 3.5.1 - Authentication & Cloud Storage
 **Released: 2024**
@@ -126,6 +127,8 @@
 - **Core Functionality**: Basic match timing and goal tracking
 - **Initial Modal System**: Basic modal dialogs
 - **Foundation**: Core app architecture and functionality
+
+</details>
 
 ---
 

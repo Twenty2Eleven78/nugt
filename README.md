@@ -1,9 +1,38 @@
 # NUFC GameTime App - Release Notes
 
-## 🚀 Version 3.6 - Enhanced Events & Attendance System
+## 🚀 Version 3.7 - Mobile-First Layout Optimization
 **Released: January 2025**
 
-### ✨ New Features
+### 📱 Mobile Layout Revolution
+- **Compact Events Tab**: Redesigned statistics cards for maximum screen space utilization
+- **Streamlined Controls**: Removed search functionality, simplified filter controls
+- **Game Tab Redesign**: Complete mobile-first redesign with improved information hierarchy
+- **Optimized Scoreboard**: Horizontal team-score-team layout for better mobile viewing
+- **Enhanced Game Actions**: Large, touch-friendly action buttons with visual feedback
+- **Repositioned Timer**: Game timer moved to bottom for better workflow
+
+### 🎯 Mobile-First Improvements
+- **40px+ Space Savings**: Compact statistics cards provide more room for event information
+- **Touch-Optimized Buttons**: Larger, more accessible buttons for mobile interaction
+- **Better Visual Hierarchy**: Scoreboard → Actions → Timer flow for intuitive usage
+- **Responsive Spacing**: Optimized padding and margins for mobile screens
+- **Gradient Backgrounds**: Modern visual design with hover effects and animations
+
+### 🔧 Layout Enhancements
+- **Bootstrap Gutters**: Consistent spacing using Bootstrap's g-3 gutter system
+- **Compact Statistics**: 70px height cards with optimized typography
+- **Full-Width Timer**: Timer button now fills card width while staying centered
+- **Streamlined Controls**: Single-line filter and export controls
+- **Professional Design**: Card-based layout with subtle shadows and gradients
+
+---
+
+## 📋 Previous Versions
+
+### Version 3.6 - Enhanced Events & Attendance System
+**Released: January 2025**
+
+#### ✨ New Features
 - **Enhanced Events Tab**: Statistics dashboard with real-time event counting
 - **Advanced Filtering**: Search and filter events by type (Goals, Cards, Fouls)
 - **Event Statistics**: Visual cards showing Goals, Cards, Fouls, and Total Events
@@ -12,14 +41,14 @@
 - **Modern Options Layout**: Card-based interface with quick actions
 - **Consistent Notifications**: Unified notification system across the app
 
-### 🎨 UI/UX Improvements
+#### 🎨 UI/UX Improvements
 - **Statistics Cards**: Visual event counters with hover effects
 - **Search & Filter Controls**: Professional search interface with clear filters
 - **Enhanced Timeline**: Improved event timeline with card-based design
 - **Quick Actions**: Fast access to most-used features
 - **Responsive Design**: Optimized for mobile and desktop
 
-### 🔧 Technical Enhancements
+#### 🔧 Technical Enhancements
 - **PWA Updates**: Enhanced service worker with automatic updates
 - **Modular Architecture**: Separated attendance and enhanced events systems
 - **Performance**: Optimized event rendering and filtering

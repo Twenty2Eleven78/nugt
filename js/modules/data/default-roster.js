@@ -17,6 +17,7 @@ export const DEFAULT_ROSTER_CONFIG = {
     players: [
         { name: 'A-R.Obidi', shirtNumber: null },
         { name: 'A.Seaman', shirtNumber: null },
+        { name: 'D.Peacock', shirtNumber: null },
         { name: 'E.Doyle', shirtNumber: null },
         { name: 'E.Van-Kerro', shirtNumber: null },
         { name: 'E.Mutiti', shirtNumber: null },
@@ -25,7 +26,6 @@ export const DEFAULT_ROSTER_CONFIG = {
         { name: 'H.Strowthers', shirtNumber: null },
         { name: 'M.Finch', shirtNumber: null },
         { name: 'M.Stevens', shirtNumber: null },
-        { name: 'N.Janicka', shirtNumber: null },
         { name: 'S.Smith', shirtNumber: null },
         { name: 'T.Rushmer', shirtNumber: null },
         { name: 'V.Aig-Imoru', shirtNumber: null }

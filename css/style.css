@@ -783,6 +783,50 @@ body.modal-open {
   .quick-action-card span {
     font-size: 0.75rem;
   }
+
+  /* Event stat cards mobile spacing */
+  .event-stat-card {
+    height: 90px;
+    padding: 0.75rem;
+  }
+
+  .event-stat-card i {
+    font-size: 1.5rem !important;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-number {
+    font-size: 1.25rem;
+    margin-bottom: 0.125rem;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+  }
+
+  /* Events container mobile spacing */
+  .events-container {
+    padding: 0.75rem;
+  }
+
+  .events-container .row.mb-4 {
+    margin-bottom: 1.5rem !important;
+  }
+
+  /* Event controls mobile optimization */
+  .event-controls {
+    padding: 0.75rem;
+    margin-bottom: 1rem !important;
+  }
+
+  .event-controls .d-flex {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .event-controls .form-select {
+    font-size: 0.875rem;
+  }
 }
 
 /* Timeline styling */

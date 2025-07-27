@@ -609,6 +609,9 @@ body.modal-open {
   font-weight: 600;
   border-radius: 8px;
   transition: all 0.3s ease;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
 }
 
 .timer-btn-compact:hover {

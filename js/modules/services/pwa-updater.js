@@ -1,46 +1,38 @@
 /**
  * PWA Update Manager
- * @version 3.3
- * 
- * Handles automatic updates for the PWA including:
- * - Service worker registration and updates
- * - User notifications for available updates
- * - Seamless update installation
+ * Handles service worker registration, updates, and user notifications
  */
 
 import { notificationManager } from './notifications.js';
 
-// PWA Update Manager
+const UPDATE_CHECK_INTERVAL = 30; // minutes
+const UPDATE_NOTIFICATION_TIMEOUT = 15000; // 15 seconds
+const SERVICE_WORKER_PATH = '/sw.js';
+const SERVICE_WORKER_SCOPE = './';
 class PWAUpdater {
   constructor() {
     this.registration = null;
     this.updateAvailable = false;
     this.refreshing = false;
     this.updateCheckInterval = null;
+    this.currentNotification = null;
   }
 
-  // Initialize PWA updater
   async init() {
-    if (!('serviceWorker' in navigator)) {
+    if (!this._isServiceWorkerSupported()) {
       console.log('Service Worker not supported');
       return false;
     }
 
     try {
-      // Register service worker
-      this.registration = await navigator.serviceWorker.register('/sw.js', {
-        scope: './'
+      this.registration = await navigator.serviceWorker.register(SERVICE_WORKER_PATH, {
+        scope: SERVICE_WORKER_SCOPE
       });
 
       console.log('Service Worker registered:', this.registration);
 
-      // Set up event listeners
-      this.setupEventListeners();
-
-      // Check for updates periodically
-      this.startUpdateChecker();
-
-      // Check for updates immediately
+      this._setupEventListeners();
+      this._startUpdateChecker();
       this.checkForUpdates();
 
       return true;
@@ -50,22 +42,18 @@ class PWAUpdater {
     }
   }
 
-  // Set up service worker event listeners
-  setupEventListeners() {
-    // Listen for service worker updates
+  _setupEventListeners() {
     this.registration.addEventListener('updatefound', () => {
       console.log('New service worker found');
       const newWorker = this.registration.installing;
-      
+
       newWorker.addEventListener('statechange', () => {
         if (newWorker.state === 'installed') {
           if (navigator.serviceWorker.controller) {
-            // New update available
             console.log('New content available');
             this.updateAvailable = true;
-            this.showUpdateNotification();
+            this._showUpdateNotification();
           } else {
-            // First time installation
             console.log('Content cached for offline use');
             notificationManager.success('App ready for offline use!');
           }
@@ -73,20 +61,16 @@ class PWAUpdater {
       });
     });
 
-    // Listen for messages from service worker
     navigator.serviceWorker.addEventListener('message', (event) => {
-      if (event.data && event.data.type === 'SW_UPDATED') {
+      if (event.data?.type === 'SW_UPDATED') {
         console.log('Service worker updated to:', event.data.version);
         if (!this.refreshing) {
           this.refreshing = true;
           notificationManager.success('App updated successfully!');
-          // Optional: Reload the page to apply updates
-          // window.location.reload();
         }
       }
     });
 
-    // Listen for controller changes (new service worker activated)
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (this.refreshing) return;
       console.log('New service worker activated');
@@ -110,60 +94,40 @@ class PWAUpdater {
     }
   }
 
-  // Start periodic update checking
-  startUpdateChecker(intervalMinutes = 30) {
-    // Clear existing interval
-    if (this.updateCheckInterval) {
-      clearInterval(this.updateCheckInterval);
-    }
+  _startUpdateChecker(intervalMinutes = UPDATE_CHECK_INTERVAL) {
+    this._clearUpdateInterval();
 
-    // Check for updates every X minutes
     this.updateCheckInterval = setInterval(() => {
       console.log('Checking for app updates...');
       this.checkForUpdates();
     }, intervalMinutes * 60 * 1000);
   }
 
-  // Stop periodic update checking
   stopUpdateChecker() {
-    if (this.updateCheckInterval) {
-      clearInterval(this.updateCheckInterval);
-      this.updateCheckInterval = null;
-    }
+    this._clearUpdateInterval();
   }
 
-  // Show update notification to user
-  showUpdateNotification() {
-    // Show persistent notification with action buttons
-    const notification = notificationManager.persistent(
+  _showUpdateNotification() {
+    this._clearCurrentNotification();
+
+    this.currentNotification = notificationManager.persistent(
       'App Update Available! A new version is ready to install.',
       'info'
     );
-    
-    // Add update action buttons
-    if (notification) {
-      const buttonContainer = document.createElement('div');
-      buttonContainer.className = 'mt-2 d-flex gap-2';
-      buttonContainer.innerHTML = `
-        <button class="btn btn-primary btn-sm" onclick="pwaUpdater.installUpdate(); this.closest('.notification').remove();">
-          <i class="fa-solid fa-download me-1"></i>Update Now
-        </button>
-        <button class="btn btn-outline-secondary btn-sm" onclick="this.closest('.notification').remove();">
-          Later
-        </button>
-      `;
-      notification.appendChild(buttonContainer);
-      
-      // Auto-hide after 15 seconds if not interacted with
+
+    if (this.currentNotification) {
+      const buttonContainer = this._createUpdateButtons();
+      this.currentNotification.appendChild(buttonContainer);
+
       setTimeout(() => {
-        if (notification.parentNode) {
-          notificationManager.remove(notification);
+        if (this.currentNotification?.parentNode) {
+          notificationManager.remove(this.currentNotification);
+          this.currentNotification = null;
         }
-      }, 15000);
+      }, UPDATE_NOTIFICATION_TIMEOUT);
     }
   }
 
-  // Install available update
   async installUpdate() {
     if (!this.updateAvailable) {
       notificationManager.info('No update available');
@@ -171,18 +135,12 @@ class PWAUpdater {
     }
 
     try {
-      // Tell the service worker to skip waiting
       if (this.registration.waiting) {
         this.registration.waiting.postMessage({ type: 'SKIP_WAITING' });
         notificationManager.info('Installing update...');
       }
 
-      // Remove update notification
-      const updateNotification = document.querySelector('.update-notification');
-      if (updateNotification) {
-        updateNotification.remove();
-      }
-
+      this._clearCurrentNotification();
     } catch (error) {
       console.error('Failed to install update:', error);
       notificationManager.error('Failed to install update');
@@ -197,14 +155,14 @@ class PWAUpdater {
 
   // Get app version from service worker
   getAppVersion() {
-    return this.registration?.active?.scriptURL?.includes('v') ? 
+    return this.registration?.active?.scriptURL?.includes('v') ?
       this.registration.active.scriptURL.match(/v(\d+)/)?.[1] : 'unknown';
   }
 
   // Check if app is running as PWA
   isPWA() {
     return window.matchMedia('(display-mode: standalone)').matches ||
-           window.navigator.standalone === true;
+      window.navigator.standalone === true;
   }
 
   // Get installation status
@@ -217,7 +175,6 @@ class PWAUpdater {
     };
   }
 
-  // Manual update trigger for debugging
   async triggerUpdate() {
     console.log('Manually triggering update check...');
     const result = await this.checkForUpdates();
@@ -226,6 +183,38 @@ class PWAUpdater {
     } else {
       notificationManager.error('Update check failed');
     }
+  }
+
+  _isServiceWorkerSupported() {
+    return 'serviceWorker' in navigator;
+  }
+
+  _clearUpdateInterval() {
+    if (this.updateCheckInterval) {
+      clearInterval(this.updateCheckInterval);
+      this.updateCheckInterval = null;
+    }
+  }
+
+  _clearCurrentNotification() {
+    if (this.currentNotification) {
+      notificationManager.remove(this.currentNotification);
+      this.currentNotification = null;
+    }
+  }
+
+  _createUpdateButtons() {
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'mt-2 d-flex gap-2';
+    buttonContainer.innerHTML = `
+      <button class="btn btn-primary btn-sm" onclick="pwaUpdater.installUpdate(); this.closest('.notification').remove();">
+        <i class="fa-solid fa-download me-1"></i>Update Now
+      </button>
+      <button class="btn btn-outline-secondary btn-sm" onclick="this.closest('.notification').remove();">
+        Later
+      </button>
+    `;
+    return buttonContainer;
   }
 }
 

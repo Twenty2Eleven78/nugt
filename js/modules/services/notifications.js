@@ -54,16 +54,16 @@ class NotificationManager {
     notification.textContent = message;
     
     // Add close button for persistent notifications
-    if (type === NOTIFICATION_TYPES.DANGER || type === NOTIFICATION_TYPES.WARNING) {
-      const closeBtn = document.createElement('button');
-      closeBtn.className = 'btn-close btn-close-white ms-2';
-      closeBtn.setAttribute('aria-label', 'Close');
-      closeBtn.onclick = () => this.remove(notification);
-      notification.appendChild(closeBtn);
-      notification.style.display = 'flex';
-      notification.style.alignItems = 'center';
-      notification.style.justifyContent = 'space-between';
-    }
+    //if (type === NOTIFICATION_TYPES.DANGER || type === NOTIFICATION_TYPES.WARNING) {
+    //  const closeBtn = document.createElement('button');
+    //  closeBtn.className = 'btn-close btn-close-white ms-2';
+    //  closeBtn.setAttribute('aria-label', 'Close');
+    //  closeBtn.onclick = () => this.remove(notification);
+    //  notification.appendChild(closeBtn);
+    //  notification.style.display = 'flex';
+    // notification.style.alignItems = 'center';
+    // notification.style.justifyContent = 'space-between';
+    //}
     
     return notification;
   }
@@ -97,12 +97,12 @@ class NotificationManager {
   }
 
   // Show warning notification
-  warning(message, duration = 5000) {
+  warning(message, duration = 3000) {
     return this.show(message, NOTIFICATION_TYPES.WARNING, duration);
   }
 
   // Show error notification
-  error(message, duration = 7000) {
+  error(message, duration = 3000) {
     return this.show(message, NOTIFICATION_TYPES.DANGER, duration);
   }
 

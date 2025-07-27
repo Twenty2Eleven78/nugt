@@ -14,7 +14,6 @@ import { notificationManager } from '../services/notifications.js';
 class TimerController {
   constructor() {
     this.updateInterval = null;
-    this.heartbeatInterval = null;
   }
 
   // Start or pause the timer
@@ -55,11 +54,7 @@ class TimerController {
     const currentSeconds = getCurrentSeconds();
     stateManager.setTimerState(currentSeconds, false, null);
 
-    if (this.updateInterval) {
-      clearInterval(this.updateInterval);
-      this.updateInterval = null;
-    }
-
+    this._stopTimer();
     this._updateButtonUI('Resume Game', 'btn-danger', formatTime(currentSeconds));
     notificationManager.error('Game Paused');
 
@@ -92,18 +87,19 @@ class TimerController {
     }
   }
 
+  // Helper method to stop timer interval
+  _stopTimer() {
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+      this.updateInterval = null;
+    }
+  }
+
   // Handle half time
   handleHalfTime() {
     const halfTimeSeconds = gameState.gameTime / 2;
 
-    // Stop timer if running
-    if (gameState.isRunning) {
-      if (this.updateInterval) {
-        clearInterval(this.updateInterval);
-        this.updateInterval = null;
-      }
-    }
-
+    this._stopTimer();
     stateManager.setTimerState(halfTimeSeconds, false, null);
     stateManager.setHalfState(true);
 
@@ -116,14 +112,7 @@ class TimerController {
 
   // Handle full time
   handleFullTime() {
-    // Stop timer if running
-    if (gameState.isRunning) {
-      if (this.updateInterval) {
-        clearInterval(this.updateInterval);
-        this.updateInterval = null;
-      }
-    }
-
+    this._stopTimer();
     stateManager.setTimerState(gameState.seconds, false, null);
 
     this._updateButtonUI('Full Time', 'btn-danger', formatTime(gameState.seconds));
@@ -178,64 +167,52 @@ class TimerController {
     }
   }
 
+  // Helper method to update UI for paused state
+  _updatePausedUI() {
+    this.updateDisplay();
+    if (gameState.seconds > 0) {
+      this._updateButtonUI('Resume Game', 'btn-danger', formatTime(gameState.seconds));
+    } else {
+      this._updateButtonUI('Start Game', 'btn-danger', formatTime(0));
+    }
+  }
+
+  // Helper method to resume running timer
+  _resumeRunningTimer(currentSeconds, restartInterval = false) {
+    stateManager.setTimerState(currentSeconds, gameState.isRunning, gameState.startTimestamp);
+
+    // Handle interval restart
+    if (restartInterval || !this.updateInterval) {
+      if (this.updateInterval) {
+        clearInterval(this.updateInterval);
+      }
+      this.updateInterval = setInterval(() => {
+        this.updateDisplay();
+      }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
+    }
+
+    this.updateDisplay();
+    this._updateButtonUI('Game in Progress', 'btn-success', formatTime(currentSeconds));
+  }
+
   // Handle page visibility changes
   handlePageVisibilityChange() {
     if (gameState.isRunning && gameState.startTimestamp) {
-      // Recalculate time and resume if timer should be running
       const currentSeconds = getCurrentSeconds();
-      stateManager.setTimerState(currentSeconds, gameState.isRunning, gameState.startTimestamp);
-
-      // Restart interval if it's not running
-      if (!this.updateInterval) {
-        this.updateInterval = setInterval(() => {
-          this.updateDisplay();
-        }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
-      }
-
-      // Update display immediately
-      this.updateDisplay();
-      this._updateButtonUI('Game in Progress', 'btn-success', formatTime(currentSeconds));
+      this._resumeRunningTimer(currentSeconds, false);
     } else {
-      // Handle paused state - update display and button UI
-      this.updateDisplay();
-      if (gameState.seconds > 0) {
-        this._updateButtonUI('Resume Game', 'btn-danger', formatTime(gameState.seconds));
-      } else {
-        this._updateButtonUI('Start Game', 'btn-danger', formatTime(0));
-      }
+      this._updatePausedUI();
     }
   }
 
   // Handle page focus events
   handlePageFocus() {
-    // Similar to visibility change but with additional safety checks
     if (gameState.isRunning && gameState.startTimestamp) {
       const currentSeconds = getCurrentSeconds();
-
-      // Ensure we have the correct state
-      stateManager.setTimerState(currentSeconds, gameState.isRunning, gameState.startTimestamp);
-
-      // Clear any existing interval and restart
-      if (this.updateInterval) {
-        clearInterval(this.updateInterval);
-      }
-
-      this.updateInterval = setInterval(() => {
-        this.updateDisplay();
-      }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
-
-      this.updateDisplay();
-      this._updateButtonUI('Game in Progress', 'btn-success', formatTime(currentSeconds));
-
+      this._resumeRunningTimer(currentSeconds, true);
       console.log('Timer resumed after page focus - Current time:', formatTime(currentSeconds));
     } else {
-      // Handle paused state - update display and button UI
-      this.updateDisplay();
-      if (gameState.seconds > 0) {
-        this._updateButtonUI('Resume Game', 'btn-danger', formatTime(gameState.seconds));
-      } else {
-        this._updateButtonUI('Start Game', 'btn-danger', formatTime(0));
-      }
+      this._updatePausedUI();
       console.log('Timer focus handled in paused state - Time:', formatTime(gameState.seconds));
     }
   }

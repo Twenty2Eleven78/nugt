@@ -4,7 +4,7 @@
  */
 
 import { gameState, stateManager } from '../data/state.js';
-import { storage, storageHelpers } from '../data/storage.js';
+import { storage } from '../data/storage.js';
 import { domCache } from '../shared/dom.js';
 import { STORAGE_KEYS, GAME_CONFIG } from '../shared/constants.js';
 import { notificationManager } from '../services/notifications.js';
@@ -32,58 +32,61 @@ class TeamManager {
     notificationManager.success(`Team name updated to ${trimmedName}`);
   }
 
+  // Helper method to get team-specific DOM elements and storage keys
+  _getTeamConfig(teamNumber) {
+    if (teamNumber === 1) {
+      return {
+        nameElement: domCache.get('Team1NameElement'),
+        goalButton: domCache.get('goalButton'),
+        inputElement: domCache.get('team1Input'),
+        nameKey: STORAGE_KEYS.TEAM1_NAME,
+        historyKey: STORAGE_KEYS.TEAM1_HISTORY,
+        history: gameState.team1History
+      };
+    } else {
+      return {
+        nameElement: domCache.get('Team2NameElement'),
+        goalButton: domCache.get('opgoalButton'),
+        inputElement: domCache.get('team2Input'),
+        nameKey: STORAGE_KEYS.TEAM2_NAME,
+        historyKey: STORAGE_KEYS.TEAM2_HISTORY,
+        history: gameState.team2History
+      };
+    }
+  }
+
+  // Helper method to update team UI elements
+  _updateTeamUI(teamName, config, saveToStorage = false) {
+    if (config.nameElement) {
+      config.nameElement.textContent = teamName;
+    }
+
+    if (config.goalButton && config.goalButton.lastChild) {
+      config.goalButton.lastChild.nodeValue = ' ' + teamName;
+    }
+
+    if (config.inputElement) {
+      config.inputElement.placeholder = teamName;
+    }
+
+    if (saveToStorage) {
+      storage.save(config.nameKey, teamName);
+      storage.save(config.historyKey, config.history);
+    }
+  }
+
   // Update team 1
   _updateTeam1(teamName) {
-    // Add to history if not already present
     stateManager.addTeamToHistory(1, teamName);
-
-    // Update UI elements
-    const team1NameElement = domCache.get('Team1NameElement');
-    const goalButton = domCache.get('goalButton');
-    const team1Input = domCache.get('team1Input');
-
-    if (team1NameElement) {
-      team1NameElement.textContent = teamName;
-    }
-
-    if (goalButton && goalButton.lastChild) {
-      goalButton.lastChild.nodeValue = ' ' + teamName;
-    }
-
-    if (team1Input) {
-      team1Input.placeholder = teamName;
-    }
-
-    // Save to storage
-    storage.save(STORAGE_KEYS.TEAM1_NAME, teamName);
-    storage.save(STORAGE_KEYS.TEAM1_HISTORY, gameState.team1History);
+    const config = this._getTeamConfig(1);
+    this._updateTeamUI(teamName, config, true);
   }
 
   // Update team 2
   _updateTeam2(teamName) {
-    // Add to history if not already present
     stateManager.addTeamToHistory(2, teamName);
-
-    // Update UI elements
-    const team2NameElement = domCache.get('Team2NameElement');
-    const opgoalButton = domCache.get('opgoalButton');
-    const team2Input = domCache.get('team2Input');
-
-    if (team2NameElement) {
-      team2NameElement.textContent = teamName;
-    }
-
-    if (opgoalButton && opgoalButton.lastChild) {
-      opgoalButton.lastChild.nodeValue = ' ' + teamName;
-    }
-
-    if (team2Input) {
-      team2Input.placeholder = teamName;
-    }
-
-    // Save to storage
-    storage.save(STORAGE_KEYS.TEAM2_NAME, teamName);
-    storage.save(STORAGE_KEYS.TEAM2_HISTORY, gameState.team2History);
+    const config = this._getTeamConfig(2);
+    this._updateTeamUI(teamName, config, true);
   }
 
   // Initialize teams from storage
@@ -96,47 +99,11 @@ class TeamManager {
     gameState.team1History = storage.load(STORAGE_KEYS.TEAM1_HISTORY, [GAME_CONFIG.DEFAULT_TEAM1_NAME]);
     gameState.team2History = storage.load(STORAGE_KEYS.TEAM2_HISTORY, [GAME_CONFIG.DEFAULT_TEAM2_NAME]);
 
-    // Update UI without notifications
-    this._updateTeam1UI(team1Name);
-    this._updateTeam2UI(team2Name);
-  }
-
-  // Update team 1 UI without saving (for initialization)
-  _updateTeam1UI(teamName) {
-    const team1NameElement = domCache.get('Team1NameElement');
-    const goalButton = domCache.get('goalButton');
-    const team1Input = domCache.get('team1Input');
-
-    if (team1NameElement) {
-      team1NameElement.textContent = teamName;
-    }
-
-    if (goalButton && goalButton.lastChild) {
-      goalButton.lastChild.nodeValue = ' ' + teamName;
-    }
-
-    if (team1Input) {
-      team1Input.placeholder = teamName;
-    }
-  }
-
-  // Update team 2 UI without saving (for initialization)
-  _updateTeam2UI(teamName) {
-    const team2NameElement = domCache.get('Team2NameElement');
-    const opgoalButton = domCache.get('opgoalButton');
-    const team2Input = domCache.get('team2Input');
-
-    if (team2NameElement) {
-      team2NameElement.textContent = teamName;
-    }
-
-    if (opgoalButton && opgoalButton.lastChild) {
-      opgoalButton.lastChild.nodeValue = ' ' + teamName;
-    }
-
-    if (team2Input) {
-      team2Input.placeholder = teamName;
-    }
+    // Update UI without saving to storage
+    const team1Config = this._getTeamConfig(1);
+    const team2Config = this._getTeamConfig(2);
+    this._updateTeamUI(team1Name, team1Config, false);
+    this._updateTeamUI(team2Name, team2Config, false);
   }
 
   // Get current team names
@@ -158,14 +125,12 @@ class TeamManager {
   // Reset teams to defaults
   resetTeams() {
     stateManager.resetTeams();
-    this._updateTeam1UI(GAME_CONFIG.DEFAULT_TEAM1_NAME);
-    this._updateTeam2UI(GAME_CONFIG.DEFAULT_TEAM2_NAME);
 
-    // Save to storage
-    storage.save(STORAGE_KEYS.TEAM1_NAME, GAME_CONFIG.DEFAULT_TEAM1_NAME);
-    storage.save(STORAGE_KEYS.TEAM2_NAME, GAME_CONFIG.DEFAULT_TEAM2_NAME);
-    storage.save(STORAGE_KEYS.TEAM1_HISTORY, gameState.team1History);
-    storage.save(STORAGE_KEYS.TEAM2_HISTORY, gameState.team2History);
+    // Update UI and save to storage
+    const team1Config = this._getTeamConfig(1);
+    const team2Config = this._getTeamConfig(2);
+    this._updateTeamUI(GAME_CONFIG.DEFAULT_TEAM1_NAME, team1Config, true);
+    this._updateTeamUI(GAME_CONFIG.DEFAULT_TEAM2_NAME, team2Config, true);
   }
 }
 

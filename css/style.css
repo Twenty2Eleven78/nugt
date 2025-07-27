@@ -695,6 +695,12 @@ button#startPauseButton.timer-btn-compact:active .timer-text {
   text-shadow: none !important;
 }
 
+/* Timer text color when running (success state) - make it green */
+button#startPauseButton.timer-btn-compact.btn-success .timer-text {
+  color: #28a745 !important;
+  font-weight: bold !important;
+}
+
 /* Force timer display visibility with ID selector */
 button#startPauseButton.timer-btn-compact:hover .timer-display,
 button#startPauseButton.timer-btn-compact:focus .timer-display,

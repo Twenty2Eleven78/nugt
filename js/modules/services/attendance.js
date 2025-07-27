@@ -42,6 +42,23 @@ class AttendanceManager {
     }));
   }
 
+  // Helper method to save attendance and update UI
+  _saveAndUpdateUI(attendanceData, successMessage) {
+    this._saveAttendance(attendanceData);
+    
+    // Use setTimeout to ensure storage is complete before UI update
+    setTimeout(() => {
+      this.updateAttendanceList();
+      notificationManager.success(successMessage);
+    }, 100);
+  }
+
+  // Helper method to find player by name (case-insensitive)
+  _findPlayerByName(attendance, playerName) {
+    const lowerName = playerName.toLowerCase();
+    return attendance.find(p => p.playerName.toLowerCase() === lowerName);
+  }
+
   // Set player attendance
   setPlayerAttendance(playerName, attending) {
     const currentAttendance = this.getMatchAttendance();
@@ -51,20 +68,14 @@ class AttendanceManager {
         : record
     );
     
-    this._saveAttendance(updatedAttendance);
-    
-    // Use setTimeout to ensure storage is complete before UI update
-    setTimeout(() => {
-      this.updateAttendanceList();
-      const status = attending ? 'present' : 'absent';
-      notificationManager.success(`${playerName} marked as ${status}`);
-    }, 100);
+    const status = attending ? 'present' : 'absent';
+    this._saveAndUpdateUI(updatedAttendance, `${playerName} marked as ${status}`);
   }
 
   // Toggle player attendance
   togglePlayerAttendance(playerName) {
     const attendance = this.getMatchAttendance();
-    const playerRecord = attendance.find(p => p.playerName.toLowerCase() === playerName.toLowerCase());
+    const playerRecord = this._findPlayerByName(attendance, playerName);
     
     if (playerRecord) {
       this.setPlayerAttendance(playerName, !playerRecord.attending);
@@ -78,13 +89,7 @@ class AttendanceManager {
       attending: true
     }));
     
-    this._saveAttendance(attendance);
-    
-    // Use setTimeout to ensure storage is complete before UI update
-    setTimeout(() => {
-      this.updateAttendanceList();
-      notificationManager.success('All players marked as present');
-    }, 100);
+    this._saveAndUpdateUI(attendance, 'All players marked as present');
   }
 
   // Mark all players as absent
@@ -94,13 +99,7 @@ class AttendanceManager {
       attending: false
     }));
     
-    this._saveAttendance(attendance);
-    
-    // Use setTimeout to ensure storage is complete before UI update
-    setTimeout(() => {
-      this.updateAttendanceList();
-      notificationManager.success('All players marked as absent');
-    }, 100);
+    this._saveAndUpdateUI(attendance, 'All players marked as absent');
   }
 
   // Clear attendance (reset all to attending)
@@ -231,59 +230,37 @@ class AttendanceManager {
     this._bindAttendanceToggleEvents();
   }
 
+  // Helper method to create button event handler with debouncing
+  _createButtonHandler(button, action) {
+    return (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      if (button.disabled) return;
+      button.disabled = true;
+      
+      action();
+      
+      setTimeout(() => {
+        button.disabled = false;
+      }, 500);
+    };
+  }
+
   // Bind bulk attendance events
   _bindBulkAttendanceEvents() {
-    const markAllAttendingBtn = document.getElementById('markAllAttendingBtnMain');
-    const markAllAbsentBtn = document.getElementById('markAllAbsentBtnMain');
-    const clearAttendanceBtn = document.getElementById('clearAttendanceBtnMain');
+    const buttons = [
+      { id: 'markAllAttendingBtnMain', action: () => this.markAllAttending() },
+      { id: 'markAllAbsentBtnMain', action: () => this.markAllAbsent() },
+      { id: 'clearAttendanceBtnMain', action: () => this.clearAttendance() }
+    ];
 
-    if (markAllAttendingBtn) {
-      markAllAttendingBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        if (markAllAttendingBtn.disabled) return;
-        markAllAttendingBtn.disabled = true;
-        
-        this.markAllAttending();
-        
-        setTimeout(() => {
-          markAllAttendingBtn.disabled = false;
-        }, 500);
-      });
-    }
-
-    if (markAllAbsentBtn) {
-      markAllAbsentBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        if (markAllAbsentBtn.disabled) return;
-        markAllAbsentBtn.disabled = true;
-        
-        this.markAllAbsent();
-        
-        setTimeout(() => {
-          markAllAbsentBtn.disabled = false;
-        }, 500);
-      });
-    }
-
-    if (clearAttendanceBtn) {
-      clearAttendanceBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        if (clearAttendanceBtn.disabled) return;
-        clearAttendanceBtn.disabled = true;
-        
-        this.clearAttendance();
-        
-        setTimeout(() => {
-          clearAttendanceBtn.disabled = false;
-        }, 500);
-      });
-    }
+    buttons.forEach(({ id, action }) => {
+      const button = document.getElementById(id);
+      if (button) {
+        button.addEventListener('click', this._createButtonHandler(button, action));
+      }
+    });
   }
 
   // Bind attendance toggle events using event delegation

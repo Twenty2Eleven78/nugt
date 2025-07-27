@@ -820,12 +820,18 @@ body.modal-open {
   }
 
   .event-controls .d-flex {
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 0.5rem;
   }
 
   .event-controls .form-select {
     font-size: 0.875rem;
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .event-controls .btn {
+    white-space: nowrap;
   }
 }
 

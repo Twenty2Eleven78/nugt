@@ -210,12 +210,29 @@ class RosterManager {
       .join('');
   }
 
+  // Helper method to refresh UI after roster changes
+  _refreshUI() {
+    this.updateSelects();
+    this.updateRosterList();
+  }
+
+  // Helper method to save and refresh after roster changes
+  _saveAndRefresh() {
+    this._saveRoster();
+    this._refreshUI();
+  }
+
+  // Helper method to normalize shirt number input
+  _normalizeShirtNumber(shirtNumber) {
+    return shirtNumber !== null && shirtNumber !== '' ? parseInt(shirtNumber, 10) : null;
+  }
+
   // Add a new player
   addPlayer(name, shirtNumber) {
     if (!name) return false;
 
     const trimmedName = name.trim();
-    const num = shirtNumber !== null && shirtNumber !== '' ? parseInt(shirtNumber, 10) : null;
+    const num = this._normalizeShirtNumber(shirtNumber);
 
     // Validation
     if (!this._validatePlayerData(trimmedName, num)) {
@@ -231,9 +248,7 @@ class RosterManager {
     // Add player
     this.roster.push({ name: trimmedName, shirtNumber: num });
     this.roster = this._sortRoster(this.roster);
-    this._saveRoster();
-    this.updateSelects();
-    this.updateRosterList();
+    this._saveAndRefresh();
 
     const shirtText = num !== null ? ` (#${num})` : '';
     notificationManager.success(`Player ${trimmedName}${shirtText} added successfully.`);
@@ -249,9 +264,7 @@ class RosterManager {
     this._handlePlayerRemovalFromSelects(playerName);
 
     this.roster.splice(index, 1);
-    this._saveRoster();
-    this.updateSelects();
-    this.updateRosterList();
+    this._saveAndRefresh();
 
     notificationManager.success(`Player ${playerName} removed successfully.`);
     return true;
@@ -265,7 +278,7 @@ class RosterManager {
     }
 
     const trimmedNewName = newName.trim();
-    const num = newShirtNumber !== null && newShirtNumber !== '' ? parseInt(newShirtNumber, 10) : null;
+    const num = this._normalizeShirtNumber(newShirtNumber);
 
     // Validation
     if (!this._validatePlayerData(trimmedNewName, num)) {
@@ -288,9 +301,7 @@ class RosterManager {
     this.roster[oldPlayerIndex].name = trimmedNewName;
     this.roster[oldPlayerIndex].shirtNumber = num;
     this.roster = this._sortRoster(this.roster);
-    this._saveRoster();
-    this.updateSelects();
-    this.updateRosterList();
+    this._saveAndRefresh();
 
     // Update dropdowns if player was selected
     this._updateSelectsAfterEdit(oldName, trimmedNewName);
@@ -322,9 +333,7 @@ class RosterManager {
     if (results.added.length > 0) {
       this.roster.push(...results.added);
       this.roster = this._sortRoster(this.roster);
-      this._saveRoster();
-      this.updateSelects();
-      this.updateRosterList();
+      this._saveAndRefresh();
 
       const successMsg = `Successfully added ${results.added.length} player(s): ${results.added.map(p => p.name).join(', ')}. Shirt numbers can be added via Edit.`;
       notificationManager.success(successMsg);
@@ -370,9 +379,7 @@ class RosterManager {
     }
 
     this.roster = [];
-    this._saveRoster();
-    this.updateSelects();
-    this.updateRosterList();
+    this._saveAndRefresh();
     notificationManager.success('Roster cleared successfully.');
   }
 

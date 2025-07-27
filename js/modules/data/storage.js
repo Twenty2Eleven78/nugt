@@ -170,6 +170,15 @@ export const storageHelpers = {
     storage.save(STORAGE_KEYS.IS_SECOND_HALF, gameState.isSecondHalf);
   },
 
+  // Save game state immediately (for critical saves like before page unload)
+  saveGameStateImmediate(gameState) {
+    storage.saveImmediate(STORAGE_KEYS.ELAPSED_TIME, gameState.seconds);
+    storage.saveImmediate(STORAGE_KEYS.IS_RUNNING, gameState.isRunning);
+    storage.saveImmediate(STORAGE_KEYS.START_TIMESTAMP, gameState.startTimestamp);
+    storage.saveImmediate(STORAGE_KEYS.GAME_TIME, gameState.gameTime);
+    storage.saveImmediate(STORAGE_KEYS.IS_SECOND_HALF, gameState.isSecondHalf);
+  },
+
   // Save match data
   saveMatchData(gameState) {
     storage.save(STORAGE_KEYS.GOALS, gameState.goals);

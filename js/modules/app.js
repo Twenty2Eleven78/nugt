@@ -79,6 +79,9 @@ export function initializeApp() {
 
   // Initialize timer with enhanced state recovery
   timerController.initialize();
+  
+  // Make timer controller available globally for beforeunload handler
+  window.timerControllerInstance = timerController;
 
   // Initialize PWA updater
   pwaUpdater.init().then(success => {

@@ -34,26 +34,45 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
     // Page became visible, update displays and resume timer if needed
-    import('./modules/game/timer.js').then(({ timerController }) => {
-      timerController.handlePageVisibilityChange();
-    });
+    if (window.timerControllerInstance) {
+      window.timerControllerInstance.handlePageVisibilityChange();
+    }
   }
 });
 
 // Handle page refresh/reload events
-window.addEventListener('beforeunload', () => {
-  // Save current timer state before page unloads
-  import('./modules/game/timer.js').then(({ timerController }) => {
-    timerController.saveCurrentState();
-  });
+window.addEventListener('beforeunload', (event) => {
+  // Save current timer state before page unloads - must be synchronous
+  try {
+    // Access the already loaded timer controller from the global scope
+    if (window.timerControllerInstance) {
+      window.timerControllerInstance.saveCurrentState();
+    }
+  } catch (error) {
+    console.error('Error saving timer state before unload:', error);
+  }
 });
 
 // Handle page focus events (additional safety net)
 window.addEventListener('focus', () => {
   // Ensure timer is properly resumed when window regains focus
-  import('./modules/game/timer.js').then(({ timerController }) => {
-    timerController.handlePageFocus();
-  });
+  if (window.timerControllerInstance) {
+    window.timerControllerInstance.handlePageFocus();
+  }
+});
+
+// Add pagehide event as additional safety net (more reliable than beforeunload on mobile)
+window.addEventListener('pagehide', (event) => {
+  if (window.timerControllerInstance) {
+    window.timerControllerInstance.saveCurrentState();
+  }
+});
+
+// Add unload event as final fallback
+window.addEventListener('unload', (event) => {
+  if (window.timerControllerInstance) {
+    window.timerControllerInstance.saveCurrentState();
+  }
 });
 
 // Service Worker registration is handled by PWA updater in app.js

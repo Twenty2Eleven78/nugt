@@ -55,93 +55,78 @@
 
             <!-- Game Tab Content -->
             <div class="tab-pane fade show active" id="gametab">
+              <div class="game-container">
 
-              <!-- Game Timer Card -->
-              <div class="card">
-                <div class="card-body">
-                  <h5 class="card-title"><i class="fa-regular fa-clock"></i> Game Timer</h5>
-                  <hr>
-                  <div class="text-center">
-                    <button class="btn btn-danger timer-btn-inline" id="startPauseButton">Start Game
-                      <span id="stopwatch" role="timer" class="timer-badge">00:00</span>
+                <!-- Compact Game Header -->
+                <div class="game-header-card">
+                  <div class="timer-section">
+                    <button class="btn btn-danger timer-btn-compact" id="startPauseButton">
+                      <i class="fa-regular fa-clock me-2"></i>
+                      <span class="timer-text">Start Game</span>
+                      <span id="stopwatch" role="timer" class="timer-display">00:00</span>
+                    </button>
+                  </div>
+                  
+                  <!-- Compact Score Board -->
+                  <div class="scoreboard-compact" id="scoreboard">
+                    <div class="team-score-section">
+                      <button id="first-team-name" class="team-name-btn" data-bs-toggle="modal" data-bs-target="#fixtureModalTeam1">
+                        Netherton
+                      </button>
+                      <div class="score-display" id="first-score">0</div>
+                    </div>
+                    <div class="score-separator">-</div>
+                    <div class="team-score-section">
+                      <button id="second-team-name" class="team-name-btn" data-bs-toggle="modal" data-bs-target="#fixtureModalTeam2">
+                        Opposition Team
+                      </button>
+                      <div class="score-display" id="second-score">0</div>
+                    </div>
+                  </div>
+                </div>
+                <!--END Compact Game Header-->
+
+                <!-- Game Actions -->
+                <div class="game-actions-card">
+                  <h6 class="actions-title">
+                    <i class="fa-regular fa-futbol me-2"></i>Game Actions
+                  </h6>
+                  
+                  <!-- Goals Row -->
+                  <div class="action-row">
+                    <button id="goalButton" class="action-btn btn-success" onclick="showGoalModal()">
+                      <i class="fa-solid fa-futbol"></i>
+                      <span class="btn-text">Team1 Goal</span>
+                    </button>
+                    <button id="opgoalButton" class="action-btn btn-danger" type="button">
+                      <i class="fa-solid fa-futbol"></i>
+                      <span class="btn-text">Team2 Goal</span>
+                    </button>
+                  </div>
+
+                  <!-- Time Markers Row -->
+                  <div class="action-row">
+                    <button id="HalfTimeButton" class="action-btn btn-secondary" type="button">
+                      <i class="fa-solid fa-stopwatch"></i>
+                      <span class="btn-text">Half Time</span>
+                    </button>
+                    <button id="FullTimeButton" class="action-btn btn-secondary" type="button">
+                      <i class="fa-solid fa-stopwatch"></i>
+                      <span class="btn-text">Full Time</span>
+                    </button>
+                  </div>
+
+                  <!-- Record Event Row -->
+                  <div class="action-row">
+                    <button id="recordEventButton" class="action-btn btn-warning full-width" type="button"
+                      data-bs-toggle="modal" data-bs-target="#recordEventModal">
+                      <i class="fa-solid fa-hand"></i>
+                      <span class="btn-text">Record Event</span>
                     </button>
                   </div>
                 </div>
               </div>
-              <!--END Gate Timer Card-->
-
-              <!-- Score Board Card -->
-              <div class="card" id="scoreboard">
-                <div class="card-body">
-                  <h5 class="card-title"><i class="fa-regular fa-star"></i> Score Board</h5>
-                  <hr>
-                  <div class="row">
-                    <div class="col-6 text-center">
-                      <h1 id="first-score">0</h1>
-                      <div><button id="first-team-name" class="btn btn-link btn-custom" data-bs-toggle="modal"
-                          data-bs-target="#fixtureModalTeam1">Netherton</button></div>
-                    </div>
-                    <div class="col-6 text-center">
-                      <h1 id="second-score">0</h1>
-                      <div><button id="second-team-name" class="btn btn-link btn-custom" data-bs-toggle="modal"
-                          data-bs-target="#fixtureModalTeam2">Opposition Team</button></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!--END Score Board Card-->
-
-              <!-- Game Actions Card -->
-              <div class="card">
-                <div class="card-body">
-                  <h5 class="card-title"><i class="fa-regular fa-futbol"></i> Game Actions</h5>
-                  <hr>
-                  <div class="container-fluid p-0">
-
-                    <!-- Goals Row -->
-                    <div class="row g-2 mb-3">
-                      <div class="col-6">
-                        <button id="goalButton" class="btn btn-success w-100 d-flex flex-column align-items-center py-2"
-                          onclick="showGoalModal()">
-                          <i class="fa-solid fa-futbol me-2"></i>Team1
-                        </button>
-                      </div>
-                      <div class="col-6">
-                        <button id="opgoalButton"
-                          class="btn btn-danger w-100 d-flex flex-column align-items-center py-2" type="button">
-                          <i class="fa-solid fa-futbol me-2"></i>Team2
-                        </button>
-                      </div>
-                    </div>
-                    <!--END Goals Row-->
-
-                    <!-- Time Markers Row -->
-                    <div class="row g-2 mb-3">
-                      <div class="col-6">
-                        <button id="HalfTimeButton" class="btn btn-secondary w-100" type="button"><i
-                            class="fa-solid fa-stopwatch me-2"></i>Half Time</button>
-                      </div>
-                      <div class="col-6">
-                        <button id="FullTimeButton" class="btn btn-secondary w-100" type="button"><i
-                            class="fa-solid fa-stopwatch me-2"></i>Full Time</button>
-                      </div>
-                    </div>
-                    <!-- END Time Marker Row-->
-
-                    <!-- Incidents Row -->
-                    <div class="row g-2">
-                      <div class="col-12">
-                        <button id="recordEventButton" class="btn btn-warning w-100" type="button"
-                          data-bs-toggle="modal" data-bs-target="#recordEventModal">
-                          <i class="fa-solid fa-hand me-2"></i>Record Event
-                        </button>
-                      </div>
-                    </div>
-                    <!--END Incidents Row-->
-
-                  </div>
-                </div>
-              </div>
+            </div>
             </div>
             <!--END Game Tab Content-->
 

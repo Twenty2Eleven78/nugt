@@ -10,6 +10,10 @@ import { domCache } from './shared/dom.js';
 import { formatTime } from './shared/utils.js';
 import { STORAGE_KEYS, EVENT_TYPES } from './shared/constants.js';
 
+// Import high priority optimizations
+import { ModuleErrorBoundary } from './shared/error-boundary.js';
+import { storageQuotaManager } from './shared/storage-manager.js';
+
 // Game modules
 import { timerController } from './game/timer.js';
 
@@ -38,9 +42,81 @@ import { attendanceManager } from './services/attendance.js';
 import { authService } from './services/auth.js';
 import { userMatchesApi } from './services/user-matches-api.js';
 
+// Initialize high priority optimizations
+function initializeOptimizations() {
+  // Initialize storage quota manager
+  storageQuotaManager.init();
+
+  // Wrap critical functions with error boundaries
+  wrapCriticalFunctions();
+
+  // Add touch target classes to interactive elements
+  enhanceTouchTargets();
+
+  console.log('High priority optimizations initialized');
+}
+
+// Wrap critical functions with error boundaries
+function wrapCriticalFunctions() {
+  // Wrap timer functions
+  const originalToggleTimer = timerController.toggleTimer;
+  timerController.toggleTimer = ModuleErrorBoundary.wrap(
+    originalToggleTimer.bind(timerController),
+    () => console.warn('Timer toggle failed, please try again'),
+    'TimerController'
+  );
+
+  // Wrap goal manager functions
+  const originalShowGoalModal = goalManager.showGoalModal;
+  goalManager.showGoalModal = ModuleErrorBoundary.wrap(
+    originalShowGoalModal.bind(goalManager),
+    () => notificationManager.error('Could not open goal modal'),
+    'GoalManager'
+  );
+
+  // Wrap events manager functions
+  const originalAddMatchEvent = eventsManager.addMatchEvent;
+  eventsManager.addMatchEvent = ModuleErrorBoundary.wrap(
+    originalAddMatchEvent.bind(eventsManager),
+    () => notificationManager.error('Could not add match event'),
+    'EventsManager'
+  );
+}
+
+// Enhance touch targets for better mobile UX
+function enhanceTouchTargets() {
+  // Add touch-target class to buttons and interactive elements
+  const interactiveSelectors = [
+    'button',
+    '.btn',
+    '.nav-link',
+    '.team-name-btn',
+    '.toggle-attendance-btn',
+    '.btn-close'
+  ];
+
+  interactiveSelectors.forEach(selector => {
+    const elements = document.querySelectorAll(selector);
+    elements.forEach(element => {
+      if (!element.classList.contains('touch-target')) {
+        element.classList.add('touch-target');
+      }
+    });
+  });
+
+  // Add touch-action: manipulation to prevent double-tap zoom
+  const touchElements = document.querySelectorAll('button, .btn, input, select, textarea');
+  touchElements.forEach(element => {
+    element.style.touchAction = 'manipulation';
+  });
+}
+
 // Initialize application
 export function initializeApp() {
-  console.log('Initializing NUFC GameTime App v3.5 - Modular Architecture');
+  console.log('Initializing NUFC GameTime App v3.7 - Enhanced with High Priority Optimizations');
+
+  // Initialize high priority optimizations
+  initializeOptimizations();
 
   // Check storage health
   if (!storage.checkStorageHealth()) {

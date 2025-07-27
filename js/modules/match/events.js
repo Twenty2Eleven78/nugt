@@ -66,8 +66,8 @@ class EventsManager {
     storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
   }
 
-  // Handle half time event
-  _handleHalfTimeEvent(eventData, team1Name, team2Name) {
+  // Helper method to add score data to events
+  _addScoreData(eventData, team1Name, team2Name) {
     const team1Score = domCache.get('firstScoreElement')?.textContent;
     const team2Score = domCache.get('secondScoreElement')?.textContent;
     
@@ -76,14 +76,14 @@ class EventsManager {
     eventData.team2Name = team2Name;
   }
 
+  // Handle half time event
+  _handleHalfTimeEvent(eventData, team1Name, team2Name) {
+    this._addScoreData(eventData, team1Name, team2Name);
+  }
+
   // Handle full time event
   _handleFullTimeEvent(eventData, team1Name, team2Name) {
-    const team1Score = domCache.get('firstScoreElement')?.textContent;
-    const team2Score = domCache.get('secondScoreElement')?.textContent;
-    
-    eventData.score = `${team1Name} ${team1Score} - ${team2Score} ${team2Name}`;
-    eventData.team1Name = team1Name;
-    eventData.team2Name = team2Name;
+    this._addScoreData(eventData, team1Name, team2Name);
   }
 
   // Get notification type for event
@@ -256,6 +256,41 @@ function _createTimelineItem(event, index, currentTeam1Name, currentTeam2Name) {
   return item;
 }
 
+// Helper function to create action buttons HTML
+function _createActionButtons(event, type) {
+  const editButton = `
+    <button class="btn btn-sm btn-outline-primary" 
+      onclick="window.EventsModule.openEditEventModal(${event.originalIndex}, '${event.updatetype}')">
+      <i class="fas fa-edit"></i>
+    </button>`;
+  
+  const deleteButton = `
+    <button class="btn btn-sm btn-outline-danger" 
+      onclick="window.EventsModule.deleteLogEntry(${event.originalIndex}, '${type}')" 
+      aria-label="Delete ${type}">
+      <i class="fas fa-trash"></i>
+    </button>`;
+  
+  if (type === 'goal') {
+    const toggleButton = `
+      <button class="btn btn-sm btn-outline-warning me-2" 
+         onclick="window.GoalsModule.toggleGoalDisallowed(${event.originalIndex})" 
+         title="${event.disallowed ? 'Allow goal' : 'Disallow goal'}">
+        <i class="fas fa-${event.disallowed ? 'check' : 'ban'}"></i>
+      </button>`;
+    
+    return `${toggleButton}${editButton.replace('">', ' me-2">')}${deleteButton}`;
+  }
+  
+  return `${editButton}${deleteButton}`;
+}
+
+// Helper function to update team names in text
+function _updateTeamNames(text, oldTeam1Name, oldTeam2Name, newTeam1Name, newTeam2Name) {
+  if (!text) return text;
+  return text.replace(oldTeam1Name, newTeam1Name).replace(oldTeam2Name, newTeam2Name);
+}
+
 // Create match event HTML
 function _createMatchEventHTML(event, currentTeam1Name, currentTeam2Name) {
   const cardClass = getEventCardClass(event.type);
@@ -266,15 +301,13 @@ function _createMatchEventHTML(event, currentTeam1Name, currentTeam2Name) {
 
   // Update team names if needed
   if (event.teamName) {
-    if (event.team === 1) {
-      eventText = event.type.replace(event.teamName, currentTeam1Name);
-    } else if (event.team === 2) {
-      eventText = event.type.replace(event.teamName, currentTeam2Name);
-    }
+    eventText = event.team === 1 
+      ? event.type.replace(event.teamName, currentTeam1Name)
+      : event.type.replace(event.teamName, currentTeam2Name);
   }
   
   if (event.score && event.team1Name && event.team2Name) {
-    scoreInfo = ` (${event.score.replace(event.team1Name, currentTeam1Name).replace(event.team2Name, currentTeam2Name)})`;
+    scoreInfo = ` (${_updateTeamNames(event.score, event.team1Name, event.team2Name, currentTeam1Name, currentTeam2Name)})`;
   }
   
   return `
@@ -287,15 +320,7 @@ function _createMatchEventHTML(event, currentTeam1Name, currentTeam2Name) {
             <p class="mb-0">${event.notes || ''}</p>
           </div>
           <div class="event-actions">
-            <button class="btn btn-sm btn-outline-primary" 
-              onclick="window.EventsModule.openEditEventModal(${event.originalIndex}, '${event.updatetype}')">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-danger" 
-              onclick="window.EventsModule.deleteLogEntry(${event.originalIndex}, 'event')" 
-              aria-label="Delete event">
-              <i class="fas fa-trash"></i>
-            </button>
+            ${_createActionButtons(event, 'event')}
           </div>
         </div>
       </div>
@@ -303,49 +328,51 @@ function _createMatchEventHTML(event, currentTeam1Name, currentTeam2Name) {
   `;
 }
 
+// Helper function to create goal details HTML
+function _createGoalDetails(event, isOppositionGoal) {
+  if (isOppositionGoal) return '';
+  
+  const scorerInfo = `${event.goalScorerName} ${event.goalScorerShirtNumber ? `(#${event.goalScorerShirtNumber})` : ''}`;
+  const assistInfo = `${event.goalAssistName} ${event.goalAssistShirtNumber ? `(#${event.goalAssistShirtNumber})` : ''}`;
+  
+  return `<br><small><strong>Scored By: </strong>${scorerInfo}<br> <Strong>Assisted By:</strong> ${assistInfo}</small>`;
+}
+
 // Create goal event HTML
 function _createGoalEventHTML(event, currentTeam1Name, currentTeam2Name) {
   const goalTeam = event.team || (event.goalScorerName === currentTeam2Name ? 2 : 1);
   const isOppositionGoal = goalTeam === 2;
   const displayTeamName = isOppositionGoal ? currentTeam2Name : currentTeam1Name;
+  
+  // Determine styling classes
   const cardClass = isOppositionGoal ? 'border-danger border-2' : 'border-success border-2';
   const markerClass = isOppositionGoal ? 'marker-danger' : 'marker-success';
   const disallowedClass = event.disallowed ? 'border-warning border-2' : cardClass;
   const disallowedMarker = event.disallowed ? 'marker-warning' : markerClass;
-  const disallowedText = event.disallowed ? `<br><small class="text-warning"><strong>DISALLOWED:</strong> ${event.disallowedReason}</small>` : '';
+  
+  // Create content elements
+  const goalIcon = `<i class="fa-regular fa-futbol"></i>`;
+  const goalTitle = isOppositionGoal 
+    ? `<span class="text-danger">${goalIcon} Goal: ${displayTeamName}</span>`
+    : `<span class="text-success">${goalIcon} Goal: ${displayTeamName}</span>`;
+  
+  const disallowedText = event.disallowed 
+    ? `<br><small class="text-warning"><strong>DISALLOWED:</strong> ${event.disallowedReason}</small>` 
+    : '';
+  
+  const goalDetails = _createGoalDetails(event, isOppositionGoal);
   
   return `
     <div class="timeline-marker ${disallowedMarker}"></div>
     <div class="timeline-content ${disallowedClass}">
-      <div class="timeline-time">${event.timestamp}' - <strong>
-              ${isOppositionGoal
-                ? `<span class="text-danger"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</span>`
-                : `<span class="text-success"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</span>`
-              }
-            </strong></div>
+      <div class="timeline-time">${event.timestamp}' - <strong>${goalTitle}</strong></div>
       <div class="timeline-body">
         <div class="d-flex justify-content-between align-items-start">
           <div class="event-info">
-            ${isOppositionGoal ? '' : `<br><small><strong>Scored By: </strong>${event.goalScorerName} ${event.goalScorerShirtNumber ? `(#${event.goalScorerShirtNumber})` : ''}<br> <Strong>Assisted By:</strong> ${event.goalAssistName} ${event.goalAssistShirtNumber ? `(#${event.goalAssistShirtNumber})` : ''}</small>`}
-            ${disallowedText}
+            ${goalDetails}${disallowedText}
           </div>
           <div class="event-actions">
-            <button class="btn btn-sm btn-outline-warning me-2" 
-               onclick="window.GoalsModule.toggleGoalDisallowed(${event.originalIndex})" 
-               title="${event.disallowed ? 'Allow goal' : 'Disallow goal'}">
-              <i class="fas fa-${event.disallowed ? 'check' : 'ban'}"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-primary me-2" 
-               onclick="window.EventsModule.openEditEventModal(${event.originalIndex}, '${event.updatetype}')"
-               title="Edit goal">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-danger"
-              onclick="window.EventsModule.deleteLogEntry(${event.originalIndex}, 'goal')"
-              aria-label="Delete goal"
-              title="Delete goal">
-              <i class="fas fa-trash"></i>
-            </button>
+            ${_createActionButtons(event, 'goal')}
           </div>
         </div>
       </div>
@@ -362,18 +389,6 @@ export function deleteLogEntry(index, type) {
     stateManager.removeGoal(index);
     // Recalculate scores after goal deletion using the manager instance
     eventsManager._recalculateScores();
-    
-    // Update storage for scores
-    const team2Name = domCache.get('Team2NameElement')?.textContent;
-    const teamGoals = gameState.goals.filter(goal => 
-      !goal.disallowed && goal.goalScorerName !== team2Name
-    ).length;
-    const oppositionGoals = gameState.goals.filter(goal => 
-      !goal.disallowed && goal.goalScorerName === team2Name
-    ).length;
-    
-    storage.save('nugt_firstScore', teamGoals);
-    storage.save('nugt_secondScore', oppositionGoals);
   } else if (type === 'event') {
     stateManager.removeMatchEvent(index);
   }

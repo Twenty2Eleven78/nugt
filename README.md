@@ -1,7 +1,7 @@
 # NUFC GameTime App - Release Notes
 
 ## 🚀 Version 3.7 - Mobile-First Layout Optimization
-**Released: January 2025**
+**Released: July 2025**
 
 ### 📱 Mobile Layout Revolution
 - **Compact Events Tab**: Redesigned statistics cards for maximum screen space utilization
@@ -30,7 +30,7 @@
 ## 📋 Previous Versions
 
 ### Version 3.6 - Enhanced Events & Attendance System
-**Released: January 2025**
+**Released: July 2025**
 
 #### ✨ New Features
 - **Enhanced Events Tab**: Statistics dashboard with real-time event counting
@@ -57,75 +57,69 @@
 ---
 
 <details>
-<summary><strong>📚 Version History (2022-2024)</strong> - Click to expand</summary>
+<summary><strong>📚 Version History (2024-2025)</strong> - Click to expand</summary>
 
 ### Version 3.5.1 - Authentication & Cloud Storage
-**Released: 2024**
+**Released: 2025**
 - **Passkey Authentication**: Secure user authentication system
 - **Cloud Data Storage**: Save and load match data to/from cloud
 - **User Management**: Personal match history and data management
 
 ### Version 3.5.0 - Code Architecture
-**Released: 2024**
+**Released: 2025**
 - **Modular JavaScript**: Modern ES6 module architecture
 - **Separated Roster Defaults**: Cleaner code organization
 - **Performance Improvements**: Faster loading and better maintainability
 
 ### Version 3.4 - Modern Architecture
-**Released: 2024**
+**Released: 2025**
 - **JavaScript Refactor**: Complete rewrite using modern module architecture
 - **Improved Performance**: Better code organization and loading times
 - **Enhanced Maintainability**: Cleaner, more maintainable codebase
 
 ### Version 3.3 - Enhanced Gameplay
-**Released: 2023**
+**Released: 2025**
 - **Disallowed Goals**: Option to mark goals as disallowed with reasons
 - **Additional Game Times**: More match duration options for different age groups
 - **Improved Goal Management**: Better goal tracking and modification
 
 ### Version 3.2 - Timeline & Player Management
-**Released: 2023**
+**Released: 2025**
 - **Timeline View**: Events displayed in chronological timeline format
 - **Goal Timestamp Accuracy**: Improved timing precision for goals
 - **Shirt Numbers**: Added shirt number functionality to player roster
-- **Stability Improvements**: Enhanced app reliability and performance
 
 ### Version 3.1 - Match Events System
-**Released: 2023**
+**Released: 2025**
 - **Match Events**: Comprehensive event tracking (Cards, Fouls, Penalties)
 - **Event Management**: Ability to edit and delete individual log entries
-- **Enhanced Logging**: Detailed match event recording system
 
 ### Version 3.0 - Major UI Overhaul
-**Released: 2023**
+**Released: 2025**
 - **Complete UI Redesign**: Modern, professional interface
 - **Dynamic Scoreboard**: Real-time score display
 - **Navigation Pills**: Improved tab-based navigation
-- **Modal System**: Professional modal dialogs
 - **Fixture Management**: Team name and fixture management
 
 ### Version 2.1 - UI & Functionality
-**Released: 2022**
+**Released: 2025**
 - **UI Improvements**: General interface enhancements
 - **Time Rounding**: Automatic time rounding for goal timestamps
-- **Function Improvements**: Enhanced app functionality and reliability
 
 ### Version 2.0 - Team Management
-**Released: 2022**
-- **Roster Management**: Complete team roster system
+**Released: 2024**
+- **Roster Management**: Team roster system
 - **Player Tracking**: Individual player management
 - **Team Organization**: Structured team data management
 
 ### Version 1.3 - Reports & UI
-**Released: 2022**
+**Released: 2024**
 - **WhatsApp Reports**: Share match reports via WhatsApp
-- **Layout Changes**: Improved app layout and design
 - **UI Enhancements**: General user interface improvements
 
 ### Version 1.0 - Initial Release
-**Released: 2022**
+**Released: 2024**
 - **Core Functionality**: Basic match timing and goal tracking
-- **Initial Modal System**: Basic modal dialogs
 - **Foundation**: Core app architecture and functionality
 
 </details>

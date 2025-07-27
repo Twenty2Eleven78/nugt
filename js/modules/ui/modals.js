@@ -55,6 +55,12 @@ export function hideModal(modalId) {
     
     // Enhanced cleanup to prevent overlay issues
     setTimeout(() => {
+      // Remove focus from any elements inside the modal before hiding
+      const focusedElement = modalElement.querySelector(':focus');
+      if (focusedElement) {
+        focusedElement.blur();
+      }
+      
       // Remove all modal backdrops (in case multiple exist)
       const backdrops = document.querySelectorAll('.modal-backdrop');
       backdrops.forEach(backdrop => backdrop.remove());
@@ -94,6 +100,15 @@ export function bindModalEvents() {
     // Clean up when modal is hidden
     modal.addEventListener('hidden.bs.modal', () => {
       cleanupModalOverlays();
+    });
+
+    // Handle focus management before hiding
+    modal.addEventListener('hide.bs.modal', () => {
+      // Remove focus from any elements inside the modal before hiding
+      const focusedElement = modal.querySelector(':focus');
+      if (focusedElement) {
+        focusedElement.blur();
+      }
     });
 
     // Prevent multiple backdrop issues

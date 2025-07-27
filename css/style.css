@@ -1,7 +1,43 @@
+/* CSS Custom Properties for consistent theming */
+:root {
+  --primary-color: #dc3545;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+  --info-color: #17a2b8;
+  --secondary-color: #6c757d;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+  
+  --border-radius: 12px;
+  --border-radius-sm: 8px;
+  --border-radius-lg: 15px;
+  
+  --box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --box-shadow-hover: 0 4px 12px rgba(0,0,0,0.15);
+  --box-shadow-lg: 0 4px 6px rgba(0,0,0,0.1);
+  
+  --transition: all 0.3s ease;
+  --transition-fast: all 0.2s ease;
+  
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 0.75rem;
+  --spacing-lg: 1rem;
+  --spacing-xl: 1.5rem;
+  
+  --font-size-xs: 0.7rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+}
+
 .card {
-  border-radius: 15px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  margin-bottom: 1rem;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--box-shadow-lg);
+  margin-bottom: var(--spacing-lg);
+  transition: var(--transition);
 }
 .card-title {
   font-weight: bold;
@@ -18,8 +54,8 @@
 }
 .timer-badge {
         background-color: rgba(255,255,255,0.2);
-        padding: 2px 8px;
-        border-radius: 15px;
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--border-radius-lg);
 }
 
 /* Consolidated nav pills styles */
@@ -579,21 +615,21 @@ body.modal-open {
 }
 
 .scoreboard-card {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  background: linear-gradient(135deg, var(--light-color) 0%, #e9ecef 100%);
   border: 1px solid #dee2e6;
-  border-radius: 12px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--box-shadow);
 }
 
 .timer-card {
   background: white;
   border: 1px solid #dee2e6;
-  border-radius: 12px;
-  padding: 1rem;
-  margin-top: 1rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+  box-shadow: var(--box-shadow);
 }
 
 .timer-section {
@@ -604,11 +640,11 @@ body.modal-open {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xl);
   font-weight: 600;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  border-radius: var(--border-radius-sm);
+  transition: var(--transition);
   width: 100%;
   max-width: 300px;
   margin: 0 auto;
@@ -956,6 +992,49 @@ body.modal-open {
 
 .option-card-body {
   padding: 1rem;
+}
+
+/* Touch Target Optimization for Mobile */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  padding: var(--spacing-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.touch-target:hover {
+  background-color: var(--light-color);
+  border-radius: var(--border-radius-sm);
+}
+
+/* Accessibility - Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Enhanced button touch targets */
+.btn, .action-btn, .timer-btn-compact, .team-name-btn {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+/* Improved form control touch targets */
+.form-control, .form-select {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+/* Better modal close button touch target */
+.modal-header .btn-close {
+  min-height: 44px;
+  min-width: 44px;
+  padding: var(--spacing-md);
 }
 
 /* Responsive attendance controls */

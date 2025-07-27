@@ -627,9 +627,10 @@ body.modal-open {
   background: white;
   border: 1px solid #dee2e6;
   border-radius: var(--border-radius);
-  padding: var(--spacing-lg);
+  padding: calc(var(--spacing-lg) + 0.5rem);
   margin-top: var(--spacing-lg);
   box-shadow: var(--box-shadow);
+  min-height: 100px;
 }
 
 .timer-section {
@@ -648,6 +649,7 @@ body.modal-open {
   width: 100%;
   max-width: 300px;
   margin: 0 auto;
+  border: 2px solid transparent !important;
 }
 
 /* Complete Bootstrap override for timer button with maximum specificity */

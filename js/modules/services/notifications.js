@@ -1,19 +1,20 @@
 /**
  * Notification Service
- * @version 3.3
  */
 
 import { NOTIFICATION_TYPES } from '../shared/constants.js';
 
-// Notification manager class
+const DEFAULT_DURATION = 3000;
+const ANIMATION_DURATION = 300;
+const MAX_NOTIFICATIONS = 5;
 class NotificationManager {
   constructor() {
     this.container = null;
     this.notifications = new Set();
+    this.timeouts = new Map();
     this._initializeContainer();
   }
 
-  // Initialize notification container
   _initializeContainer() {
     this.container = document.getElementById('notification-container');
     if (!this.container) {
@@ -21,99 +22,118 @@ class NotificationManager {
     }
   }
 
-  // Show notification
-  show(message, type = NOTIFICATION_TYPES.INFO, duration = 3000) {
+  show(message, type = NOTIFICATION_TYPES.INFO, duration = DEFAULT_DURATION) {
+    if (!this._validateInput(message, type)) return null;
     if (!this.container) {
       console.warn('Cannot show notification: container not available');
       return null;
     }
 
+    this._enforceMaxNotifications();
+
     const notification = this._createNotification(message, type);
-    this.container.appendChild(notification);
-    this.notifications.add(notification);
-    
-    // Trigger animation
-    requestAnimationFrame(() => {
-      notification.classList.add('show');
-    });
-    
-    // Auto-remove after duration
+    this._addNotification(notification);
+
     if (duration > 0) {
-      setTimeout(() => {
-        this.remove(notification);
-      }, duration);
+      this._scheduleRemoval(notification, duration);
     }
-    
+
     return notification;
   }
 
-  // Create notification element
   _createNotification(message, type) {
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.textContent = message;
-    
-    // Add close button for persistent notifications
-    //if (type === NOTIFICATION_TYPES.DANGER || type === NOTIFICATION_TYPES.WARNING) {
-    //  const closeBtn = document.createElement('button');
-    //  closeBtn.className = 'btn-close btn-close-white ms-2';
-    //  closeBtn.setAttribute('aria-label', 'Close');
-    //  closeBtn.onclick = () => this.remove(notification);
-    //  notification.appendChild(closeBtn);
-    //  notification.style.display = 'flex';
-    // notification.style.alignItems = 'center';
-    // notification.style.justifyContent = 'space-between';
-    //}
-    
+
+    // Add click to dismiss functionality
+    notification.addEventListener('click', () => this.remove(notification));
+
     return notification;
   }
 
-  // Remove notification
   remove(notification) {
-    if (!notification || !this.notifications.has(notification)) {
-      return;
-    }
-    
+    if (!notification || !this.notifications.has(notification)) return;
+
+    // Clear any pending timeout
+    this._clearTimeout(notification);
+
     notification.classList.remove('show');
-    
+
     setTimeout(() => {
       if (this.container && this.container.contains(notification)) {
         this.container.removeChild(notification);
       }
       this.notifications.delete(notification);
-    }, 300);
+    }, ANIMATION_DURATION);
   }
 
-  // Clear all notifications
   clearAll() {
-    this.notifications.forEach(notification => {
-      this.remove(notification);
-    });
+    this.notifications.forEach(notification => this.remove(notification));
   }
 
-  // Show success notification
-  success(message, duration = 3000) {
+  success(message, duration = DEFAULT_DURATION) {
     return this.show(message, NOTIFICATION_TYPES.SUCCESS, duration);
   }
 
-  // Show warning notification
-  warning(message, duration = 3000) {
+  warning(message, duration = DEFAULT_DURATION) {
     return this.show(message, NOTIFICATION_TYPES.WARNING, duration);
   }
 
-  // Show error notification
-  error(message, duration = 3000) {
+  error(message, duration = DEFAULT_DURATION) {
     return this.show(message, NOTIFICATION_TYPES.DANGER, duration);
   }
 
-  // Show info notification
-  info(message, duration = 3000) {
+  info(message, duration = DEFAULT_DURATION) {
     return this.show(message, NOTIFICATION_TYPES.INFO, duration);
   }
 
-  // Show persistent notification (no auto-remove)
   persistent(message, type = NOTIFICATION_TYPES.INFO) {
     return this.show(message, type, 0);
+  }
+
+  _validateInput(message, type) {
+    if (!message || typeof message !== 'string' || message.trim() === '') {
+      console.warn('Invalid notification message');
+      return false;
+    }
+    if (!Object.values(NOTIFICATION_TYPES).includes(type)) {
+      console.warn('Invalid notification type');
+      return false;
+    }
+    return true;
+  }
+
+  _enforceMaxNotifications() {
+    if (this.notifications.size >= MAX_NOTIFICATIONS) {
+      const oldestNotification = this.notifications.values().next().value;
+      this.remove(oldestNotification);
+    }
+  }
+
+  _addNotification(notification) {
+    this.container.appendChild(notification);
+    this.notifications.add(notification);
+
+    requestAnimationFrame(() => {
+      notification.classList.add('show');
+    });
+  }
+
+  _scheduleRemoval(notification, duration) {
+    const timeoutId = setTimeout(() => {
+      this.remove(notification);
+    }, duration);
+
+    this.timeouts.set(notification, timeoutId);
+  }
+
+  _clearTimeout(notification) {
+    const timeoutId = this.timeouts.get(notification);
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      this.timeouts.delete(notification);
+    }
   }
 }
 

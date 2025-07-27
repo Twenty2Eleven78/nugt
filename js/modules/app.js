@@ -385,16 +385,116 @@ function bindEventListeners() {
     editEventForm.addEventListener('submit', (e) => eventsManager.handleEditEventFormSubmission(e));
   }
 
-  // Share button
+  // Share button - open sharing modal
   const shareButton = domCache.get('shareButton');
   if (shareButton) {
-    shareButton.addEventListener('click', () => sharingService.shareViaWhatsApp());
+    shareButton.addEventListener('click', () => {
+      const sharingModal = new bootstrap.Modal(document.getElementById('sharingModal'));
+      sharingModal.show();
+    });
   }
+
+  // Sharing modal event listeners
+  setupSharingModalListeners();
 
   // Reset button
   const resetButton = domCache.get('resetButton');
   if (resetButton) {
     resetButton.addEventListener('click', resetTracker);
+  }
+}
+
+// Setup sharing modal event listeners
+function setupSharingModalListeners() {
+  // Handle sharing platform buttons
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.share-platform-btn')) {
+      const button = e.target.closest('.share-platform-btn');
+      const platform = button.dataset.platform;
+      
+      handleSharingPlatform(platform);
+    }
+    
+    // Handle export buttons
+    if (e.target.closest('.export-btn')) {
+      const button = e.target.closest('.export-btn');
+      const format = button.dataset.format;
+      
+      handleExport(format);
+    }
+  });
+}
+
+// Handle sharing to different platforms
+async function handleSharingPlatform(platform) {
+  try {
+    // Show loading state
+    notificationManager.info('Preparing to share...');
+    
+    switch (platform) {
+      case 'whatsapp':
+        sharingService.shareViaWhatsApp();
+        break;
+      case 'twitter':
+        sharingService.shareViaTwitter();
+        break;
+      case 'facebook':
+        sharingService.shareViaFacebook();
+        break;
+      case 'web-api':
+        await sharingService.shareViaWebAPI();
+        break;
+      case 'clipboard':
+        await sharingService.copyToClipboard();
+        notificationManager.success('Match report copied to clipboard!');
+        break;
+      default:
+        throw new Error(`Unsupported platform: ${platform}`);
+    }
+    
+    // Close the modal after successful sharing
+    const sharingModal = bootstrap.Modal.getInstance(document.getElementById('sharingModal'));
+    if (sharingModal) {
+      sharingModal.hide();
+    }
+    
+  } catch (error) {
+    console.error('Sharing failed:', error);
+    notificationManager.error(error.message || 'Failed to share match report');
+  }
+}
+
+// Handle data export
+function handleExport(format) {
+  try {
+    // Show loading state
+    notificationManager.info('Preparing export...');
+    
+    switch (format) {
+      case 'json':
+        sharingService.exportAsJSON();
+        break;
+      case 'csv':
+        sharingService.exportAsCSV();
+        break;
+      case 'txt':
+        sharingService.exportAsText();
+        break;
+      default:
+        throw new Error(`Unsupported export format: ${format}`);
+    }
+    
+    notificationManager.success(`Match data exported as ${format.toUpperCase()}!`);
+    
+    // Close the modal after successful export
+    const sharingModal = bootstrap.Modal.getInstance(document.getElementById('sharingModal'));
+    if (sharingModal) {
+      sharingModal.hide();
+    }
+    
+  } catch (error) {
+    console.error('Export failed:', error);
+    notificationManager.error(error.message || 'Failed to export match data');
   }
 }
 

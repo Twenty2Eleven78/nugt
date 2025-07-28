@@ -61,9 +61,9 @@ class DOMCache {
       sharingModal: 'sharingModal',
 
       // Navigation elements
-      gameTab: 'game-tab',
-      eventsTab: 'events-tab',
-      optionsTab: 'options-tab',
+      gameTab: 'gametab',
+      eventsTab: 'gamelogtab',
+      optionsTab: 'optionstab',
 
       // Other elements
       resetButton: 'confirmResetBtn',

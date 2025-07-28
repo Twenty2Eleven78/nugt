@@ -695,10 +695,17 @@ button#startPauseButton.timer-btn-compact:active .timer-text {
   text-shadow: none !important;
 }
 
-/* Timer text color when running (success state) - make it green */
+/* Timer text color when running (success state) - make it white */
 button#startPauseButton.timer-btn-compact.btn-success .timer-text {
-  color: #28a745 !important;
+  color: white !important;
   font-weight: bold !important;
+}
+
+/* Timer display (time digits) when running (success state) - make it green */
+button#startPauseButton.timer-btn-compact.btn-success .timer-display {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #28a745 !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
 }
 
 /* Force timer display visibility with ID selector */

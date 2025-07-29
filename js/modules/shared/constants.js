@@ -55,7 +55,7 @@ export const GAME_CONFIG = {
 
   // Team Defaults
   DEFAULT_TEAM1_NAME: 'Netherton',
-  DEFAULT_TEAM2_NAME: 'Opposition Team',
+  DEFAULT_TEAM2_NAME: 'Opposition',
 
   // Match Settings
   MAX_PLAYERS_PER_TEAM: 22,

@@ -27,12 +27,12 @@ const ERROR_CATEGORIES = {
 
 // Configuration constants
 const ERROR_CONFIG = {
-  MAX_ERROR_LOG_SIZE: 50,
+  MAX_ERROR_LOG_SIZE: 20, // Reduced from 50 to save memory
   ERROR_LOG_KEY: 'nugt_error_log',
   ERROR_STATS_KEY: 'nugt_error_stats',
-  MAX_RETRY_ATTEMPTS: 3,
+  MAX_RETRY_ATTEMPTS: 2, // Reduced from 3
   RETRY_DELAY: 1000,
-  NOTIFICATION_COOLDOWN: 5000 // 5 seconds between similar error notifications
+  NOTIFICATION_COOLDOWN: 10000 // Increased to 10 seconds to reduce spam
 };
 class ModuleErrorBoundary {
   static notificationCooldowns = new Map();
@@ -52,31 +52,31 @@ class ModuleErrorBoundary {
 
     return async (...args) => {
       const operationId = `${moduleName}_${Date.now()}`;
-      
+
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
           const result = await moduleFunction(...args);
-          
+
           // Clear retry attempts on success
           if (attempt > 0) {
             this.retryAttempts.delete(operationId);
             console.log(`${moduleName} succeeded after ${attempt} retries`);
           }
-          
+
           return result;
         } catch (error) {
           const isLastAttempt = attempt === maxRetries;
           const shouldRetry = retryable && !isLastAttempt && this._shouldRetryError(error);
-          
+
           if (shouldRetry) {
             console.warn(`${moduleName} failed (attempt ${attempt + 1}/${maxRetries + 1}), retrying...`);
             await this._delay(retryDelay * (attempt + 1)); // Exponential backoff
             continue;
           }
-          
+
           // Log error and handle failure
           this._handleError(error, moduleName, severity, category, args, attempt);
-          
+
           // Return fallback if provided
           return fallback ? (typeof fallback === 'function' ? fallback(...args) : fallback) : null;
         }
@@ -111,45 +111,11 @@ class ModuleErrorBoundary {
     return errorInfo;
   }
 
-  // Enhanced event handler wrapper
-  static wrapEventHandler(handler, options = {}) {
-    const {
-      elementName = 'element',
-      preventDefault = false,
-      stopPropagation = false,
-      showNotification = true
-    } = options;
-
-    return (event) => {
-      try {
-        if (preventDefault) event.preventDefault();
-        if (stopPropagation) event.stopPropagation();
-        
-        return handler(event);
-      } catch (error) {
-        this._handleError(
-          error,
-          `EventHandler-${elementName}`,
-          ERROR_SEVERITY.LOW,
-          ERROR_CATEGORIES.DOM,
-          [event.type]
-        );
-        
-        if (showNotification) {
-          this._showThrottledNotification('warning', ERROR_MESSAGES.GENERIC_ERROR);
-        }
-        
-        return false;
-      }
-    };
-  }
-
-  // Enhanced async operation wrapper
+  // Simplified async operation wrapper (only used method)
   static async safeAsync(asyncFunction, options = {}) {
     const {
       fallback = null,
       context = 'async operation',
-      timeout = 10000,
       retryable = false,
       maxRetries = ERROR_CONFIG.MAX_RETRY_ATTEMPTS
     } = options;
@@ -164,82 +130,7 @@ class ModuleErrorBoundary {
     })();
   }
 
-  // Safe DOM operation wrapper
-  static safeDOMOperation(operation, options = {}) {
-    const {
-      fallback = null,
-      elementName = 'unknown',
-      showNotification = false
-    } = options;
-
-    try {
-      return operation();
-    } catch (error) {
-      this._handleError(
-        error,
-        `DOM-${elementName}`,
-        ERROR_SEVERITY.LOW,
-        ERROR_CATEGORIES.DOM,
-        []
-      );
-      
-      if (showNotification) {
-        this._showThrottledNotification('warning', 'Interface error occurred');
-      }
-      
-      return fallback;
-    }
-  }
-
-  // Enhanced error log retrieval
-  static getErrorLog(options = {}) {
-    const {
-      limit = null,
-      severity = null,
-      category = null,
-      since = null
-    } = options;
-
-    try {
-      let errors = JSON.parse(localStorage.getItem(ERROR_CONFIG.ERROR_LOG_KEY) || '[]');
-      
-      // Apply filters
-      if (severity) {
-        errors = errors.filter(error => error.severity === severity);
-      }
-      
-      if (category) {
-        errors = errors.filter(error => error.category === category);
-      }
-      
-      if (since) {
-        const sinceDate = new Date(since);
-        errors = errors.filter(error => new Date(error.timestamp) >= sinceDate);
-      }
-      
-      // Apply limit
-      if (limit) {
-        errors = errors.slice(-limit);
-      }
-      
-      return errors;
-    } catch (error) {
-      console.warn('Could not retrieve error log:', error);
-      return [];
-    }
-  }
-
-  // Get error statistics
-  static getErrorStats() {
-    try {
-      return JSON.parse(localStorage.getItem(ERROR_CONFIG.ERROR_STATS_KEY) || '{}');
-    } catch (error) {
-      console.warn('Could not retrieve error stats:', error);
-      return {};
-    }
-  }
-
-  // Clear error log and stats
+  // Clear error log and stats (simplified)
   static clearErrorLog() {
     try {
       localStorage.removeItem(ERROR_CONFIG.ERROR_LOG_KEY);
@@ -247,7 +138,7 @@ class ModuleErrorBoundary {
       this.errorStats.clear();
       this.notificationCooldowns.clear();
       this.retryAttempts.clear();
-      console.log('Error log and stats cleared');
+      console.log('Error log cleared');
       return true;
     } catch (error) {
       console.warn('Could not clear error log:', error);
@@ -255,86 +146,57 @@ class ModuleErrorBoundary {
     }
   }
 
-  // Export error log for debugging
-  static exportErrorLog() {
+  // Cleanup memory periodically
+  static performMemoryCleanup() {
     try {
-      const errors = this.getErrorLog();
-      const stats = this.getErrorStats();
-      const exportData = {
-        errors,
-        stats,
-        exportedAt: new Date().toISOString(),
-        userAgent: navigator.userAgent,
-        url: window.location.href
-      };
-      
-      const dataStr = JSON.stringify(exportData, null, 2);
-      const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(dataBlob);
-      link.download = `error-log-${new Date().toISOString().split('T')[0]}.json`;
-      link.click();
-      
-      URL.revokeObjectURL(link.href);
-      return true;
-    } catch (error) {
-      console.error('Could not export error log:', error);
-      return false;
-    }
-  }
+      // Clear old cooldowns
+      const now = Date.now();
+      for (const [key, timestamp] of this.notificationCooldowns.entries()) {
+        if (now - timestamp > ERROR_CONFIG.NOTIFICATION_COOLDOWN * 2) {
+          this.notificationCooldowns.delete(key);
+        }
+      }
 
-  // Check application health
-  static getHealthStatus() {
-    const errors = this.getErrorLog({ since: new Date(Date.now() - 3600000) }); // Last hour
-    const criticalErrors = errors.filter(e => e.severity === ERROR_SEVERITY.CRITICAL);
-    const highErrors = errors.filter(e => e.severity === ERROR_SEVERITY.HIGH);
-    
-    let status = 'healthy';
-    let message = 'Application is running normally';
-    
-    if (criticalErrors.length > 0) {
-      status = 'critical';
-      message = `${criticalErrors.length} critical errors in the last hour`;
-    } else if (highErrors.length > 3) {
-      status = 'degraded';
-      message = `${highErrors.length} high-severity errors in the last hour`;
-    } else if (errors.length > 10) {
-      status = 'warning';
-      message = `${errors.length} errors in the last hour`;
+      // Clear old retry attempts
+      this.retryAttempts.clear();
+
+      // Limit error stats size
+      if (this.errorStats.size > 100) {
+        const entries = Array.from(this.errorStats.entries());
+        this.errorStats.clear();
+        // Keep only the most recent 50 entries
+        entries.slice(-50).forEach(([key, value]) => {
+          this.errorStats.set(key, value);
+        });
+      }
+
+      console.log('Memory cleanup completed');
+    } catch (error) {
+      console.warn('Memory cleanup failed:', error);
     }
-    
-    return {
-      status,
-      message,
-      errorCount: errors.length,
-      criticalCount: criticalErrors.length,
-      highCount: highErrors.length,
-      lastError: errors.length > 0 ? errors[errors.length - 1] : null
-    };
   }
 
   // Private helper methods
   static _handleError(error, moduleName, severity, category, args, retryAttempt = 0) {
     const errorInfo = this.logError(error, moduleName, severity, category, args, retryAttempt);
-    
+
     // Show user notification based on severity
     this._showErrorNotification(errorInfo);
-    
+
     return errorInfo;
   }
 
   static _showErrorNotification(errorInfo) {
     const { severity, module, fingerprint } = errorInfo;
-    
+
     // Check notification cooldown
     if (this._isNotificationCooledDown(fingerprint)) {
       return;
     }
-    
+
     let message;
     let type;
-    
+
     switch (severity) {
       case ERROR_SEVERITY.CRITICAL:
         message = ERROR_MESSAGES.GENERIC_ERROR;
@@ -355,7 +217,7 @@ class ModuleErrorBoundary {
         message = ERROR_MESSAGES.GENERIC_ERROR;
         type = 'warning';
     }
-    
+
     this._showThrottledNotification(type, message);
     this._setCooldown(fingerprint);
   }
@@ -365,7 +227,7 @@ class ModuleErrorBoundary {
     if (this._isNotificationCooledDown(key)) {
       return;
     }
-    
+
     notificationManager[type](message);
     this._setCooldown(key);
   }
@@ -389,7 +251,7 @@ class ModuleErrorBoundary {
       'not found',
       'dom exception'
     ];
-    
+
     const errorMessage = error.message.toLowerCase();
     return !nonRetryablePatterns.some(pattern => errorMessage.includes(pattern));
   }
@@ -410,46 +272,35 @@ class ModuleErrorBoundary {
 
   static _sanitizeArgs(args) {
     try {
-      const sanitized = args.map(arg => {
-        if (typeof arg === 'object' && arg !== null) {
-          return JSON.stringify(arg).substring(0, 200);
-        }
-        return String(arg).substring(0, 100);
-      });
-      return sanitized.join(', ');
+      // Simplified sanitization to reduce memory usage
+      if (args.length === 0) return '';
+      if (args.length === 1) return String(args[0]).substring(0, 50);
+      return `${args.length} args`;
     } catch {
-      return 'args-serialization-failed';
+      return 'args-error';
     }
   }
 
   static _getErrorContext() {
+    // Simplified context to reduce memory usage
     return {
-      userAgent: navigator.userAgent,
-      url: window.location.href,
-      timestamp: Date.now(),
-      viewport: {
-        width: window.innerWidth,
-        height: window.innerHeight
-      },
-      memory: performance.memory ? {
-        used: performance.memory.usedJSHeapSize,
-        total: performance.memory.totalJSHeapSize
-      } : null
+      url: window.location.pathname, // Only pathname, not full URL
+      timestamp: Date.now()
     };
   }
 
   static _updateErrorStats(errorInfo) {
     const { module, severity, category, fingerprint } = errorInfo;
-    
+
     // Update in-memory stats
     const moduleKey = `module_${module}`;
     const severityKey = `severity_${severity}`;
     const categoryKey = `category_${category}`;
-    
+
     this.errorStats.set(moduleKey, (this.errorStats.get(moduleKey) || 0) + 1);
     this.errorStats.set(severityKey, (this.errorStats.get(severityKey) || 0) + 1);
     this.errorStats.set(categoryKey, (this.errorStats.get(categoryKey) || 0) + 1);
-    
+
     // Update persistent stats
     try {
       const stats = JSON.parse(localStorage.getItem(ERROR_CONFIG.ERROR_STATS_KEY) || '{}');
@@ -458,7 +309,7 @@ class ModuleErrorBoundary {
       stats[categoryKey] = (stats[categoryKey] || 0) + 1;
       stats.total = (stats.total || 0) + 1;
       stats.lastUpdated = Date.now();
-      
+
       localStorage.setItem(ERROR_CONFIG.ERROR_STATS_KEY, JSON.stringify(stats));
     } catch (error) {
       console.warn('Could not update error stats:', error);
@@ -469,12 +320,12 @@ class ModuleErrorBoundary {
     try {
       const errors = JSON.parse(localStorage.getItem(ERROR_CONFIG.ERROR_LOG_KEY) || '[]');
       errors.push(errorInfo);
-      
+
       // Keep only the most recent errors
       if (errors.length > ERROR_CONFIG.MAX_ERROR_LOG_SIZE) {
         errors.splice(0, errors.length - ERROR_CONFIG.MAX_ERROR_LOG_SIZE);
       }
-      
+
       localStorage.setItem(ERROR_CONFIG.ERROR_LOG_KEY, JSON.stringify(errors));
     } catch (storageError) {
       console.warn('Could not store error log:', storageError);
@@ -483,7 +334,7 @@ class ModuleErrorBoundary {
 
   static _logToConsole(errorInfo) {
     const { severity, module, message, stack } = errorInfo;
-    
+
     switch (severity) {
       case ERROR_SEVERITY.CRITICAL:
         console.error(`🔴 CRITICAL [${module}]:`, message, stack);
@@ -506,13 +357,13 @@ class ModuleErrorBoundary {
 // Enhanced global error handler
 window.addEventListener('error', (event) => {
   const error = event.error || new Error(event.message);
-  
+
   // Skip runtime.lastError messages as they're often harmless extension-related warnings
   if (event.message && event.message.includes('runtime.lastError')) {
     console.debug('Suppressed runtime.lastError:', event.message);
     return;
   }
-  
+
   ModuleErrorBoundary._handleError(
     error,
     'GlobalError',
@@ -525,14 +376,14 @@ window.addEventListener('error', (event) => {
 // Enhanced unhandled promise rejection handler
 window.addEventListener('unhandledrejection', (event) => {
   const error = event.reason instanceof Error ? event.reason : new Error(String(event.reason));
-  
+
   // Skip Chrome extension runtime errors
   if (error.message && error.message.includes('runtime.lastError')) {
     console.debug('Suppressed runtime.lastError promise rejection:', error.message);
     event.preventDefault();
     return;
   }
-  
+
   ModuleErrorBoundary._handleError(
     error,
     'UnhandledPromiseRejection',
@@ -540,7 +391,7 @@ window.addEventListener('unhandledrejection', (event) => {
     ERROR_CATEGORIES.ASYNC,
     []
   );
-  
+
   // Prevent the default browser behavior for better UX
   event.preventDefault();
 });
@@ -550,7 +401,7 @@ if (typeof chrome !== 'undefined' && chrome.runtime) {
   // Suppress runtime.lastError by checking it periodically
   const originalLastError = chrome.runtime.lastError;
   Object.defineProperty(chrome.runtime, 'lastError', {
-    get: function() {
+    get: function () {
       const error = originalLastError;
       if (error) {
         console.debug('Chrome runtime error suppressed:', error.message);
@@ -561,42 +412,73 @@ if (typeof chrome !== 'undefined' && chrome.runtime) {
   });
 }
 
-// Performance monitoring for memory leaks with throttling
+// Lightweight memory monitoring (only when critically needed)
 if (performance.memory) {
+  let memoryCheckInterval;
   let lastMemoryWarning = 0;
-  const MEMORY_WARNING_COOLDOWN = 60000; // 1 minute between warnings
-  
-  setInterval(() => {
-    const memoryUsage = performance.memory.usedJSHeapSize / performance.memory.totalJSHeapSize;
-    
-    if (memoryUsage > 0.95) {
-      const now = Date.now();
-      if (now - lastMemoryWarning > MEMORY_WARNING_COOLDOWN) {
-        console.warn('🚨 Critical memory usage detected:', {
-          used: performance.memory.usedJSHeapSize,
-          total: performance.memory.totalJSHeapSize,
-          percentage: (memoryUsage * 100).toFixed(1) + '%'
-        });
-        
-        // Trigger garbage collection if available
-        if (window.gc) {
-          window.gc();
-          console.log('🗑️ Garbage collection triggered');
+  const MEMORY_WARNING_COOLDOWN = 300000; // 5 minutes between warnings
+  const MEMORY_CHECK_INTERVAL = 120000; // Check every 2 minutes
+
+  // Start memory monitoring only when needed
+  const startMemoryMonitoring = () => {
+    if (memoryCheckInterval) return; // Already running
+
+    memoryCheckInterval = setInterval(() => {
+      try {
+        const memoryUsage = performance.memory.usedJSHeapSize / performance.memory.totalJSHeapSize;
+
+        if (memoryUsage > 0.95) {
+          const now = Date.now();
+          if (now - lastMemoryWarning > MEMORY_WARNING_COOLDOWN) {
+            console.warn('🚨 Critical memory usage detected:', {
+              used: Math.round(performance.memory.usedJSHeapSize / 1048576) + 'MB',
+              total: Math.round(performance.memory.totalJSHeapSize / 1048576) + 'MB',
+              percentage: (memoryUsage * 100).toFixed(1) + '%'
+            });
+
+            // Trigger cleanup
+            if (window.storageQuotaManager) {
+              window.storageQuotaManager.performRoutineCleanup();
+            }
+
+            lastMemoryWarning = now;
+          }
+        } else if (memoryUsage < 0.8) {
+          // Stop monitoring if memory usage is back to normal
+          stopMemoryMonitoring();
         }
-        
-        // Trigger storage cleanup
-        if (window.storageQuotaManager) {
-          window.storageQuotaManager.performRoutineCleanup();
-        }
-        
-        lastMemoryWarning = now;
+      } catch (error) {
+        console.warn('Memory monitoring error:', error);
+        stopMemoryMonitoring();
       }
+    }, MEMORY_CHECK_INTERVAL);
+  };
+
+  const stopMemoryMonitoring = () => {
+    if (memoryCheckInterval) {
+      clearInterval(memoryCheckInterval);
+      memoryCheckInterval = null;
     }
-  }, 60000); // Check every minute instead of 30 seconds
+  };
+
+  // Initial check - only start monitoring if memory is already high
+  const initialMemoryUsage = performance.memory.usedJSHeapSize / performance.memory.totalJSHeapSize;
+  if (initialMemoryUsage > 0.85) {
+    startMemoryMonitoring();
+  }
+
+  // Make functions available globally for manual control
+  window.startMemoryMonitoring = startMemoryMonitoring;
+  window.stopMemoryMonitoring = stopMemoryMonitoring;
+
+  // Automatic memory cleanup every 5 minutes
+  setInterval(() => {
+    ModuleErrorBoundary.performMemoryCleanup();
+  }, 300000); // 5 minutes
 }
 
 // Export enhanced error boundary and utilities
-export { 
+export {
   ModuleErrorBoundary,
   ERROR_SEVERITY,
   ERROR_CATEGORIES,

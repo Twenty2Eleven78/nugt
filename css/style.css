@@ -106,24 +106,19 @@
   --theme-primary-rgb: 253, 126, 20;
 }
 
-/* Dark Theme */
-[data-theme="dark"] {
-  --theme-primary: #dc3545;
-  --theme-primary-light: #e74c3c;
-  --theme-primary-dark: #c82333;
-  --theme-primary-rgb: 220, 53, 69;
-
+/* Dark Mode - Applied to any color theme */
+.theme-dark {
   --bg-primary: #212529;
   --bg-secondary: #343a40;
   --bg-tertiary: #495057;
   --bg-card: #343a40;
   --bg-modal: #343a40;
-
+  
   --text-primary: #ffffff;
   --text-secondary: #adb5bd;
   --text-muted: #6c757d;
   --text-light: #ffffff;
-
+  
   --border-color: #495057;
   --border-color-light: #6c757d;
   --border-color-dark: #343a40;
@@ -1390,6 +1385,27 @@ button#startPauseButton.timer-btn-compact.btn-success:hover .timer-display {
   background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-light) 100%);
   border: 2px solid var(--border-color);
   transition: var(--transition);
+}
+
+/* Dark Mode Toggle */
+.form-check-input:checked {
+  background-color: var(--theme-primary);
+  border-color: var(--theme-primary);
+}
+
+.form-check-input:focus {
+  border-color: var(--theme-primary);
+  box-shadow: 0 0 0 0.25rem rgba(var(--theme-primary-rgb), 0.25);
+}
+
+.form-check-label {
+  color: var(--text-primary);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.form-check-label i {
+  color: var(--theme-primary);
 }
 
 /* Consistent button styles for options tab */

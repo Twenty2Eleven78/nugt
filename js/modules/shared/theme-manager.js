@@ -6,9 +6,11 @@
 class ThemeManager {
   constructor() {
     this.currentTheme = 'red';
+    this.isDarkMode = false;
     this.themeSelect = null;
     this.themePreview = null;
-    
+    this.darkModeToggle = null;
+
     this.themes = {
       red: {
         name: 'Red (Default)',
@@ -39,12 +41,6 @@ class ThemeManager {
         primary: '#fd7e14',
         primaryLight: '#ff8c42',
         primaryDark: '#e8590c'
-      },
-      dark: {
-        name: 'Dark Mode',
-        primary: '#dc3545',
-        primaryLight: '#e74c3c',
-        primaryDark: '#c82333'
       }
     };
   }
@@ -56,21 +52,22 @@ class ThemeManager {
     try {
       this.themeSelect = document.getElementById('themeSelect');
       this.themePreview = document.getElementById('themePreview');
-      
-      if (!this.themeSelect || !this.themePreview) {
+      this.darkModeToggle = document.getElementById('darkModeToggle');
+
+      if (!this.themeSelect || !this.themePreview || !this.darkModeToggle) {
         console.warn('Theme manager: Required elements not found');
         return;
       }
 
-      // Load saved theme
-      this.loadSavedTheme();
-      
+      // Load saved theme and dark mode preference
+      this.loadSavedSettings();
+
       // Set up event listeners
       this.setupEventListeners();
-      
+
       // Update preview
       this.updateThemePreview();
-      
+
       console.log('Theme manager initialized successfully');
     } catch (error) {
       console.error('Error initializing theme manager:', error);
@@ -86,29 +83,44 @@ class ThemeManager {
         this.changeTheme(e.target.value);
       });
     }
-  }
 
-  /**
-   * Load saved theme from localStorage
-   */
-  loadSavedTheme() {
-    try {
-      const savedTheme = localStorage.getItem('app-theme');
-      if (savedTheme && this.themes[savedTheme]) {
-        this.currentTheme = savedTheme;
-        this.applyTheme(savedTheme);
-        
-        if (this.themeSelect) {
-          this.themeSelect.value = savedTheme;
-        }
-      }
-    } catch (error) {
-      console.error('Error loading saved theme:', error);
+    if (this.darkModeToggle) {
+      this.darkModeToggle.addEventListener('change', (e) => {
+        this.toggleDarkMode(e.target.checked);
+      });
     }
   }
 
   /**
-   * Change theme
+   * Load saved theme and dark mode from localStorage
+   */
+  loadSavedSettings() {
+    try {
+      // Load color theme
+      const savedTheme = localStorage.getItem('app-theme');
+      if (savedTheme && this.themes[savedTheme]) {
+        this.currentTheme = savedTheme;
+        if (this.themeSelect) {
+          this.themeSelect.value = savedTheme;
+        }
+      }
+
+      // Load dark mode preference
+      const savedDarkMode = localStorage.getItem('app-dark-mode');
+      this.isDarkMode = savedDarkMode === 'true';
+      if (this.darkModeToggle) {
+        this.darkModeToggle.checked = this.isDarkMode;
+      }
+
+      // Apply the combined theme
+      this.applyCurrentTheme();
+    } catch (error) {
+      console.error('Error loading saved settings:', error);
+    }
+  }
+
+  /**
+   * Change color theme
    * @param {string} themeName - Theme name to apply
    */
   changeTheme(themeName) {
@@ -119,67 +131,107 @@ class ThemeManager {
 
     try {
       this.currentTheme = themeName;
-      this.applyTheme(themeName);
-      this.saveTheme(themeName);
+      this.applyCurrentTheme();
+      this.saveSettings();
       this.updateThemePreview();
-      
+
       // Dispatch theme change event
       window.dispatchEvent(new CustomEvent('themeChanged', {
-        detail: { theme: themeName, themeData: this.themes[themeName] }
+        detail: {
+          theme: themeName,
+          darkMode: this.isDarkMode,
+          themeData: this.themes[themeName]
+        }
       }));
-      
-      console.log('Theme changed to:', themeName);
+
+      console.log('Color theme changed to:', themeName);
     } catch (error) {
       console.error('Error changing theme:', error);
     }
   }
 
   /**
-   * Apply theme to document
-   * @param {string} themeName - Theme name to apply
+   * Toggle dark mode
+   * @param {boolean} enabled - Whether dark mode should be enabled
    */
-  applyTheme(themeName) {
-    const body = document.body;
-    
-    // Remove existing theme classes
-    Object.keys(this.themes).forEach(theme => {
-      body.classList.remove(`theme-${theme}`);
-    });
-    
-    // Add new theme class and data attribute
-    body.classList.add(`theme-${themeName}`);
-    body.setAttribute('data-theme', themeName);
-    
-    // Apply theme-specific styles if needed
-    this.applyThemeSpecificStyles(themeName);
-  }
+  toggleDarkMode(enabled) {
+    try {
+      this.isDarkMode = enabled;
+      this.applyCurrentTheme();
+      this.saveSettings();
 
-  /**
-   * Apply theme-specific styles
-   * @param {string} themeName - Theme name
-   */
-  applyThemeSpecificStyles(themeName) {
-    // Add any theme-specific logic here
-    if (themeName === 'dark') {
-      // Dark theme specific adjustments
-      document.documentElement.style.setProperty('--box-shadow', '0 2px 8px rgba(255,255,255,0.05)');
-      document.documentElement.style.setProperty('--box-shadow-hover', '0 4px 12px rgba(255,255,255,0.1)');
-    } else {
-      // Light theme shadows
-      document.documentElement.style.setProperty('--box-shadow', '0 2px 8px rgba(0,0,0,0.08)');
-      document.documentElement.style.setProperty('--box-shadow-hover', '0 4px 12px rgba(0,0,0,0.15)');
+      // Dispatch dark mode change event
+      window.dispatchEvent(new CustomEvent('darkModeChanged', {
+        detail: {
+          darkMode: enabled,
+          theme: this.currentTheme,
+          themeData: this.themes[this.currentTheme]
+        }
+      }));
+
+      console.log('Dark mode', enabled ? 'enabled' : 'disabled');
+    } catch (error) {
+      console.error('Error toggling dark mode:', error);
     }
   }
 
   /**
-   * Save theme to localStorage
-   * @param {string} themeName - Theme name to save
+   * Apply current theme and dark mode to document
    */
-  saveTheme(themeName) {
+  applyCurrentTheme() {
+    const body = document.body;
+
+    // Remove existing theme classes
+    Object.keys(this.themes).forEach(theme => {
+      body.classList.remove(`theme-${theme}`);
+    });
+    body.classList.remove('theme-dark');
+
+    // Add color theme class
+    body.classList.add(`theme-${this.currentTheme}`);
+
+    // Add dark mode class if enabled
+    if (this.isDarkMode) {
+      body.classList.add('theme-dark');
+    }
+
+    // Set data attributes
+    body.setAttribute('data-theme', this.currentTheme);
+    body.setAttribute('data-dark-mode', this.isDarkMode.toString());
+
+    // Apply theme-specific styles
+    this.applyThemeSpecificStyles();
+  }
+
+  /**
+   * Apply theme-specific styles
+   */
+  applyThemeSpecificStyles() {
+    // Apply dark mode specific adjustments
+    if (this.isDarkMode) {
+      // Dark theme specific shadows
+      document.documentElement.style.setProperty('--box-shadow', '0 2px 8px rgba(255,255,255,0.05)');
+      document.documentElement.style.setProperty('--box-shadow-hover', '0 4px 12px rgba(255,255,255,0.1)');
+      document.documentElement.style.setProperty('--box-shadow-card', '0 2px 8px rgba(255,255,255,0.05)');
+      document.documentElement.style.setProperty('--box-shadow-modal', '0 8px 32px rgba(255,255,255,0.1)');
+    } else {
+      // Light theme shadows
+      document.documentElement.style.setProperty('--box-shadow', '0 2px 8px rgba(0,0,0,0.08)');
+      document.documentElement.style.setProperty('--box-shadow-hover', '0 4px 12px rgba(0,0,0,0.15)');
+      document.documentElement.style.setProperty('--box-shadow-card', '0 2px 8px rgba(0,0,0,0.08)');
+      document.documentElement.style.setProperty('--box-shadow-modal', '0 8px 32px rgba(0,0,0,0.15)');
+    }
+  }
+
+  /**
+   * Save theme and dark mode settings to localStorage
+   */
+  saveSettings() {
     try {
-      localStorage.setItem('app-theme', themeName);
+      localStorage.setItem('app-theme', this.currentTheme);
+      localStorage.setItem('app-dark-mode', this.isDarkMode.toString());
     } catch (error) {
-      console.error('Error saving theme:', error);
+      console.error('Error saving settings:', error);
     }
   }
 
@@ -188,7 +240,7 @@ class ThemeManager {
    */
   updateThemePreview() {
     if (!this.themePreview) return;
-    
+
     const theme = this.themes[this.currentTheme];
     if (theme) {
       this.themePreview.style.background = `linear-gradient(135deg, ${theme.primary} 0%, ${theme.primaryLight} 100%)`;
@@ -201,6 +253,14 @@ class ThemeManager {
    */
   getCurrentTheme() {
     return this.currentTheme;
+  }
+
+  /**
+   * Get dark mode status
+   * @returns {boolean} Whether dark mode is enabled
+   */
+  isDarkModeEnabled() {
+    return this.isDarkMode;
   }
 
   /**
@@ -218,6 +278,18 @@ class ThemeManager {
    */
   getAllThemes() {
     return this.themes;
+  }
+
+  /**
+   * Get current theme settings
+   * @returns {object} Current theme and dark mode settings
+   */
+  getCurrentSettings() {
+    return {
+      theme: this.currentTheme,
+      darkMode: this.isDarkMode,
+      themeData: this.themes[this.currentTheme]
+    };
   }
 }
 

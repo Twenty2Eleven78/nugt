@@ -4,8 +4,7 @@
  */
 
 import { gameState } from '../data/state.js';
-import { ModuleErrorBoundary, ERROR_SEVERITY, ERROR_CATEGORIES } from './error-boundary.js';
-import { GAME_CONFIG, VALIDATION } from './constants.js';
+import { GAME_CONFIG } from './constants.js';
 
 // Cache for expensive operations
 const utilsCache = new Map();
@@ -57,7 +56,7 @@ export function formatTime(seconds, options = {}) {
 
 // Enhanced current seconds calculation with error handling
 export function getCurrentSeconds() {
-  return ModuleErrorBoundary.wrap(() => {
+  try {
     if (!gameState.isRunning || !gameState.startTimestamp) {
       return gameState.seconds || 0;
     }
@@ -72,29 +71,27 @@ export function getCurrentSeconds() {
     }
 
     return elapsedSeconds;
-  }, {
-    moduleName: 'getCurrentSeconds',
-    severity: ERROR_SEVERITY.LOW,
-    category: ERROR_CATEGORIES.RUNTIME,
-    fallback: gameState.seconds || 0
-  })();
+  } catch (error) {
+    console.error('Error in getCurrentSeconds:', error);
+    return gameState.seconds || 0;
+  }
 }
 
 // Enhanced match time formatting with better extra time calculation
 export function formatMatchTime(seconds, options = {}) {
   const { showExtraTime = true, useMinutes = true } = options;
-
-  return ModuleErrorBoundary.wrap(() => {
+  
+  try {
     if (typeof seconds !== 'number' || seconds < 0) {
       return '0';
     }
 
     const halfTime = (gameState.gameTime || GAME_CONFIG.DEFAULT_GAME_TIME) / 2;
     const fullTime = gameState.gameTime || GAME_CONFIG.DEFAULT_GAME_TIME;
-
+    
     let displayTime;
     let extraTime = 0;
-
+    
     if (gameState.isSecondHalf) {
       // Second half
       if (seconds <= fullTime) {
@@ -113,18 +110,16 @@ export function formatMatchTime(seconds, options = {}) {
         extraTime = Math.ceil((seconds - halfTime) / (useMinutes ? 60 : 1));
       }
     }
-
+    
     if (showExtraTime && extraTime > 0) {
       return `${displayTime}+${extraTime}`;
     }
-
+    
     return displayTime.toString();
-  }, {
-    moduleName: 'formatMatchTime',
-    severity: ERROR_SEVERITY.LOW,
-    category: ERROR_CATEGORIES.RUNTIME,
-    fallback: '0'
-  })();
+  } catch (error) {
+    console.error('Error in formatMatchTime:', error);
+    return '0';
+  }
 }
 
 // ===== FUNCTION UTILITIES =====
@@ -135,7 +130,7 @@ export function debounce(func, wait, options = {}) {
   let timeout;
   let maxTimeout;
   let lastCallTime;
-
+  
   const debounced = function executedFunction(...args) {
     const callNow = immediate && !timeout;
     const later = () => {
@@ -143,12 +138,12 @@ export function debounce(func, wait, options = {}) {
       maxTimeout = null;
       if (!immediate) func.apply(this, args);
     };
-
+    
     clearTimeout(timeout);
     clearTimeout(maxTimeout);
-
+    
     timeout = setTimeout(later, wait);
-
+    
     // Handle maxWait
     if (maxWait && !maxTimeout) {
       maxTimeout = setTimeout(() => {
@@ -158,11 +153,11 @@ export function debounce(func, wait, options = {}) {
         }
       }, maxWait);
     }
-
+    
     if (callNow) func.apply(this, args);
     lastCallTime = Date.now();
   };
-
+  
   // Add cancel method
   debounced.cancel = () => {
     clearTimeout(timeout);
@@ -170,9 +165,9 @@ export function debounce(func, wait, options = {}) {
     timeout = null;
     maxTimeout = null;
   };
-
+  
   // Add flush method
-  debounced.flush = function (...args) {
+  debounced.flush = function(...args) {
     if (timeout) {
       clearTimeout(timeout);
       clearTimeout(maxTimeout);
@@ -181,7 +176,7 @@ export function debounce(func, wait, options = {}) {
       maxTimeout = null;
     }
   };
-
+  
   return debounced;
 }
 
@@ -190,14 +185,14 @@ export function debounce(func, wait, options = {}) {
 // Enhanced DOM element validation
 export function validateElement(element, name, options = {}) {
   const { required = true, logWarning = true } = options;
-
+  
   if (!element) {
     if (logWarning) {
       console.warn(`Element ${name} not found in DOM`);
     }
     return !required;
   }
-
+  
   // Check if element is connected to DOM
   if (!element.isConnected) {
     if (logWarning) {
@@ -205,7 +200,7 @@ export function validateElement(element, name, options = {}) {
     }
     return false;
   }
-
+  
   return true;
 }
 
@@ -227,7 +222,7 @@ export async function copyToClipboard(text) {
       document.body.appendChild(textArea);
       textArea.focus();
       textArea.select();
-
+      
       const result = document.execCommand('copy');
       document.body.removeChild(textArea);
       return result;
@@ -244,12 +239,12 @@ export async function copyToClipboard(text) {
 function getCachedValue(key) {
   const cached = utilsCache.get(key);
   if (!cached) return null;
-
+  
   if (Date.now() - cached.timestamp > CACHE_EXPIRY) {
     utilsCache.delete(key);
     return null;
   }
-
+  
   return cached.value;
 }
 
@@ -259,7 +254,7 @@ function setCachedValue(key, value) {
     value,
     timestamp: Date.now()
   });
-
+  
   // Clean up old cache entries periodically
   if (utilsCache.size > 100) {
     const now = Date.now();

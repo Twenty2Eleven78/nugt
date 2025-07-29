@@ -1,71 +1,277 @@
 /**
  * Shared Utility Functions
- * @version 3.3
+ * Essential utility functions used throughout the application
  */
 
 import { gameState } from '../data/state.js';
+import { ModuleErrorBoundary, ERROR_SEVERITY, ERROR_CATEGORIES } from './error-boundary.js';
+import { GAME_CONFIG, VALIDATION } from './constants.js';
 
-// Time formatting utility
-export function formatTime(seconds) {
-  const minutes = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return [minutes, secs]
-    .map(num => num.toString().padStart(2, '0'))
-    .join(':');
-}
+// Cache for expensive operations
+const utilsCache = new Map();
+const CACHE_EXPIRY = 5000; // 5 seconds
 
-// Get current elapsed seconds
-export function getCurrentSeconds() {
-  if (!gameState.isRunning || !gameState.startTimestamp) {
-    return gameState.seconds;
+// ===== TIME UTILITIES =====
+
+// Enhanced time formatting with validation and caching
+export function formatTime(seconds, options = {}) {
+  const {
+    showHours = false,
+    showMilliseconds = false,
+    separator = ':',
+    padHours = true
+  } = options;
+
+  // Validate input
+  if (typeof seconds !== 'number' || seconds < 0) {
+    console.warn('Invalid seconds value for formatTime:', seconds);
+    return '00:00';
   }
-  const currentTime = Date.now();
-  const elapsedSeconds = Math.floor((currentTime - gameState.startTimestamp) / 1000);
-  return elapsedSeconds;
-}
 
-// Format match time with extra time calculation
-export function formatMatchTime(seconds) {
-  const halfTime = gameState.gameTime / 2;
-  const isExtraTime = seconds > halfTime && !gameState.isSecondHalf || seconds > gameState.gameTime;
-  
-  if (!isExtraTime) {
-    return Math.ceil(seconds / 60).toString();
-  }
-  
-  // Calculate extra time
-  let baseTime, extraMinutes;
-  if (!gameState.isSecondHalf) {
-    // First half extra time
-    baseTime = halfTime / 60;
-    extraMinutes = Math.ceil((seconds - halfTime) / 60);
+  // Check cache for performance
+  const cacheKey = `formatTime_${seconds}_${JSON.stringify(options)}`;
+  const cached = getCachedValue(cacheKey);
+  if (cached) return cached;
+
+  let totalSeconds = Math.floor(seconds);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const secs = totalSeconds % 60;
+
+  let result;
+  if (showHours || hours > 0) {
+    const hourStr = padHours ? hours.toString().padStart(2, '0') : hours.toString();
+    result = `${hourStr}${separator}${minutes.toString().padStart(2, '0')}${separator}${secs.toString().padStart(2, '0')}`;
   } else {
-    // Second half extra time
-    baseTime = gameState.gameTime / 60;
-    extraMinutes = Math.ceil((seconds - gameState.gameTime) / 60);
+    result = `${minutes.toString().padStart(2, '0')}${separator}${secs.toString().padStart(2, '0')}`;
   }
-  
-  return `${baseTime}+${extraMinutes}`;
+
+  if (showMilliseconds) {
+    const ms = Math.floor((seconds % 1) * 1000);
+    result += `.${ms.toString().padStart(3, '0')}`;
+  }
+
+  setCachedValue(cacheKey, result);
+  return result;
 }
 
-// Debounce utility
-export function debounce(func, wait) {
+// Enhanced current seconds calculation with error handling
+export function getCurrentSeconds() {
+  return ModuleErrorBoundary.wrap(() => {
+    if (!gameState.isRunning || !gameState.startTimestamp) {
+      return gameState.seconds || 0;
+    }
+
+    const currentTime = Date.now();
+    const elapsedSeconds = Math.floor((currentTime - gameState.startTimestamp) / 1000);
+
+    // Validate result
+    if (elapsedSeconds < 0) {
+      console.warn('Negative elapsed time detected, resetting to stored seconds');
+      return gameState.seconds || 0;
+    }
+
+    return elapsedSeconds;
+  }, {
+    moduleName: 'getCurrentSeconds',
+    severity: ERROR_SEVERITY.LOW,
+    category: ERROR_CATEGORIES.RUNTIME,
+    fallback: gameState.seconds || 0
+  })();
+}
+
+// Enhanced match time formatting with better extra time calculation
+export function formatMatchTime(seconds, options = {}) {
+  const { showExtraTime = true, useMinutes = true } = options;
+
+  return ModuleErrorBoundary.wrap(() => {
+    if (typeof seconds !== 'number' || seconds < 0) {
+      return '0';
+    }
+
+    const halfTime = (gameState.gameTime || GAME_CONFIG.DEFAULT_GAME_TIME) / 2;
+    const fullTime = gameState.gameTime || GAME_CONFIG.DEFAULT_GAME_TIME;
+
+    let displayTime;
+    let extraTime = 0;
+
+    if (gameState.isSecondHalf) {
+      // Second half
+      if (seconds <= fullTime) {
+        displayTime = Math.ceil((seconds - halfTime) / (useMinutes ? 60 : 1));
+        displayTime = Math.max(displayTime, 45); // Start from 45 minutes
+      } else {
+        displayTime = Math.ceil(fullTime / (useMinutes ? 60 : 1));
+        extraTime = Math.ceil((seconds - fullTime) / (useMinutes ? 60 : 1));
+      }
+    } else {
+      // First half
+      if (seconds <= halfTime) {
+        displayTime = Math.ceil(seconds / (useMinutes ? 60 : 1));
+      } else {
+        displayTime = Math.ceil(halfTime / (useMinutes ? 60 : 1));
+        extraTime = Math.ceil((seconds - halfTime) / (useMinutes ? 60 : 1));
+      }
+    }
+
+    if (showExtraTime && extraTime > 0) {
+      return `${displayTime}+${extraTime}`;
+    }
+
+    return displayTime.toString();
+  }, {
+    moduleName: 'formatMatchTime',
+    severity: ERROR_SEVERITY.LOW,
+    category: ERROR_CATEGORIES.RUNTIME,
+    fallback: '0'
+  })();
+}
+
+// ===== FUNCTION UTILITIES =====
+
+// Enhanced debounce with immediate option and cancellation
+export function debounce(func, wait, options = {}) {
+  const { immediate = false, maxWait = null } = options;
   let timeout;
-  return function executedFunction(...args) {
+  let maxTimeout;
+  let lastCallTime;
+
+  const debounced = function executedFunction(...args) {
+    const callNow = immediate && !timeout;
     const later = () => {
-      clearTimeout(timeout);
-      func(...args);
+      timeout = null;
+      maxTimeout = null;
+      if (!immediate) func.apply(this, args);
     };
+
     clearTimeout(timeout);
+    clearTimeout(maxTimeout);
+
     timeout = setTimeout(later, wait);
+
+    // Handle maxWait
+    if (maxWait && !maxTimeout) {
+      maxTimeout = setTimeout(() => {
+        if (timeout) {
+          clearTimeout(timeout);
+          later();
+        }
+      }, maxWait);
+    }
+
+    if (callNow) func.apply(this, args);
+    lastCallTime = Date.now();
   };
+
+  // Add cancel method
+  debounced.cancel = () => {
+    clearTimeout(timeout);
+    clearTimeout(maxTimeout);
+    timeout = null;
+    maxTimeout = null;
+  };
+
+  // Add flush method
+  debounced.flush = function (...args) {
+    if (timeout) {
+      clearTimeout(timeout);
+      clearTimeout(maxTimeout);
+      func.apply(this, args);
+      timeout = null;
+      maxTimeout = null;
+    }
+  };
+
+  return debounced;
 }
 
-// DOM element validation
-export function validateElement(element, name) {
+// ===== VALIDATION UTILITIES =====
+
+// Enhanced DOM element validation
+export function validateElement(element, name, options = {}) {
+  const { required = true, logWarning = true } = options;
+
   if (!element) {
-    console.warn(`Element ${name} not found in DOM`);
+    if (logWarning) {
+      console.warn(`Element ${name} not found in DOM`);
+    }
+    return !required;
+  }
+
+  // Check if element is connected to DOM
+  if (!element.isConnected) {
+    if (logWarning) {
+      console.warn(`Element ${name} is not connected to DOM`);
+    }
     return false;
   }
+
   return true;
+}
+
+// ===== BROWSER UTILITIES =====
+
+// Copy text to clipboard (used in sharing functionality)
+export async function copyToClipboard(text) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } else {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      const result = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      return result;
+    }
+  } catch (error) {
+    console.error('Failed to copy to clipboard:', error);
+    return false;
+  }
+}
+
+// ===== CACHE UTILITIES =====
+
+// Get cached value with expiry check
+function getCachedValue(key) {
+  const cached = utilsCache.get(key);
+  if (!cached) return null;
+
+  if (Date.now() - cached.timestamp > CACHE_EXPIRY) {
+    utilsCache.delete(key);
+    return null;
+  }
+
+  return cached.value;
+}
+
+// Set cached value with timestamp
+function setCachedValue(key, value) {
+  utilsCache.set(key, {
+    value,
+    timestamp: Date.now()
+  });
+
+  // Clean up old cache entries periodically
+  if (utilsCache.size > 100) {
+    const now = Date.now();
+    for (const [cacheKey, cacheValue] of utilsCache.entries()) {
+      if (now - cacheValue.timestamp > CACHE_EXPIRY) {
+        utilsCache.delete(cacheKey);
+      }
+    }
+  }
+}
+
+// Clear utils cache
+export function clearUtilsCache() {
+  utilsCache.clear();
 }

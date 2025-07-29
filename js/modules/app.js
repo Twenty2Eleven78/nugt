@@ -9,6 +9,7 @@ import { storage, storageHelpers } from './data/storage.js';
 import { domCache } from './shared/dom.js';
 import { formatTime } from './shared/utils.js';
 import { STORAGE_KEYS, EVENT_TYPES } from './shared/constants.js';
+import themeManager from './shared/theme-manager.js';
 
 // Import high priority optimizations
 import { ModuleErrorBoundary } from './shared/error-boundary.js';
@@ -152,6 +153,9 @@ export function initializeApp() {
   matchLoadModal.init();
   matchSummaryModal.init();
   rawDataModal.init();
+  
+  // Initialize theme manager
+  themeManager.init();
 
   // Initialize timer with enhanced state recovery
   timerController.initialize();
@@ -604,3 +608,6 @@ window.handleEditEventFormSubmission = eventsManager.handleEditEventFormSubmissi
 
 // Global RosterManager for backward compatibility
 window.RosterManager = rosterManager;
+
+// Global ThemeManager for backward compatibility
+window.ThemeManager = themeManager;

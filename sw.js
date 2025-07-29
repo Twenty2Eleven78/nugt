@@ -105,9 +105,27 @@ self.addEventListener('activate', function (event) {
 
 // Handle messages from clients
 self.addEventListener('message', function (event) {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    console.log('Received SKIP_WAITING message');
-    self.skipWaiting();
+  try {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+      console.log('Received SKIP_WAITING message');
+      self.skipWaiting();
+      
+      // Send acknowledgment back to prevent runtime.lastError
+      if (event.ports && event.ports[0]) {
+        event.ports[0].postMessage({ success: true });
+      }
+    }
+  } catch (error) {
+    console.error('Service worker message handling error:', error);
+    
+    // Still try to send error response to prevent runtime.lastError
+    if (event.ports && event.ports[0]) {
+      try {
+        event.ports[0].postMessage({ success: false, error: error.message });
+      } catch (portError) {
+        console.error('Failed to send error response:', portError);
+      }
+    }
   }
 });
 

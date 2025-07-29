@@ -136,7 +136,22 @@ class PWAUpdater {
 
     try {
       if (this.registration.waiting) {
-        this.registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        // Use MessageChannel for proper two-way communication
+        const messageChannel = new MessageChannel();
+        
+        // Set up response handler
+        messageChannel.port1.onmessage = (event) => {
+          if (event.data.success) {
+            console.log('Service worker acknowledged SKIP_WAITING');
+          }
+        };
+        
+        // Send message with response port
+        this.registration.waiting.postMessage(
+          { type: 'SKIP_WAITING' },
+          [messageChannel.port2]
+        );
+        
         notificationManager.info('Installing update...');
       }
 

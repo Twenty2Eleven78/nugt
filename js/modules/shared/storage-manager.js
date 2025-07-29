@@ -429,6 +429,15 @@ class StorageQuotaManager {
       if (quotaInfo && quotaInfo.usagePercentage > STORAGE_CONFIG.QUOTA_WARNING_THRESHOLD * 100) {
         await this.performRoutineCleanup();
       }
+      
+      // Check memory usage and trigger cleanup if high
+      if (performance.memory) {
+        const memoryUsage = performance.memory.usedJSHeapSize / performance.memory.totalJSHeapSize;
+        if (memoryUsage > 0.9) {
+          console.log('🧹 High memory usage detected during init, performing cleanup...');
+          await this.performRoutineCleanup();
+        }
+      }
 
       console.log('✅ Storage Manager initialized successfully');
       return true;
@@ -812,3 +821,6 @@ class StorageQuotaManager {
 
 // Create and export singleton instance
 export const storageQuotaManager = new StorageQuotaManager();
+
+// Make available globally for memory management
+window.storageQuotaManager = storageQuotaManager;

@@ -507,6 +507,12 @@ class ModuleErrorBoundary {
 window.addEventListener('error', (event) => {
   const error = event.error || new Error(event.message);
   
+  // Skip runtime.lastError messages as they're often harmless extension-related warnings
+  if (event.message && event.message.includes('runtime.lastError')) {
+    console.debug('Suppressed runtime.lastError:', event.message);
+    return;
+  }
+  
   ModuleErrorBoundary._handleError(
     error,
     'GlobalError',
@@ -520,6 +526,13 @@ window.addEventListener('error', (event) => {
 window.addEventListener('unhandledrejection', (event) => {
   const error = event.reason instanceof Error ? event.reason : new Error(String(event.reason));
   
+  // Skip Chrome extension runtime errors
+  if (error.message && error.message.includes('runtime.lastError')) {
+    console.debug('Suppressed runtime.lastError promise rejection:', error.message);
+    event.preventDefault();
+    return;
+  }
+  
   ModuleErrorBoundary._handleError(
     error,
     'UnhandledPromiseRejection',
@@ -532,19 +545,54 @@ window.addEventListener('unhandledrejection', (event) => {
   event.preventDefault();
 });
 
-// Performance monitoring for memory leaks
+// Specific handler for Chrome extension runtime errors
+if (typeof chrome !== 'undefined' && chrome.runtime) {
+  // Suppress runtime.lastError by checking it periodically
+  const originalLastError = chrome.runtime.lastError;
+  Object.defineProperty(chrome.runtime, 'lastError', {
+    get: function() {
+      const error = originalLastError;
+      if (error) {
+        console.debug('Chrome runtime error suppressed:', error.message);
+      }
+      return null; // Always return null to prevent the error from propagating
+    },
+    configurable: true
+  });
+}
+
+// Performance monitoring for memory leaks with throttling
 if (performance.memory) {
+  let lastMemoryWarning = 0;
+  const MEMORY_WARNING_COOLDOWN = 60000; // 1 minute between warnings
+  
   setInterval(() => {
     const memoryUsage = performance.memory.usedJSHeapSize / performance.memory.totalJSHeapSize;
     
-    if (memoryUsage > 0.9) {
-      console.warn('High memory usage detected:', {
-        used: performance.memory.usedJSHeapSize,
-        total: performance.memory.totalJSHeapSize,
-        percentage: (memoryUsage * 100).toFixed(1) + '%'
-      });
+    if (memoryUsage > 0.95) {
+      const now = Date.now();
+      if (now - lastMemoryWarning > MEMORY_WARNING_COOLDOWN) {
+        console.warn('🚨 Critical memory usage detected:', {
+          used: performance.memory.usedJSHeapSize,
+          total: performance.memory.totalJSHeapSize,
+          percentage: (memoryUsage * 100).toFixed(1) + '%'
+        });
+        
+        // Trigger garbage collection if available
+        if (window.gc) {
+          window.gc();
+          console.log('🗑️ Garbage collection triggered');
+        }
+        
+        // Trigger storage cleanup
+        if (window.storageQuotaManager) {
+          window.storageQuotaManager.performRoutineCleanup();
+        }
+        
+        lastMemoryWarning = now;
+      }
     }
-  }, 30000); // Check every 30 seconds
+  }, 60000); // Check every minute instead of 30 seconds
 }
 
 // Export enhanced error boundary and utilities

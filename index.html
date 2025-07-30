@@ -419,154 +419,15 @@
   </div>
   <!--END Release Notes Modal-->
 
-  <!-- Fixture Modal Team 1 -->
-  <div class="modal fade" id="fixtureModalTeam1" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Our Team Name Management</h5>
-          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="row">
-            <div class="col-12 col-md-8">
-              <div class="input-group mb-3">
-                <div>
-                  <input type="text" id="team1Name" class="form-control" placeholder="Netherton">
-                  <br>
-                  <button class="btn btn-danger btn-custom" id="updTeam1Btn">Update Team Name</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- END Fixture Modal Team 1 -->
+  <!-- Team modals are now managed by team-modals.js -->
 
-  <!-- Fixture Modal Team 2 -->
-  <div class="modal fade" id="fixtureModalTeam2" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Opposition Name Management</h5>
-          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="row">
-            <div class="col-12 col-md-8">
-              <div class="input-group mb-3">
-                <div>
-                  <input type="text" id="team2Name" class="form-control" placeholder="Opposition Team">
-                  <br>
-                  <button class="btn btn-danger btn-custom" id="updTeam2Btn">Update Team Name</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- END Fixture Modal Team 2 -->
 
-  <!-- Goal Modal -->
-  <div class="modal fade" id="goalModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Goal Details:</h5>
-          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="row">
-            <div class="col-12">
-              <div class="input-group mb-3">
-                <form id="goalForm" class="w-100">
-                  <div class="mb-3">
-                    <label for="goalScorer" class="form-label">Goal Scorer:</label>
-                    <select id="goalScorer" class="form-select" required>
-                      <option value="" selected>Select goal scorer</option>
-                      <option value="Own Goal">Own Goal</option>
-                    </select>
-                  </div>
-                  <div class="mb-3">
-                    <label for="goalAssist" class="form-label">Goal Assist:</label>
-                    <select id="goalAssist" class="form-select" required>
-                      <option value="" selected>Select goal assist</option>
-                      <option value="N/A">N/A</option>
-                    </select>
-                  </div>
-                  <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-success btn-custom" id="goalButton">Goal</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- END Goal Modal -->
 
-  <!-- Edit Event Modal -->
-  <div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editEventModalLabel">Edit Event Time</h5>
-          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="editEventForm">
-            <div class="mb-3">
-              <label for="editEventTime" class="form-label">Event Time (in minutes)</label>
-              <input type="number" class="form-control" id="editEventTime" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- END Edit Event Modal -->
+  <!-- Goal modal is now managed by goal-modal.js -->
 
-  <!-- Record Event Modal -->
-  <div class="modal fade" id="recordEventModal" tabindex="-1" aria-labelledby="recordEventModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="recordEventModalLabel">Record New Event</h5>
-          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="recordEventForm">
-            <div class="mb-3">
-              <label for="eventTypeSelect" class="form-label">Event Type</label>
-              <select class="form-select" id="eventTypeSelect" required>
-                <option value="" disabled selected>Choose event type...</option>
-                <option value="Yellow Card">Yellow Card</option>
-                <option value="Red Card">Red Card</option>
-                <option value="Sin Bin">Sin Bin</option>
-                <option value="Foul">Foul</option>
-                <option value="Penalty">Penalty</option>
-                <option value="Incident">Incident</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="eventNotes" class="form-label">Notes (Optional)</label>
-              <textarea class="form-control" id="eventNotes" rows="3"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Record Event</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- END Record Event Modal -->
+  <!-- Event modals are now managed by event-modals.js -->
+
+
 
   <!-- Roster Modal -->
   <div class="modal fade" id="rosterModal" tabindex="-1">

@@ -83,9 +83,19 @@
 - [x] Theme integration
 - [x] Updated HTML attributes (data-bs-* → data-*)
 - [x] Updated JavaScript imports and usage
+- [x] **Modular Modal System**: Created dedicated JS modules for each modal type
+  - `team-modals.js` - Team name management modals
+  - `goal-modal.js` - Goal recording modal with player integration
+  - `event-modals.js` - Event recording and editing modals
+  - `reset-modal.js` - App reset confirmation modal
+  - `feedback-modal.js` - User feedback collection modal
+- [x] **Clean HTML**: Removed modal HTML from index.html, now managed by JS modules
+- [x] **Better Organization**: Each modal has its own dedicated module with proper encapsulation
 
 ### **🔄 In Progress**
-- [ ] Update remaining JavaScript files that reference Bootstrap
+- [x] Update remaining JavaScript files that reference Bootstrap
+- [x] Created dedicated modal modules (team-modals.js, goal-modal.js, event-modals.js, etc.)
+- [x] Moved modal HTML from index.html to JavaScript modules
 - [ ] Remove Bootstrap CSS and JS files
 - [ ] Test all modal functionality
 - [ ] Verify responsive behavior

@@ -28,15 +28,15 @@ export function hideModal(modalId) {
         modal = CustomModal.getOrCreateInstance(modalElement);
       }
       modal.hide();
-      } else {
-        // Fallback if Bootstrap is not loaded yet
-        console.warn('Bootstrap not loaded, using fallback modal hide');
-        modalElement.classList.remove('show');
-        modalElement.style.display = 'none';
-        
-        // Remove backdrop
-        const backdrops = document.querySelectorAll('.modal-backdrop');
-        backdrops.forEach(backdrop => backdrop.remove());
+    } catch (error) {
+      // Fallback if modal system fails
+      console.warn('Modal hide failed, using fallback:', error);
+      modalElement.classList.remove('show');
+      modalElement.style.display = 'none';
+      
+      // Remove backdrop
+      const backdrops = document.querySelectorAll('.modal-backdrop');
+      backdrops.forEach(backdrop => backdrop.remove());
         
         // Clean up body
         document.body.classList.remove('modal-open');

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NUFC GameTime App v3.7</title>
   <!-- Preload critical resources -->
-  <link rel="preload" href="css/bootstrap.min.css" as="style">
+  <link rel="preload" href="css/custom-framework.css" as="style">
   <link rel="preload" href="css/style.css" as="style">
   <link rel="preload" href="webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
 
@@ -344,20 +344,20 @@
                       </div>
                       <div class="option-card-body">
                         <div class="d-grid gap-2">
-                          <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#releasenotesmodal">
+                          <button class="btn btn-outline-secondary btn-sm" data-toggle="modal"
+                            data-target="#releasenotesmodal">
                             <i class="fas fa-list me-2"></i>Release Notes
                           </button>
                           <button class="btn btn-outline-info btn-sm" id="checkForUpdatesBtn"
                             onclick="pwaUpdater.triggerUpdate()">
                             <i class="fas fa-sync me-2"></i>Check Updates
                           </button>
-                          <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#feedbackModal">
+                          <button class="btn btn-outline-primary btn-sm" data-toggle="modal"
+                            data-target="#feedbackModal">
                             <i class="fas fa-comments me-2"></i>Feedback
                           </button>
-                          <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#resetConfirmModal">
+                          <button class="btn btn-outline-danger btn-sm" data-toggle="modal"
+                            data-target="#resetConfirmModal">
                             <i class="fas fa-arrows-rotate me-2"></i>Reset App
                           </button>
                         </div>
@@ -406,7 +406,7 @@
   <!-----------------------------------------Modal Section-------------------------------------->
 
   <!--Release Notes Modal-->
-  <div class="modal fade" id="releasenotesmodal" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
+  <div class="modal fade" id="releasenotesmodal" tabindex="-1" data-backdrop="static" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header bg-danger text-white">
@@ -494,7 +494,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="editPlayerModalLabel"><i class="fas fa-user-edit me-2"></i>Edit Player</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <form id="editPlayerForm">
@@ -526,7 +526,7 @@
           <h4 class="modal-title" id="attendanceModalLabel">
             <i class="fas fa-user-check me-2"></i>Match Attendance
           </h4>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <!-- Attendance Summary -->
@@ -572,8 +572,8 @@
             <i class="fas fa-users fa-3x mb-3"></i>
             <h5>No Players in Roster</h5>
             <p>Add players to your roster first to track attendance.</p>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#rosterModal"
-              data-bs-dismiss="modal">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#rosterModal"
+              data-dismiss="modal">
               <i class="fas fa-users me-2"></i>Manage Roster
             </button>
           </div>
@@ -584,14 +584,14 @@
   <!-- END Match Attendance Modal -->
 
   <!--Confirm Reset Modal-->
-  <div class="modal fade" id="resetConfirmModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="resetConfirmModal" data-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header bg-danger text-white">
           <h5 class="modal-title">
             <i class="fas fa-exclamation-triangle me-2"></i>Confirm Reset
           </h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <p class="mb-0">Are you sure you want to reset the game?</p>
@@ -606,7 +606,7 @@
           </div>
         </div>
         <div class="d-flex justify-content-end gap-2 mt-3 px-3 pb-3">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
             <i class="fas fa-times me-2"></i>Cancel
           </button>
           <button type="button" class="btn btn-danger" id="confirmResetBtn">
@@ -627,7 +627,7 @@
           <h5 class="modal-title" id="donateModalLabel">
             <i class="fa-solid fa-heart text-danger me-2"></i>Support Netherton U12 Girls Black
           </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
 
         <!-- Modal Body -->
@@ -669,7 +669,7 @@
           <h5 class="modal-title" id="feedbackModalLabel">
             <i class="fa-solid fa-comments me-2"></i>App Feedback
           </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <!-- Replace YOUR-EMAIL@example.com with your actual email -->
@@ -733,7 +733,7 @@
           <h5 class="modal-title" id="sharingModalLabel">
             <i class="fas fa-share-alt me-2"></i>Share Match Report
           </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="row g-3 mb-4">

@@ -17,7 +17,7 @@ class AuthUI {
    */
   async init() {
     console.log('Initializing authentication UI');
-    
+
     // Create auth modal if it doesn't exist
     if (!document.getElementById('authModal')) {
       this._createAuthModal();
@@ -67,26 +67,23 @@ class AuthUI {
           `;
         }
       }
-      
+
       try {
-        // Make sure Bootstrap is available
-        if (typeof bootstrap !== 'undefined') {
-          const bsModal = new bootstrap.Modal(authModal);
-          bsModal.show();
-        } else {
-          // Fallback if Bootstrap is not loaded yet
-          console.warn('Bootstrap not loaded, using fallback modal display');
-          authModal.classList.add('show');
-          authModal.style.display = 'block';
-          document.body.classList.add('modal-open');
-          
-          // Create backdrop
-          const backdrop = document.createElement('div');
-          backdrop.className = 'modal-backdrop fade show';
-          document.body.appendChild(backdrop);
-        }
+        // Use custom modal system
+        const { CustomModal } = await import('../shared/custom-modal.js');
+        const modal = CustomModal.getOrCreateInstance(authModal);
+        modal.show();
       } catch (error) {
         console.error('Error showing modal:', error);
+        // Fallback modal display
+        authModal.classList.add('show');
+        authModal.style.display = 'block';
+        document.body.classList.add('modal-open');
+
+        // Create backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade show';
+        document.body.appendChild(backdrop);
       }
     }
   }
@@ -102,7 +99,7 @@ class AuthUI {
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="authModalLabel">NUFC GameTime Authentication</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div class="auth-container">
@@ -150,7 +147,7 @@ class AuthUI {
     document.body.appendChild(modalContainer.firstElementChild);
 
     this.authModalInitialized = true;
-    
+
     // Bind event listeners to the modal buttons
     setTimeout(() => this._bindModalButtons(), 100);
   }
@@ -181,28 +178,80 @@ class AuthUI {
     // Create profile button
     const profileButton = document.createElement('button');
     profileButton.id = 'userProfileButton';
-    profileButton.className = 'btn btn-sm btn-outline-secondary';
+    profileButton.className = 'btn btn-sm btn-outline-secondary dropdown-toggle';
     profileButton.innerHTML = '<i class="fas fa-user me-1"></i><span id="profileUsername">Guest</span>';
-    profileButton.setAttribute('data-bs-toggle', 'dropdown');
     profileButton.setAttribute('aria-expanded', 'false');
-    
+
     // Create dropdown menu
-    const dropdownMenu = document.createElement('ul');
+    const dropdownMenu = document.createElement('div');
     dropdownMenu.className = 'dropdown-menu dropdown-menu-end';
+    dropdownMenu.id = 'userProfileDropdown';
     dropdownMenu.setAttribute('aria-labelledby', 'userProfileButton');
-    
+
     // Add dropdown items
     dropdownMenu.innerHTML = `
-      <li><button class="dropdown-item" id="logoutButton">Sign Out</button></li>
+      <button class="dropdown-item" id="logoutButton">
+        <i class="fas fa-sign-out-alt me-2"></i>Sign Out
+      </button>
     `;
-    
+
     // Append elements
     profileContainer.appendChild(profileButton);
     profileContainer.appendChild(dropdownMenu);
-    
+
     // Make header position relative for absolute positioning of profile button
     headerRow.style.position = 'relative';
     headerRow.appendChild(profileContainer);
+
+    // Set up dropdown functionality
+    this._setupDropdown(profileButton, dropdownMenu);
+  }
+
+  /**
+   * Set up dropdown functionality
+   * @param {HTMLElement} button - The dropdown button
+   * @param {HTMLElement} menu - The dropdown menu
+   * @private
+   */
+  _setupDropdown(button, menu) {
+    // Toggle dropdown on button click
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const isOpen = menu.classList.contains('show');
+
+      // Close all other dropdowns
+      document.querySelectorAll('.dropdown-menu.show').forEach(dropdown => {
+        dropdown.classList.remove('show');
+      });
+
+      // Toggle this dropdown
+      if (!isOpen) {
+        menu.classList.add('show');
+        button.setAttribute('aria-expanded', 'true');
+      } else {
+        menu.classList.remove('show');
+        button.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!button.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.remove('show');
+        button.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Close dropdown on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && menu.classList.contains('show')) {
+        menu.classList.remove('show');
+        button.setAttribute('aria-expanded', 'false');
+        button.focus();
+      }
+    });
   }
 
   /**
@@ -212,16 +261,26 @@ class AuthUI {
   _bindEventListeners() {
     // Bind modal buttons immediately instead of waiting for DOMContentLoaded
     this._bindModalButtons();
-    
+
     // Add global event listeners for dynamically created elements
     document.body.addEventListener('click', (e) => {
       if (e.target && e.target.id === 'logoutButton') {
-        // Only trigger logout, state change and UI updates will be handled by listeners
+        // Close the dropdown
+        const dropdown = document.getElementById('userProfileDropdown');
+        if (dropdown) {
+          dropdown.classList.remove('show');
+        }
+        const button = document.getElementById('userProfileButton');
+        if (button) {
+          button.setAttribute('aria-expanded', 'false');
+        }
+
+        // Trigger logout
         authService.logout();
       }
     });
   }
-  
+
   /**
    * Bind event listeners to modal buttons
    * @private
@@ -232,7 +291,7 @@ class AuthUI {
     if (registerButton) {
       registerButton.onclick = async () => {
         const email = document.getElementById('usernameInput').value.trim();
-        
+
         try {
           console.log('Attempting to register with email:', email);
           const success = await authService.register(email);
@@ -298,18 +357,18 @@ class AuthUI {
   _updateAuthState(isAuthenticated) {
     // Create profile button if it doesn't exist
     this._createProfileButton();
-    
+
     const profileButton = document.getElementById('userProfileButton');
     const profileUsername = document.getElementById('profileUsername');
-    
+
     if (isAuthenticated) {
       const user = authService.getCurrentUser();
-      
+
       if (profileButton) {
         profileButton.classList.remove('btn-outline-secondary');
         profileButton.classList.add('btn-outline-primary');
       }
-      
+
       if (profileUsername && user) {
         profileUsername.textContent = user.name;
       }
@@ -318,7 +377,7 @@ class AuthUI {
         profileButton.classList.remove('btn-outline-primary');
         profileButton.classList.add('btn-outline-secondary');
       }
-      
+
       if (profileUsername) {
         profileUsername.textContent = 'Guest';
       }
@@ -330,16 +389,16 @@ class AuthUI {
    */
   fixModalOverlays() {
     console.log('Fixing modal overlays...');
-    
+
     // Remove all backdrops
     const backdrops = document.querySelectorAll('.modal-backdrop');
     backdrops.forEach(backdrop => backdrop.remove());
-    
+
     // Clean up body
     document.body.classList.remove('modal-open');
     document.body.style.overflow = '';
     document.body.style.paddingRight = '';
-    
+
     // Reset all modals
     const modals = document.querySelectorAll('.modal');
     modals.forEach(modal => {
@@ -349,7 +408,7 @@ class AuthUI {
       modal.removeAttribute('aria-modal');
       modal.removeAttribute('role');
     });
-    
+
     console.log('Modal overlays fixed');
   }
 }

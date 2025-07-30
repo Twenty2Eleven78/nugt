@@ -6,6 +6,7 @@
 import { authService } from '../services/auth.js';
 import { notificationManager } from '../services/notifications.js';
 import { hideModal } from './modals.js';
+import { CustomModal } from '../shared/custom-modal.js';
 
 class AuthUI {
   constructor() {
@@ -70,7 +71,6 @@ class AuthUI {
 
       try {
         // Use custom modal system
-        const { CustomModal } = await import('../shared/custom-modal.js');
         const modal = CustomModal.getOrCreateInstance(authModal);
         modal.show();
       } catch (error) {

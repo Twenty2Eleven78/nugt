@@ -350,16 +350,18 @@ function bindEventListeners() {
     opgoalButton.addEventListener('click', () => goalManager.addOppositionGoal());
   }
 
-  const goalForm = domCache.get('goalForm');
-  if (goalForm) {
-    goalForm.addEventListener('submit', (e) => goalManager.addGoal(e));
-  }
+  // Goal form event listener is now handled by the goal modal module
+  // The form is dynamically created, so we use event delegation
+  document.addEventListener('submit', (e) => {
+    if (e.target.id === 'goalForm') {
+      goalManager.addGoal(e);
+    }
+  });
 
-  // Team management
-  const updTeam1Btn = domCache.get('updTeam1Btn');
-  if (updTeam1Btn) {
-    updTeam1Btn.addEventListener('click', () => {
-      const teamInput = domCache.get('team1Input');
+  // Team management - using event delegation for dynamically created buttons
+  document.addEventListener('click', (e) => {
+    if (e.target.id === 'updTeam1Btn') {
+      const teamInput = document.getElementById('team1Name');
       const teamName = teamInput?.value.trim();
       if (teamName) {
         teamManager.updateTeamName('first', teamName);
@@ -370,13 +372,10 @@ function bindEventListeners() {
           modal.hide();
         }
       }
-    });
-  }
-
-  const updTeam2Btn = domCache.get('updTeam2Btn');
-  if (updTeam2Btn) {
-    updTeam2Btn.addEventListener('click', () => {
-      const teamInput = domCache.get('team2Input');
+    }
+    
+    if (e.target.id === 'updTeam2Btn') {
+      const teamInput = document.getElementById('team2Name');
       const teamName = teamInput?.value.trim();
       if (teamName) {
         teamManager.updateTeamName('second', teamName);
@@ -387,8 +386,8 @@ function bindEventListeners() {
           modal.hide();
         }
       }
-    });
-  }
+    }
+  });
 
   // Match events
   const recordEventButton = document.getElementById('recordEventButton');

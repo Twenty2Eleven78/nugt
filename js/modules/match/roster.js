@@ -136,8 +136,8 @@ class RosterManager {
 
   // Update select dropdowns
   updateSelects() {
-    const goalScorerSelect = domCache.get('goalScorer');
-    const goalAssistSelect = domCache.get('goalAssist');
+    const goalScorerSelect = document.getElementById('goalScorer');
+    const goalAssistSelect = document.getElementById('goalAssist');
 
     if (!goalScorerSelect || !goalAssistSelect) {
       return;
@@ -413,8 +413,8 @@ class RosterManager {
 
   // Handle player removal from select dropdowns
   _handlePlayerRemovalFromSelects(playerName) {
-    const goalScorerSelect = domCache.get('goalScorer');
-    const goalAssistSelect = domCache.get('goalAssist');
+    const goalScorerSelect = document.getElementById('goalScorer');
+    const goalAssistSelect = document.getElementById('goalAssist');
 
     if (goalScorerSelect?.value === playerName) {
       goalScorerSelect.value = '';
@@ -429,8 +429,8 @@ class RosterManager {
 
   // Update selects after player edit
   _updateSelectsAfterEdit(oldName, newName) {
-    const goalScorerSelect = domCache.get('goalScorer');
-    const goalAssistSelect = domCache.get('goalAssist');
+    const goalScorerSelect = document.getElementById('goalScorer');
+    const goalAssistSelect = document.getElementById('goalAssist');
 
     if (goalScorerSelect?.value === oldName) {
       goalScorerSelect.value = newName;

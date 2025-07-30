@@ -62,8 +62,8 @@ class GoalManager {
   addGoal(event) {
     event.preventDefault();
 
-    const goalScorerName = domCache.get('goalScorer')?.value;
-    const goalAssistName = domCache.get('goalAssist')?.value;
+    const goalScorerName = document.getElementById('goalScorer')?.value;
+    const goalAssistName = document.getElementById('goalAssist')?.value;
     const currentSeconds = gameState.pendingGoalTimestamp || getCurrentSeconds();
     const team1Name = domCache.get('Team1NameElement')?.textContent;
 
@@ -125,7 +125,7 @@ class GoalManager {
 
   // Reset goal form
   _resetGoalForm() {
-    const goalForm = domCache.get('goalForm');
+    const goalForm = document.getElementById('goalForm');
     if (goalForm) {
       goalForm.reset();
     }

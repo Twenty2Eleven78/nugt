@@ -3,11 +3,13 @@
  * @version 3.3
  */
 
+import { CustomModal } from '../shared/custom-modal.js';
+
 // Modal utilities
 export function showModal(modalId) {
   const modalElement = document.getElementById(modalId);
   if (modalElement) {
-    const modal = new bootstrap.Modal(modalElement);
+    const modal = CustomModal.getOrCreateInstance(modalElement);
     modal.show();
     return modal;
   } else {
@@ -20,14 +22,12 @@ export function hideModal(modalId) {
   const modalElement = document.getElementById(modalId);
   if (modalElement) {
     try {
-      // Check if Bootstrap is available
-      if (typeof bootstrap !== 'undefined') {
-        let modal = bootstrap.Modal.getInstance(modalElement);
-        if (!modal) {
-          // If no instance exists, create one and then hide it
-          modal = new bootstrap.Modal(modalElement);
-        }
-        modal.hide();
+      let modal = CustomModal.getInstance(modalElement);
+      if (!modal) {
+        // If no instance exists, create one and then hide it
+        modal = CustomModal.getOrCreateInstance(modalElement);
+      }
+      modal.hide();
       } else {
         // Fallback if Bootstrap is not loaded yet
         console.warn('Bootstrap not loaded, using fallback modal hide');
@@ -85,7 +85,7 @@ export function hideModal(modalId) {
 export function getModalInstance(modalId) {
   const modalElement = document.getElementById(modalId);
   if (modalElement) {
-    return bootstrap.Modal.getInstance(modalElement);
+    return CustomModal.getInstance(modalElement);
   }
   return null;
 }
@@ -143,7 +143,7 @@ export function cleanupModalOverlays() {
 export function closeAllModals() {
   const allModals = document.querySelectorAll('.modal');
   allModals.forEach(modalElement => {
-    const modal = bootstrap.Modal.getInstance(modalElement);
+    const modal = CustomModal.getInstance(modalElement);
     if (modal) {
       modal.hide();
     }

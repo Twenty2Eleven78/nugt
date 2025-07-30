@@ -10,6 +10,7 @@ import { domCache } from './shared/dom.js';
 import { formatTime } from './shared/utils.js';
 import { STORAGE_KEYS, EVENT_TYPES } from './shared/constants.js';
 import themeManager from './shared/theme-manager.js';
+import { CustomModal } from './shared/custom-modal.js';
 
 // Import high priority optimizations
 import { ModuleErrorBoundary } from './shared/error-boundary.js';
@@ -42,6 +43,30 @@ import { pwaUpdater } from './services/pwa-updater.js';
 import { attendanceManager } from './services/attendance.js';
 import { authService } from './services/auth.js';
 import { userMatchesApi } from './services/user-matches-api.js';
+
+// Initialize custom modal system
+function initializeCustomModals() {
+  // Set up modal triggers
+  document.addEventListener('click', (e) => {
+    const trigger = e.target.closest('[data-toggle="modal"]');
+    if (trigger) {
+      e.preventDefault();
+      const targetId = trigger.getAttribute('data-target');
+      if (targetId) {
+        const modal = CustomModal.getOrCreateInstance(targetId);
+        modal.show();
+      }
+    }
+  });
+
+  // Initialize all existing modals
+  const modals = document.querySelectorAll('.modal');
+  modals.forEach(modalElement => {
+    CustomModal.getOrCreateInstance(modalElement);
+  });
+
+  console.log('Custom modal system initialized');
+}
 
 // Initialize high priority optimizations
 function initializeOptimizations() {
@@ -114,7 +139,10 @@ function enhanceTouchTargets() {
 
 // Initialize application
 export function initializeApp() {
-  console.log('Initializing NUFC GameTime App v3.7 - Enhanced with High Priority Optimizations');
+  console.log('Initializing NUFC GameTime App v3.7 - Enhanced with Custom Framework');
+
+  // Initialize custom modal system
+  initializeCustomModals();
 
   // Initialize high priority optimizations
   initializeOptimizations();
@@ -325,7 +353,7 @@ function bindEventListeners() {
         teamManager.updateTeamName('first', teamName);
         teamInput.value = '';
         // Close the modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('fixtureModalTeam1'));
+        const modal = CustomModal.getInstance(document.getElementById('fixtureModalTeam1'));
         if (modal) {
           modal.hide();
         }
@@ -342,7 +370,7 @@ function bindEventListeners() {
         teamManager.updateTeamName('second', teamName);
         teamInput.value = '';
         // Close the modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('fixtureModalTeam2'));
+        const modal = CustomModal.getInstance(document.getElementById('fixtureModalTeam2'));
         if (modal) {
           modal.hide();
         }
@@ -393,7 +421,7 @@ function bindEventListeners() {
   const shareButton = domCache.get('shareButton');
   if (shareButton) {
     shareButton.addEventListener('click', () => {
-      const sharingModal = new bootstrap.Modal(document.getElementById('sharingModal'));
+      const sharingModal = CustomModal.getOrCreateInstance(document.getElementById('sharingModal'));
       sharingModal.show();
     });
   }
@@ -457,7 +485,7 @@ async function handleSharingPlatform(platform) {
     }
     
     // Close the modal after successful sharing
-    const sharingModal = bootstrap.Modal.getInstance(document.getElementById('sharingModal'));
+    const sharingModal = CustomModal.getInstance(document.getElementById('sharingModal'));
     if (sharingModal) {
       sharingModal.hide();
     }
@@ -491,7 +519,7 @@ function handleExport(format) {
     notificationManager.success(`Match data exported as ${format.toUpperCase()}!`);
     
     // Close the modal after successful export
-    const sharingModal = bootstrap.Modal.getInstance(document.getElementById('sharingModal'));
+    const sharingModal = CustomModal.getInstance(document.getElementById('sharingModal'));
     if (sharingModal) {
       sharingModal.hide();
     }

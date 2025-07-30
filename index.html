@@ -10,8 +10,8 @@
   <link rel="preload" href="css/style.css" as="style">
   <link rel="preload" href="webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
 
-  <!-- Bootstrap CSS -->
-  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom Framework CSS -->
+  <link href="css/custom-framework.css" rel="stylesheet">
   <!-- Font Awesome for icons -->
   <link href="css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript>
@@ -61,16 +61,16 @@
                 <div class="scoreboard-card">
                   <div class="scoreboard-compact" id="scoreboard">
                     <div class="team-score-section">
-                      <button id="first-team-name" class="team-name-btn" data-bs-toggle="modal"
-                        data-bs-target="#fixtureModalTeam1">
+                      <button id="first-team-name" class="team-name-btn" data-toggle="modal"
+                        data-target="#fixtureModalTeam1">
                         Netherton
                       </button>
                       <div class="score-display" id="first-score">0</div>
                     </div>
                     <div class="score-separator">-</div>
                     <div class="team-score-section">
-                      <button id="second-team-name" class="team-name-btn" data-bs-toggle="modal"
-                        data-bs-target="#fixtureModalTeam2">
+                      <button id="second-team-name" class="team-name-btn" data-toggle="modal"
+                        data-target="#fixtureModalTeam2">
                         Opposition Team
                       </button>
                       <div class="score-display" id="second-score">0</div>
@@ -112,7 +112,7 @@
                   <!-- Record Event Row -->
                   <div class="action-row">
                     <button id="recordEventButton" class="action-btn btn-warning full-width" type="button"
-                      data-bs-toggle="modal" data-bs-target="#recordEventModal">
+                      data-toggle="modal" data-target="#recordEventModal">
                       <i class="fa-solid fa-hand"></i>
                       <span class="btn-text">Record Event</span>
                     </button>
@@ -209,7 +209,7 @@
                     </h6>
                     <div class="row g-3">
                       <div class="col-6 col-md-3">
-                        <div class="quick-action-card" data-bs-toggle="modal" data-bs-target="#attendanceModal">
+                        <div class="quick-action-card" data-toggle="modal" data-target="#attendanceModal">
                           <i class="fas fa-user-check fa-2x mb-2 text-primary"></i>
                           <span>Attendance</span>
                         </div>
@@ -267,12 +267,12 @@
                       </div>
                       <div class="option-card-body">
                         <div class="d-grid gap-2">
-                          <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#rosterModal">
+                          <button class="btn btn-outline-danger btn-sm" data-toggle="modal"
+                            data-target="#rosterModal">
                             <i class="fas fa-users me-2"></i>Manage Roster
                           </button>
-                          <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#attendanceModal">
+                          <button class="btn btn-outline-primary btn-sm" data-toggle="modal"
+                            data-target="#attendanceModal">
                             <i class="fas fa-user-check me-2"></i>Match Attendance
                           </button>
                         </div>
@@ -384,17 +384,17 @@
     <div class="content-width">
       <ul class="nav nav-pills nav-fill" role="tablist">
         <li class="nav-item pill-1">
-          <a class="nav-link active" data-bs-toggle="pill" href="#gametab">
+          <a class="nav-link active" data-toggle="pill" href="#gametab">
             <i class="fa-regular fa-futbol"></i> Game
           </a>
         </li>
         <li class="nav-item pill-2">
-          <a class="nav-link" data-bs-toggle="pill" href="#gamelogtab">
+          <a class="nav-link" data-toggle="pill" href="#gamelogtab">
             <i class="fa-solid fa-list"></i> Events
           </a>
         </li>
         <li class="nav-item pill-3">
-          <a class="nav-link" data-bs-toggle="pill" href="#optionstab">
+          <a class="nav-link" data-toggle="pill" href="#optionstab">
             <i class="fa-solid fa-gears"></i> Options
           </a>
         </li>
@@ -411,7 +411,7 @@
       <div class="modal-content">
         <div class="modal-header bg-danger text-white">
           <h5 class="modal-title">Release Notes</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div id=readme class="modal-body readme-content"></div>
       </div>
@@ -425,7 +425,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Our Team Name Management</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="row">
@@ -451,7 +451,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Opposition Name Management</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="row">
@@ -477,7 +477,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Goal Details:</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="row">
@@ -517,7 +517,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="editEventModalLabel">Edit Event Time</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <form id="editEventForm">
@@ -540,7 +540,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="recordEventModalLabel">Record New Event</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <form id="recordEventForm">
@@ -574,7 +574,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title modal-title-enhanced"><i class="fas fa-users me-2"></i>Team Roster Management</h4>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <h5>Add New Player</h5>

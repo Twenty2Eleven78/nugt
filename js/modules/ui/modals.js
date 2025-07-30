@@ -37,20 +37,9 @@ export function hideModal(modalId) {
       // Remove backdrop
       const backdrops = document.querySelectorAll('.modal-backdrop');
       backdrops.forEach(backdrop => backdrop.remove());
-        
-        // Clean up body
-        document.body.classList.remove('modal-open');
-      }
-    } catch (error) {
-      console.error('Error hiding modal:', error);
-      // Fallback cleanup
-      modalElement.style.display = 'none';
-      modalElement.classList.remove('show');
-      document.body.classList.remove('modal-open');
       
-      // Remove backdrop
-      const backdrops = document.querySelectorAll('.modal-backdrop');
-      backdrops.forEach(backdrop => backdrop.remove());
+      // Clean up body
+      document.body.classList.remove('modal-open');
     }
     
     // Enhanced cleanup to prevent overlay issues
@@ -98,12 +87,12 @@ export function bindModalEvents() {
   const allModals = document.querySelectorAll('.modal');
   allModals.forEach(modal => {
     // Clean up when modal is hidden
-    modal.addEventListener('hidden.bs.modal', () => {
+    modal.addEventListener('modal.hidden', () => {
       cleanupModalOverlays();
     });
 
     // Handle focus management before hiding
-    modal.addEventListener('hide.bs.modal', () => {
+    modal.addEventListener('modal.hide', () => {
       // Remove focus from any elements inside the modal before hiding
       const focusedElement = modal.querySelector(':focus');
       if (focusedElement) {
@@ -112,7 +101,7 @@ export function bindModalEvents() {
     });
 
     // Prevent multiple backdrop issues
-    modal.addEventListener('show.bs.modal', () => {
+    modal.addEventListener('modal.show', () => {
       // Remove any existing backdrops before showing new modal
       const existingBackdrops = document.querySelectorAll('.modal-backdrop');
       if (existingBackdrops.length > 0) {

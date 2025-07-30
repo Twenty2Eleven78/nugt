@@ -527,7 +527,7 @@
     background-size: contain;
     border: 1px solid var(--border-color);
     appearance: none;
-    color-adjust: exact;
+    print-color-adjust: exact;
     transition: var(--transition-fast);
 }
 

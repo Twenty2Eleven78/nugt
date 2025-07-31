@@ -1217,7 +1217,6 @@ html {
 #optionstab.show,
 #optionstab.active {
     display: block !important;
-    visibility: visible !important;
 }
 
 #gamelogtab {
@@ -1235,31 +1234,6 @@ html {
 .events-container {
     min-height: 100%;
     padding-bottom: var(--spacing-lg);
-}
-
-/* Ensure buttons in options are visible */
-#optionstab .btn {
-    display: inline-block !important;
-    visibility: visible !important;
-}
-
-#optionstab .option-card {
-    display: block !important;
-    visibility: visible !important;
-}
-
-#optionstab .option-card-body {
-    display: block !important;
-    visibility: visible !important;
-}
-
-/* Make Sign In button very visible for testing */
-#showAuthButton {
-    background-color: red !important;
-    color: white !important;
-    border: 2px solid yellow !important;
-    font-weight: bold !important;
-    min-height: 40px !important;
 }
 
 /* Game tab stays with no scroll */

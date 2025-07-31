@@ -263,8 +263,7 @@
                       </div>
                       <div class="option-card-body">
                         <div class="d-grid gap-2">
-                          <button class="btn btn-outline-danger btn-sm" data-toggle="modal"
-                            data-target="#rosterModal">
+                          <button class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#rosterModal">
                             <i class="fas fa-users me-2"></i>Manage Roster
                           </button>
                           <button class="btn btn-outline-primary btn-sm" data-toggle="modal"
@@ -321,7 +320,7 @@
                           <div class="theme-color-preview" id="themePreview"></div>
                           <small class="text-muted align-self-center">Color preview</small>
                         </div>
-                        
+
                         <div class="form-check form-switch">
                           <input class="form-check-input" type="checkbox" role="switch" id="darkModeToggle">
                           <label class="form-check-label" for="darkModeToggle">
@@ -568,8 +567,7 @@
             <i class="fas fa-users fa-3x mb-3"></i>
             <h5>No Players in Roster</h5>
             <p>Add players to your roster first to track attendance.</p>
-            <button class="btn btn-primary" data-toggle="modal" data-target="#rosterModal"
-              data-dismiss="modal">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#rosterModal" data-dismiss="modal">
               <i class="fas fa-users me-2"></i>Manage Roster
             </button>
           </div>
@@ -598,18 +596,21 @@
           <div class="text-center mb-4">
             <h6 class="mb-3">Thank you for considering supporting<br>Netherton United U12 Girls Football Team!</h6>
             <p class="text-muted">Your support helps our girls both on and off the pitch encouraging teamwork,
-              responsability, confidence, passion and overcoming adversity.</p>
+              responsibility, confidence, passion and overcoming adversity.</p>
           </div>
           <!-- GoFundMe Button -->
           <div class="text-center mt-4">
-            <a href=""></a>
+            <button class="btn btn-success btn-lg"
+              onclick="window.open('https://gofund.me/your-campaign-link', '_blank')">
+              <i class="fas fa-heart me-2"></i>Support Our Team
+            </button>
+            <p class="text-muted small mt-2">Opens in new window</p>
           </div>
 
           <!-- Additional Information -->
           <div class="text-left mt-4">
             <p class="text-muted small mb-0">All donations go directly towards:</p>
-            <ul class=" text-muted small">
-              <br>
+            <ul class="text-muted small">
               <li>Equipment for the team</li>
               <li>Veo Cam fund and subscriptions to help with future game development</li>
               <li>Kit updates alongside our main Sponsors, <b>Flagship Partners</b> and <b>Resource Engineering
@@ -651,6 +652,7 @@
                 <option value="bug">Bug Report</option>
                 <option value="feature">Feature Request</option>
                 <option value="improvement">Improvement Suggestion</option>
+                <option value="other">Other</option>alue="improvement">Improvement Suggestion</option>
                 <option value="other">Other</option>
               </select>
             </div>
@@ -670,7 +672,7 @@
             </div>
 
             <!-- App Version -->
-            <input type="hidden" name="App Version" value="3.2.2">
+            <input type="hidden" name="App Version" value="3.7">
 
             <!-- Submit Button -->
             <div class="d-grid">

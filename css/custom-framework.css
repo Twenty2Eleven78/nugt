@@ -755,7 +755,7 @@ html {
     }
     
     .content-wrapper {
-        height: calc(100vh - 100px); /* Smaller on mobile */
+        height: calc(100vh - 120px); /* Account for mobile nav */
     }
     
     .game-container {
@@ -769,15 +769,23 @@ html {
     }
     
     .action-btn {
-        min-height: 45px;
+        min-height: 40px;
         padding: var(--spacing-xs);
         font-size: var(--font-size-xs);
+    }
+    
+    .action-btn i {
+        font-size: 1.2rem;
+    }
+    
+    .btn-text {
+        font-size: 0.8rem;
     }
     
     .scoreboard-card,
     .timer-card,
     .game-actions-card {
-        padding: var(--spacing-sm);
+        padding: var(--spacing-xs);
     }
 }
 
@@ -1168,7 +1176,7 @@ html {
 
 /* Tab System */
 .content-wrapper {
-    height: calc(100vh - 120px); /* Account for header and bottom nav */
+    height: calc(100vh - 140px); /* Account for header and bottom nav */
     overflow: hidden;
 }
 
@@ -1261,10 +1269,10 @@ html {
 
 /* Game Components */
 .game-container {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-xs);
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-xs);
     height: 100%;
     overflow: hidden;
 }
@@ -1273,7 +1281,7 @@ html {
     background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
     box-shadow: var(--box-shadow-card);
     flex-shrink: 0;
 }
@@ -1282,7 +1290,7 @@ html {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
     box-shadow: var(--box-shadow-card);
     flex-shrink: 0;
 }
@@ -1291,10 +1299,10 @@ html {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
     background: var(--bg-primary);
     border-radius: var(--border-radius-sm);
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
     border: 1px solid var(--border-color);
 }
 
@@ -1352,9 +1360,9 @@ html {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
     box-shadow: var(--box-shadow-card);
-    flex: 1;
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
 }
@@ -1362,17 +1370,18 @@ html {
 .actions-title {
     color: var(--text-primary);
     font-weight: 600;
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
     text-align: center;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: var(--spacing-xs);
     flex-shrink: 0;
+    font-size: var(--font-size-sm);
 }
 
 .action-row {
     display: flex;
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-sm);
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-xs);
 }
 
 .action-row:last-child {
@@ -1386,12 +1395,12 @@ html {
     align-items: center;
     justify-content: center;
     gap: var(--spacing-xs);
-    padding: var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
     border-radius: var(--border-radius-sm);
     font-weight: 600;
     transition: var(--transition);
     border: 2px solid transparent;
-    min-height: 55px;
+    min-height: 45px;
     color: var(--text-light);
 }
 

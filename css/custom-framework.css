@@ -1417,12 +1417,13 @@ html {
 .actions-title {
     color: var(--text-primary);
     font-weight: 600;
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
     text-align: center;
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: var(--spacing-xs);
+    padding-bottom: 2px;
     flex-shrink: 0;
     font-size: var(--font-size-base);
+    line-height: 1.1;
 }
 
 .action-row {

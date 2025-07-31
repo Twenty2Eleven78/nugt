@@ -769,17 +769,17 @@ html {
     }
     
     .action-btn {
-        min-height: 40px;
-        padding: var(--spacing-xs);
-        font-size: var(--font-size-xs);
+        min-height: 50px;
+        padding: var(--spacing-sm);
+        font-size: var(--font-size-sm);
     }
     
     .action-btn i {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
     }
     
     .btn-text {
-        font-size: 0.8rem;
+        font-size: 0.9rem;
     }
     
     .scoreboard-card,
@@ -1344,12 +1344,12 @@ html {
 .actions-title {
     color: var(--text-primary);
     font-weight: 600;
-    margin-bottom: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
     text-align: center;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: var(--spacing-xs);
     flex-shrink: 0;
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-base);
 }
 
 .action-row {
@@ -1369,12 +1369,12 @@ html {
     align-items: center;
     justify-content: center;
     gap: var(--spacing-xs);
-    padding: var(--spacing-xs) var(--spacing-sm);
+    padding: var(--spacing-sm);
     border-radius: var(--border-radius-sm);
     font-weight: 600;
     transition: var(--transition);
     border: 2px solid transparent;
-    min-height: 45px;
+    min-height: 60px;
     color: var(--text-light);
 }
 
@@ -1393,7 +1393,7 @@ html {
 }
 
 .btn-text {
-    font-size: 0.9rem;
+    font-size: 1rem;
     text-align: center;
     line-height: 1.2;
 }

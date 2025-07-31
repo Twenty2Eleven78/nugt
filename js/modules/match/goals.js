@@ -73,7 +73,7 @@ class GoalManager {
     const team1Name = domCache.get('Team1NameElement')?.textContent;
 
     if (!goalScorerName) {
-      notificationManager.warning('Please select a goal scorer');
+      notificationManager.warning('Please select a goal scorer from the dropdown');
       return;
     }
 

@@ -36,17 +36,17 @@ class GoalModal {
                   <div class="input-group mb-3">
                     <form id="goalForm" class="w-100">
                       <div class="mb-3">
-                        <label for="goalScorer" class="form-label">Goal Scorer:</label>
+                        <label for="goalScorer" class="form-label">Goal Scorer: <span class="text-danger">*</span></label>
                         <select id="goalScorer" class="form-select" required>
-                          <option value="" selected>Select goal scorer</option>
+                          <option value="">Select goal scorer</option>
                           <option value="Own Goal">Own Goal</option>
                         </select>
                       </div>
                       <div class="mb-3">
                         <label for="goalAssist" class="form-label">Goal Assist:</label>
-                        <select id="goalAssist" class="form-select" required>
-                          <option value="" selected>Select goal assist</option>
-                          <option value="N/A">N/A</option>
+                        <select id="goalAssist" class="form-select">
+                          <option value="">Select goal assist</option>
+                          <option value="N/A" selected>N/A</option>
                         </select>
                       </div>
                       <div>
@@ -135,7 +135,7 @@ class GoalModal {
     if (goalScorerSelect && players) {
       // Clear existing options except default and "Own Goal"
       goalScorerSelect.innerHTML = `
-        <option value="" selected>Select goal scorer</option>
+        <option value="">Select goal scorer</option>
         <option value="Own Goal">Own Goal</option>
       `;
 
@@ -148,6 +148,11 @@ class GoalModal {
           player.name;
         goalScorerSelect.appendChild(option);
       });
+
+      // Auto-select first player if there's only one player
+      if (players.length === 1) {
+        goalScorerSelect.value = players[0].name;
+      }
     }
   }
 
@@ -160,8 +165,8 @@ class GoalModal {
     if (goalAssistSelect && players) {
       // Clear existing options except default and "N/A"
       goalAssistSelect.innerHTML = `
-        <option value="" selected>Select goal assist</option>
-        <option value="N/A">N/A</option>
+        <option value="">Select goal assist</option>
+        <option value="N/A" selected>N/A</option>
       `;
 
       // Add player options
@@ -173,6 +178,9 @@ class GoalModal {
           player.name;
         goalAssistSelect.appendChild(option);
       });
+
+      // Default to "N/A" for assist (most common case)
+      goalAssistSelect.value = "N/A";
     }
   }
 }

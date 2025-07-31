@@ -58,11 +58,19 @@ function initializeCustomModals() {
       e.preventDefault();
       const targetId = trigger.getAttribute('data-target');
       if (targetId) {
-        // Special handling for reset modal
+        // Special handling for dynamically created modals
         if (targetId === '#resetConfirmModal') {
           resetModal.show(() => {
             resetTracker();
           });
+        } else if (targetId === '#fixtureModalTeam1') {
+          teamModals.showTeam1Modal();
+        } else if (targetId === '#fixtureModalTeam2') {
+          teamModals.showTeam2Modal();
+        } else if (targetId === '#recordEventModal') {
+          eventModals.showRecordEventModal();
+        } else if (targetId === '#goalModal') {
+          goalModal.show();
         } else {
           const modal = CustomModal.getOrCreateInstance(targetId);
           modal.show();
@@ -193,20 +201,20 @@ export function initializeApp() {
   matchLoadModal.init();
   matchSummaryModal.init();
   rawDataModal.init();
-  
+
   // Initialize modal modules
   teamModals.init();
   goalModal.init();
   eventModals.init();
   resetModal.init();
   feedbackModal.init();
-  
+
   // Initialize theme manager
   themeManager.init();
 
   // Initialize timer with enhanced state recovery
   timerController.initialize();
-  
+
   // Make timer controller available globally for beforeunload handler
   window.timerControllerInstance = timerController;
 
@@ -262,7 +270,7 @@ function bindEventListeners() {
   const saveBtn = document.getElementById('saveMatchDataBtn');
   const saveBtnCard = document.getElementById('saveMatchDataBtnCard');
   const loadBtn = document.getElementById('loadMatchDataBtn');
-  
+
   // Save match data to Netlify Blobs - function for both buttons
   const handleSaveMatch = async () => {
     if (!authService.isUserAuthenticated()) {
@@ -277,7 +285,7 @@ function bindEventListeners() {
     const score2 = domCache.get('secondScoreElement')?.textContent || '0';
     const currentDate = new Date().toLocaleDateString('en-GB');
     const defaultTitle = `${team1Name}(${score1}):${team2Name}(${score2}) - ${currentDate}`;
-    
+
     matchSaveModal.show({
       defaultTitle,
       defaultNotes: ''
@@ -299,7 +307,7 @@ function bindEventListeners() {
           attendance: attendanceManager.getMatchAttendance(),
           savedAt: Date.now()
         };
-      
+
         await userMatchesApi.saveMatchData(matchData);
         notificationManager.success('Match saved to cloud!');
       } catch (e) {
@@ -313,7 +321,7 @@ function bindEventListeners() {
   if (saveBtn) {
     saveBtn.addEventListener('click', handleSaveMatch);
   }
-  
+
   if (saveBtnCard) {
     saveBtnCard.addEventListener('click', handleSaveMatch);
   }
@@ -325,7 +333,7 @@ function bindEventListeners() {
         notificationManager.warning('Please sign in to load match data from the cloud');
         return;
       }
-      
+
       try {
         const matches = await userMatchesApi.loadMatchData();
         matchLoadModal.show(matches);
@@ -380,7 +388,7 @@ function bindEventListeners() {
         }
       }
     }
-    
+
     if (e.target.id === 'updTeam2Btn') {
       const teamInput = document.getElementById('team2Name');
       const teamName = teamInput?.value.trim();
@@ -457,15 +465,15 @@ function setupSharingModalListeners() {
     if (e.target.closest('.share-platform-btn')) {
       const button = e.target.closest('.share-platform-btn');
       const platform = button.dataset.platform;
-      
+
       handleSharingPlatform(platform);
     }
-    
+
     // Handle export buttons
     if (e.target.closest('.export-btn')) {
       const button = e.target.closest('.export-btn');
       const format = button.dataset.format;
-      
+
       handleExport(format);
     }
   });
@@ -476,7 +484,7 @@ async function handleSharingPlatform(platform) {
   try {
     // Show loading state
     notificationManager.info('Preparing to share...');
-    
+
     switch (platform) {
       case 'whatsapp':
         sharingService.shareViaWhatsApp();
@@ -497,13 +505,13 @@ async function handleSharingPlatform(platform) {
       default:
         throw new Error(`Unsupported platform: ${platform}`);
     }
-    
+
     // Close the modal after successful sharing
     const sharingModal = CustomModal.getInstance(document.getElementById('sharingModal'));
     if (sharingModal) {
       sharingModal.hide();
     }
-    
+
   } catch (error) {
     console.error('Sharing failed:', error);
     notificationManager.error(error.message || 'Failed to share match report');
@@ -515,7 +523,7 @@ function handleExport(format) {
   try {
     // Show loading state
     notificationManager.info('Preparing export...');
-    
+
     switch (format) {
       case 'json':
         sharingService.exportAsJSON();
@@ -529,15 +537,15 @@ function handleExport(format) {
       default:
         throw new Error(`Unsupported export format: ${format}`);
     }
-    
+
     notificationManager.success(`Match data exported as ${format.toUpperCase()}!`);
-    
+
     // Close the modal after successful export
     const sharingModal = CustomModal.getInstance(document.getElementById('sharingModal'));
     if (sharingModal) {
       sharingModal.hide();
     }
-    
+
   } catch (error) {
     console.error('Export failed:', error);
     notificationManager.error(error.message || 'Failed to export match data');

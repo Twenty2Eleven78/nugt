@@ -59,7 +59,7 @@ class DOMCache {
       optionsTab: 'optionstab',
 
       // Other elements
-      resetButton: 'confirmResetBtn',
+      // resetButton (confirmResetBtn) is now dynamically created by reset-modal.js
       shareButton: 'shareButton',
       notificationContainer: 'notification-container'
     };

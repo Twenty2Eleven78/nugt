@@ -163,7 +163,7 @@ class AuthUI {
     }
 
     // Find the header row
-    const headerRow = document.querySelector('.row.mb-3 .col-12');
+    const headerRow = document.querySelector('.row.mb-2 .col-12') || document.querySelector('.row.mb-3 .col-12');
     if (!headerRow) {
       return;
     }

@@ -49,6 +49,12 @@ class CustomModal {
 
     show() {
         if (this.isVisible) return;
+        
+        // Check if element exists
+        if (!this.element) {
+            console.error('CustomModal: Cannot show modal - element not found');
+            return;
+        }
 
         // Dispatch show event
         const showEvent = new CustomEvent('modal.show', {

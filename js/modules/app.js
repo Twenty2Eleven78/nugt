@@ -58,8 +58,15 @@ function initializeCustomModals() {
       e.preventDefault();
       const targetId = trigger.getAttribute('data-target');
       if (targetId) {
-        const modal = CustomModal.getOrCreateInstance(targetId);
-        modal.show();
+        // Special handling for reset modal
+        if (targetId === '#resetConfirmModal') {
+          resetModal.show(() => {
+            resetTracker();
+          });
+        } else {
+          const modal = CustomModal.getOrCreateInstance(targetId);
+          modal.show();
+        }
       }
     }
   });
@@ -440,11 +447,7 @@ function bindEventListeners() {
   // Sharing modal event listeners
   setupSharingModalListeners();
 
-  // Reset button
-  const resetButton = domCache.get('resetButton');
-  if (resetButton) {
-    resetButton.addEventListener('click', resetTracker);
-  }
+  // Reset button is now handled by the reset modal system
 }
 
 // Setup sharing modal event listeners

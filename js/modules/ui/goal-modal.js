@@ -50,7 +50,9 @@ class GoalModal {
                         </select>
                       </div>
                       <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-success btn-custom" id="goalButton">Goal</button>
+                        <button type="submit" class="btn btn-success w-100" id="goalButton">
+                          <i class="fa-solid fa-futbol me-2"></i>Record Goal
+                        </button>
                       </div>
                     </form>
                   </div>

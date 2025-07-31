@@ -1417,6 +1417,7 @@ html {
 .actions-title {
     color: var(--text-primary);
     font-weight: 600;
+    margin-top: 0;
     margin-bottom: 4px;
     text-align: center;
     border-bottom: 1px solid var(--border-color);

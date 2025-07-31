@@ -38,7 +38,7 @@ class TeamManager {
       return {
         nameElement: domCache.get('Team1NameElement'),
         goalButton: domCache.get('goalButton'),
-        inputElement: domCache.get('team1Input'),
+        inputElement: () => document.getElementById('team1Name'), // Dynamic lookup
         nameKey: STORAGE_KEYS.TEAM1_NAME,
         historyKey: STORAGE_KEYS.TEAM1_HISTORY,
         history: gameState.team1History
@@ -47,7 +47,7 @@ class TeamManager {
       return {
         nameElement: domCache.get('Team2NameElement'),
         goalButton: domCache.get('opgoalButton'),
-        inputElement: domCache.get('team2Input'),
+        inputElement: () => document.getElementById('team2Name'), // Dynamic lookup
         nameKey: STORAGE_KEYS.TEAM2_NAME,
         historyKey: STORAGE_KEYS.TEAM2_HISTORY,
         history: gameState.team2History
@@ -65,8 +65,9 @@ class TeamManager {
       config.goalButton.lastChild.nodeValue = ' ' + teamName;
     }
 
-    if (config.inputElement) {
-      config.inputElement.placeholder = teamName;
+    const inputElement = config.inputElement();
+    if (inputElement) {
+      inputElement.placeholder = teamName;
     }
 
     if (saveToStorage) {

@@ -228,7 +228,16 @@ class ModuleErrorBoundary {
       return;
     }
 
-    notificationManager[type](message);
+    // Ensure the notification method exists
+    if (notificationManager && typeof notificationManager[type] === 'function') {
+      notificationManager[type](message);
+    } else {
+      console.error(`NotificationManager method '${type}' not found`);
+      // Fallback to error method
+      if (notificationManager && typeof notificationManager.error === 'function') {
+        notificationManager.error(message);
+      }
+    }
     this._setCooldown(key);
   }
 

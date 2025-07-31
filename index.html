@@ -5,21 +5,56 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NUFC GameTime App v3.7</title>
-  <!-- Preload critical resources -->
-  <link rel="preload" href="css/bootstrap.min.css" as="style">
-  <link rel="preload" href="css/style.css" as="style">
-  <link rel="preload" href="webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
 
-  <!-- Bootstrap CSS -->
-  <link href="css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome for icons -->
-  <link href="css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+  <!-- Critical CSS for CLS prevention -->
+  <style>
+    /* Prevent layout shifts during font loading */
+    .fa,
+    .fas,
+    .far,
+    .fab {
+      min-width: 1em;
+      text-align: center;
+    }
+
+    .timer-display {
+      min-width: 4ch;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .score-display {
+      min-width: 2ch;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-number {
+      min-width: 2ch;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Prevent flash of unstyled content */
+    body {
+      visibility: hidden;
+    }
+
+    body.loaded {
+      visibility: visible;
+    }
+  </style>
+
+  <!-- Preload critical resources -->
+  <link rel="preload" href="css/custom-framework.css" as="style">
+  <link rel="preload" href="webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="webfonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+
+  <!-- Custom Framework CSS - All styles merged -->
+  <link href="css/custom-framework.css" rel="stylesheet">
+  <!-- Font Awesome for icons - optimized loading -->
+  <link href="css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'; this.onload=null;">
   <noscript>
     <link href="css/all.min.css" rel="stylesheet">
   </noscript>
-  <!--custom style-->
-  <link href="css/style.css" rel="stylesheet">
-  <link href="css/auth.css" rel="stylesheet">
   <!-- PWA Manifest-->
   <link rel="manifest" href="manifest.json">
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
@@ -42,9 +77,9 @@
     <div class="container-fluid px-4 py-3">
       <div class="content-width">
         <!-- Header -->
-        <div class="row mb-3">
+        <div class="row mb-2">
           <div class="col-12">
-            <h3>NUFC GameTime v3.7</h3>
+            <h4 class="mb-0">NUFC GameTime v3.7</h4>
           </div>
         </div>
         <!-- END Header -->
@@ -61,19 +96,19 @@
                 <div class="scoreboard-card">
                   <div class="scoreboard-compact" id="scoreboard">
                     <div class="team-score-section">
-                      <button id="first-team-name" class="team-name-btn" data-bs-toggle="modal"
-                        data-bs-target="#fixtureModalTeam1">
+                      <button id="first-team-name" class="team-name-btn" data-toggle="modal"
+                        data-target="#fixtureModalTeam1">
                         Netherton
                       </button>
-                      <div class="score-display" id="first-score">0</div>
+                      <div class="score-display" id="first-score" style="min-width: 2ch;">0</div>
                     </div>
                     <div class="score-separator">-</div>
                     <div class="team-score-section">
-                      <button id="second-team-name" class="team-name-btn" data-bs-toggle="modal"
-                        data-bs-target="#fixtureModalTeam2">
+                      <button id="second-team-name" class="team-name-btn" data-toggle="modal"
+                        data-target="#fixtureModalTeam2">
                         Opposition Team
                       </button>
-                      <div class="score-display" id="second-score">0</div>
+                      <div class="score-display" id="second-score" style="min-width: 2ch;">0</div>
                     </div>
                   </div>
                 </div>
@@ -112,7 +147,7 @@
                   <!-- Record Event Row -->
                   <div class="action-row">
                     <button id="recordEventButton" class="action-btn btn-warning full-width" type="button"
-                      data-bs-toggle="modal" data-bs-target="#recordEventModal">
+                      data-toggle="modal" data-target="#recordEventModal">
                       <i class="fa-solid fa-hand"></i>
                       <span class="btn-text">Record Event</span>
                     </button>
@@ -125,7 +160,7 @@
                     <button class="btn btn-danger timer-btn-compact" id="startPauseButton">
                       <i class="fa-regular fa-clock me-2"></i>
                       <span class="timer-text">Start Game</span>
-                      <span id="stopwatch" role="timer" class="timer-display">00:00</span>
+                      <span id="stopwatch" role="timer" class="timer-display" style="min-width: 4ch;">00:00</span>
                     </button>
                   </div>
                 </div>
@@ -209,7 +244,7 @@
                     </h6>
                     <div class="row g-3">
                       <div class="col-6 col-md-3">
-                        <div class="quick-action-card" data-bs-toggle="modal" data-bs-target="#attendanceModal">
+                        <div class="quick-action-card" data-toggle="modal" data-target="#attendanceModal">
                           <i class="fas fa-user-check fa-2x mb-2 text-primary"></i>
                           <span>Attendance</span>
                         </div>
@@ -267,12 +302,11 @@
                       </div>
                       <div class="option-card-body">
                         <div class="d-grid gap-2">
-                          <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#rosterModal">
+                          <button class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#rosterModal">
                             <i class="fas fa-users me-2"></i>Manage Roster
                           </button>
-                          <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#attendanceModal">
+                          <button class="btn btn-outline-primary btn-sm" data-toggle="modal"
+                            data-target="#attendanceModal">
                             <i class="fas fa-user-check me-2"></i>Match Attendance
                           </button>
                         </div>
@@ -306,6 +340,36 @@
                     </div>
                   </div>
 
+                  <!-- Theme & Appearance Card -->
+                  <div class="col-12 col-lg-6">
+                    <div class="option-card">
+                      <div class="option-card-header">
+                        <i class="fas fa-palette me-2"></i>Theme & Appearance
+                      </div>
+                      <div class="option-card-body">
+                        <label for="themeSelect" class="form-label">Choose Color Theme</label>
+                        <select id="themeSelect" class="form-select mb-3">
+                          <option value="red" selected>Red (Default)</option>
+                          <option value="blue">Blue</option>
+                          <option value="green">Green</option>
+                          <option value="purple">Purple</option>
+                          <option value="orange">Orange</option>
+                        </select>
+                        <div class="theme-preview d-flex gap-2 mb-3">
+                          <div class="theme-color-preview" id="themePreview"></div>
+                          <small class="text-muted align-self-center">Color preview</small>
+                        </div>
+
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" id="darkModeToggle">
+                          <label class="form-check-label" for="darkModeToggle">
+                            <i class="fas fa-moon me-2"></i>Dark Mode
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   <!-- App Management Card -->
                   <div class="col-12 col-lg-6">
                     <div class="option-card">
@@ -314,20 +378,20 @@
                       </div>
                       <div class="option-card-body">
                         <div class="d-grid gap-2">
-                          <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#releasenotesmodal">
+                          <button class="btn btn-outline-secondary btn-sm" data-toggle="modal"
+                            data-target="#releasenotesmodal">
                             <i class="fas fa-list me-2"></i>Release Notes
                           </button>
                           <button class="btn btn-outline-info btn-sm" id="checkForUpdatesBtn"
                             onclick="pwaUpdater.triggerUpdate()">
                             <i class="fas fa-sync me-2"></i>Check Updates
                           </button>
-                          <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#feedbackModal">
+                          <button class="btn btn-outline-primary btn-sm" data-toggle="modal"
+                            data-target="#feedbackModal">
                             <i class="fas fa-comments me-2"></i>Feedback
                           </button>
-                          <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#resetConfirmModal">
+                          <button class="btn btn-outline-danger btn-sm" data-toggle="modal"
+                            data-target="#resetConfirmModal">
                             <i class="fas fa-arrows-rotate me-2"></i>Reset App
                           </button>
                         </div>
@@ -354,17 +418,17 @@
     <div class="content-width">
       <ul class="nav nav-pills nav-fill" role="tablist">
         <li class="nav-item pill-1">
-          <a class="nav-link active" data-bs-toggle="pill" href="#gametab">
+          <a class="nav-link active" data-toggle="pill" href="#gametab">
             <i class="fa-regular fa-futbol"></i> Game
           </a>
         </li>
         <li class="nav-item pill-2">
-          <a class="nav-link" data-bs-toggle="pill" href="#gamelogtab">
+          <a class="nav-link" data-toggle="pill" href="#gamelogtab">
             <i class="fa-solid fa-list"></i> Events
           </a>
         </li>
         <li class="nav-item pill-3">
-          <a class="nav-link" data-bs-toggle="pill" href="#optionstab">
+          <a class="nav-link" data-toggle="pill" href="#optionstab">
             <i class="fa-solid fa-gears"></i> Options
           </a>
         </li>
@@ -376,12 +440,12 @@
   <!-----------------------------------------Modal Section-------------------------------------->
 
   <!--Release Notes Modal-->
-  <div class="modal fade" id="releasenotesmodal" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
+  <div class="modal fade" id="releasenotesmodal" tabindex="-1" data-backdrop="static" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header bg-danger text-white">
           <h5 class="modal-title">Release Notes</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div id=readme class="modal-body readme-content"></div>
       </div>
@@ -389,154 +453,15 @@
   </div>
   <!--END Release Notes Modal-->
 
-  <!-- Fixture Modal Team 1 -->
-  <div class="modal fade" id="fixtureModalTeam1" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Our Team Name Management</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="row">
-            <div class="col-12 col-md-8">
-              <div class="input-group mb-3">
-                <div>
-                  <input type="text" id="team1Name" class="form-control" placeholder="Netherton">
-                  <br>
-                  <button class="btn btn-danger btn-custom" id="updTeam1Btn">Update Team Name</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- END Fixture Modal Team 1 -->
+  <!-- Team modals are now managed by team-modals.js -->
 
-  <!-- Fixture Modal Team 2 -->
-  <div class="modal fade" id="fixtureModalTeam2" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Opposition Name Management</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="row">
-            <div class="col-12 col-md-8">
-              <div class="input-group mb-3">
-                <div>
-                  <input type="text" id="team2Name" class="form-control" placeholder="Opposition Team">
-                  <br>
-                  <button class="btn btn-danger btn-custom" id="updTeam2Btn">Update Team Name</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- END Fixture Modal Team 2 -->
 
-  <!-- Goal Modal -->
-  <div class="modal fade" id="goalModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Goal Details:</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="row">
-            <div class="col-12">
-              <div class="input-group mb-3">
-                <form id="goalForm" class="w-100">
-                  <div class="mb-3">
-                    <label for="goalScorer" class="form-label">Goal Scorer:</label>
-                    <select id="goalScorer" class="form-select" required>
-                      <option value="" selected>Select goal scorer</option>
-                      <option value="Own Goal">Own Goal</option>
-                    </select>
-                  </div>
-                  <div class="mb-3">
-                    <label for="goalAssist" class="form-label">Goal Assist:</label>
-                    <select id="goalAssist" class="form-select" required>
-                      <option value="" selected>Select goal assist</option>
-                      <option value="N/A">N/A</option>
-                    </select>
-                  </div>
-                  <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-success btn-custom" id="goalButton">Goal</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- END Goal Modal -->
 
-  <!-- Edit Event Modal -->
-  <div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editEventModalLabel">Edit Event Time</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="editEventForm">
-            <div class="mb-3">
-              <label for="editEventTime" class="form-label">Event Time (in minutes)</label>
-              <input type="number" class="form-control" id="editEventTime" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- END Edit Event Modal -->
+  <!-- Goal modal is now managed by goal-modal.js -->
 
-  <!-- Record Event Modal -->
-  <div class="modal fade" id="recordEventModal" tabindex="-1" aria-labelledby="recordEventModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="recordEventModalLabel">Record New Event</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="recordEventForm">
-            <div class="mb-3">
-              <label for="eventTypeSelect" class="form-label">Event Type</label>
-              <select class="form-select" id="eventTypeSelect" required>
-                <option value="" disabled selected>Choose event type...</option>
-                <option value="Yellow Card">Yellow Card</option>
-                <option value="Red Card">Red Card</option>
-                <option value="Sin Bin">Sin Bin</option>
-                <option value="Foul">Foul</option>
-                <option value="Penalty">Penalty</option>
-                <option value="Incident">Incident</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="eventNotes" class="form-label">Notes (Optional)</label>
-              <textarea class="form-control" id="eventNotes" rows="3"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Record Event</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- END Record Event Modal -->
+  <!-- Event modals are now managed by event-modals.js -->
+
+
 
   <!-- Roster Modal -->
   <div class="modal fade" id="rosterModal" tabindex="-1">
@@ -544,7 +469,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title modal-title-enhanced"><i class="fas fa-users me-2"></i>Team Roster Management</h4>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <h5>Add New Player</h5>
@@ -603,7 +528,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="editPlayerModalLabel"><i class="fas fa-user-edit me-2"></i>Edit Player</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <form id="editPlayerForm">
@@ -635,7 +560,7 @@
           <h4 class="modal-title" id="attendanceModalLabel">
             <i class="fas fa-user-check me-2"></i>Match Attendance
           </h4>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <!-- Attendance Summary -->
@@ -681,8 +606,7 @@
             <i class="fas fa-users fa-3x mb-3"></i>
             <h5>No Players in Roster</h5>
             <p>Add players to your roster first to track attendance.</p>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#rosterModal"
-              data-bs-dismiss="modal">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#rosterModal" data-dismiss="modal">
               <i class="fas fa-users me-2"></i>Manage Roster
             </button>
           </div>
@@ -692,40 +616,7 @@
   </div>
   <!-- END Match Attendance Modal -->
 
-  <!--Confirm Reset Modal-->
-  <div class="modal fade" id="resetConfirmModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-danger text-white">
-          <h5 class="modal-title">
-            <i class="fas fa-exclamation-triangle me-2"></i>Confirm Reset
-          </h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p class="mb-0">Are you sure you want to reset the game?</p>
-          <small class="text-muted">This will clear all game data including:</small>
-          <ul class="text-muted small">
-            <li>Stopwatch time</li>
-            <li>Goals and assists</li>
-            <li>Game log</li>
-          </ul>
-          <div class="alert alert-warning mb-0">
-            <i class="fas fa-info-circle me-2"></i>This action cannot be undone.
-          </div>
-        </div>
-        <div class="d-flex justify-content-end gap-2 mt-3 px-3 pb-3">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            <i class="fas fa-times me-2"></i>Cancel
-          </button>
-          <button type="button" class="btn btn-danger" id="confirmResetBtn">
-            <i class="fas fa-trash me-2"></i>Reset Game
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!--END Confirm Reset Modal-->
+  <!-- Reset modal is now managed by reset-modal.js -->
 
   <!--Donate Modal -->
   <div class="modal fade" id="donateModal" tabindex="-1" aria-labelledby="donateModalLabel" aria-hidden="true">
@@ -736,7 +627,7 @@
           <h5 class="modal-title" id="donateModalLabel">
             <i class="fa-solid fa-heart text-danger me-2"></i>Support Netherton U12 Girls Black
           </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
 
         <!-- Modal Body -->
@@ -744,18 +635,21 @@
           <div class="text-center mb-4">
             <h6 class="mb-3">Thank you for considering supporting<br>Netherton United U12 Girls Football Team!</h6>
             <p class="text-muted">Your support helps our girls both on and off the pitch encouraging teamwork,
-              responsability, confidence, passion and overcoming adversity.</p>
+              responsibility, confidence, passion and overcoming adversity.</p>
           </div>
           <!-- GoFundMe Button -->
           <div class="text-center mt-4">
-            <a href=""></a>
+            <button class="btn btn-success btn-lg"
+              onclick="window.open('https://gofund.me/your-campaign-link', '_blank')">
+              <i class="fas fa-heart me-2"></i>Support Our Team
+            </button>
+            <p class="text-muted small mt-2">Opens in new window</p>
           </div>
 
           <!-- Additional Information -->
           <div class="text-left mt-4">
             <p class="text-muted small mb-0">All donations go directly towards:</p>
-            <ul class=" text-muted small">
-              <br>
+            <ul class="text-muted small">
               <li>Equipment for the team</li>
               <li>Veo Cam fund and subscriptions to help with future game development</li>
               <li>Kit updates alongside our main Sponsors, <b>Flagship Partners</b> and <b>Resource Engineering
@@ -778,7 +672,7 @@
           <h5 class="modal-title" id="feedbackModalLabel">
             <i class="fa-solid fa-comments me-2"></i>App Feedback
           </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <!-- Replace YOUR-EMAIL@example.com with your actual email -->
@@ -797,6 +691,7 @@
                 <option value="bug">Bug Report</option>
                 <option value="feature">Feature Request</option>
                 <option value="improvement">Improvement Suggestion</option>
+                <option value="other">Other</option>alue="improvement">Improvement Suggestion</option>
                 <option value="other">Other</option>
               </select>
             </div>
@@ -816,7 +711,7 @@
             </div>
 
             <!-- App Version -->
-            <input type="hidden" name="App Version" value="3.2.2">
+            <input type="hidden" name="App Version" value="3.7">
 
             <!-- Submit Button -->
             <div class="d-grid">
@@ -842,7 +737,7 @@
           <h5 class="modal-title" id="sharingModalLabel">
             <i class="fas fa-share-alt me-2"></i>Share Match Report
           </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="row g-3 mb-4">
@@ -917,8 +812,13 @@
   <!-- END Enhanced Sharing Modal -->
 
   <!-- Scripts - modular architecture -->
+  <script>
+    // Show body once DOM is ready to prevent FOUC
+    document.addEventListener('DOMContentLoaded', function () {
+      document.body.classList.add('loaded');
+    });
+  </script>
   <script src="js/main.js" type="module"></script>
-  <script src="js/bootstrap.bundle.min.js" defer></script>
   <script src="js/debug.js" type="module"></script>
   <!-- ENDScripts -->
 </body>

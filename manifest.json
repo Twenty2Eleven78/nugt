@@ -1,7 +1,7 @@
 {
-    "name": "Netherton United Goal Time App",
+    "name": "Netherton United Game Time App",
     "short_name": "NUGT",
-	"start_url": "https://nugt.netlify.app/",
+    "start_url": "./",
     "theme_color": "#8B0000",
     "background_color": "#fff",
     "display": "standalone",
@@ -17,8 +17,19 @@
     "id": "NUGT",
     "lang": "en",
     "orientation": "portrait-primary",
-    "categories": ["sports", "utilities"],
-    "display_override": ["window-controls-overlay", "standalone"],
-    "launch_handler": {"client_mode": ["focus-existing", "auto"]},
+    "categories": [
+        "sports",
+        "utilities"
+    ],
+    "display_override": [
+        "window-controls-overlay",
+        "standalone"
+    ],
+    "launch_handler": {
+        "client_mode": [
+            "focus-existing",
+            "auto"
+        ]
+    },
     "handle_links": "preferred"
 }

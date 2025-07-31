@@ -5,9 +5,9 @@ const cacheFiles = [
   './',
   './index.html',
   './css/all.min.css',
-  './css/bootstrap.min.css',
+  './css/custom-framework.css',
   './css/style.css',
-  './js/bootstrap.bundle.min.js',
+
   './js/main.js',
   // Core modules
   './js/modules/app.js',

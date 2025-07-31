@@ -44,7 +44,7 @@ class ResetModal {
                 </p>
               </div>
             </div>
-            <div class="d-flex justify-content-end gap-2 mt-3 px-3 pb-3">
+            <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">
                 <i class="fas fa-times me-2"></i>Cancel
               </button>

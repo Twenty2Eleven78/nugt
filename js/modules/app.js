@@ -420,22 +420,20 @@ function bindEventListeners() {
     fullTimeButton.addEventListener('click', () => eventsManager.addMatchEvent(EVENT_TYPES.FULL_TIME));
   }
 
-  // Record event form
-  const recordEventForm = document.getElementById('recordEventForm');
-  if (recordEventForm) {
-    recordEventForm.addEventListener('submit', (e) => {
+  // Record event form - using event delegation for dynamically created form
+  document.addEventListener('submit', (e) => {
+    if (e.target.id === 'recordEventForm') {
       e.preventDefault();
       const eventType = document.getElementById('eventTypeSelect')?.value;
       const notes = document.getElementById('eventNotes')?.value;
 
       if (eventType) {
         eventsManager.addMatchEvent(eventType, notes);
-        recordEventForm.reset();
-
-        hideModal('recordEventModal');
+        e.target.reset();
+        eventModals.hideRecordEventModal();
       }
-    });
-  }
+    }
+  });
 
   // Edit event form
   const editEventForm = document.getElementById('editEventForm');

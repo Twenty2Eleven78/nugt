@@ -657,5 +657,11 @@ window.handleEditEventFormSubmission = eventsManager.handleEditEventFormSubmissi
 // Global RosterManager for backward compatibility
 window.RosterManager = rosterManager;
 
+// Global goal modal for backward compatibility
+window.goalModal = goalModal;
+
+// Global goal manager for backward compatibility
+window.goalManager = goalManager;
+
 // Global ThemeManager for backward compatibility
 window.ThemeManager = themeManager;

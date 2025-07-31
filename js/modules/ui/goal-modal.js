@@ -70,9 +70,12 @@ class GoalModal {
 
     // Add modal to DOM
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
+
     // Initialize custom modal
     this.modal = CustomModal.getOrCreateInstance('goalModal');
+
+    // Add form submission handler
+    this.setupFormHandler();
   }
 
   /**
@@ -80,7 +83,36 @@ class GoalModal {
    */
   show() {
     if (this.modal) {
+      // Update roster data before showing
+      this.updateRosterData();
       this.modal.show();
+    }
+  }
+
+  /**
+   * Update roster data in goal modal
+   */
+  updateRosterData() {
+    // Get roster from RosterManager if available
+    if (window.RosterManager && window.RosterManager.getRoster) {
+      const roster = window.RosterManager.getRoster();
+      this.updateGoalScorerOptions(roster);
+      this.updateGoalAssistOptions(roster);
+    }
+  }
+
+  /**
+   * Setup form submission handler
+   */
+  setupFormHandler() {
+    const goalForm = document.getElementById('goalForm');
+    if (goalForm) {
+      goalForm.addEventListener('submit', (event) => {
+        // Call the goal manager's addGoal method
+        if (window.goalManager && window.goalManager.addGoal) {
+          window.goalManager.addGoal(event);
+        }
+      });
     }
   }
 
@@ -105,13 +137,13 @@ class GoalModal {
         <option value="" selected>Select goal scorer</option>
         <option value="Own Goal">Own Goal</option>
       `;
-      
+
       // Add player options
       players.forEach(player => {
         const option = document.createElement('option');
         option.value = player.name;
-        option.textContent = player.shirtNumber ? 
-          `${player.name} (#${player.shirtNumber})` : 
+        option.textContent = player.shirtNumber ?
+          `${player.name} (#${player.shirtNumber})` :
           player.name;
         goalScorerSelect.appendChild(option);
       });
@@ -130,13 +162,13 @@ class GoalModal {
         <option value="" selected>Select goal assist</option>
         <option value="N/A">N/A</option>
       `;
-      
+
       // Add player options
       players.forEach(player => {
         const option = document.createElement('option');
         option.value = player.name;
-        option.textContent = player.shirtNumber ? 
-          `${player.name} (#${player.shirtNumber})` : 
+        option.textContent = player.shirtNumber ?
+          `${player.name} (#${player.shirtNumber})` :
           player.name;
         goalAssistSelect.appendChild(option);
       });

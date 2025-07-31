@@ -18,7 +18,12 @@ class GoalManager {
   // Show goal modal and capture timestamp
   showGoalModal() {
     stateManager.setPendingGoalTimestamp(getCurrentSeconds());
-    showModal('goalModal');
+    // Use the goal modal's show method which updates roster data
+    if (window.goalModal) {
+      window.goalModal.show();
+    } else {
+      showModal('goalModal');
+    }
   }
 
   // Helper method to create goal data

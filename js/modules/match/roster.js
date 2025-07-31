@@ -214,6 +214,11 @@ class RosterManager {
   _refreshUI() {
     this.updateSelects();
     this.updateRosterList();
+    
+    // Update goal modal if it exists
+    if (window.goalModal && window.goalModal.updateRosterData) {
+      window.goalModal.updateRosterData();
+    }
   }
 
   // Helper method to save and refresh after roster changes

@@ -1180,12 +1180,36 @@ html {
 .tab-pane {
     height: 100%;
     overflow: hidden;
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+.tab-pane.fade {
+    opacity: 0;
+    transition: opacity 0.15s linear;
+}
+
+.tab-pane.fade.show {
+    opacity: 1;
+}
+
+.tab-pane.show {
+    display: block;
 }
 
 /* Options and Events tabs need scrolling */
 #optionstab {
     overflow-y: auto;
     padding: var(--spacing-sm);
+}
+
+#optionstab.show,
+#optionstab.active {
+    display: block !important;
+    visibility: visible !important;
 }
 
 #gamelogtab {
@@ -1203,6 +1227,31 @@ html {
 .events-container {
     min-height: 100%;
     padding-bottom: var(--spacing-lg);
+}
+
+/* Ensure buttons in options are visible */
+#optionstab .btn {
+    display: inline-block !important;
+    visibility: visible !important;
+}
+
+#optionstab .option-card {
+    display: block !important;
+    visibility: visible !important;
+}
+
+#optionstab .option-card-body {
+    display: block !important;
+    visibility: visible !important;
+}
+
+/* Make Sign In button very visible for testing */
+#showAuthButton {
+    background-color: red !important;
+    color: white !important;
+    border: 2px solid yellow !important;
+    font-weight: bold !important;
+    min-height: 40px !important;
 }
 
 /* Game tab stays with no scroll */

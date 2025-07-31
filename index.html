@@ -5,14 +5,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NUFC GameTime App v3.7</title>
+  
+  <!-- Critical CSS for CLS prevention -->
+  <style>
+    /* Prevent layout shifts during font loading */
+    .fa, .fas, .far, .fab { min-width: 1em; text-align: center; }
+    .timer-display { min-width: 4ch; font-variant-numeric: tabular-nums; }
+    .score-display { min-width: 2ch; font-variant-numeric: tabular-nums; }
+    .stat-number { min-width: 2ch; font-variant-numeric: tabular-nums; }
+    /* Prevent flash of unstyled content */
+    body { visibility: hidden; }
+    body.loaded { visibility: visible; }
+  </style>
+  
   <!-- Preload critical resources -->
   <link rel="preload" href="css/custom-framework.css" as="style">
   <link rel="preload" href="webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="webfonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Custom Framework CSS - All styles merged -->
   <link href="css/custom-framework.css" rel="stylesheet">
-  <!-- Font Awesome for icons -->
-  <link href="css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+  <!-- Font Awesome for icons - optimized loading -->
+  <link href="css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'; this.onload=null;">
   <noscript>
     <link href="css/all.min.css" rel="stylesheet">
   </noscript>
@@ -61,7 +76,7 @@
                         data-target="#fixtureModalTeam1">
                         Netherton
                       </button>
-                      <div class="score-display" id="first-score">0</div>
+                      <div class="score-display" id="first-score" style="min-width: 2ch;">0</div>
                     </div>
                     <div class="score-separator">-</div>
                     <div class="team-score-section">
@@ -69,7 +84,7 @@
                         data-target="#fixtureModalTeam2">
                         Opposition Team
                       </button>
-                      <div class="score-display" id="second-score">0</div>
+                      <div class="score-display" id="second-score" style="min-width: 2ch;">0</div>
                     </div>
                   </div>
                 </div>
@@ -121,7 +136,7 @@
                     <button class="btn btn-danger timer-btn-compact" id="startPauseButton">
                       <i class="fa-regular fa-clock me-2"></i>
                       <span class="timer-text">Start Game</span>
-                      <span id="stopwatch" role="timer" class="timer-display">00:00</span>
+                      <span id="stopwatch" role="timer" class="timer-display" style="min-width: 4ch;">00:00</span>
                     </button>
                   </div>
                 </div>
@@ -773,6 +788,12 @@
   <!-- END Enhanced Sharing Modal -->
 
   <!-- Scripts - modular architecture -->
+  <script>
+    // Show body once DOM is ready to prevent FOUC
+    document.addEventListener('DOMContentLoaded', function() {
+      document.body.classList.add('loaded');
+    });
+  </script>
   <script src="js/main.js" type="module"></script>
   <script src="js/debug.js" type="module"></script>
   <!-- ENDScripts -->

@@ -3,6 +3,66 @@
  * Lightweight, theme-aware components
  */
 
+/* ===== CLS PREVENTION & PERFORMANCE ===== */
+/* Font loading optimization */
+@font-face {
+    font-family: 'Font Awesome 6 Free';
+    font-display: swap;
+}
+
+/* Prevent layout shifts during font loading */
+.fa, .fas, .far, .fab {
+    font-display: swap;
+    min-width: 1em;
+    text-align: center;
+}
+
+/* Prevent layout shifts for dynamic content */
+.timer-display {
+    min-width: 4ch;
+    font-variant-numeric: tabular-nums;
+}
+
+.score-display {
+    min-width: 2ch;
+    font-variant-numeric: tabular-nums;
+}
+
+.stat-number {
+    min-width: 2ch;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Notification container - prevent layout shifts */
+#notification-container {
+    contain: layout style;
+}
+
+/* Modal backdrop - prevent layout shifts */
+.modal-backdrop {
+    contain: layout style;
+}
+
+/* Button loading states - prevent layout shifts */
+.btn {
+    min-height: 2.25rem;
+}
+
+.btn-sm {
+    min-height: 1.875rem;
+}
+
+/* Timeline container - prevent layout shifts */
+.enhanced-timeline {
+    min-height: 100px;
+    contain: layout;
+}
+
+/* Event statistics - prevent layout shifts */
+.event-stat-card {
+    min-height: 120px;
+}
+
 /* ===== RESET & BASE ===== */
 * {
     box-sizing: border-box;

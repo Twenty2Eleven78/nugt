@@ -67,12 +67,23 @@ class GoalManager {
   addGoal(event) {
     event.preventDefault();
 
-    const goalScorerName = document.getElementById('goalScorer')?.value;
-    const goalAssistName = document.getElementById('goalAssist')?.value;
+    const goalScorerElement = document.getElementById('goalScorer');
+    const goalAssistElement = document.getElementById('goalAssist');
+    
+    console.log('Goal form submission:', {
+      goalScorerElement,
+      goalScorerValue: goalScorerElement?.value,
+      goalAssistElement,
+      goalAssistValue: goalAssistElement?.value
+    });
+
+    const goalScorerName = goalScorerElement?.value;
+    const goalAssistName = goalAssistElement?.value;
     const currentSeconds = gameState.pendingGoalTimestamp || getCurrentSeconds();
     const team1Name = domCache.get('Team1NameElement')?.textContent;
 
-    if (!goalScorerName) {
+    if (!goalScorerName || goalScorerName.trim() === '') {
+      console.log('Goal scorer validation failed:', goalScorerName);
       notificationManager.warning('Please select a goal scorer from the dropdown');
       return;
     }

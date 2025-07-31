@@ -22,6 +22,13 @@ class GoalModal {
    * Create goal modal
    */
   createModal() {
+    // Remove existing modal if it exists
+    const existingModal = document.getElementById('goalModal');
+    if (existingModal) {
+      console.log('Removing existing goal modal');
+      existingModal.remove();
+    }
+
     const modalHTML = `
       <div class="modal fade" id="goalModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -49,8 +56,9 @@ class GoalModal {
                           <option value="N/A" selected>N/A</option>
                         </select>
                       </div>
-                      <div>
-                        <button type="submit" class="btn btn-primary">Goal</button>
+                      <div class="d-flex gap-2">
+                        <button type="submit" class="team-name-btn w-100" id="goalSubmitButton" style="max-width: none; min-height: 2.5rem;">
+                          <i class="fa-solid fa-futbol me-2"></i>Record Goal
                         </button>
                       </div>
                     </form>
@@ -62,12 +70,6 @@ class GoalModal {
         </div>
       </div>
     `;
-
-    // Remove existing modal if it exists
-    const existingModal = document.getElementById('goalModal');
-    if (existingModal) {
-      existingModal.remove();
-    }
 
     // Add modal to DOM
     document.body.insertAdjacentHTML('beforeend', modalHTML);
@@ -97,8 +99,11 @@ class GoalModal {
     // Get roster from RosterManager if available
     if (window.RosterManager && window.RosterManager.getRoster) {
       const roster = window.RosterManager.getRoster();
+      console.log('Updating goal modal with roster:', roster);
       this.updateGoalScorerOptions(roster);
       this.updateGoalAssistOptions(roster);
+    } else {
+      console.log('RosterManager not available or no getRoster method');
     }
   }
 
@@ -132,6 +137,8 @@ class GoalModal {
    */
   updateGoalScorerOptions(players) {
     const goalScorerSelect = document.getElementById('goalScorer');
+    console.log('Updating goal scorer options:', { goalScorerSelect, players });
+
     if (goalScorerSelect && players) {
       // Clear existing options except default and "Own Goal"
       goalScorerSelect.innerHTML = `
@@ -152,7 +159,12 @@ class GoalModal {
       // Auto-select first player if there's only one player
       if (players.length === 1) {
         goalScorerSelect.value = players[0].name;
+        console.log('Auto-selected single player:', players[0].name);
       }
+
+      console.log('Final goal scorer select value:', goalScorerSelect.value);
+    } else {
+      console.log('Goal scorer select not found or no players');
     }
   }
 

@@ -57,7 +57,7 @@ class GoalModal {
                         </select>
                       </div>
                       <div class="d-flex gap-2">
-                        <button type="submit" class="team-name-btn w-100" id="goalSubmitButton" style="max-width: none; min-height: 2.5rem;">
+                        <button type="submit" class="btn btn-primary w-100" id="goalSubmitButton">
                           <i class="fa-solid fa-futbol me-2"></i>Record Goal
                         </button>
                       </div>

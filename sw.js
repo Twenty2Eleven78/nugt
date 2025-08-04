@@ -32,6 +32,7 @@ const cacheFiles = [
   './js/modules/ui/components.js',
   './js/modules/ui/enhanced-events.js',
   './js/modules/ui/release-notes.js',
+  './js/modules/ui/roster-modal.js',
   // Services
   './js/modules/services/notifications.js',
   './js/modules/services/sharing.js',

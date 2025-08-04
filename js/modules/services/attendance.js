@@ -218,7 +218,7 @@ class AttendanceManager {
     // Bind attendance modal events when it's shown
     const attendanceModal = document.getElementById('attendanceModal');
     if (attendanceModal) {
-      attendanceModal.addEventListener('show.bs.modal', () => {
+      attendanceModal.addEventListener('modal.show', () => {
         this.updateAttendanceList();
       });
     }

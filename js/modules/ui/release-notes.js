@@ -35,7 +35,7 @@ class ReleaseNotesManager {
       <div class="modal fade" id="releasenotesmodal" tabindex="-1" data-backdrop="static" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
+            <div class="modal-header">
               <h5 class="modal-title">Release Notes</h5>
               <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Close"></button>
             </div>

@@ -71,6 +71,8 @@ function initializeCustomModals() {
           eventModals.showRecordEventModal();
         } else if (targetId === '#goalModal') {
           goalModal.show();
+        } else if (targetId === '#releasenotesmodal') {
+          releaseNotesManager.show();
         } else {
           // Remove the # prefix from targetId for CustomModal
           const modalId = targetId.startsWith('#') ? targetId.substring(1) : targetId;

@@ -288,7 +288,7 @@ class ReleaseNotesManager {
     // Listen for modal show event
     const releaseNotesModal = document.getElementById('releasenotesmodal');
     if (releaseNotesModal) {
-      releaseNotesModal.addEventListener('show.bs.modal', () => {
+      releaseNotesModal.addEventListener('modal.show', () => {
         this.loadReleaseNotes();
       });
     }

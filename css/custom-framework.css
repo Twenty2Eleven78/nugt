@@ -71,7 +71,10 @@
 }
 
 /* Compact headers for frequently used modals */
-#goalModal .modal-header,
+#goalModal .modal-header {
+    padding: var(--spacing-md) var(--spacing-lg);
+}
+
 #recordEventModal .modal-header,
 #editPlayerModal .modal-header,
 #attendanceModal .modal-header {

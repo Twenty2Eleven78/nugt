@@ -11,7 +11,10 @@
 }
 
 /* Prevent layout shifts during font loading */
-.fa, .fas, .far, .fab {
+.fa,
+.fas,
+.far,
+.fab {
     font-display: swap;
     min-width: 1em;
     text-align: center;
@@ -101,18 +104,18 @@
     .modal-header {
         padding: var(--spacing-xs) var(--spacing-sm);
     }
-    
+
     #goalModal .modal-header,
     #recordEventModal .modal-header,
     #editPlayerModal .modal-header,
     #attendanceModal .modal-header {
         padding: var(--spacing-xs) var(--spacing-sm);
     }
-    
+
     .modal-title {
         font-size: var(--font-size-sm);
     }
-    
+
     .btn-close {
         padding: var(--spacing-xs);
         font-size: var(--font-size-xs);
@@ -152,7 +155,8 @@ html {
 
 /* Main container with bottom padding for fixed navigation */
 .main-container {
-    padding-bottom: 80px; /* Space for fixed bottom navigation */
+    padding-bottom: 80px;
+    /* Space for fixed bottom navigation */
     min-height: 100vh;
 }
 
@@ -820,44 +824,46 @@ html {
         padding: var(--spacing-xs);
         font-size: var(--font-size-xs);
     }
-    
+
     .bottom-nav .nav-link i {
         font-size: var(--font-size-sm);
         margin-bottom: 2px;
     }
-    
+
     .main-container {
-        padding-bottom: 70px; /* Smaller padding on mobile */
+        padding-bottom: 70px;
+        /* Smaller padding on mobile */
     }
-    
+
     .content-wrapper {
-        height: calc(100vh - 120px); /* Account for mobile nav */
+        height: calc(100vh - 120px);
+        /* Account for mobile nav */
     }
-    
+
     .game-container {
         padding: var(--spacing-xs);
         gap: var(--spacing-xs);
     }
-    
+
     #optionstab,
     #gamelogtab {
         padding: var(--spacing-xs);
     }
-    
+
     .action-btn {
         min-height: 50px;
         padding: var(--spacing-sm);
         font-size: var(--font-size-sm);
     }
-    
+
     .action-btn i {
         font-size: 1.3rem;
     }
-    
+
     .btn-text {
         font-size: 0.9rem;
     }
-    
+
     .scoreboard-card,
     .timer-card,
     .game-actions-card {
@@ -1252,7 +1258,8 @@ html {
 
 /* Tab System */
 .content-wrapper {
-    height: calc(100vh - 140px); /* Account for header and bottom nav */
+    height: calc(100vh - 140px);
+    /* Account for header and bottom nav */
     overflow: hidden;
 }
 
@@ -1748,6 +1755,7 @@ html {
         justify-content: flex-end;
     }
 }
+
 /* ====
 = TIMELINE STYLES ===== */
 
@@ -1926,15 +1934,7 @@ html {
     opacity: 0.5;
 }
 
-/* Filter States */
-.timeline-item.filtered-out {
-    display: none;
-}
 
-.timeline-item.search-highlight .timeline-content {
-    border-color: var(--theme-primary);
-    box-shadow: 0 0 0 2px rgba(var(--theme-primary-rgb), 0.2);
-}
 
 /* Event Statistics Cards */
 .event-stat-card {
@@ -1969,31 +1969,25 @@ html {
     font-weight: 500;
 }
 
-/* Event Controls */
-.event-controls {
-    background: var(--bg-secondary);
-    border-radius: var(--border-radius);
-    padding: var(--spacing-sm);
-    margin-bottom: var(--spacing-lg);
-}
+
 
 /* Mobile Timeline Adjustments */
 @media (max-width: 768px) {
     .timeline::before {
         left: 20px;
     }
-    
+
     .timeline-item-left,
     .timeline-item-right {
         justify-content: flex-start;
         padding-left: 50px;
         padding-right: 0;
     }
-    
+
     .timeline-marker {
         left: 20px;
     }
-    
+
     .timeline-item-left .timeline-content::after,
     .timeline-item-right .timeline-content::after {
         left: -8px;
@@ -2001,16 +1995,16 @@ html {
         border-right: 8px solid var(--bg-card);
         border-left: none;
     }
-    
+
     .timeline-content {
         max-width: none;
     }
-    
+
     .event-stat-card {
         min-height: 100px;
         padding: var(--spacing-sm);
     }
-    
+
     .stat-number {
         font-size: var(--font-size-lg);
     }

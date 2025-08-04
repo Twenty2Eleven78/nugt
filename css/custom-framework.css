@@ -1748,3 +1748,283 @@ html {
         justify-content: flex-end;
     }
 }
+/* ====
+= TIMELINE STYLES ===== */
+
+/* Enhanced Timeline Container */
+.enhanced-timeline-container {
+    position: relative;
+    background: var(--bg-primary);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.enhanced-timeline {
+    position: relative;
+    padding: var(--spacing-lg);
+    min-height: 200px;
+}
+
+/* Timeline Structure */
+.timeline {
+    position: relative;
+    padding: 0;
+    margin: 0;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--theme-primary), var(--theme-primary-light));
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+/* Timeline Items */
+.timeline-item {
+    position: relative;
+    margin-bottom: var(--spacing-xl);
+    display: flex;
+    align-items: flex-start;
+    opacity: 1;
+    transition: var(--transition);
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Timeline Item Positioning */
+.timeline-item-left {
+    justify-content: flex-end;
+    padding-right: calc(50% + var(--spacing-xl));
+}
+
+.timeline-item-right {
+    justify-content: flex-start;
+    padding-left: calc(50% + var(--spacing-xl));
+}
+
+/* Timeline Marker */
+.timeline-marker {
+    position: absolute;
+    left: 50%;
+    top: var(--spacing-sm);
+    width: 16px;
+    height: 16px;
+    background: var(--theme-primary);
+    border: 3px solid var(--bg-primary);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    box-shadow: 0 0 0 3px var(--theme-primary-light);
+}
+
+/* Marker Variants */
+.marker-success {
+    background: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.3);
+}
+
+.marker-danger {
+    background: var(--danger-color);
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.3);
+}
+
+.marker-warning {
+    background: var(--warning-color);
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.3);
+}
+
+/* Timeline Content */
+.timeline-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-lg);
+    box-shadow: var(--box-shadow-card);
+    max-width: 400px;
+    width: 100%;
+    position: relative;
+    transition: var(--transition);
+}
+
+.timeline-content:hover {
+    box-shadow: var(--box-shadow-hover);
+    transform: translateY(-2px);
+}
+
+/* Timeline Content Arrow */
+.timeline-item-left .timeline-content::after {
+    content: '';
+    position: absolute;
+    right: -8px;
+    top: var(--spacing-lg);
+    width: 0;
+    height: 0;
+    border-left: 8px solid var(--bg-card);
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+}
+
+.timeline-item-right .timeline-content::after {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: var(--spacing-lg);
+    width: 0;
+    height: 0;
+    border-right: 8px solid var(--bg-card);
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+}
+
+/* Timeline Time */
+.timeline-time {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+}
+
+/* Timeline Body */
+.timeline-body {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+}
+
+/* Event Actions */
+.event-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+}
+
+.event-actions .btn {
+    padding: var(--spacing-xs);
+    min-height: auto;
+}
+
+/* Event Info */
+.event-info {
+    flex-grow: 1;
+}
+
+/* Empty Timeline Message */
+.empty-timeline-message {
+    text-align: center;
+    padding: var(--spacing-xxl);
+    color: var(--text-muted);
+}
+
+.empty-timeline-message i {
+    opacity: 0.5;
+}
+
+/* Filter States */
+.timeline-item.filtered-out {
+    display: none;
+}
+
+.timeline-item.search-highlight .timeline-content {
+    border-color: var(--theme-primary);
+    box-shadow: 0 0 0 2px rgba(var(--theme-primary-rgb), 0.2);
+}
+
+/* Event Statistics Cards */
+.event-stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-lg);
+    text-align: center;
+    transition: var(--transition);
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.event-stat-card:hover {
+    box-shadow: var(--box-shadow-hover);
+    transform: translateY(-2px);
+}
+
+.stat-number {
+    font-size: var(--font-size-xl);
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.stat-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Event Controls */
+.event-controls {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Mobile Timeline Adjustments */
+@media (max-width: 768px) {
+    .timeline::before {
+        left: 20px;
+    }
+    
+    .timeline-item-left,
+    .timeline-item-right {
+        justify-content: flex-start;
+        padding-left: 50px;
+        padding-right: 0;
+    }
+    
+    .timeline-marker {
+        left: 20px;
+    }
+    
+    .timeline-item-left .timeline-content::after,
+    .timeline-item-right .timeline-content::after {
+        left: -8px;
+        right: auto;
+        border-right: 8px solid var(--bg-card);
+        border-left: none;
+    }
+    
+    .timeline-content {
+        max-width: none;
+    }
+    
+    .event-stat-card {
+        min-height: 100px;
+        padding: var(--spacing-sm);
+    }
+    
+    .stat-number {
+        font-size: var(--font-size-lg);
+    }
+}
+
+/* Dark Mode Timeline Adjustments */
+.theme-dark .timeline-content::after {
+    border-color: var(--bg-card) transparent transparent transparent;
+}
+
+.theme-dark .timeline-item-left .timeline-content::after {
+    border-left-color: var(--bg-card);
+}
+
+.theme-dark .timeline-item-right .timeline-content::after {
+    border-right-color: var(--bg-card);
+}

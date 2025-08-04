@@ -134,10 +134,16 @@ class RosterModal {
           if (rosterManager && rosterManager.updateRosterList) {
             rosterManager.updateRosterList();
           }
+          // Re-bind roster events after modal is shown
+          if (rosterManager && rosterManager.rebindEvents) {
+            rosterManager.rebindEvents();
+          }
         });
       }
     }, 100); // Small delay to ensure modal is created
   }
+
+
 }
 
 // Create and export instance

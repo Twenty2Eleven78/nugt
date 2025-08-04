@@ -227,6 +227,11 @@ class RosterManager {
     this._refreshUI();
   }
 
+  // Public method to re-bind events (called by roster-modal.js)
+  rebindEvents() {
+    this._bindEvents();
+  }
+
   // Helper method to normalize shirt number input
   _normalizeShirtNumber(shirtNumber) {
     return shirtNumber !== null && shirtNumber !== '' ? parseInt(shirtNumber, 10) : null;
@@ -448,11 +453,15 @@ class RosterManager {
 
   // Bind event listeners
   _bindEvents() {
-    this._bindAddPlayerEvents();
-    this._bindBulkAddEvents();
-    this._bindRosterListEvents();
-    this._bindEditPlayerEvents();
-    this._bindClearRosterEvents();
+    // Only bind events if modal elements exist (for backward compatibility)
+    // The roster-modal.js now handles these events when the modal is shown
+    if (document.getElementById('addPlayerBtn')) {
+      this._bindAddPlayerEvents();
+      this._bindBulkAddEvents();
+      this._bindRosterListEvents();
+      this._bindEditPlayerEvents();
+      this._bindClearRosterEvents();
+    }
   }
 
   // Bind add player events

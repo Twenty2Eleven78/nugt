@@ -39,7 +39,6 @@ import teamModals from './ui/team-modals.js';
 import goalModal from './ui/goal-modal.js';
 import eventModals from './ui/event-modals.js';
 import resetModal from './ui/reset-modal.js';
-import feedbackModal from './ui/feedback-modal.js';
 
 // Services
 import { notificationManager } from './services/notifications.js';
@@ -211,7 +210,6 @@ export function initializeApp() {
   goalModal.init();
   eventModals.init();
   resetModal.init();
-  feedbackModal.init();
 
   // Initialize theme manager
   themeManager.init();

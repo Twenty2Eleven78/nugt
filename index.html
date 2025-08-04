@@ -366,10 +366,7 @@
                             onclick="pwaUpdater.triggerUpdate()">
                             <i class="fas fa-sync me-2"></i>Check Updates
                           </button>
-                          <button class="btn btn-outline-primary btn-sm" data-toggle="modal"
-                            data-target="#feedbackModal">
-                            <i class="fas fa-comments me-2"></i>Feedback
-                          </button>
+
                           <button class="btn btn-outline-danger btn-sm" data-toggle="modal"
                             data-target="#resetConfirmModal">
                             <i class="fas fa-arrows-rotate me-2"></i>Reset App
@@ -572,70 +569,7 @@
   </div>
   <!-- END Match Attendance Modal -->
 
-  <!--Feedback Modal-->
-  <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="feedbackModalLabel">
-            <i class="fa-solid fa-comments me-2"></i>App Feedback
-          </h5>
-          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Replace YOUR-EMAIL@example.com with your actual email -->
-          <form action="https://formsubmit.co/aad39494b2f0dab389a44f1ce39dab62" method="POST">
-            <!-- FormSubmit Configuration -->
-            <input type="hidden" name="_subject" value="NUFC GameTime App Feedback">
-            <input type="hidden" name="_template" value="table">
-            <input type="hidden" name="_captcha" value="true">
-            <input type="hidden" name="_next" value="">
 
-            <!-- Feedback Type -->
-            <div class="mb-3">
-              <label for="feedbackType" class="form-label">Feedback Type</label>
-              <select class="form-select" name="Feedback Type" id="feedbackType" required>
-                <option value="">Select feedback type</option>
-                <option value="bug">Bug Report</option>
-                <option value="feature">Feature Request</option>
-                <option value="improvement">Improvement Suggestion</option>
-                <option value="other">Other</option>alue="improvement">Improvement Suggestion</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <!-- Feedback Description -->
-            <div class="mb-3">
-              <label for="feedbackDescription" class="form-label">Description</label>
-              <textarea class="form-control" name="message" id="feedbackDescription" rows="4" required
-                placeholder="Please describe your feedback in detail..."></textarea>
-            </div>
-
-            <!-- Contact Information (Optional) -->
-            <div class="mb-3">
-              <label for="contactEmail" class="form-label">Contact Email (Optional)</label>
-              <input type="email" class="form-control" name="email" id="contactEmail" placeholder="your@email.com">
-              <div class="form-text">We'll only use this to follow up if needed.</div>
-            </div>
-
-            <!-- App Version -->
-            <input type="hidden" name="App Version" value="3.7">
-
-            <!-- Submit Button -->
-            <div class="d-grid">
-              <button type="submit" class="btn btn-primary"
-                onclick="this.innerHTML='<span class=\'spinner-border spinner-border-sm me-2\' role=\'status\' aria-hidden=\'true\'></span>Submitting Feedback...'; ">
-                <i class="fa-solid fa-paper-plane me-2"></i>Submit Feedback
-              </button>
-              <div class="form-text text-center">The form can take a few moments to send.</div>
-            </div>
-          </form>
-        </div>
-
-      </div>
-    </div>
-  </div>
-  <!--END Feedback Modal-->
 
   <!-- Enhanced Sharing Modal -->
   <div class="modal fade" id="sharingModal" tabindex="-1" aria-labelledby="sharingModalLabel" aria-hidden="true">

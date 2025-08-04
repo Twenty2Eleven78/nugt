@@ -72,7 +72,9 @@ function initializeCustomModals() {
         } else if (targetId === '#goalModal') {
           goalModal.show();
         } else {
-          const modal = CustomModal.getOrCreateInstance(targetId);
+          // Remove the # prefix from targetId for CustomModal
+          const modalId = targetId.startsWith('#') ? targetId.substring(1) : targetId;
+          const modal = CustomModal.getOrCreateInstance(modalId);
           modal.show();
         }
       }

@@ -1421,10 +1421,10 @@ html {
     color: var(--text-primary);
     font-weight: 600;
     margin-top: 0;
-    margin-bottom: 4px;
+    margin-bottom: var(--spacing-sm);
     text-align: center;
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 1px;
+    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-sm);
     flex-shrink: 0;
     font-size: var(--font-size-base);
     line-height: 1;

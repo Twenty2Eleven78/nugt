@@ -17,7 +17,6 @@ class GoalModal {
    */
   init() {
     this.createModal();
-    console.log('Goal modal initialized');
   }
 
   /**
@@ -27,7 +26,6 @@ class GoalModal {
     // Remove existing modal if it exists
     const existingModal = document.getElementById('goalModal');
     if (existingModal) {
-      console.log('Removing existing goal modal');
       existingModal.remove();
     }
 
@@ -79,10 +77,8 @@ class GoalModal {
     // Initialize custom modal
     this.modal = CustomModal.getOrCreateInstance('goalModal');
 
-    // Add form submission handler after modal is created
-    setTimeout(() => {
-      this.setupFormHandler();
-    }, 100);
+    // Add form submission handler
+    this.setupFormHandler();
   }
 
   /**

@@ -2,13 +2,14 @@
  * Match Load Modal UI Component
  */
 
-import { hideModal } from './modals.js';
+import { CustomModal } from '../shared/custom-modal.js';
 import { matchSummaryModal } from './match-summary-modal.js';
 import { rawDataModal } from './raw-data-modal.js';
 
 class MatchLoadModal {
   constructor() {
-    this.modalInitialized = false;
+    this.modal = null;
+    this.isInitialized = false;
     this.onLoad = null;
   }
 
@@ -16,10 +17,11 @@ class MatchLoadModal {
    * Initialize the match load modal
    */
   init() {
-    if (!this.modalInitialized) {
-      this._createModal();
-      this.modalInitialized = true;
-    }
+    if (this.isInitialized) return;
+    
+    this._createModal();
+    this._bindEventListeners();
+    this.isInitialized = true;
   }
 
   /**
@@ -30,8 +32,7 @@ class MatchLoadModal {
   show(matches, onLoad) {
     this.onLoad = onLoad;
 
-    const modal = document.getElementById('matchLoadModal');
-    if (!modal) return;
+    if (!this.modal) return;
 
     const matchListElement = document.getElementById('matchLoadList');
     if (!matchListElement) return;
@@ -65,9 +66,17 @@ class MatchLoadModal {
       matchListElement.innerHTML = '<p>No saved matches found.</p>';
     }
 
-    // Show modal
-    const bootstrapModal = new bootstrap.Modal(modal);
-    bootstrapModal.show();
+    // Show modal using custom modal system
+    this.modal.show();
+  }
+
+  /**
+   * Hide the match load modal
+   */
+  hide() {
+    if (this.modal) {
+      this.modal.hide();
+    }
   }
 
   /**
@@ -75,9 +84,10 @@ class MatchLoadModal {
    * @private
    */
   _createModal() {
-    // Check if modal already exists
-    if (document.getElementById('matchLoadModal')) {
-      return;
+    // Remove existing modal if it exists
+    const existingModal = document.getElementById('matchLoadModal');
+    if (existingModal) {
+      existingModal.remove();
     }
 
     const modalHtml = `
@@ -86,7 +96,7 @@ class MatchLoadModal {
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="matchLoadModalLabel">Load Match from Cloud</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <ul class="list-group" id="matchLoadList">
@@ -94,17 +104,31 @@ class MatchLoadModal {
               </ul>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-secondary" id="cancelMatchLoadBtn">Cancel</button>
             </div>
           </div>
         </div>
       </div>
     `;
 
-    // Create modal container and append to body
-    const modalContainer = document.createElement('div');
-    modalContainer.innerHTML = modalHtml;
-    document.body.appendChild(modalContainer.firstElementChild);
+    // Add modal to DOM
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Initialize custom modal
+    this.modal = CustomModal.getOrCreateInstance('matchLoadModal');
+  }
+
+  /**
+   * Bind event listeners for the modal
+   * @private
+   */
+  _bindEventListeners() {
+    // Handle cancel button click
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'cancelMatchLoadBtn') {
+        this.hide();
+      }
+    });
   }
 }
 

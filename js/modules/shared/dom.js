@@ -46,10 +46,9 @@ class DOMCache {
       fullTimeButton: 'FullTimeButton',
 
       // Modal elements are now dynamically created by their respective modal modules
-      // goalModal, recordEventModal, editEventModal, rosterModal, attendanceModal are created by JS modules
+      // goalModal, recordEventModal, editEventModal, rosterModal, attendanceModal, sharingModal are created by JS modules
 
       // Form elements
-      sharingModal: 'sharingModal',
 
       // Navigation elements
       gameTab: 'gametab',

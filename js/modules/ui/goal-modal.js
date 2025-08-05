@@ -4,10 +4,12 @@
  */
 
 import { CustomModal } from '../shared/custom-modal.js';
+import { rosterManager } from '../match/roster.js';
 
 class GoalModal {
   constructor() {
     this.modal = null;
+    this.formHandlerSetup = false;
   }
 
   /**
@@ -77,8 +79,10 @@ class GoalModal {
     // Initialize custom modal
     this.modal = CustomModal.getOrCreateInstance('goalModal');
 
-    // Add form submission handler
-    this.setupFormHandler();
+    // Add form submission handler after modal is created
+    setTimeout(() => {
+      this.setupFormHandler();
+    }, 100);
   }
 
   /**
@@ -86,9 +90,11 @@ class GoalModal {
    */
   show() {
     if (this.modal) {
-      // Update roster data before showing
-      this.updateRosterData();
       this.modal.show();
+      // Update roster data after showing to ensure DOM is ready
+      setTimeout(() => {
+        this.updateRosterData();
+      }, 100);
     }
   }
 
@@ -96,14 +102,11 @@ class GoalModal {
    * Update roster data in goal modal
    */
   updateRosterData() {
-    // Get roster from RosterManager if available
-    if (window.RosterManager && window.RosterManager.getRoster) {
-      const roster = window.RosterManager.getRoster();
-      console.log('Updating goal modal with roster:', roster);
+    // Get roster from rosterManager if available
+    if (rosterManager && rosterManager.getRoster) {
+      const roster = rosterManager.getRoster();
       this.updateGoalScorerOptions(roster);
       this.updateGoalAssistOptions(roster);
-    } else {
-      console.log('RosterManager not available or no getRoster method');
     }
   }
 
@@ -112,14 +115,27 @@ class GoalModal {
    */
   setupFormHandler() {
     const goalForm = document.getElementById('goalForm');
-    if (goalForm) {
-      goalForm.addEventListener('submit', (event) => {
+    if (!goalForm || this.formHandlerSetup) return;
+
+    // Remove any existing event listeners by cloning the form
+    const newForm = goalForm.cloneNode(true);
+    goalForm.parentNode.replaceChild(newForm, goalForm);
+
+    // Add single event listener to the new form
+    const finalForm = document.getElementById('goalForm');
+    if (finalForm) {
+      finalForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
         // Call the goal manager's addGoal method
         if (window.goalManager && window.goalManager.addGoal) {
           window.goalManager.addGoal(event);
         }
       });
     }
+
+    this.formHandlerSetup = true;
   }
 
   /**
@@ -137,7 +153,6 @@ class GoalModal {
    */
   updateGoalScorerOptions(players) {
     const goalScorerSelect = document.getElementById('goalScorer');
-    console.log('Updating goal scorer options:', { goalScorerSelect, players });
 
     if (goalScorerSelect && players) {
       // Clear existing options except default and "Own Goal"
@@ -156,15 +171,6 @@ class GoalModal {
         goalScorerSelect.appendChild(option);
       });
 
-      // Auto-select first player if there's only one player
-      if (players.length === 1) {
-        goalScorerSelect.value = players[0].name;
-        console.log('Auto-selected single player:', players[0].name);
-      }
-
-      console.log('Final goal scorer select value:', goalScorerSelect.value);
-    } else {
-      console.log('Goal scorer select not found or no players');
     }
   }
 

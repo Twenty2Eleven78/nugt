@@ -17,7 +17,7 @@ class RosterModal {
    */
   init() {
     if (this.isInitialized) return;
-    
+
     this.createModal();
     this._bindEvents();
     this.isInitialized = true;

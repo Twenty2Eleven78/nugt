@@ -69,7 +69,7 @@ class GoalManager {
 
     const goalScorerElement = document.getElementById('goalScorer');
     const goalAssistElement = document.getElementById('goalAssist');
-    
+
     console.log('Goal form submission:', {
       goalScorerElement,
       goalScorerValue: goalScorerElement?.value,

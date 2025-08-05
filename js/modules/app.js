@@ -371,13 +371,7 @@ function bindEventListeners() {
     opgoalButton.addEventListener('click', () => goalManager.addOppositionGoal());
   }
 
-  // Goal form event listener is now handled by the goal modal module
-  // The form is dynamically created, so we use event delegation
-  document.addEventListener('submit', (e) => {
-    if (e.target.id === 'goalForm') {
-      goalManager.addGoal(e);
-    }
-  });
+
 
   // Team management - using event delegation for dynamically created buttons
   document.addEventListener('click', (e) => {

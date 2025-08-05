@@ -40,6 +40,7 @@ import goalModal from './ui/goal-modal.js';
 import eventModals from './ui/event-modals.js';
 import resetModal from './ui/reset-modal.js';
 import rosterModal from './ui/roster-modal.js';
+import attendanceModal from './ui/attendance-modal.js';
 
 // Services
 import { notificationManager } from './services/notifications.js';
@@ -75,6 +76,8 @@ function initializeCustomModals() {
           releaseNotesManager.show();
         } else if (targetId === '#rosterModal') {
           rosterModal.show();
+        } else if (targetId === '#attendanceModal') {
+          attendanceModal.show();
         } else {
           // Remove the # prefix from targetId for CustomModal
           const modalId = targetId.startsWith('#') ? targetId.substring(1) : targetId;
@@ -214,6 +217,7 @@ export function initializeApp() {
   eventModals.init();
   resetModal.init();
   rosterModal.init();
+  attendanceModal.init();
 
   // Initialize theme manager
   themeManager.init();

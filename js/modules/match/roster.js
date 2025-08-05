@@ -9,6 +9,7 @@ import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from '../ui/modals.js';
 import { rosterUtils } from '../data/default-roster.js';
 import { STORAGE_KEYS } from '../shared/constants.js';
+import { showEditPlayerModal } from '../ui/roster-modal.js';
 
 // Configuration constants
 const ROSTER_CONFIG = {
@@ -544,40 +545,15 @@ class RosterManager {
 
 
 
-  // Show edit player modal
+  // Show edit player modal (now handled by roster modal)
   _showEditPlayerModal(playerName) {
-    const playerToEdit = this.roster.find(p => p.name === playerName);
-    if (!playerToEdit) return;
-
-    const oldNameInput = document.getElementById('editPlayerOldName');
-    const nameInput = document.getElementById('editPlayerName');
-    const shirtNumberInput = document.getElementById('editPlayerShirtNumber');
-
-    if (oldNameInput) oldNameInput.value = playerToEdit.name;
-    if (nameInput) nameInput.value = playerToEdit.name;
-    if (shirtNumberInput) {
-      shirtNumberInput.value = playerToEdit.shirtNumber !== null ? playerToEdit.shirtNumber : '';
-    }
-
-    showModal('editPlayerModal');
+    showEditPlayerModal(playerName);
   }
 
-  // Bind edit player events
+  // Edit player events now handled by roster modal
   _bindEditPlayerEvents() {
-    const editPlayerForm = document.getElementById('editPlayerForm');
-    if (!editPlayerForm) return;
-
-    editPlayerForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      const oldName = document.getElementById('editPlayerOldName')?.value;
-      const newName = document.getElementById('editPlayerName')?.value.trim();
-      const newShirtNumber = document.getElementById('editPlayerShirtNumber')?.value;
-
-      if (this.editPlayer(oldName, newName, newShirtNumber)) {
-        hideModal('editPlayerModal');
-      }
-    });
+    // This functionality is now handled by the roster modal
+    // No need to bind events here
   }
 
   // Bind clear roster events

@@ -25,16 +25,20 @@ class RosterModal {
   }
 
   /**
-   * Create roster modal
+   * Create roster modal and edit player modal
    */
   createModal() {
-    // Remove existing modal if it exists
-    const existingModal = document.getElementById('rosterModal');
-    if (existingModal) {
-      existingModal.remove();
+    // Remove existing modals if they exist
+    const existingRosterModal = document.getElementById('rosterModal');
+    if (existingRosterModal) {
+      existingRosterModal.remove();
+    }
+    const existingEditModal = document.getElementById('editPlayerModal');
+    if (existingEditModal) {
+      existingEditModal.remove();
     }
 
-    const modalHTML = `
+    const rosterModalHTML = `
       <div class="modal fade" id="rosterModal" tabindex="-1">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -93,11 +97,42 @@ class RosterModal {
       </div>
     `;
 
-    // Add modal to DOM
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    const editPlayerModalHTML = `
+      <div class="modal fade" id="editPlayerModal" tabindex="-1" aria-labelledby="editPlayerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editPlayerModalLabel"><i class="fas fa-user-edit me-2"></i>Edit Player</h5>
+              <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form id="editPlayerForm">
+                <input type="hidden" id="editPlayerOldName" name="editPlayerOldName">
+                <div class="mb-3">
+                  <label for="editPlayerName" class="form-label">Player Name</label>
+                  <input type="text" class="form-control" id="editPlayerName" name="editPlayerName" required>
+                </div>
+                <div class="mb-3">
+                  <label for="editPlayerShirtNumber" class="form-label">Shirt Number (0-99, blank for none)</label>
+                  <input type="number" class="form-control" id="editPlayerShirtNumber" name="editPlayerShirtNumber" min="0" max="99">
+                </div>
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                  <button type="submit" class="btn btn-danger">Save Changes</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
 
-    // Initialize custom modal
+    // Add both modals to DOM
+    document.body.insertAdjacentHTML('beforeend', rosterModalHTML);
+    document.body.insertAdjacentHTML('beforeend', editPlayerModalHTML);
+
+    // Initialize custom modals
     this.modal = CustomModal.getOrCreateInstance('rosterModal');
+    this.editModal = CustomModal.getOrCreateInstance('editPlayerModal');
   }
 
   /**
@@ -123,6 +158,38 @@ class RosterModal {
   }
 
   /**
+   * Show edit player modal
+   */
+  showEditPlayerModal(playerName) {
+    if (!this.editModal) return;
+
+    const playerToEdit = rosterManager.getPlayerByName(playerName);
+    if (!playerToEdit) return;
+
+    // Populate form fields
+    const oldNameInput = document.getElementById('editPlayerOldName');
+    const nameInput = document.getElementById('editPlayerName');
+    const shirtNumberInput = document.getElementById('editPlayerShirtNumber');
+
+    if (oldNameInput) oldNameInput.value = playerToEdit.name;
+    if (nameInput) nameInput.value = playerToEdit.name;
+    if (shirtNumberInput) {
+      shirtNumberInput.value = playerToEdit.shirtNumber !== null ? playerToEdit.shirtNumber : '';
+    }
+
+    this.editModal.show();
+  }
+
+  /**
+   * Hide edit player modal
+   */
+  hideEditPlayerModal() {
+    if (this.editModal) {
+      this.editModal.hide();
+    }
+  }
+
+  /**
    * Bind event listeners
    */
   _bindEvents() {
@@ -141,6 +208,34 @@ class RosterModal {
         });
       }
     }, 100); // Small delay to ensure modal is created
+
+    // Handle edit player form submission
+    document.addEventListener('submit', (e) => {
+      if (e.target.id === 'editPlayerForm') {
+        e.preventDefault();
+
+        const oldName = document.getElementById('editPlayerOldName')?.value;
+        const newName = document.getElementById('editPlayerName')?.value.trim();
+        const newShirtNumber = document.getElementById('editPlayerShirtNumber')?.value;
+
+        if (rosterManager && rosterManager.editPlayer) {
+          if (rosterManager.editPlayer(oldName, newName, newShirtNumber)) {
+            this.hideEditPlayerModal();
+          }
+        }
+      }
+    });
+
+    // Handle edit player button clicks via event delegation
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.edit-player')) {
+        const button = e.target.closest('.edit-player');
+        const playerName = button.dataset.playerName;
+        if (playerName) {
+          this.showEditPlayerModal(playerName);
+        }
+      }
+    });
   }
 
 
@@ -148,4 +243,10 @@ class RosterModal {
 
 // Create and export instance
 const rosterModal = new RosterModal();
+
+// Export methods for external access
+export const showEditPlayerModal = (playerName) => {
+  rosterModal.showEditPlayerModal(playerName);
+};
+
 export default rosterModal;

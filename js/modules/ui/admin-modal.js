@@ -1,6 +1,7 @@
 import { userMatchesApi } from '../services/user-matches-api.js';
 import { notificationManager } from '../services/notifications.js';
 import { matchSummaryModal } from './match-summary-modal.js';
+import { CustomModal } from '../shared/custom-modal.js';
 
 const modalHtml = `
 <div class="modal fade" id="admin-modal" tabindex="-1" aria-labelledby="admin-modal-label" aria-hidden="true">
@@ -10,7 +11,7 @@ const modalHtml = `
                 <h5 class="modal-title" id="admin-modal-label">
                     <i class="fas fa-cog"></i> Admin Dashboard
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-2 p-md-3">
                 <!-- Search and Controls -->
@@ -114,7 +115,7 @@ const modalHtml = `
                 <h5 class="modal-title">
                     <i class="fas fa-trash"></i> Confirm Deletion
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <p>Are you sure you want to delete this match?</p>
@@ -126,7 +127,7 @@ const modalHtml = `
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
                 <button type="button" class="btn btn-danger" id="confirm-delete-btn">
                     <i class="fas fa-trash"></i> Delete Match
                 </button>
@@ -143,7 +144,7 @@ const modalHtml = `
                 <h5 class="modal-title">
                     <i class="fas fa-exchange-alt"></i> Transfer Match
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
@@ -176,7 +177,7 @@ const modalHtml = `
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" id="cancelTransferBtn">Cancel</button>
                 <button type="button" class="btn btn-warning" id="confirm-transfer-btn" disabled>
                     <i class="fas fa-exchange-alt"></i> Transfer Match
                 </button>
@@ -199,9 +200,9 @@ const init = () => {
     const deleteModalElement = document.getElementById('delete-confirm-modal');
     const transferModalElement = document.getElementById('transfer-match-modal');
     
-    modalInstance = new bootstrap.Modal(modalElement);
-    deleteModalInstance = new bootstrap.Modal(deleteModalElement);
-    transferModalInstance = new bootstrap.Modal(transferModalElement);
+    modalInstance = CustomModal.getOrCreateInstance(modalElement);
+    deleteModalInstance = CustomModal.getOrCreateInstance(deleteModalElement);
+    transferModalInstance = CustomModal.getOrCreateInstance(transferModalElement);
 
     // Initialize match summary modal
     matchSummaryModal.init();
@@ -249,6 +250,14 @@ const init = () => {
         confirmDeleteBtn.addEventListener('click', handleDeleteConfirm);
     }
 
+    // Cancel delete button
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+    if (cancelDeleteBtn) {
+        cancelDeleteBtn.addEventListener('click', () => {
+            deleteModalInstance.hide();
+        });
+    }
+
     // Transfer confirmation and validation
     const confirmTransferBtn = document.getElementById('confirm-transfer-btn');
     const targetUserSelect = document.getElementById('target-user-select');
@@ -256,6 +265,14 @@ const init = () => {
     
     if (confirmTransferBtn) {
         confirmTransferBtn.addEventListener('click', handleTransferConfirm);
+    }
+
+    // Cancel transfer button
+    const cancelTransferBtn = document.getElementById('cancelTransferBtn');
+    if (cancelTransferBtn) {
+        cancelTransferBtn.addEventListener('click', () => {
+            transferModalInstance.hide();
+        });
     }
 
     // Enable/disable transfer button based on selection
@@ -277,12 +294,12 @@ const init = () => {
         newUserEmail.addEventListener('input', validateTransferForm);
     }
 
-    modalElement.addEventListener('show.bs.modal', async () => {
+    modalElement.addEventListener('modal.show', async () => {
         await loadMatchesData();
     });
 
     // Clean up when admin modal is hidden
-    modalElement.addEventListener('hidden.bs.modal', cleanupModalBackdrops);
+    modalElement.addEventListener('modal.hidden', cleanupModalBackdrops);
 };
 
 const loadMatchesData = async () => {

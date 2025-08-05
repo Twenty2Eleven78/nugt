@@ -89,84 +89,37 @@ const modalHtml = `
                     </div>
                 </div>
 
-                <!-- View Toggle for Mobile -->
-                <div class="d-lg-none px-3 pb-3">
-                    <div class="btn-group w-100" role="group">
-                        <input type="radio" class="btn-check" name="view-mode" id="card-view" checked>
-                        <label class="btn btn-outline-secondary" for="card-view">
-                            <i class="fas fa-th-large me-1"></i>Cards
-                        </label>
-                        <input type="radio" class="btn-check" name="view-mode" id="table-view">
-                        <label class="btn btn-outline-secondary" for="table-view">
-                            <i class="fas fa-table me-1"></i>Table
-                        </label>
-                    </div>
-                </div>
-
                 <!-- Main Content Area -->
                 <div class="px-3 pb-3">
-                    <!-- Desktop Table View -->
-                    <div id="desktop-table-view" class="d-none d-lg-block">
-                        <div class="card border-0 shadow-sm">
-                            <div class="table-responsive">
-                                <table class="table table-hover mb-0">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th class="border-0">
-                                                <i class="fas fa-user me-2"></i>User
-                                            </th>
-                                            <th class="border-0">
-                                                <i class="fas fa-futbol me-2"></i>Match
-                                            </th>
-                                            <th class="border-0">
-                                                <i class="fas fa-calendar me-2"></i>Date
-                                            </th>
-                                            <th class="border-0 text-center">
-                                                <i class="fas fa-cogs me-2"></i>Actions
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="matches-table-body">
-                                        <tr>
-                                            <td colspan="4" class="text-center py-5">
-                                                <div class="spinner-border text-primary mb-3" role="status"></div>
-                                                <div class="text-muted">Loading match data...</div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Mobile Card View -->
-                    <div id="mobile-card-view" class="d-lg-none">
-                        <div id="matches-cards-container">
-                            <div class="text-center py-5">
-                                <div class="spinner-border text-primary mb-3" role="status"></div>
-                                <div class="text-muted">Loading match data...</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Mobile Table View -->
-                    <div id="mobile-table-view" class="d-lg-none" style="display: none;">
-                        <div class="card border-0 shadow-sm">
-                            <div class="table-responsive">
-                                <table class="table table-sm table-hover mb-0">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th class="border-0">User</th>
-                                            <th class="border-0">Match</th>
-                                            <th class="border-0">Date</th>
-                                            <th class="border-0">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="matches-mobile-table-body">
-                                        <!-- Mobile table content -->
-                                    </tbody>
-                                </table>
-                            </div>
+                    <!-- Table View -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th class="border-0">
+                                            <i class="fas fa-user me-2"></i>User
+                                        </th>
+                                        <th class="border-0">
+                                            <i class="fas fa-futbol me-2"></i>Match
+                                        </th>
+                                        <th class="border-0">
+                                            <i class="fas fa-calendar me-2"></i>Date
+                                        </th>
+                                        <th class="border-0 text-center">
+                                            <i class="fas fa-cogs me-2"></i>Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="matches-table-body">
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5">
+                                            <div class="spinner-border text-primary mb-3" role="status"></div>
+                                            <div class="text-muted">Loading match data...</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -297,28 +250,7 @@ const init = () => {
         });
     }
 
-    // Add view mode toggle for mobile
-    const cardViewRadio = document.getElementById('card-view');
-    const tableViewRadio = document.getElementById('table-view');
-    const mobileCardView = document.getElementById('mobile-card-view');
-    const mobileTableView = document.getElementById('mobile-table-view');
 
-    if (cardViewRadio && tableViewRadio) {
-        cardViewRadio.addEventListener('change', () => {
-            if (cardViewRadio.checked) {
-                mobileCardView.style.display = 'block';
-                mobileTableView.style.display = 'none';
-            }
-        });
-
-        tableViewRadio.addEventListener('change', () => {
-            if (tableViewRadio.checked) {
-                mobileCardView.style.display = 'none';
-                mobileTableView.style.display = 'block';
-                renderMobileTable(allMatches);
-            }
-        });
-    }
 
     // Delete confirmation
     const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
@@ -380,7 +312,6 @@ const init = () => {
 
 const loadMatchesData = async () => {
     const tableBody = document.getElementById('matches-table-body');
-    const cardsContainer = document.getElementById('matches-cards-container');
     const statsCardsContainer = document.getElementById('admin-stats-cards');
     const refreshBtn = document.getElementById('refresh-data-btn');
     
@@ -391,11 +322,11 @@ const loadMatchesData = async () => {
     }
 
     try {
-        // Show loading in all views
+        // Show loading in table view
         if (tableBody) {
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="5" class="text-center p-4">
+                    <td colspan="4" class="text-center p-4">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
@@ -405,23 +336,11 @@ const loadMatchesData = async () => {
             `;
         }
 
-        if (cardsContainer) {
-            cardsContainer.innerHTML = `
-                <div class="text-center p-4">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <div class="mt-2">Loading matches...</div>
-                </div>
-            `;
-        }
-
         const matches = await userMatchesApi.loadAllMatchData();
         allMatches = matches || [];
         
         if (allMatches.length > 0) {
-            renderDesktopTable(allMatches);
-            renderMobileCards(allMatches);
+            renderTable(allMatches);
             renderStats(allMatches, statsCardsContainer);
             notificationManager.info(`Loaded ${allMatches.length} matches from ${new Set(allMatches.map(m => m.userEmail || m.userId)).size} users.`);
 
@@ -441,7 +360,7 @@ const loadMatchesData = async () => {
     }
 };
 
-const renderDesktopTable = (matches) => {
+const renderTable = (matches) => {
     const tableBody = document.getElementById('matches-table-body');
     if (!tableBody) return;
 
@@ -518,123 +437,7 @@ const renderDesktopTable = (matches) => {
     addEventListeners();
 };
 
-const renderMobileCards = (matches) => {
-    const cardsContainer = document.getElementById('matches-cards-container');
-    if (!cardsContainer) return;
 
-    if (matches.length === 0) {
-        cardsContainer.innerHTML = `
-            <div class="text-center text-muted py-5">
-                <i class="fas fa-inbox fa-3x mb-3 opacity-50"></i>
-                <h5>No matches found</h5>
-                <p>Try adjusting your search or filters</p>
-            </div>
-        `;
-        return;
-    }
-
-    cardsContainer.innerHTML = '';
-    
-    matches.forEach((match, index) => {
-        const userEmail = match.userEmail || 
-                         (match.userId && match.userId !== 'unknown' ? `${match.userId}@unknown.com` : 'unknown@example.com');
-        
-        const matchTitle = match.title || match.matchTitle || 'Untitled Match';
-        const savedDate = match.savedAt ? new Date(match.savedAt).toLocaleString() : 'Unknown';
-        
-        // Create user avatar initials
-        const userInitials = userEmail.split('@')[0].substring(0, 2).toUpperCase();
-        
-        const card = document.createElement('div');
-        card.className = 'card mb-3 border-0 shadow-sm';
-        card.innerHTML = `
-            <div class="card-body p-3">
-                <div class="d-flex align-items-start">
-                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" 
-                         style="width: 45px; height: 45px;">
-                        <small class="fw-bold text-primary">${userInitials}</small>
-                    </div>
-                    <div class="flex-grow-1 min-width-0">
-                        <h6 class="card-title mb-1 text-break fw-bold">${escapeHtml(matchTitle)}</h6>
-                        <div class="text-primary mb-1 small text-break">${escapeHtml(userEmail)}</div>
-                        <div class="text-muted small mb-2">
-                            <i class="fas fa-futbol me-1"></i>
-                            ${match.team1Name || 'Team 1'} vs ${match.team2Name || 'Team 2'}
-                        </div>
-                        <div class="text-muted small">
-                            <i class="fas fa-clock me-1"></i>
-                            ${new Date(match.savedAt || Date.now()).toLocaleDateString()}
-                        </div>
-                    </div>
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <button class="dropdown-item view-match-btn" data-match-index="${index}">
-                                    <i class="fas fa-eye me-2"></i>View Match
-                                </button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item transfer-match-btn" data-match-index="${index}">
-                                    <i class="fas fa-exchange-alt me-2"></i>Transfer
-                                </button>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <button class="dropdown-item text-danger delete-match-btn" data-match-index="${index}">
-                                    <i class="fas fa-trash me-2"></i>Delete
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        cardsContainer.appendChild(card);
-    });
-
-    addEventListeners();
-};
-
-const renderMobileTable = (matches) => {
-    const tableBody = document.getElementById('matches-mobile-table-body');
-    if (!tableBody) return;
-
-    tableBody.innerHTML = '';
-    
-    matches.forEach((match, index) => {
-        const userEmail = match.userEmail || 'unknown@example.com';
-        const matchTitle = match.title || match.matchTitle || 'Untitled';
-        const savedDate = match.savedAt ? new Date(match.savedAt).toLocaleDateString() : 'Unknown';
-        
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td class="text-break small">${escapeHtml(userEmail.split('@')[0])}</td>
-            <td class="text-break small">${escapeHtml(matchTitle.substring(0, 20))}${matchTitle.length > 20 ? '...' : ''}</td>
-            <td class="text-nowrap small">${savedDate}</td>
-            <td>
-                <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-primary view-match-btn" data-match-index="${index}">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="btn btn-outline-warning transfer-match-btn" data-match-index="${index}">
-                        <i class="fas fa-exchange-alt"></i>
-                    </button>
-                    <button class="btn btn-outline-danger delete-match-btn" data-match-index="${index}">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </td>
-        `;
-        
-        tableBody.appendChild(row);
-    });
-
-    addEventListeners();
-};
 
 const addEventListeners = () => {
     // View buttons
@@ -774,14 +577,8 @@ const handleTransferConfirm = async () => {
         // Update local data
         allMatches.splice(currentTransferMatch.index, 1);
         
-        // Re-render all views
-        renderDesktopTable(allMatches);
-        renderMobileCards(allMatches);
-        
-        const tableViewRadio = document.getElementById('table-view');
-        if (tableViewRadio && tableViewRadio.checked) {
-            renderMobileTable(allMatches);
-        }
+        // Re-render table view
+        renderTable(allMatches);
         
         const statsCardsContainer = document.getElementById('admin-stats-cards');
         renderStats(allMatches, statsCardsContainer);
@@ -1022,13 +819,7 @@ const applyFilter = (filterValue) => {
         });
     }
     
-    renderDesktopTable(filteredMatches);
-    renderMobileCards(filteredMatches);
-    
-    const tableViewRadio = document.getElementById('table-view');
-    if (tableViewRadio && tableViewRadio.checked) {
-        renderMobileTable(filteredMatches);
-    }
+    renderTable(filteredMatches);
     
     // Update stats with filtered data
     const statsCardsContainer = document.getElementById('admin-stats-cards');
@@ -1054,24 +845,21 @@ const filterMatches = (searchTerm) => {
                userId.includes(searchTerm);
     });
 
-    renderDesktopTable(filtered);
-    renderMobileCards(filtered);
+    renderTable(filtered);
     
-    const tableViewRadio = document.getElementById('table-view');
-    if (tableViewRadio && tableViewRadio.checked) {
-        renderMobileTable(filtered);
-    }
+    // Update stats with filtered data
+    const statsCardsContainer = document.getElementById('admin-stats-cards');
+    renderStats(filtered, statsCardsContainer);
 };
 
 const showNoDataMessage = () => {
     const tableBody = document.getElementById('matches-table-body');
-    const cardsContainer = document.getElementById('matches-cards-container');
     const statsCardsContainer = document.getElementById('admin-stats-cards');
 
     if (tableBody) {
         tableBody.innerHTML = `
             <tr>
-                <td colspan="5" class="text-center text-muted p-4">
+                <td colspan="4" class="text-center text-muted p-4">
                     <i class="fas fa-inbox fa-3x mb-3"></i>
                     <h5>No matches found</h5>
                     <p class="mb-0">No match data available to display.</p>
@@ -1080,24 +868,13 @@ const showNoDataMessage = () => {
         `;
     }
 
-    if (cardsContainer) {
-        cardsContainer.innerHTML = `
-            <div class="text-center text-muted p-4">
-                <i class="fas fa-inbox fa-3x mb-3"></i>
-                <h5>No matches found</h5>
-                <p>No match data available to display.</p>
-            </div>
-        `;
-    }
-
-    if (statsDiv) {
-        statsDiv.innerHTML = '<div class="alert alert-info">No data available for statistics.</div>';
+    if (statsCardsContainer) {
+        renderStats([], statsCardsContainer);
     }
 };
 
 const showErrorMessage = (errorMessage) => {
     const tableBody = document.getElementById('matches-table-body');
-    const cardsContainer = document.getElementById('matches-cards-container');
     const statsCardsContainer = document.getElementById('admin-stats-cards');
 
     const errorHtml = `
@@ -1112,15 +889,11 @@ const showErrorMessage = (errorMessage) => {
     `;
 
     if (tableBody) {
-        tableBody.innerHTML = `<tr><td colspan="5">${errorHtml}</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="4">${errorHtml}</td></tr>`;
     }
 
-    if (cardsContainer) {
-        cardsContainer.innerHTML = errorHtml;
-    }
-
-    if (statsDiv) {
-        statsDiv.innerHTML = '<div class="alert alert-danger">Failed to load statistics.</div>';
+    if (statsCardsContainer) {
+        renderStats([], statsCardsContainer);
     }
 };
 

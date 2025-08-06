@@ -18,7 +18,7 @@ class MatchLoadModal {
    */
   init() {
     if (this.isInitialized) return;
-    
+
     this._createModal();
     this._bindEventListeners();
     this.isInitialized = true;
@@ -56,21 +56,22 @@ class MatchLoadModal {
         const matchDate = new Date(match.savedAt);
         const formattedDate = matchDate.toLocaleDateString();
         const formattedTime = matchDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        
+
         // Create team vs team display
-        const teamsDisplay = match.team1Name && match.team2Name 
+        const teamsDisplay = match.team1Name && match.team2Name
           ? `${match.team1Name} vs ${match.team2Name}`
           : '';
-        
+
         // Create score display if available
         const scoreDisplay = (match.score1 !== undefined && match.score2 !== undefined)
           ? ` (${match.score1}-${match.score2})`
           : '';
 
         const listItem = document.createElement('div');
-        listItem.className = 'card border-0 shadow-sm mb-3';
+        listItem.className = 'card shadow-sm mb-3';
         listItem.style.borderRadius = '12px';
-        
+        listItem.style.border = '1px solid #e0e0e0';
+
         listItem.innerHTML = `
           <div class="card-body p-3">
             <div class="d-flex justify-content-between align-items-start">
@@ -93,21 +94,21 @@ class MatchLoadModal {
             </div>
           </div>
         `;
-        
+
         // Add click handlers
         listItem.querySelector('.view-btn').addEventListener('click', () => {
           matchSummaryModal.show(match);
         });
-        
+
         listItem.querySelector('.raw-data-btn').addEventListener('click', () => {
           rawDataModal.show(match);
         });
-        
+
         matchListElement.appendChild(listItem);
       });
     } else {
       matchListElement.innerHTML = `
-        <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+        <div class="card shadow-sm" style="border-radius: 12px; border: 1px solid #e0e0e0;">
           <div class="card-body text-center text-muted py-5">
             <i class="fas fa-cloud fa-3x mb-3 opacity-50"></i>
             <h6>No saved matches found</h6>
@@ -209,21 +210,21 @@ class MatchLoadModal {
   _filterMatches(searchTerm) {
     if (!this.allMatches) return;
 
-    const filteredMatches = searchTerm.trim() 
+    const filteredMatches = searchTerm.trim()
       ? this.allMatches.filter(match => {
-          const title = (match.title || '').toLowerCase();
-          const notes = (match.notes || '').toLowerCase();
-          const team1 = (match.team1Name || '').toLowerCase();
-          const team2 = (match.team2Name || '').toLowerCase();
-          const date = new Date(match.savedAt).toLocaleDateString().toLowerCase();
-          const searchLower = searchTerm.toLowerCase();
-          
-          return title.includes(searchLower) || 
-                 notes.includes(searchLower) || 
-                 team1.includes(searchLower) || 
-                 team2.includes(searchLower) || 
-                 date.includes(searchLower);
-        })
+        const title = (match.title || '').toLowerCase();
+        const notes = (match.notes || '').toLowerCase();
+        const team1 = (match.team1Name || '').toLowerCase();
+        const team2 = (match.team2Name || '').toLowerCase();
+        const date = new Date(match.savedAt).toLocaleDateString().toLowerCase();
+        const searchLower = searchTerm.toLowerCase();
+
+        return title.includes(searchLower) ||
+          notes.includes(searchLower) ||
+          team1.includes(searchLower) ||
+          team2.includes(searchLower) ||
+          date.includes(searchLower);
+      })
       : this.allMatches;
 
     this._renderMatches(filteredMatches);

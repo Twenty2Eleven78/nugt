@@ -68,25 +68,28 @@ class MatchLoadModal {
           : '';
 
         const listItem = document.createElement('div');
-        listItem.className = 'border rounded p-3 mb-2 bg-light';
+        listItem.className = 'card border-0 shadow-sm mb-3';
+        listItem.style.borderRadius = '12px';
         
         listItem.innerHTML = `
-          <div class="d-flex justify-content-between align-items-start">
-            <div class="flex-grow-1">
-              <h6 class="mb-1">${this._escapeHtml(match.title)}</h6>
-              ${teamsDisplay ? `<div class="text-muted small mb-1">${this._escapeHtml(teamsDisplay)}${scoreDisplay}</div>` : ''}
-              <div class="text-muted small">
-                ${formattedDate} at ${formattedTime}
+          <div class="card-body p-3">
+            <div class="d-flex justify-content-between align-items-start">
+              <div class="flex-grow-1">
+                <h6 class="card-title mb-2 fw-bold">${this._escapeHtml(match.title)}</h6>
+                ${teamsDisplay ? `<div class="text-primary small mb-1"><i class="fas fa-futbol me-1"></i>${this._escapeHtml(teamsDisplay)}${scoreDisplay}</div>` : ''}
+                <div class="text-muted small mb-1">
+                  <i class="fas fa-calendar me-1"></i>${formattedDate} at ${formattedTime}
+                </div>
+                ${match.notes ? `<div class="text-muted small"><i class="fas fa-sticky-note me-1"></i>${this._escapeHtml(match.notes.substring(0, 80))}${match.notes.length > 80 ? '...' : ''}</div>` : ''}
               </div>
-              ${match.notes ? `<div class="text-muted small mt-1">${this._escapeHtml(match.notes.substring(0, 100))}${match.notes.length > 100 ? '...' : ''}</div>` : ''}
-            </div>
-            <div class="ms-3">
-              <button class="btn btn-primary btn-sm view-btn" data-match-index="${index}">
-                View
-              </button>
-              <button class="btn btn-outline-secondary btn-sm ms-1 raw-data-btn" data-match-index="${index}" title="Raw Data">
-                <i class="fas fa-code"></i>
-              </button>
+              <div class="ms-3 d-flex flex-column gap-1">
+                <button class="btn btn-primary btn-sm view-btn" data-match-index="${index}">
+                  <i class="fas fa-eye me-1"></i>View
+                </button>
+                <button class="btn btn-outline-secondary btn-sm raw-data-btn" data-match-index="${index}" title="View Raw Data">
+                  <i class="fas fa-code"></i>
+                </button>
+              </div>
             </div>
           </div>
         `;
@@ -104,10 +107,12 @@ class MatchLoadModal {
       });
     } else {
       matchListElement.innerHTML = `
-        <div class="text-center text-muted py-4">
-          <i class="fas fa-cloud fa-2x mb-3"></i>
-          <div>No saved matches found</div>
-          <small>Try adjusting your search or save some matches first</small>
+        <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+          <div class="card-body text-center text-muted py-5">
+            <i class="fas fa-cloud fa-3x mb-3 opacity-50"></i>
+            <h6>No saved matches found</h6>
+            <small>Try adjusting your search or save some matches first</small>
+          </div>
         </div>
       `;
     }

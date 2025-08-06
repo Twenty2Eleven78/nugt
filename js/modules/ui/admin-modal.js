@@ -14,38 +14,38 @@ const modalHtml = `
             
             <div class="modal-body">
                 <!-- Search and Controls -->
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <input type="text" class="form-control" id="admin-search" 
-                               placeholder="Search matches...">
-                    </div>
-                    <div class="col-md-3">
-                        <select class="form-select" id="filter-select">
-                            <option value="">All Matches</option>
-                            <option value="today">Today</option>
-                            <option value="week">This Week</option>
-                            <option value="month">This Month</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <button class="btn btn-primary w-100" id="refresh-data-btn">
-                            <i class="fas fa-sync-alt me-2"></i>Refresh
-                        </button>
+                <div class="mb-3">
+                    <input type="text" class="form-control mb-2" id="admin-search" 
+                           placeholder="Search matches...">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <select class="form-select" id="filter-select">
+                                <option value="">All Matches</option>
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-primary w-100" id="refresh-data-btn">
+                                <i class="fas fa-sync-alt me-1"></i>Refresh
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Statistics -->
-                <div class="row g-3 mb-4" id="admin-stats-cards">
+                <div class="row g-2 mb-3" id="admin-stats-cards">
                     <!-- Stats will be populated here -->
                 </div>
 
                 <!-- Matches List -->
-                <div style="max-height: 500px; overflow-y: auto;">
+                <div style="max-height: 400px; overflow-y: auto;">
                     <div id="matches-list">
                         <!-- Match cards will be populated here -->
-                        <div class="text-center py-5">
-                            <div class="spinner-border text-primary mb-3" role="status"></div>
-                            <div class="text-muted">Loading match data...</div>
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary mb-2" role="status"></div>
+                            <div class="text-muted small">Loading match data...</div>
                         </div>
                     </div>
                 </div>
@@ -328,34 +328,36 @@ const renderCards = (matches) => {
         listItem.style.cursor = 'pointer';
 
         listItem.innerHTML = `
-          <div class="card-body" style="padding: 1.5rem;">
+          <div class="card-body" style="padding: 1rem;">
             <div class="d-flex justify-content-between align-items-start">
-              <div class="flex-grow-1 me-3">
-                <div class="d-flex align-items-center mb-2">
+              <div class="flex-grow-1 me-2">
+                <div class="d-flex align-items-center mb-1">
                   <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-2" 
-                       style="width: 32px; height: 32px;">
-                    <small class="fw-bold text-primary">${userInitials}</small>
+                       style="width: 28px; height: 28px;">
+                    <small class="fw-bold text-primary" style="font-size: 0.7rem;">${userInitials}</small>
                   </div>
-                  <div>
-                    <h6 class="card-title mb-0 fw-bold">${escapeHtml(matchTitle)}</h6>
-                    <small class="text-muted">${escapeHtml(userEmail)}</small>
+                  <div class="min-width-0">
+                    <div class="fw-bold text-truncate" style="font-size: 0.9rem;">${escapeHtml(matchTitle)}</div>
+                    <div class="text-muted text-truncate" style="font-size: 0.75rem;">${escapeHtml(userEmail)}</div>
                   </div>
                 </div>
-                ${teamsDisplay ? `<div class="text-primary small mb-1"><i class="fas fa-futbol me-1"></i>${escapeHtml(teamsDisplay)}</div>` : ''}
-                <div class="text-muted small">
-                  <i class="fas fa-calendar me-1"></i>${formattedDate} at ${formattedTime}
+                ${teamsDisplay ? `<div class="text-primary mb-1" style="font-size: 0.8rem;"><i class="fas fa-futbol me-1"></i>${escapeHtml(teamsDisplay)}</div>` : ''}
+                <div class="text-muted" style="font-size: 0.75rem;">
+                  <i class="fas fa-calendar me-1"></i>${formattedDate} ${formattedTime}
                 </div>
               </div>
-              <div class="d-flex gap-1 flex-shrink-0">
-                <button class="btn btn-primary btn-sm view-match-btn" data-match-index="${index}" style="min-width: 50px;" title="View Match">
+              <div class="d-flex flex-column gap-1 flex-shrink-0">
+                <button class="btn btn-primary btn-sm view-match-btn" data-match-index="${index}" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" title="View Match">
                   View
                 </button>
-                <button class="btn btn-outline-warning btn-sm transfer-match-btn" data-match-index="${index}" style="width: 36px;" title="Transfer Match">
-                  <i class="fas fa-exchange-alt"></i>
-                </button>
-                <button class="btn btn-outline-danger btn-sm delete-match-btn" data-match-index="${index}" style="width: 36px;" title="Delete Match">
-                  <i class="fas fa-trash"></i>
-                </button>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-outline-warning btn-sm transfer-match-btn" data-match-index="${index}" style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" title="Transfer">
+                    <i class="fas fa-exchange-alt"></i>
+                  </button>
+                  <button class="btn btn-outline-danger btn-sm delete-match-btn" data-match-index="${index}" style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" title="Delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -690,45 +692,45 @@ const renderStats = (matches, statsContainer) => {
 
     statsCardsContainer.innerHTML = `
         <div class="col-6 col-md-3">
-            <div class="card border-0 bg-primary bg-opacity-10 h-100">
-                <div class="card-body text-center p-3">
-                    <div class="text-primary mb-2">
-                        <i class="fas fa-futbol fa-2x"></i>
+            <div class="card shadow-sm" style="border-radius: 8px; border: 1px solid #e0e0e0;">
+                <div class="card-body text-center p-2">
+                    <div class="text-primary mb-1">
+                        <i class="fas fa-futbol"></i>
                     </div>
-                    <h4 class="fw-bold text-primary mb-1">${totalMatches}</h4>
-                    <div class="small text-muted">Total Matches</div>
+                    <div class="fw-bold text-primary">${totalMatches}</div>
+                    <div class="small text-muted">Total</div>
                 </div>
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="card border-0 bg-success bg-opacity-10 h-100">
-                <div class="card-body text-center p-3">
-                    <div class="text-success mb-2">
-                        <i class="fas fa-users fa-2x"></i>
+            <div class="card shadow-sm" style="border-radius: 8px; border: 1px solid #e0e0e0;">
+                <div class="card-body text-center p-2">
+                    <div class="text-success mb-1">
+                        <i class="fas fa-users"></i>
                     </div>
-                    <h4 class="fw-bold text-success mb-1">${uniqueUsers}</h4>
-                    <div class="small text-muted">Active Users</div>
+                    <div class="fw-bold text-success">${uniqueUsers}</div>
+                    <div class="small text-muted">Users</div>
                 </div>
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="card border-0 bg-info bg-opacity-10 h-100">
-                <div class="card-body text-center p-3">
-                    <div class="text-info mb-2">
-                        <i class="fas fa-calendar-week fa-2x"></i>
+            <div class="card shadow-sm" style="border-radius: 8px; border: 1px solid #e0e0e0;">
+                <div class="card-body text-center p-2">
+                    <div class="text-info mb-1">
+                        <i class="fas fa-calendar-week"></i>
                     </div>
-                    <h4 class="fw-bold text-info mb-1">${recentMatches}</h4>
-                    <div class="small text-muted">This Week</div>
+                    <div class="fw-bold text-info">${recentMatches}</div>
+                    <div class="small text-muted">Week</div>
                 </div>
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="card border-0 bg-warning bg-opacity-10 h-100">
-                <div class="card-body text-center p-3">
-                    <div class="text-warning mb-2">
-                        <i class="fas fa-calendar-day fa-2x"></i>
+            <div class="card shadow-sm" style="border-radius: 8px; border: 1px solid #e0e0e0;">
+                <div class="card-body text-center p-2">
+                    <div class="text-warning mb-1">
+                        <i class="fas fa-calendar-day"></i>
                     </div>
-                    <h4 class="fw-bold text-warning mb-1">${todayMatches}</h4>
+                    <div class="fw-bold text-warning">${todayMatches}</div>
                     <div class="small text-muted">Today</div>
                 </div>
             </div>

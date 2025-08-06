@@ -74,19 +74,19 @@ class MatchLoadModal {
         listItem.innerHTML = `
           <div class="card-body p-3">
             <div class="d-flex justify-content-between align-items-start">
-              <div class="flex-grow-1">
+              <div class="flex-grow-1 me-3">
                 <h6 class="card-title mb-2 fw-bold">${this._escapeHtml(match.title)}</h6>
                 ${teamsDisplay ? `<div class="text-primary small mb-1"><i class="fas fa-futbol me-1"></i>${this._escapeHtml(teamsDisplay)}${scoreDisplay}</div>` : ''}
                 <div class="text-muted small mb-1">
                   <i class="fas fa-calendar me-1"></i>${formattedDate} at ${formattedTime}
                 </div>
-                ${match.notes ? `<div class="text-muted small"><i class="fas fa-sticky-note me-1"></i>${this._escapeHtml(match.notes.substring(0, 80))}${match.notes.length > 80 ? '...' : ''}</div>` : ''}
+                ${match.notes ? `<div class="text-muted small"><i class="fas fa-sticky-note me-1"></i>${this._escapeHtml(match.notes.substring(0, 60))}${match.notes.length > 60 ? '...' : ''}</div>` : ''}
               </div>
-              <div class="ms-3 d-flex flex-column gap-1">
-                <button class="btn btn-primary btn-sm view-btn" data-match-index="${index}">
-                  <i class="fas fa-eye me-1"></i>View
+              <div class="d-flex gap-1 flex-shrink-0">
+                <button class="btn btn-primary btn-sm view-btn" data-match-index="${index}" style="min-width: 60px;">
+                  View
                 </button>
-                <button class="btn btn-outline-secondary btn-sm raw-data-btn" data-match-index="${index}" title="View Raw Data">
+                <button class="btn btn-outline-secondary btn-sm raw-data-btn" data-match-index="${index}" title="View Raw Data" style="width: 36px;">
                   <i class="fas fa-code"></i>
                 </button>
               </div>

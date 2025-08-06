@@ -7,119 +7,45 @@ const modalHtml = `
 <div class="modal fade" id="admin-modal" tabindex="-1" aria-labelledby="admin-modal-label" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen-lg-down modal-xl">
         <div class="modal-content">
-            <!-- Modern Header with Gradient -->
-            <div class="modal-header bg-gradient text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                <div class="d-flex align-items-center">
-                    <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
-                        <i class="fas fa-shield-alt fa-lg"></i>
-                    </div>
-                    <div>
-                        <h4 class="modal-title mb-0" id="admin-modal-label">Admin Dashboard</h4>
-                        <small class="opacity-75">Match Management & Analytics</small>
-                    </div>
-                </div>
-                <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header">
+                <h5 class="modal-title" id="admin-modal-label">Admin Dashboard</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             
-            <div class="modal-body p-0">
-                <!-- Top Control Bar -->
-                <div class="bg-light border-bottom p-3">
-                    <div class="row g-3 align-items-center">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0">
-                                    <i class="fas fa-search text-muted"></i>
-                                </span>
-                                <input type="text" class="form-control border-start-0" id="admin-search" 
-                                       placeholder="Search matches, users, or dates...">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select" id="filter-select">
-                                <option value="">All Matches</option>
-                                <option value="today">Today</option>
-                                <option value="week">This Week</option>
-                                <option value="month">This Month</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-outline-primary w-100" id="refresh-data-btn">
-                                <i class="fas fa-sync-alt me-2"></i>Refresh
-                            </button>
-                        </div>
+            <div class="modal-body">
+                <!-- Search and Controls -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" id="admin-search" 
+                               placeholder="Search matches...">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="filter-select">
+                            <option value="">All Matches</option>
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-primary w-100" id="refresh-data-btn">
+                            <i class="fas fa-sync-alt me-2"></i>Refresh
+                        </button>
                     </div>
                 </div>
 
-                <!-- Statistics Cards -->
-                <div class="p-3 bg-white">
-                    <div class="row g-3" id="admin-stats-cards">
-                        <!-- Stats cards will be populated here -->
-                        <div class="col-6 col-md-3">
-                            <div class="card border-0 bg-primary bg-opacity-10 h-100">
-                                <div class="card-body text-center p-3">
-                                    <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
-                                    <div class="small text-muted">Loading...</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div class="card border-0 bg-success bg-opacity-10 h-100">
-                                <div class="card-body text-center p-3">
-                                    <div class="spinner-border spinner-border-sm text-success mb-2" role="status"></div>
-                                    <div class="small text-muted">Loading...</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div class="card border-0 bg-info bg-opacity-10 h-100">
-                                <div class="card-body text-center p-3">
-                                    <div class="spinner-border spinner-border-sm text-info mb-2" role="status"></div>
-                                    <div class="small text-muted">Loading...</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div class="card border-0 bg-warning bg-opacity-10 h-100">
-                                <div class="card-body text-center p-3">
-                                    <div class="spinner-border spinner-border-sm text-warning mb-2" role="status"></div>
-                                    <div class="small text-muted">Loading...</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Statistics -->
+                <div class="row g-3 mb-4" id="admin-stats-cards">
+                    <!-- Stats will be populated here -->
                 </div>
 
-                <!-- Main Content Area -->
-                <div class="px-3 pb-3">
-                    <!-- Table View -->
-                    <div class="card border-0 shadow-sm">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th class="border-0">
-                                            <i class="fas fa-user me-2"></i>User
-                                        </th>
-                                        <th class="border-0">
-                                            <i class="fas fa-futbol me-2"></i>Match
-                                        </th>
-                                        <th class="border-0">
-                                            <i class="fas fa-calendar me-2"></i>Date
-                                        </th>
-                                        <th class="border-0 text-center">
-                                            <i class="fas fa-cogs me-2"></i>Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody id="matches-table-body">
-                                    <tr>
-                                        <td colspan="4" class="text-center py-5">
-                                            <div class="spinner-border text-primary mb-3" role="status"></div>
-                                            <div class="text-muted">Loading match data...</div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                <!-- Matches List -->
+                <div style="max-height: 500px; overflow-y: auto;">
+                    <div id="matches-list">
+                        <!-- Match cards will be populated here -->
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary mb-3" role="status"></div>
+                            <div class="text-muted">Loading match data...</div>
                         </div>
                     </div>
                 </div>
@@ -311,7 +237,7 @@ const init = () => {
 };
 
 const loadMatchesData = async () => {
-    const tableBody = document.getElementById('matches-table-body');
+    const matchesList = document.getElementById('matches-list');
     const statsCardsContainer = document.getElementById('admin-stats-cards');
     const refreshBtn = document.getElementById('refresh-data-btn');
     
@@ -322,17 +248,15 @@ const loadMatchesData = async () => {
     }
 
     try {
-        // Show loading in table view
-        if (tableBody) {
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="4" class="text-center p-4">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <div class="mt-2">Loading matches...</div>
-                    </td>
-                </tr>
+        // Show loading in matches list
+        if (matchesList) {
+            matchesList.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="text-muted">Loading matches...</div>
+                </div>
             `;
         }
 
@@ -340,7 +264,7 @@ const loadMatchesData = async () => {
         allMatches = matches || [];
         
         if (allMatches.length > 0) {
-            renderTable(allMatches);
+            renderCards(allMatches);
             renderStats(allMatches, statsCardsContainer);
             notificationManager.info(`Loaded ${allMatches.length} matches from ${new Set(allMatches.map(m => m.userEmail || m.userId)).size} users.`);
 
@@ -360,78 +284,97 @@ const loadMatchesData = async () => {
     }
 };
 
-const renderTable = (matches) => {
-    const tableBody = document.getElementById('matches-table-body');
-    if (!tableBody) return;
+const renderCards = (matches) => {
+    const matchesList = document.getElementById('matches-list');
+    if (!matchesList) return;
 
     if (matches.length === 0) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="4" class="text-center py-5">
-                    <div class="text-muted">
-                        <i class="fas fa-inbox fa-3x mb-3 opacity-50"></i>
-                        <div>No matches found</div>
-                        <small>Try adjusting your search or filters</small>
-                    </div>
-                </td>
-            </tr>
+        matchesList.innerHTML = `
+            <div class="card shadow-sm" style="border-radius: 12px; border: 1px solid #e0e0e0;">
+                <div class="card-body text-center text-muted" style="padding: 2rem;">
+                    <i class="fas fa-inbox fa-3x mb-3 opacity-50"></i>
+                    <h6>No matches found</h6>
+                    <small>Try adjusting your search or filters</small>
+                </div>
+            </div>
         `;
         return;
     }
 
-    tableBody.innerHTML = '';
+    matchesList.innerHTML = '';
     
     matches.forEach((match, index) => {
-        const row = document.createElement('tr');
-        
         const userEmail = match.userEmail || 
                          (match.userId && match.userId !== 'unknown' ? `${match.userId}@unknown.com` : 'unknown@example.com');
         
         const matchTitle = match.title || match.matchTitle || 'Untitled Match';
-        const savedDate = match.savedAt ? new Date(match.savedAt).toLocaleString() : 'Unknown';
+        const matchDate = new Date(match.savedAt || Date.now());
+        const formattedDate = matchDate.toLocaleDateString();
+        const formattedTime = matchDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         
         // Create user avatar initials
         const userInitials = userEmail.split('@')[0].substring(0, 2).toUpperCase();
         
-        row.innerHTML = `
-            <td class="align-middle">
-                <div class="d-flex align-items-center">
-                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" 
-                         style="width: 40px; height: 40px;">
-                        <small class="fw-bold text-primary">${userInitials}</small>
-                    </div>
-                    <div>
-                        <div class="fw-medium text-break">${escapeHtml(userEmail)}</div>
-                        <small class="text-muted font-monospace">${escapeHtml(match.userId || 'unknown')}</small>
-                    </div>
+        // Create team vs team display
+        const teamsDisplay = match.team1Name && match.team2Name 
+          ? `${match.team1Name} vs ${match.team2Name}`
+          : '';
+
+        const listItem = document.createElement('div');
+        listItem.className = 'card shadow-sm mb-3';
+        listItem.style.borderRadius = '12px';
+        listItem.style.border = '1px solid #e0e0e0';
+        listItem.style.transition = 'all 0.2s ease';
+        listItem.style.cursor = 'pointer';
+
+        listItem.innerHTML = `
+          <div class="card-body" style="padding: 1.5rem;">
+            <div class="d-flex justify-content-between align-items-start">
+              <div class="flex-grow-1 me-3">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-2" 
+                       style="width: 32px; height: 32px;">
+                    <small class="fw-bold text-primary">${userInitials}</small>
+                  </div>
+                  <div>
+                    <h6 class="card-title mb-0 fw-bold">${escapeHtml(matchTitle)}</h6>
+                    <small class="text-muted">${escapeHtml(userEmail)}</small>
+                  </div>
                 </div>
-            </td>
-            <td class="align-middle">
-                <div class="fw-medium text-break">${escapeHtml(matchTitle)}</div>
-                <small class="text-muted">
-                    ${match.team1Name || 'Team 1'} vs ${match.team2Name || 'Team 2'}
-                </small>
-            </td>
-            <td class="align-middle">
-                <div class="text-nowrap">${new Date(match.savedAt || Date.now()).toLocaleDateString()}</div>
-                <small class="text-muted">${new Date(match.savedAt || Date.now()).toLocaleTimeString()}</small>
-            </td>
-            <td class="align-middle text-center">
-                <div class="btn-group" role="group">
-                    <button class="btn btn-sm btn-outline-primary view-match-btn" data-match-index="${index}" title="View Match">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-warning transfer-match-btn" data-match-index="${index}" title="Transfer Match">
-                        <i class="fas fa-exchange-alt"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger delete-match-btn" data-match-index="${index}" title="Delete Match">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                ${teamsDisplay ? `<div class="text-primary small mb-1"><i class="fas fa-futbol me-1"></i>${escapeHtml(teamsDisplay)}</div>` : ''}
+                <div class="text-muted small">
+                  <i class="fas fa-calendar me-1"></i>${formattedDate} at ${formattedTime}
                 </div>
-            </td>
+              </div>
+              <div class="d-flex gap-1 flex-shrink-0">
+                <button class="btn btn-primary btn-sm view-match-btn" data-match-index="${index}" style="min-width: 50px;" title="View Match">
+                  View
+                </button>
+                <button class="btn btn-outline-warning btn-sm transfer-match-btn" data-match-index="${index}" style="width: 36px;" title="Transfer Match">
+                  <i class="fas fa-exchange-alt"></i>
+                </button>
+                <button class="btn btn-outline-danger btn-sm delete-match-btn" data-match-index="${index}" style="width: 36px;" title="Delete Match">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
         `;
         
-        tableBody.appendChild(row);
+        // Add hover effects
+        listItem.addEventListener('mouseenter', () => {
+          listItem.style.transform = 'translateY(-2px)';
+          listItem.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+          listItem.style.borderColor = '#c0c0c0';
+        });
+        
+        listItem.addEventListener('mouseleave', () => {
+          listItem.style.transform = 'translateY(0)';
+          listItem.style.boxShadow = '';
+          listItem.style.borderColor = '#e0e0e0';
+        });
+
+        matchesList.appendChild(listItem);
     });
 
     addEventListeners();
@@ -577,8 +520,8 @@ const handleTransferConfirm = async () => {
         // Update local data
         allMatches.splice(currentTransferMatch.index, 1);
         
-        // Re-render table view
-        renderTable(allMatches);
+        // Re-render cards view
+        renderCards(allMatches);
         
         const statsCardsContainer = document.getElementById('admin-stats-cards');
         renderStats(allMatches, statsCardsContainer);
@@ -819,7 +762,7 @@ const applyFilter = (filterValue) => {
         });
     }
     
-    renderTable(filteredMatches);
+    renderCards(filteredMatches);
     
     // Update stats with filtered data
     const statsCardsContainer = document.getElementById('admin-stats-cards');
@@ -845,7 +788,7 @@ const filterMatches = (searchTerm) => {
                userId.includes(searchTerm);
     });
 
-    renderTable(filtered);
+    renderCards(filtered);
     
     // Update stats with filtered data
     const statsCardsContainer = document.getElementById('admin-stats-cards');
@@ -853,18 +796,18 @@ const filterMatches = (searchTerm) => {
 };
 
 const showNoDataMessage = () => {
-    const tableBody = document.getElementById('matches-table-body');
+    const matchesList = document.getElementById('matches-list');
     const statsCardsContainer = document.getElementById('admin-stats-cards');
 
-    if (tableBody) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="4" class="text-center text-muted p-4">
-                    <i class="fas fa-inbox fa-3x mb-3"></i>
-                    <h5>No matches found</h5>
-                    <p class="mb-0">No match data available to display.</p>
-                </td>
-            </tr>
+    if (matchesList) {
+        matchesList.innerHTML = `
+            <div class="card shadow-sm" style="border-radius: 12px; border: 1px solid #e0e0e0;">
+                <div class="card-body text-center text-muted" style="padding: 2rem;">
+                    <i class="fas fa-inbox fa-3x mb-3 opacity-50"></i>
+                    <h6>No matches found</h6>
+                    <small>No match data available to display</small>
+                </div>
+            </div>
         `;
     }
 
@@ -874,22 +817,22 @@ const showNoDataMessage = () => {
 };
 
 const showErrorMessage = (errorMessage) => {
-    const tableBody = document.getElementById('matches-table-body');
+    const matchesList = document.getElementById('matches-list');
     const statsCardsContainer = document.getElementById('admin-stats-cards');
 
-    const errorHtml = `
-        <div class="text-center text-danger p-4">
-            <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
-            <h5>Error Loading Data</h5>
-            <p>${escapeHtml(errorMessage)}</p>
-            <button class="btn btn-outline-primary" onclick="location.reload()">
-                <i class="fas fa-sync-alt"></i> Retry
-            </button>
-        </div>
-    `;
-
-    if (tableBody) {
-        tableBody.innerHTML = `<tr><td colspan="4">${errorHtml}</td></tr>`;
+    if (matchesList) {
+        matchesList.innerHTML = `
+            <div class="card shadow-sm" style="border-radius: 12px; border: 1px solid #e0e0e0;">
+                <div class="card-body text-center text-danger" style="padding: 2rem;">
+                    <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                    <h6>Error Loading Data</h6>
+                    <p>${escapeHtml(errorMessage)}</p>
+                    <button class="btn btn-outline-primary" onclick="location.reload()">
+                        <i class="fas fa-sync-alt"></i> Retry
+                    </button>
+                </div>
+            </div>
+        `;
     }
 
     if (statsCardsContainer) {

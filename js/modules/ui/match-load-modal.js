@@ -114,7 +114,7 @@ class MatchLoadModal {
           listItem.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
           listItem.style.borderColor = '#c0c0c0';
         });
-        
+
         listItem.addEventListener('mouseleave', () => {
           listItem.style.transform = 'translateY(0)';
           listItem.style.boxShadow = '';

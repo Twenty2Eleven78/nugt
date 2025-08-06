@@ -71,9 +71,11 @@ class MatchLoadModal {
         listItem.className = 'card shadow-sm mb-3';
         listItem.style.borderRadius = '12px';
         listItem.style.border = '1px solid #e0e0e0';
+        listItem.style.transition = 'all 0.2s ease';
+        listItem.style.cursor = 'pointer';
 
         listItem.innerHTML = `
-          <div class="card-body p-3">
+          <div class="card-body p-4">
             <div class="d-flex justify-content-between align-items-start">
               <div class="flex-grow-1 me-3">
                 <h6 class="card-title mb-2 fw-bold">${this._escapeHtml(match.title)}</h6>
@@ -96,12 +98,32 @@ class MatchLoadModal {
         `;
 
         // Add click handlers
-        listItem.querySelector('.view-btn').addEventListener('click', () => {
+        listItem.querySelector('.view-btn').addEventListener('click', (e) => {
+          e.stopPropagation();
           matchSummaryModal.show(match);
         });
 
-        listItem.querySelector('.raw-data-btn').addEventListener('click', () => {
+        listItem.querySelector('.raw-data-btn').addEventListener('click', (e) => {
+          e.stopPropagation();
           rawDataModal.show(match);
+        });
+
+        // Add hover effects
+        listItem.addEventListener('mouseenter', () => {
+          listItem.style.transform = 'translateY(-2px)';
+          listItem.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+          listItem.style.borderColor = '#c0c0c0';
+        });
+        
+        listItem.addEventListener('mouseleave', () => {
+          listItem.style.transform = 'translateY(0)';
+          listItem.style.boxShadow = '';
+          listItem.style.borderColor = '#e0e0e0';
+        });
+
+        // Make entire card clickable to view match
+        listItem.addEventListener('click', () => {
+          matchSummaryModal.show(match);
         });
 
         matchListElement.appendChild(listItem);
@@ -109,7 +131,7 @@ class MatchLoadModal {
     } else {
       matchListElement.innerHTML = `
         <div class="card shadow-sm" style="border-radius: 12px; border: 1px solid #e0e0e0;">
-          <div class="card-body text-center text-muted py-5">
+          <div class="card-body text-center text-muted p-5">
             <i class="fas fa-cloud fa-3x mb-3 opacity-50"></i>
             <h6>No saved matches found</h6>
             <small>Try adjusting your search or save some matches first</small>

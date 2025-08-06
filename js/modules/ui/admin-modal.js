@@ -896,7 +896,7 @@ const showMatchDetails = (matchData, matchIndex) => {
 
 // Clean up any leftover modal backdrops when admin modal is hidden
 const cleanupModalBackdrops = () => {
-    // Small delay to ensure Bootstrap has finished its cleanup
+    // Small delay to ensure modal system has finished its cleanup
     setTimeout(() => {
         // Remove any orphaned modal backdrops
         const backdrops = document.querySelectorAll('.modal-backdrop');

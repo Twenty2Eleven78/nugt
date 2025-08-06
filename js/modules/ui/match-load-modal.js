@@ -42,28 +42,14 @@ class MatchLoadModal {
   }
 
   /**
-   * Render matches as cards
+   * Render matches as simple list items
    * @private
    */
   _renderMatches(matches) {
     const matchListElement = document.getElementById('matchLoadList');
-    const matchCountElement = document.getElementById('matchCount');
-    
     if (!matchListElement) return;
 
     matchListElement.innerHTML = '';
-    
-    // Update match count
-    if (matchCountElement) {
-      const totalMatches = this.allMatches ? this.allMatches.length : 0;
-      const displayedMatches = matches ? matches.length : 0;
-      
-      if (totalMatches === displayedMatches) {
-        matchCountElement.textContent = `${totalMatches} match${totalMatches !== 1 ? 'es' : ''} found`;
-      } else {
-        matchCountElement.textContent = `Showing ${displayedMatches} of ${totalMatches} matches`;
-      }
-    }
 
     if (matches && matches.length > 0) {
       matches.forEach((match, index) => {
@@ -74,86 +60,54 @@ class MatchLoadModal {
         // Create team vs team display
         const teamsDisplay = match.team1Name && match.team2Name 
           ? `${match.team1Name} vs ${match.team2Name}`
-          : 'Match Details';
+          : '';
         
         // Create score display if available
         const scoreDisplay = (match.score1 !== undefined && match.score2 !== undefined)
-          ? `<div class="text-center mb-2">
-               <span class="badge bg-primary fs-6">${match.score1} - ${match.score2}</span>
-             </div>`
+          ? ` (${match.score1}-${match.score2})`
           : '';
 
-        const cardCol = document.createElement('div');
-        cardCol.className = 'col-md-6';
+        const listItem = document.createElement('div');
+        listItem.className = 'border rounded p-3 mb-2 bg-light';
         
-        cardCol.innerHTML = `
-          <div class="card h-100 border-0 shadow-sm match-card" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
-            <div class="card-body p-3">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <h6 class="card-title mb-0 text-primary fw-bold">${this._escapeHtml(match.title)}</h6>
-                <small class="text-muted text-nowrap ms-2">${formattedDate}</small>
+        listItem.innerHTML = `
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+              <h6 class="mb-1">${this._escapeHtml(match.title)}</h6>
+              ${teamsDisplay ? `<div class="text-muted small mb-1">${this._escapeHtml(teamsDisplay)}${scoreDisplay}</div>` : ''}
+              <div class="text-muted small">
+                ${formattedDate} at ${formattedTime}
               </div>
-              
-              <div class="text-muted small mb-2">
-                <i class="fas fa-futbol me-1"></i>${teamsDisplay}
-              </div>
-              
-              ${scoreDisplay}
-              
-              <div class="text-muted small mb-3">
-                <i class="fas fa-clock me-1"></i>${formattedTime}
-                ${match.notes ? `<div class="mt-1"><i class="fas fa-sticky-note me-1"></i>${this._escapeHtml(match.notes.substring(0, 50))}${match.notes.length > 50 ? '...' : ''}</div>` : ''}
-              </div>
-              
-              <div class="d-flex gap-2">
-                <button class="btn btn-primary btn-sm flex-fill view-btn" data-match-index="${index}">
-                  <i class="fas fa-eye me-1"></i>View Details
-                </button>
-                <button class="btn btn-outline-secondary btn-sm raw-data-btn" data-match-index="${index}" title="View Raw Data">
-                  <i class="fas fa-code"></i>
-                </button>
-              </div>
+              ${match.notes ? `<div class="text-muted small mt-1">${this._escapeHtml(match.notes.substring(0, 100))}${match.notes.length > 100 ? '...' : ''}</div>` : ''}
+            </div>
+            <div class="ms-3">
+              <button class="btn btn-primary btn-sm view-btn" data-match-index="${index}">
+                View
+              </button>
+              <button class="btn btn-outline-secondary btn-sm ms-1 raw-data-btn" data-match-index="${index}" title="Raw Data">
+                <i class="fas fa-code"></i>
+              </button>
             </div>
           </div>
         `;
         
-        // Add hover effects
-        const card = cardCol.querySelector('.match-card');
-        card.addEventListener('mouseenter', () => {
-          card.style.transform = 'translateY(-2px)';
-          card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-        });
-        card.addEventListener('mouseleave', () => {
-          card.style.transform = 'translateY(0)';
-          card.style.boxShadow = '';
-        });
-        
         // Add click handlers
-        cardCol.querySelector('.view-btn').addEventListener('click', (e) => {
-          e.stopPropagation();
+        listItem.querySelector('.view-btn').addEventListener('click', () => {
           matchSummaryModal.show(match);
         });
         
-        cardCol.querySelector('.raw-data-btn').addEventListener('click', (e) => {
-          e.stopPropagation();
+        listItem.querySelector('.raw-data-btn').addEventListener('click', () => {
           rawDataModal.show(match);
         });
         
-        // Make entire card clickable to view details
-        card.addEventListener('click', () => {
-          matchSummaryModal.show(match);
-        });
-        
-        matchListElement.appendChild(cardCol);
+        matchListElement.appendChild(listItem);
       });
     } else {
       matchListElement.innerHTML = `
-        <div class="col-12">
-          <div class="text-center text-muted py-5">
-            <i class="fas fa-cloud fa-3x mb-3 opacity-50"></i>
-            <h5>No saved matches found</h5>
-            <p>You haven't saved any matches to the cloud yet.</p>
-          </div>
+        <div class="text-center text-muted py-4">
+          <i class="fas fa-cloud fa-2x mb-3"></i>
+          <div>No saved matches found</div>
+          <small>Try adjusting your search or save some matches first</small>
         </div>
       `;
     }
@@ -193,39 +147,23 @@ class MatchLoadModal {
       <div class="modal fade" id="matchLoadModal" tabindex="-1" aria-labelledby="matchLoadModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
-            <div class="modal-header bg-gradient text-white" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-              <div class="d-flex align-items-center">
-                <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
-                  <i class="fas fa-cloud-download-alt fa-lg"></i>
-                </div>
-                <div>
-                  <h5 class="modal-title mb-0" id="matchLoadModalLabel">Load Match from Cloud</h5>
-                  <small class="opacity-75">Select a match to load</small>
-                </div>
-              </div>
-              <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header">
+              <h5 class="modal-title" id="matchLoadModalLabel">Load Match from Cloud</h5>
+              <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-0">
-              <div class="p-3 bg-light border-bottom">
-                <div class="input-group mb-2">
-                  <span class="input-group-text bg-white border-end-0">
-                    <i class="fas fa-search text-muted"></i>
-                  </span>
-                  <input type="text" class="form-control border-start-0" id="matchSearchInput" 
-                         placeholder="Search matches by title, teams, or date...">
-                </div>
-                <div id="matchCount" class="small text-muted"></div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <input type="text" class="form-control" id="matchSearchInput" 
+                       placeholder="Search matches...">
               </div>
-              <div class="p-3" style="max-height: 60vh; overflow-y: auto;">
-                <div id="matchLoadList" class="row g-3">
-                  <!-- Match cards will be populated here -->
+              <div style="max-height: 400px; overflow-y: auto;">
+                <div id="matchLoadList">
+                  <!-- Match list will be populated here -->
                 </div>
               </div>
             </div>
-            <div class="modal-footer bg-light">
-              <button type="button" class="btn btn-secondary" id="cancelMatchLoadBtn">
-                <i class="fas fa-times me-2"></i>Cancel
-              </button>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" id="cancelMatchLoadBtn">Cancel</button>
             </div>
           </div>
         </div>

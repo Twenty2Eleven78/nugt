@@ -75,7 +75,7 @@ class MatchLoadModal {
         listItem.style.cursor = 'pointer';
 
         listItem.innerHTML = `
-          <div class="card-body p-4">
+          <div class="card-body" style="padding: 1.5rem;">
             <div class="d-flex justify-content-between align-items-start">
               <div class="flex-grow-1 me-3">
                 <h6 class="card-title mb-2 fw-bold">${this._escapeHtml(match.title)}</h6>
@@ -131,7 +131,7 @@ class MatchLoadModal {
     } else {
       matchListElement.innerHTML = `
         <div class="card shadow-sm" style="border-radius: 12px; border: 1px solid #e0e0e0;">
-          <div class="card-body text-center text-muted p-5">
+          <div class="card-body text-center text-muted" style="padding: 2rem;">
             <i class="fas fa-cloud fa-3x mb-3 opacity-50"></i>
             <h6>No saved matches found</h6>
             <small>Try adjusting your search or save some matches first</small>

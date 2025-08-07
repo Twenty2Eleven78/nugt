@@ -26,7 +26,7 @@ import { teamManager } from './match/teams.js';
 import { rosterManager } from './match/roster.js';
 
 // UI modules
-import { bindModalEvents, hideModal } from './ui/modals.js';
+import { bindModalEvents } from './ui/modals.js';
 import { initializeTooltips } from './ui/components.js';
 import { enhancedEventsManager } from './ui/enhanced-events.js';
 import { releaseNotesManager } from './ui/release-notes.js';
@@ -45,7 +45,7 @@ import sharingModal from './ui/sharing-modal.js';
 
 // Services
 import { notificationManager } from './services/notifications.js';
-import { sharingService } from './services/sharing.js';
+// Sharing service is used by sharing modal
 import { pwaUpdater } from './services/pwa-updater.js';
 import { attendanceManager } from './services/attendance.js';
 import { authService } from './services/auth.js';
@@ -282,7 +282,6 @@ function loadAppState() {
 function bindEventListeners() {
   // Set up cloud save/load button handlers
   const saveBtn = document.getElementById('saveMatchDataBtn');
-  const saveBtnCard = document.getElementById('saveMatchDataBtnCard');
   const loadBtn = document.getElementById('loadMatchDataBtn');
 
   // Save match data to Netlify Blobs - function for both buttons
@@ -331,13 +330,9 @@ function bindEventListeners() {
     });
   };
 
-  // Bind both save buttons to the same functionality
+  // Bind save button
   if (saveBtn) {
     saveBtn.addEventListener('click', handleSaveMatch);
-  }
-
-  if (saveBtnCard) {
-    saveBtnCard.addEventListener('click', handleSaveMatch);
   }
 
   // Load match data from Netlify Blobs
@@ -554,26 +549,7 @@ window.AuthModule = {
 
 
 
-// Global functions for backward compatibility
+// Global functions for backward compatibility (only keep essential ones)
 window.showGoalModal = goalManager.showGoalModal;
-window.addGoal = goalManager.addGoal;
-window.opaddGoal = goalManager.addOppositionGoal;
-window.toggleGoalDisallowed = toggleGoalDisallowed;
 window.deleteLogEntry = deleteLogEntry;
 window.openEditEventModal = eventsManager.openEditEventModal;
-window.addMatchEvent = eventsManager.addMatchEvent;
-window.showRecordEventModal = eventsManager.showRecordEventModal;
-window.updatefixtureTeams = teamManager.updateTeamName;
-window.handleEditEventFormSubmission = eventsManager.handleEditEventFormSubmission;
-
-// Global RosterManager for backward compatibility
-window.RosterManager = rosterManager;
-
-// Global goal modal for backward compatibility
-window.goalModal = goalModal;
-
-// Global goal manager for backward compatibility
-window.goalManager = goalManager;
-
-// Global ThemeManager for backward compatibility
-window.ThemeManager = themeManager;

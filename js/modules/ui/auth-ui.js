@@ -278,7 +278,7 @@ class AuthUI {
         // Trigger logout
         authService.logout();
       }
-      
+
       if (e.target && e.target.id === 'loginButton' && e.target.classList.contains('dropdown-item')) {
         // Close the dropdown
         const dropdown = document.getElementById('userProfileDropdown');
@@ -446,7 +446,7 @@ class AuthUI {
     import('./match-save-modal.js').then(({ matchSaveModal }) => {
       // Initialize the modal if not already done
       matchSaveModal.init();
-      
+
       // Show the save modal
       matchSaveModal.show();
     }).catch(error => {

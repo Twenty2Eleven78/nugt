@@ -17,16 +17,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const adminModalButton = document.getElementById('admin-modal-button');
   if (adminModalButton) {
-    authService.onAuthStateChange(user => {
+    // Set up click handler once
+    adminModalButton.addEventListener('click', () => {
+      adminModal.show();
+    });
+
+    // Update visibility based on auth state
+    const updateAdminButtonVisibility = () => {
       if (authService.isUserAuthenticated() && authService.isAdmin()) {
         adminModalButton.classList.remove('d-none');
-        adminModalButton.addEventListener('click', () => {
-          adminModal.show();
-        });
       } else {
         adminModalButton.classList.add('d-none');
       }
-    });
+    };
+
+    // Listen for auth state changes
+    authService.onAuthStateChange(updateAdminButtonVisibility);
+    
+    // Initial check
+    updateAdminButtonVisibility();
   }
 });
 

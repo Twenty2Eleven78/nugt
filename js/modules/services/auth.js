@@ -223,7 +223,13 @@ class AuthService {
 
   isAdmin() {
     // In a real application, this should be a proper role check on the server
-    return this.currentUser && this.currentUser.email === 'admin@nugt.app';
+    const isAdminUser = this.currentUser && this.currentUser.email === 'admin@nugt.app';
+    console.log('Admin check:', {
+      hasCurrentUser: !!this.currentUser,
+      userEmail: this.currentUser?.email,
+      isAdmin: isAdminUser
+    });
+    return isAdminUser;
   }
 
   /**
@@ -284,10 +290,8 @@ class AuthService {
   }
 
   _updateAdminUI() {
-    if (this.isAdmin()) {
-      const adminLink = document.getElementById('admin-link');
-      if (adminLink) adminLink.classList.remove('d-none');
-    }
+    // This method is no longer needed as admin UI is handled by auth state listeners
+    // Admin button visibility is now managed in main.js through onAuthStateChange
   }
 
   async _attemptWebAuthnRegistration(userId, email, displayName) {

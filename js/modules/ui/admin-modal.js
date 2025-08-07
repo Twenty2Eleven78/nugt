@@ -626,9 +626,16 @@ const handleDeleteConfirm = async () => {
             }
         }
 
+        // Use the matchIndex from the match data if available, otherwise fall back to the array index
+        const matchIndexToDelete = currentDeleteMatch.data.matchIndex !== undefined 
+            ? currentDeleteMatch.data.matchIndex 
+            : currentDeleteMatch.index;
+            
+        console.log('Deleting match with userId:', currentDeleteMatch.data.userId, 'matchIndex:', matchIndexToDelete);
+        
         await userMatchesApi.deleteMatchData(
             currentDeleteMatch.data.userId, 
-            currentDeleteMatch.index
+            matchIndexToDelete
         );
         
         allMatches.splice(currentDeleteMatch.index, 1);

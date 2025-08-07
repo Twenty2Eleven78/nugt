@@ -146,7 +146,7 @@ const init = () => {
     const modalElement = document.getElementById('admin-modal');
     const deleteModalElement = document.getElementById('delete-confirm-modal');
     const transferModalElement = document.getElementById('transfer-match-modal');
-    
+
     modalInstance = CustomModal.getOrCreateInstance(modalElement);
     deleteModalInstance = CustomModal.getOrCreateInstance(deleteModalElement);
     transferModalInstance = CustomModal.getOrCreateInstance(transferModalElement);
@@ -196,7 +196,7 @@ const init = () => {
     const confirmTransferBtn = document.getElementById('confirm-transfer-btn');
     const targetUserSelect = document.getElementById('target-user-select');
     const newUserEmail = document.getElementById('new-user-email');
-    
+
     if (confirmTransferBtn) {
         confirmTransferBtn.addEventListener('click', handleTransferConfirm);
     }
@@ -214,7 +214,7 @@ const init = () => {
         const hasSelectedUser = targetUserSelect && targetUserSelect.value;
         const hasNewEmail = newUserEmail && newUserEmail.value.trim();
         const isValidEmail = hasNewEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newUserEmail.value.trim());
-        
+
         if (confirmTransferBtn) {
             confirmTransferBtn.disabled = !(hasSelectedUser || isValidEmail);
         }
@@ -223,7 +223,7 @@ const init = () => {
     if (targetUserSelect) {
         targetUserSelect.addEventListener('change', validateTransferForm);
     }
-    
+
     if (newUserEmail) {
         newUserEmail.addEventListener('input', validateTransferForm);
     }
@@ -240,7 +240,7 @@ const loadMatchesData = async () => {
     const matchesList = document.getElementById('matches-list');
     const statsCardsContainer = document.getElementById('admin-stats-cards');
     const refreshBtn = document.getElementById('refresh-data-btn');
-    
+
     // Show loading state
     if (refreshBtn) {
         refreshBtn.disabled = true;
@@ -262,7 +262,7 @@ const loadMatchesData = async () => {
 
         const matches = await userMatchesApi.loadAllMatchData();
         allMatches = matches || [];
-        
+
         if (allMatches.length > 0) {
             renderCards(allMatches);
             renderStats(allMatches, statsCardsContainer);
@@ -302,23 +302,23 @@ const renderCards = (matches) => {
     }
 
     matchesList.innerHTML = '';
-    
+
     matches.forEach((match, index) => {
-        const userEmail = match.userEmail || 
-                         (match.userId && match.userId !== 'unknown' ? `${match.userId}@unknown.com` : 'unknown@example.com');
-        
+        const userEmail = match.userEmail ||
+            (match.userId && match.userId !== 'unknown' ? `${match.userId}@unknown.com` : 'unknown@example.com');
+
         const matchTitle = match.title || match.matchTitle || 'Untitled Match';
         const matchDate = new Date(match.savedAt || Date.now());
         const formattedDate = matchDate.toLocaleDateString();
         const formattedTime = matchDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        
+
         // Create user avatar initials
         const userInitials = userEmail.split('@')[0].substring(0, 2).toUpperCase();
-        
+
         // Create team vs team display
-        const teamsDisplay = match.team1Name && match.team2Name 
-          ? `${match.team1Name} vs ${match.team2Name}`
-          : '';
+        const teamsDisplay = match.team1Name && match.team2Name
+            ? `${match.team1Name} vs ${match.team2Name}`
+            : '';
 
         const listItem = document.createElement('div');
         listItem.className = 'card shadow-sm mb-3';
@@ -362,18 +362,18 @@ const renderCards = (matches) => {
             </div>
           </div>
         `;
-        
+
         // Add hover effects
         listItem.addEventListener('mouseenter', () => {
-          listItem.style.transform = 'translateY(-2px)';
-          listItem.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-          listItem.style.borderColor = '#c0c0c0';
+            listItem.style.transform = 'translateY(-2px)';
+            listItem.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            listItem.style.borderColor = '#c0c0c0';
         });
-        
+
         listItem.addEventListener('mouseleave', () => {
-          listItem.style.transform = 'translateY(0)';
-          listItem.style.boxShadow = '';
-          listItem.style.borderColor = '#e0e0e0';
+            listItem.style.transform = 'translateY(0)';
+            listItem.style.boxShadow = '';
+            listItem.style.borderColor = '#e0e0e0';
         });
 
         matchesList.appendChild(listItem);
@@ -415,14 +415,14 @@ const addEventListeners = () => {
 
 const showTransferModal = (matchData, matchIndex) => {
     currentTransferMatch = { data: matchData, index: matchIndex };
-    
+
     // Populate match details
     const detailsDiv = document.getElementById('transfer-match-details');
     if (detailsDiv) {
         const userEmail = matchData.userEmail || 'unknown@example.com';
         const matchTitle = matchData.title || matchData.matchTitle || 'Untitled Match';
         const savedDate = matchData.savedAt ? new Date(matchData.savedAt).toLocaleString() : 'Unknown';
-        
+
         detailsDiv.innerHTML = `
             <div class="card-body">
                 <h6 class="card-title">${escapeHtml(matchTitle)}</h6>
@@ -431,7 +431,7 @@ const showTransferModal = (matchData, matchIndex) => {
             </div>
         `;
     }
-    
+
     // Populate user dropdown with unique users (excluding current owner)
     const targetUserSelect = document.getElementById('target-user-select');
     if (targetUserSelect) {
@@ -439,7 +439,7 @@ const showTransferModal = (matchData, matchIndex) => {
             .map(m => m.userEmail || m.userId)
             .filter(user => user && user !== 'unknown' && user !== (matchData.userEmail || matchData.userId))
         )];
-        
+
         targetUserSelect.innerHTML = '<option value="">Select target user...</option>';
         uniqueUsers.forEach(user => {
             const option = document.createElement('option');
@@ -448,19 +448,19 @@ const showTransferModal = (matchData, matchIndex) => {
             targetUserSelect.appendChild(option);
         });
     }
-    
+
     // Clear new user email field
     const newUserEmail = document.getElementById('new-user-email');
     if (newUserEmail) {
         newUserEmail.value = '';
     }
-    
+
     // Reset transfer button state
     const confirmTransferBtn = document.getElementById('confirm-transfer-btn');
     if (confirmTransferBtn) {
         confirmTransferBtn.disabled = true;
     }
-    
+
     transferModalInstance.show();
 };
 
@@ -471,27 +471,27 @@ const handleTransferConfirm = async () => {
     const targetUserSelect = document.getElementById('target-user-select');
     const newUserEmail = document.getElementById('new-user-email');
     const originalText = confirmBtn.innerHTML;
-    
+
     try {
         confirmBtn.disabled = true;
         confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Transferring...';
-        
+
         // Determine target user
         let targetUser = targetUserSelect?.value;
         const emailInput = newUserEmail?.value?.trim();
-        
+
         if (!targetUser && emailInput) {
             // Generate new user ID from email
             targetUser = emailInput;
         }
-        
+
         if (!targetUser) {
             notificationManager.error('Please select a target user or enter an email address.');
             return;
         }
-        
+
         console.log('Transferring match from', currentTransferMatch.data.userId, 'to', targetUser);
-        
+
         // Create the match data for the new user
         const transferredMatch = {
             ...currentTransferMatch.data,
@@ -504,39 +504,43 @@ const handleTransferConfirm = async () => {
                 transferredAt: Date.now()
             }
         };
-        
+
         // Remove admin-specific properties that shouldn't be transferred
         delete transferredMatch.blobKey;
         delete transferredMatch.matchIndex;
         delete transferredMatch.id;
-        
+
         // Save to new user (this will be handled by the API)
         await userMatchesApi.saveMatchData(transferredMatch);
-        
-        // Delete from original user
+
+        // Delete from original user - use the correct matchIndex
+        const matchIndexToDelete = currentTransferMatch.data.matchIndex !== undefined
+            ? currentTransferMatch.data.matchIndex
+            : currentTransferMatch.index;
+
         await userMatchesApi.deleteMatchData(
-            currentTransferMatch.data.userId, 
-            currentTransferMatch.index
+            currentTransferMatch.data.userId,
+            matchIndexToDelete
         );
-        
+
         // Update local data
         allMatches.splice(currentTransferMatch.index, 1);
-        
+
         // Re-render cards view
         renderCards(allMatches);
-        
+
         const statsCardsContainer = document.getElementById('admin-stats-cards');
         renderStats(allMatches, statsCardsContainer);
-        
+
         transferModalInstance.hide();
 
-        const matchTitle = currentTransferMatch.data.title || 
-                          currentTransferMatch.data.matchTitle || 
-                          'Untitled Match';
+        const matchTitle = currentTransferMatch.data.title ||
+            currentTransferMatch.data.matchTitle ||
+            'Untitled Match';
         notificationManager.success(`Match "${matchTitle}" has been transferred to ${targetUser} successfully.`);
-        
+
         currentTransferMatch = null;
-      
+
     } catch (error) {
         console.error('Error transferring match:', error);
         notificationManager.error(`Failed to transfer match: ${error.message}`);
@@ -551,7 +555,7 @@ const generateUserIdFromEmail = (email) => {
     if (!email || !email.includes('@')) {
         return 'user_' + Math.random().toString(36).substring(2, 15);
     }
-    
+
     // Create a consistent user ID based on email
     const emailPart = email.split('@')[0];
     const domain = email.split('@')[1];
@@ -560,13 +564,13 @@ const generateUserIdFromEmail = (email) => {
 
 const showDeleteConfirmation = (matchData, matchIndex) => {
     currentDeleteMatch = { data: matchData, index: matchIndex };
-    
+
     const detailsDiv = document.getElementById('delete-match-details');
     if (detailsDiv) {
         const userEmail = matchData.userEmail || 'unknown@example.com';
         const matchTitle = matchData.title || matchData.matchTitle || 'Untitled Match';
         const savedDate = matchData.savedAt ? new Date(matchData.savedAt).toLocaleString() : 'Unknown';
-        
+
         detailsDiv.innerHTML = `
             <div class="card">
                 <div class="card-body">
@@ -577,7 +581,7 @@ const showDeleteConfirmation = (matchData, matchIndex) => {
             </div>
         `;
     }
-    
+
     deleteModalInstance.show();
 };
 
@@ -586,11 +590,11 @@ const handleDeleteConfirm = async () => {
 
     const confirmBtn = document.getElementById('confirm-delete-btn');
     const originalText = confirmBtn.innerHTML;
-    
+
     try {
         confirmBtn.disabled = true;
         confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
-        
+
         console.log('Attempting to delete match:', currentDeleteMatch.data);
         console.log('Match userId:', currentDeleteMatch.data.userId);
         console.log('Match index:', currentDeleteMatch.index);
@@ -598,23 +602,17 @@ const handleDeleteConfirm = async () => {
 
         if (!currentDeleteMatch.data.userId || currentDeleteMatch.data.userId === 'unknown') {
             notificationManager.warning('This match has missing or invalid userId. It may be orphaned data that cannot be deleted through the normal API.');
-            
+
             const removeFromDisplay = confirm('This match appears to be orphaned data. Would you like to remove it from the display? (Note: This will only hide it from the admin panel, not delete the actual data)');
-            
+
             if (removeFromDisplay) {
                 allMatches.splice(currentDeleteMatch.index, 1);
-                
-                renderDesktopTable(allMatches);
-                renderMobileCards(allMatches);
-                
-                const tableViewRadio = document.getElementById('table-view');
-                if (tableViewRadio && tableViewRadio.checked) {
-                    renderMobileTable(allMatches);
-                }
-                
+
+                // Re-render the cards view and stats
+                renderCards(allMatches);
                 const statsCardsContainer = document.getElementById('admin-stats-cards');
                 renderStats(allMatches, statsCardsContainer);
-                
+
                 deleteModalInstance.hide();
                 notificationManager.info('Match removed from display. (Orphaned data may still exist in storage)');
                 currentDeleteMatch = null;
@@ -627,39 +625,33 @@ const handleDeleteConfirm = async () => {
         }
 
         // Use the matchIndex from the match data if available, otherwise fall back to the array index
-        const matchIndexToDelete = currentDeleteMatch.data.matchIndex !== undefined 
-            ? currentDeleteMatch.data.matchIndex 
+        const matchIndexToDelete = currentDeleteMatch.data.matchIndex !== undefined
+            ? currentDeleteMatch.data.matchIndex
             : currentDeleteMatch.index;
-            
+
         console.log('Deleting match with userId:', currentDeleteMatch.data.userId, 'matchIndex:', matchIndexToDelete);
-        
+
         await userMatchesApi.deleteMatchData(
-            currentDeleteMatch.data.userId, 
+            currentDeleteMatch.data.userId,
             matchIndexToDelete
         );
-        
+
         allMatches.splice(currentDeleteMatch.index, 1);
-        
-        renderDesktopTable(allMatches);
-        renderMobileCards(allMatches);
-        
-        const tableViewRadio = document.getElementById('table-view');
-        if (tableViewRadio && tableViewRadio.checked) {
-            renderMobileTable(allMatches);
-        }
-        
+
+        // Re-render the cards view and stats
+        renderCards(allMatches);
         const statsCardsContainer = document.getElementById('admin-stats-cards');
         renderStats(allMatches, statsCardsContainer);
-        
+
         deleteModalInstance.hide();
 
-        const matchTitle = currentDeleteMatch.data.title || 
-                          currentDeleteMatch.data.matchTitle || 
-                          'Untitled Match';
+        const matchTitle = currentDeleteMatch.data.title ||
+            currentDeleteMatch.data.matchTitle ||
+            'Untitled Match';
         notificationManager.success(`Match "${matchTitle}" has been deleted successfully.`);
-        
+
         currentDeleteMatch = null;
-      
+
     } catch (error) {
         console.error('Error deleting match:', error);
         notificationManager.error(`Failed to delete match: ${error.message}`);
@@ -686,10 +678,10 @@ const renderStats = (matches, statsContainer) => {
 
     const totalMatches = matches.length;
     const uniqueUsers = new Set(matches.map(m => m.userEmail || m.userId)).size;
-    const recentMatches = matches.filter(m => 
+    const recentMatches = matches.filter(m =>
         m.savedAt && (Date.now() - m.savedAt < 7 * 24 * 60 * 60 * 1000)
     ).length;
-    
+
     const todayMatches = matches.filter(m => {
         if (!m.savedAt) return false;
         const today = new Date();
@@ -747,17 +739,17 @@ const renderStats = (matches, statsContainer) => {
 
 const applyFilter = (filterValue) => {
     let filteredMatches = [...allMatches];
-    
+
     if (filterValue) {
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
         const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-        
+
         filteredMatches = allMatches.filter(match => {
             if (!match.savedAt) return false;
             const matchDate = new Date(match.savedAt);
-            
+
             switch (filterValue) {
                 case 'today':
                     return matchDate >= today;
@@ -770,9 +762,9 @@ const applyFilter = (filterValue) => {
             }
         });
     }
-    
+
     renderCards(filteredMatches);
-    
+
     // Update stats with filtered data
     const statsCardsContainer = document.getElementById('admin-stats-cards');
     renderStats(filteredMatches, statsCardsContainer);
@@ -791,14 +783,14 @@ const filterMatches = (searchTerm) => {
         const email = (match.userEmail || '').toLowerCase();
         const title = (match.title || match.matchTitle || '').toLowerCase();
         const userId = (match.userId || '').toLowerCase();
-        
-        return email.includes(searchTerm) || 
-               title.includes(searchTerm) || 
-               userId.includes(searchTerm);
+
+        return email.includes(searchTerm) ||
+            title.includes(searchTerm) ||
+            userId.includes(searchTerm);
     });
 
     renderCards(filtered);
-    
+
     // Update stats with filtered data
     const statsCardsContainer = document.getElementById('admin-stats-cards');
     renderStats(filtered, statsCardsContainer);
@@ -852,7 +844,7 @@ const showErrorMessage = (errorMessage) => {
 // Updated showMatchDetails function to use matchSummaryModal
 const showMatchDetails = (matchData, matchIndex) => {
     console.log('Showing match details for:', matchData);
-    
+
     // Prepare the match data with admin information
     const enrichedMatchData = {
         ...matchData,
@@ -865,29 +857,29 @@ const showMatchDetails = (matchData, matchIndex) => {
             blobKey: matchData.blobKey || 'Unknown'
         }
     };
-    
+
     // Initialize the match summary modal
     matchSummaryModal.init();
-    
+
     // Get the admin modal element to determine its z-index
     const adminModalElement = document.getElementById('admin-modal');
     let targetZIndex = 1060; // Default higher z-index
-    
+
     if (adminModalElement) {
         const adminZIndex = parseInt(window.getComputedStyle(adminModalElement).zIndex) || 1055;
         targetZIndex = adminZIndex + 10; // Ensure it's higher than admin modal
     }
-    
+
     // Show the match summary modal
     matchSummaryModal.show(enrichedMatchData);
-    
+
     // Force the z-index after a brief delay to ensure the modal is rendered
     setTimeout(() => {
         const matchSummaryModalElement = document.getElementById('matchSummaryModal');
         if (matchSummaryModalElement) {
             matchSummaryModalElement.style.zIndex = targetZIndex.toString();
             matchSummaryModalElement.style.display = 'block'; // Ensure it's visible
-            
+
             // Also handle the backdrop
             const allBackdrops = document.querySelectorAll('.modal-backdrop');
             if (allBackdrops.length > 0) {
@@ -895,7 +887,7 @@ const showMatchDetails = (matchData, matchIndex) => {
                 const lastBackdrop = allBackdrops[allBackdrops.length - 1];
                 lastBackdrop.style.zIndex = (targetZIndex - 1).toString();
             }
-            
+
             console.log(`Set match summary modal z-index to ${targetZIndex}`);
         }
     }, 50);
@@ -910,7 +902,7 @@ const cleanupModalBackdrops = () => {
         backdrops.forEach(backdrop => {
             backdrop.remove();
         });
-        
+
         // Ensure body classes are cleaned up
         document.body.classList.remove('modal-open');
         document.body.style.overflow = '';

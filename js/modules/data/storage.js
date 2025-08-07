@@ -1,6 +1,6 @@
 /**
  * Data Persistence and Storage Management
- * @version 3.3
+ * @version 4.0
  */
 
 import { STORAGE_KEYS, GAME_CONFIG } from '../shared/constants.js';

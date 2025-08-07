@@ -6,7 +6,7 @@
 // Application Configuration
 export const APP_CONFIG = {
   NAME: 'NUFC GameTime',
-  VERSION: '3.5',
+  VERSION: '4.0',
   AUTHOR: 'NUFC GameTime Team',
   DESCRIPTION: 'Football match tracking and statistics application'
 };

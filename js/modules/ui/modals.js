@@ -1,13 +1,15 @@
 /**
  * Modal Management
- * @version 3.3
+ * @version 4.0
  */
+
+import { CustomModal } from '../shared/custom-modal.js';
 
 // Modal utilities
 export function showModal(modalId) {
   const modalElement = document.getElementById(modalId);
   if (modalElement) {
-    const modal = new bootstrap.Modal(modalElement);
+    const modal = CustomModal.getOrCreateInstance(modalElement);
     modal.show();
     return modal;
   } else {
@@ -20,37 +22,24 @@ export function hideModal(modalId) {
   const modalElement = document.getElementById(modalId);
   if (modalElement) {
     try {
-      // Check if Bootstrap is available
-      if (typeof bootstrap !== 'undefined') {
-        let modal = bootstrap.Modal.getInstance(modalElement);
-        if (!modal) {
-          // If no instance exists, create one and then hide it
-          modal = new bootstrap.Modal(modalElement);
-        }
-        modal.hide();
-      } else {
-        // Fallback if Bootstrap is not loaded yet
-        console.warn('Bootstrap not loaded, using fallback modal hide');
-        modalElement.classList.remove('show');
-        modalElement.style.display = 'none';
-        
-        // Remove backdrop
-        const backdrops = document.querySelectorAll('.modal-backdrop');
-        backdrops.forEach(backdrop => backdrop.remove());
-        
-        // Clean up body
-        document.body.classList.remove('modal-open');
+      let modal = CustomModal.getInstance(modalElement);
+      if (!modal) {
+        // If no instance exists, create one and then hide it
+        modal = CustomModal.getOrCreateInstance(modalElement);
       }
+      modal.hide();
     } catch (error) {
-      console.error('Error hiding modal:', error);
-      // Fallback cleanup
-      modalElement.style.display = 'none';
+      // Fallback if modal system fails
+      console.warn('Modal hide failed, using fallback:', error);
       modalElement.classList.remove('show');
-      document.body.classList.remove('modal-open');
+      modalElement.style.display = 'none';
       
       // Remove backdrop
       const backdrops = document.querySelectorAll('.modal-backdrop');
       backdrops.forEach(backdrop => backdrop.remove());
+      
+      // Clean up body
+      document.body.classList.remove('modal-open');
     }
     
     // Enhanced cleanup to prevent overlay issues
@@ -85,7 +74,7 @@ export function hideModal(modalId) {
 export function getModalInstance(modalId) {
   const modalElement = document.getElementById(modalId);
   if (modalElement) {
-    return bootstrap.Modal.getInstance(modalElement);
+    return CustomModal.getInstance(modalElement);
   }
   return null;
 }
@@ -98,12 +87,12 @@ export function bindModalEvents() {
   const allModals = document.querySelectorAll('.modal');
   allModals.forEach(modal => {
     // Clean up when modal is hidden
-    modal.addEventListener('hidden.bs.modal', () => {
+    modal.addEventListener('modal.hidden', () => {
       cleanupModalOverlays();
     });
 
     // Handle focus management before hiding
-    modal.addEventListener('hide.bs.modal', () => {
+    modal.addEventListener('modal.hide', () => {
       // Remove focus from any elements inside the modal before hiding
       const focusedElement = modal.querySelector(':focus');
       if (focusedElement) {
@@ -112,7 +101,7 @@ export function bindModalEvents() {
     });
 
     // Prevent multiple backdrop issues
-    modal.addEventListener('show.bs.modal', () => {
+    modal.addEventListener('modal.show', () => {
       // Remove any existing backdrops before showing new modal
       const existingBackdrops = document.querySelectorAll('.modal-backdrop');
       if (existingBackdrops.length > 0) {
@@ -143,7 +132,7 @@ export function cleanupModalOverlays() {
 export function closeAllModals() {
   const allModals = document.querySelectorAll('.modal');
   allModals.forEach(modalElement => {
-    const modal = bootstrap.Modal.getInstance(modalElement);
+    const modal = CustomModal.getInstance(modalElement);
     if (modal) {
       modal.hide();
     }

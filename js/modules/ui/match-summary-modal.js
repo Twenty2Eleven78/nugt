@@ -1,17 +1,22 @@
 
+import { CustomModal } from '../shared/custom-modal.js';
+
 // Match Summary Modal UI Component
 class MatchSummaryModal {
   constructor() {
-    this.modalInitialized = false;
+    this.modal = null;
+    this.isInitialized = false;
   }
 
-
-   //Initialize the match summary modal
+  /**
+   * Initialize the match summary modal
+   */
   init() {
-    if (!this.modalInitialized) {
-      this._createModal();
-      this.modalInitialized = true;
-    }
+    if (this.isInitialized) return;
+    
+    this._createModal();
+    this._bindEventListeners();
+    this.isInitialized = true;
   }
 
   /**
@@ -19,14 +24,21 @@ class MatchSummaryModal {
    * @param {Object} matchData The data for the match to display
    */
   show(matchData) {
-    const modal = document.getElementById('matchSummaryModal');
-    if (!modal) return;
+    if (!this.modal) return;
 
     this._populateModal(matchData);
 
-    // Show modal
-    const bootstrapModal = new bootstrap.Modal(modal);
-    bootstrapModal.show();
+    // Show modal using custom modal system
+    this.modal.show();
+  }
+
+  /**
+   * Hide the match summary modal
+   */
+  hide() {
+    if (this.modal) {
+      this.modal.hide();
+    }
   }
 
   /**
@@ -215,7 +227,7 @@ class MatchSummaryModal {
               <h5 class="modal-title">
                 <i class="fas fa-code"></i> Raw Match Data
               </h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+              <button type="button" class="btn-close btn-close-white" id="closeRawDataModalBtn" aria-label="Close"></button>
             </div>
             <div class="modal-body p-0">
               <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-light">
@@ -240,9 +252,24 @@ class MatchSummaryModal {
     // Add modal to DOM
     document.body.insertAdjacentHTML('beforeend', rawDataHtml);
 
-    // Show modal
-    const rawModal = new bootstrap.Modal(document.getElementById('rawDataModal'));
+    // Initialize and show modal using custom modal system
+    const rawModal = CustomModal.getOrCreateInstance('rawDataModal');
     rawModal.show();
+
+    // Add close button functionality
+    const closeRawDataModalBtn = document.getElementById('closeRawDataModalBtn');
+    if (closeRawDataModalBtn) {
+      closeRawDataModalBtn.addEventListener('click', () => {
+        rawModal.hide();
+        // Clean up modal when hidden
+        setTimeout(() => {
+          const modalElement = document.getElementById('rawDataModal');
+          if (modalElement) {
+            modalElement.remove();
+          }
+        }, 300);
+      });
+    }
 
     // Add copy functionality
     const copyRawDataBtn = document.getElementById('copyRawDataBtn');
@@ -264,11 +291,6 @@ class MatchSummaryModal {
           });
       });
     }
-
-    // Clean up modal when hidden
-    document.getElementById('rawDataModal').addEventListener('hidden.bs.modal', function() {
-      this.remove();
-    });
   }
 
   /**
@@ -306,9 +328,10 @@ class MatchSummaryModal {
    * @private
    */
   _createModal() {
-    // Check if modal already exists
-    if (document.getElementById('matchSummaryModal')) {
-      return;
+    // Remove existing modal if it exists
+    const existingModal = document.getElementById('matchSummaryModal');
+    if (existingModal) {
+      existingModal.remove();
     }
 
     const modalHtml = `
@@ -317,7 +340,7 @@ class MatchSummaryModal {
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="summaryModalTitle">Match Summary</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div class="text-center mb-4">
@@ -338,17 +361,31 @@ class MatchSummaryModal {
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-secondary" id="closeSummaryModalBtn">Close</button>
             </div>
           </div>
         </div>
       </div>
     `;
 
-    // Create modal container and append to body
-    const modalContainer = document.createElement('div');
-    modalContainer.innerHTML = modalHtml;
-    document.body.appendChild(modalContainer.firstElementChild);
+    // Add modal to DOM
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Initialize custom modal
+    this.modal = CustomModal.getOrCreateInstance('matchSummaryModal');
+  }
+
+  /**
+   * Bind event listeners for the modal
+   * @private
+   */
+  _bindEventListeners() {
+    // Handle close button click
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'closeSummaryModalBtn') {
+        this.hide();
+      }
+    });
   }
 
   /**

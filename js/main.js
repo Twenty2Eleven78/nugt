@@ -1,6 +1,6 @@
 /**
  * NUFC GameTime App - Main Entry Point
- * @version 3.6
+ * @version 4.0
  * @author Mark Van-Kerro
  * @date Last Updated: 2025-01-26
  * 
@@ -17,16 +17,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const adminModalButton = document.getElementById('admin-modal-button');
   if (adminModalButton) {
-    authService.onAuthStateChange(user => {
+    // Set up click handler once
+    adminModalButton.addEventListener('click', () => {
+      adminModal.show();
+    });
+
+    // Update visibility based on auth state
+    const updateAdminButtonVisibility = () => {
       if (authService.isUserAuthenticated() && authService.isAdmin()) {
         adminModalButton.classList.remove('d-none');
-        adminModalButton.addEventListener('click', () => {
-          adminModal.show();
-        });
       } else {
         adminModalButton.classList.add('d-none');
       }
-    });
+    };
+
+    // Listen for auth state changes
+    authService.onAuthStateChange(updateAdminButtonVisibility);
+    
+    // Initial check
+    updateAdminButtonVisibility();
   }
 });
 
@@ -68,12 +77,7 @@ window.addEventListener('pagehide', (event) => {
   }
 });
 
-// Add unload event as final fallback
-window.addEventListener('unload', (event) => {
-  if (window.timerControllerInstance) {
-    window.timerControllerInstance.saveCurrentState();
-  }
-});
+// Note: unload event is deprecated. Using pagehide above for cleanup.
 
 // Service Worker registration is handled by PWA updater in app.js
 // This ensures proper update management and avoids conflicts

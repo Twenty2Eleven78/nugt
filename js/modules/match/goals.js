@@ -1,6 +1,6 @@
 /**
  * Goal Management
- * @version 3.3
+ * @version 4.0
  */
 
 import { gameState, stateManager } from '../data/state.js';
@@ -18,7 +18,26 @@ class GoalManager {
   // Show goal modal and capture timestamp
   showGoalModal() {
     stateManager.setPendingGoalTimestamp(getCurrentSeconds());
-    showModal('goalModal');
+    
+    // Try to use the goal modal instance first
+    if (window.goalModal && typeof window.goalModal.show === 'function') {
+      window.goalModal.show();
+    } else {
+      // Fallback to importing the goal modal dynamically
+      import('../ui/goal-modal.js').then(({ default: goalModal }) => {
+        if (goalModal && typeof goalModal.show === 'function') {
+          goalModal.show();
+          // Make it available globally for next time
+          window.goalModal = goalModal;
+        } else {
+          // Final fallback to basic modal system
+          showModal('goalModal');
+        }
+      }).catch(error => {
+        console.error('Error loading goal modal:', error);
+        showModal('goalModal');
+      });
+    }
   }
 
   // Helper method to create goal data
@@ -62,13 +81,24 @@ class GoalManager {
   addGoal(event) {
     event.preventDefault();
 
-    const goalScorerName = domCache.get('goalScorer')?.value;
-    const goalAssistName = domCache.get('goalAssist')?.value;
+    const goalScorerElement = document.getElementById('goalScorer');
+    const goalAssistElement = document.getElementById('goalAssist');
+
+    console.log('Goal form submission:', {
+      goalScorerElement,
+      goalScorerValue: goalScorerElement?.value,
+      goalAssistElement,
+      goalAssistValue: goalAssistElement?.value
+    });
+
+    const goalScorerName = goalScorerElement?.value;
+    const goalAssistName = goalAssistElement?.value;
     const currentSeconds = gameState.pendingGoalTimestamp || getCurrentSeconds();
     const team1Name = domCache.get('Team1NameElement')?.textContent;
 
-    if (!goalScorerName) {
-      notificationManager.warning('Please select a goal scorer');
+    if (!goalScorerName || goalScorerName.trim() === '') {
+      console.log('Goal scorer validation failed:', goalScorerName);
+      notificationManager.warning('Please select a goal scorer from the dropdown');
       return;
     }
 
@@ -125,7 +155,7 @@ class GoalManager {
 
   // Reset goal form
   _resetGoalForm() {
-    const goalForm = domCache.get('goalForm');
+    const goalForm = document.getElementById('goalForm');
     if (goalForm) {
       goalForm.reset();
     }

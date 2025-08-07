@@ -28,9 +28,7 @@ class DOMCache {
       // Goal elements
       goalButton: 'goalButton',
       opgoalButton: 'opgoalButton',
-      goalScorer: 'goalScorer',
-      goalAssist: 'goalAssist',
-      goalForm: 'goalForm',
+      // goalScorer, goalAssist, goalForm are now dynamically created by goal-modal.js
 
       // Score elements
       firstScoreElement: 'first-score',
@@ -39,10 +37,7 @@ class DOMCache {
       // Team elements
       Team1NameElement: 'first-team-name',
       Team2NameElement: 'second-team-name',
-      team1Input: 'team1Name',
-      team2Input: 'team2Name',
-      updTeam1Btn: 'updTeam1Btn',
-      updTeam2Btn: 'updTeam2Btn',
+      // team1Input, team2Input, updTeam1Btn, updTeam2Btn are now dynamically created by team-modals.js
 
       // Event elements
       log: 'log',
@@ -50,15 +45,10 @@ class DOMCache {
       halfTimeButton: 'HalfTimeButton',
       fullTimeButton: 'FullTimeButton',
 
-      // Modal elements
-      goalModal: 'goalModal',
-      recordEventModal: 'recordEventModal',
-      editEventModal: 'editEventModal',
+      // Modal elements are now dynamically created by their respective modal modules
+      // goalModal, recordEventModal, editEventModal, rosterModal, attendanceModal, sharingModal are created by JS modules
 
       // Form elements
-      rosterModal: 'rosterModal',
-      attendanceModal: 'attendanceModal',
-      sharingModal: 'sharingModal',
 
       // Navigation elements
       gameTab: 'gametab',
@@ -66,7 +56,7 @@ class DOMCache {
       optionsTab: 'optionstab',
 
       // Other elements
-      resetButton: 'confirmResetBtn',
+      // resetButton (confirmResetBtn) is now dynamically created by reset-modal.js
       shareButton: 'shareButton',
       notificationContainer: 'notification-container'
     };

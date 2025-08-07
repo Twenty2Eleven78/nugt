@@ -1,6 +1,6 @@
 /**
  * Goal Management
- * @version 3.3
+ * @version 4.0
  */
 
 import { gameState, stateManager } from '../data/state.js';

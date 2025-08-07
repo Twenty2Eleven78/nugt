@@ -1,6 +1,6 @@
 /**
  * UI Components and Utilities
- * @version 3.3
+ * @version 4.0
  */
 
 import { EVENT_TYPES } from '../shared/constants.js';

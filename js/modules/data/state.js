@@ -1,6 +1,6 @@
 /**
  * Application State Management
- * @version 3.3
+ * @version 4.0
  */
 
 import { GAME_CONFIG } from '../shared/constants.js';

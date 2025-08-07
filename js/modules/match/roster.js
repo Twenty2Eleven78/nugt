@@ -1,6 +1,6 @@
 /**
  * Roster Management Module
- * @version 3.3
+ * @version 4.0
  */
 
 import { storage } from '../data/storage.js';

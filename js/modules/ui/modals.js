@@ -1,6 +1,6 @@
 /**
  * Modal Management
- * @version 3.3
+ * @version 4.0
  */
 
 import { CustomModal } from '../shared/custom-modal.js';

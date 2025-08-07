@@ -1,6 +1,6 @@
 /**
  * Main Application Module - Initialization and Coordination
- * @version 3.5
+ * @version 4.0
  */
 
 // Import restructured modules
@@ -171,7 +171,7 @@ function enhanceTouchTargets() {
 
 // Initialize application
 export function initializeApp() {
-  console.log('Initializing NUFC GameTime App v3.7 - Enhanced with Custom Framework');
+  console.log('Initializing NUFC GameTime App v4.0 - Enhanced with Custom Framework');
 
   // Initialize custom modal system
   initializeCustomModals();

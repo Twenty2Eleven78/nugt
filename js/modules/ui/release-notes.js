@@ -168,8 +168,8 @@ class ReleaseNotesManager {
   _addVersionBadges(html) {
     // Add current version badge
     html = html.replace(
-      /<h2 class="release-notes-h2">🚀 Version 3\.6 - Enhanced Events & Attendance System<\/h2>/,
-      '<h2 class="release-notes-h2"><span class="badge bg-success me-2">CURRENT</span>🚀 Version 3.6 - Enhanced Events & Attendance System</h2>'
+      /<h2 class="release-notes-h2">🚀 Version 4\.0 - Enhanced UI & Admin Features<\/h2>/,
+      '<h2 class="release-notes-h2"><span class="badge bg-success me-2">CURRENT</span>🚀 Version 4.0 - Enhanced UI & Admin Features</h2>'
     );
 
     // Add version badges for other versions
@@ -270,7 +270,7 @@ class ReleaseNotesManager {
     
     versionSections.forEach(header => {
       // Skip the main current version
-      if (header.textContent.includes('Version 3.6')) return;
+      if (header.textContent.includes('Version 4.0')) return;
       
       const toggleIcon = document.createElement('i');
       toggleIcon.className = 'fas fa-chevron-down ms-2 text-muted';

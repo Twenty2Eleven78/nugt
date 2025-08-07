@@ -293,6 +293,21 @@ class AuthUI {
         // Show auth modal
         this.showAuthModal();
       }
+
+      if (e.target && e.target.id === 'saveToCloudButton') {
+        // Close the dropdown
+        const dropdown = document.getElementById('userProfileDropdown');
+        if (dropdown) {
+          dropdown.classList.remove('show');
+        }
+        const button = document.getElementById('userProfileButton');
+        if (button) {
+          button.setAttribute('aria-expanded', 'false');
+        }
+
+        // Trigger save to cloud functionality
+        this._handleSaveToCloud();
+      }
     });
   }
 
@@ -389,9 +404,13 @@ class AuthUI {
         profileUsername.textContent = user.name;
       }
 
-      // Show Sign Out option for authenticated users
+      // Show options for authenticated users
       if (dropdownMenu) {
         dropdownMenu.innerHTML = `
+          <button class="dropdown-item" id="saveToCloudButton">
+            <i class="fas fa-cloud-upload-alt me-2"></i>Save to Cloud
+          </button>
+          <div class="dropdown-divider"></div>
           <button class="dropdown-item" id="logoutButton">
             <i class="fas fa-sign-out-alt me-2"></i>Sign Out
           </button>
@@ -416,6 +435,24 @@ class AuthUI {
         `;
       }
     }
+  }
+
+  /**
+   * Handle save to cloud functionality
+   * @private
+   */
+  _handleSaveToCloud() {
+    // Import and show the match save modal
+    import('./match-save-modal.js').then(({ matchSaveModal }) => {
+      // Initialize the modal if not already done
+      matchSaveModal.init();
+      
+      // Show the save modal
+      matchSaveModal.show();
+    }).catch(error => {
+      console.error('Error loading match save modal:', error);
+      notificationManager.error('Failed to open save dialog');
+    });
   }
 
   /**

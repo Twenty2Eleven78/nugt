@@ -85,7 +85,7 @@ class MatchLoadModal {
                 </div>
                 ${match.notes ? `<div class="text-muted small"><i class="fas fa-sticky-note me-1"></i>${this._escapeHtml(match.notes.substring(0, 60))}${match.notes.length > 60 ? '...' : ''}</div>` : ''}
               </div>
-              <div class="d-flex gap-1 flex-shrink-0">
+              <div class="d-flex gap-2 flex-shrink-0" style="padding: 0.25rem;">
                 <button class="btn btn-primary btn-sm view-btn" data-match-index="${index}" style="min-width: 60px;">
                   View
                 </button>

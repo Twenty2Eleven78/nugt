@@ -857,13 +857,13 @@ html {
     }
 
     .main-container {
-        padding-bottom: 70px;
-        /* Smaller padding on mobile */
+        padding-bottom: 100px;
+        /* Account for enlarged mobile nav */
     }
 
     .content-wrapper {
-        height: calc(100vh - 120px);
-        /* Account for mobile nav */
+        height: calc(100vh - 160px);
+        /* Account for header and enlarged mobile nav */
     }
 
     .game-container {
@@ -1284,7 +1284,7 @@ html {
 
 /* Tab System */
 .content-wrapper {
-    height: calc(100vh - 140px);
+    height: calc(100vh - 150px);
     /* Account for header and bottom nav */
     overflow: hidden;
 }
@@ -1298,6 +1298,11 @@ html {
     height: 100%;
     overflow: hidden;
     display: none;
+}
+
+#gametab {
+    height: 100%;
+    overflow: hidden;
 }
 
 .tab-pane.active {
@@ -1445,9 +1450,11 @@ html {
     border-radius: var(--border-radius);
     padding: var(--spacing-sm);
     box-shadow: var(--box-shadow-card);
-    flex-shrink: 0;
+    flex: 1;
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    min-height: 0;
 }
 
 .actions-title {
@@ -1467,6 +1474,8 @@ html {
     display: flex;
     gap: var(--spacing-xs);
     margin-bottom: var(--spacing-xs);
+    flex: 1;
+    align-items: center;
 }
 
 .action-row:last-child {
@@ -1480,12 +1489,12 @@ html {
     align-items: center;
     justify-content: center;
     gap: var(--spacing-xs);
-    padding: var(--spacing-sm);
+    padding: var(--spacing-lg);
     border-radius: var(--border-radius-sm);
     font-weight: 600;
     transition: var(--transition);
     border: 2px solid transparent;
-    min-height: 60px;
+    min-height: 80px;
     color: var(--text-light);
 }
 

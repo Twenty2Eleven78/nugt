@@ -110,7 +110,7 @@ self.addEventListener('message', function (event) {
     if (event.data && event.data.type === 'SKIP_WAITING') {
       console.log('Received SKIP_WAITING message');
       self.skipWaiting();
-      
+
       // Send acknowledgment back to prevent runtime.lastError
       if (event.ports && event.ports[0]) {
         event.ports[0].postMessage({ success: true });
@@ -118,7 +118,7 @@ self.addEventListener('message', function (event) {
     }
   } catch (error) {
     console.error('Service worker message handling error:', error);
-    
+
     // Still try to send error response to prevent runtime.lastError
     if (event.ports && event.ports[0]) {
       try {
@@ -136,19 +136,19 @@ function isRequestCacheable(request) {
   if (!request.url.startsWith('http')) {
     return false;
   }
-  
+
   // Don't cache extension requests
-  if (request.url.startsWith('chrome-extension://') || 
-      request.url.startsWith('moz-extension://') || 
-      request.url.startsWith('safari-extension://')) {
+  if (request.url.startsWith('chrome-extension://') ||
+    request.url.startsWith('moz-extension://') ||
+    request.url.startsWith('safari-extension://')) {
     return false;
   }
-  
+
   // Don't cache requests with non-GET methods
   if (request.method !== 'GET') {
     return false;
   }
-  
+
   return true;
 }
 

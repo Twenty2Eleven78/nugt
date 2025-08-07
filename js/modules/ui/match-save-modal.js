@@ -2,12 +2,12 @@
  * Match Save Modal UI Component
  */
 
-import { domCache } from '../shared/dom.js';
-import { hideModal } from './modals.js';
+import { CustomModal } from '../shared/custom-modal.js';
 
 class MatchSaveModal {
   constructor() {
-    this.modalInitialized = false;
+    this.modal = null;
+    this.isInitialized = false;
     this.onSave = null;
   }
 
@@ -15,11 +15,11 @@ class MatchSaveModal {
    * Initialize the match save modal
    */
   init() {
-    if (!this.modalInitialized) {
-      this._createModal();
-      this._bindEventListeners();
-      this.modalInitialized = true;
-    }
+    if (this.isInitialized) return;
+    
+    this._createModal();
+    this._bindEventListeners();
+    this.isInitialized = true;
   }
 
   /**
@@ -30,8 +30,7 @@ class MatchSaveModal {
   show(matchInfo, onSave) {
     this.onSave = onSave;
     
-    const modal = document.getElementById('matchSaveModal');
-    if (!modal) return;
+    if (!this.modal) return;
 
     // Set default values
     const titleInput = document.getElementById('matchTitleInput');
@@ -44,9 +43,8 @@ class MatchSaveModal {
       notesInput.value = matchInfo.defaultNotes || '';
     }
 
-    // Show modal
-    const bootstrapModal = new bootstrap.Modal(modal);
-    bootstrapModal.show();
+    // Show modal using custom modal system
+    this.modal.show();
   }
 
   /**
@@ -54,9 +52,10 @@ class MatchSaveModal {
    * @private
    */
   _createModal() {
-    // Check if modal already exists
-    if (document.getElementById('matchSaveModal')) {
-      return;
+    // Remove existing modal if it exists
+    const existingModal = document.getElementById('matchSaveModal');
+    if (existingModal) {
+      existingModal.remove();
     }
 
     const modalHtml = `
@@ -65,7 +64,7 @@ class MatchSaveModal {
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="matchSaveModalLabel">Save Match to Cloud</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <form id="matchSaveForm">
@@ -80,7 +79,7 @@ class MatchSaveModal {
               </form>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-secondary" id="cancelMatchSaveBtn">Cancel</button>
               <button type="button" class="btn btn-primary" id="confirmMatchSaveBtn">Save Match</button>
             </div>
           </div>
@@ -88,10 +87,20 @@ class MatchSaveModal {
       </div>
     `;
 
-    // Create modal container and append to body
-    const modalContainer = document.createElement('div');
-    modalContainer.innerHTML = modalHtml;
-    document.body.appendChild(modalContainer.firstElementChild);
+    // Add modal to DOM
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Initialize custom modal
+    this.modal = CustomModal.getOrCreateInstance('matchSaveModal');
+  }
+
+  /**
+   * Hide the match save modal
+   */
+  hide() {
+    if (this.modal) {
+      this.modal.hide();
+    }
   }
 
   /**
@@ -99,23 +108,31 @@ class MatchSaveModal {
    * @private
    */
   _bindEventListeners() {
-    document.getElementById('confirmMatchSaveBtn')?.addEventListener('click', () => {
-      const titleInput = document.getElementById('matchTitleInput');
-      const notesInput = document.getElementById('matchNotesInput');
+    // Handle save button click
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'confirmMatchSaveBtn') {
+        const titleInput = document.getElementById('matchTitleInput');
+        const notesInput = document.getElementById('matchNotesInput');
 
-      if (!titleInput?.value) {
-        return;
+        if (!titleInput?.value) {
+          return;
+        }
+
+        if (this.onSave) {
+          this.onSave({
+            title: titleInput.value,
+            notes: notesInput?.value || ''
+          });
+        }
+
+        // Hide modal
+        this.hide();
       }
-
-      if (this.onSave) {
-        this.onSave({
-          title: titleInput.value,
-          notes: notesInput?.value || ''
-        });
+      
+      // Handle cancel button click
+      if (e.target.id === 'cancelMatchSaveBtn') {
+        this.hide();
       }
-
-      // Hide modal
-      hideModal('matchSaveModal');
     });
   }
 }

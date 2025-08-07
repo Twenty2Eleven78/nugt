@@ -5,9 +5,12 @@
  * Provides enhanced markdown parsing and display for release notes
  */
 
+import { CustomModal } from '../shared/custom-modal.js';
+
 // Release Notes Manager
 class ReleaseNotesManager {
   constructor() {
+    this.modal = null;
     this.isInitialized = false;
   }
 
@@ -15,8 +18,52 @@ class ReleaseNotesManager {
   init() {
     if (this.isInitialized) return;
     
+    this.createModal();
     this._bindEvents();
     this.isInitialized = true;
+  }
+
+  // Create release notes modal
+  createModal() {
+    // Remove existing modal if it exists
+    const existingModal = document.getElementById('releasenotesmodal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    const modalHTML = `
+      <div class="modal fade" id="releasenotesmodal" tabindex="-1" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Release Notes</h5>
+              <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="readme" class="modal-body readme-content"></div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Add modal to DOM
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Initialize custom modal
+    this.modal = CustomModal.getOrCreateInstance('releasenotesmodal');
+  }
+
+  // Show release notes modal
+  show() {
+    if (this.modal) {
+      this.modal.show();
+    }
+  }
+
+  // Hide release notes modal
+  hide() {
+    if (this.modal) {
+      this.modal.hide();
+    }
   }
 
   // Load and parse release notes
@@ -121,8 +168,8 @@ class ReleaseNotesManager {
   _addVersionBadges(html) {
     // Add current version badge
     html = html.replace(
-      /<h2 class="release-notes-h2">🚀 Version 3\.6 - Enhanced Events & Attendance System<\/h2>/,
-      '<h2 class="release-notes-h2"><span class="badge bg-success me-2">CURRENT</span>🚀 Version 3.6 - Enhanced Events & Attendance System</h2>'
+      /<h2 class="release-notes-h2">🚀 Version 4\.0 - Enhanced UI & Admin Features<\/h2>/,
+      '<h2 class="release-notes-h2"><span class="badge bg-success me-2">CURRENT</span>🚀 Version 4.0 - Enhanced UI & Admin Features</h2>'
     );
 
     // Add version badges for other versions
@@ -223,7 +270,7 @@ class ReleaseNotesManager {
     
     versionSections.forEach(header => {
       // Skip the main current version
-      if (header.textContent.includes('Version 3.6')) return;
+      if (header.textContent.includes('Version 4.0')) return;
       
       const toggleIcon = document.createElement('i');
       toggleIcon.className = 'fas fa-chevron-down ms-2 text-muted';
@@ -285,13 +332,15 @@ class ReleaseNotesManager {
 
   // Bind events
   _bindEvents() {
-    // Listen for modal show event
-    const releaseNotesModal = document.getElementById('releasenotesmodal');
-    if (releaseNotesModal) {
-      releaseNotesModal.addEventListener('show.bs.modal', () => {
-        this.loadReleaseNotes();
-      });
-    }
+    // Listen for modal show event on the created modal
+    setTimeout(() => {
+      const releaseNotesModal = document.getElementById('releasenotesmodal');
+      if (releaseNotesModal) {
+        releaseNotesModal.addEventListener('modal.show', () => {
+          this.loadReleaseNotes();
+        });
+      }
+    }, 100); // Small delay to ensure modal is created
   }
 }
 
@@ -300,5 +349,7 @@ export const releaseNotesManager = new ReleaseNotesManager();
 
 // Export convenience methods
 export const {
+  show,
+  hide,
   loadReleaseNotes
 } = releaseNotesManager;

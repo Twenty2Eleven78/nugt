@@ -1,6 +1,6 @@
 /**
  * Default Roster Configuration
- * @version 3.3
+ * @version 4.0
  * 
  * This file contains the default player roster.
  * You can customize this list by adding, removing, or modifying players.

@@ -1,13 +1,13 @@
 //Cache Name
-const CACHE_NAME = "nugt-cache-v18";
+const CACHE_NAME = "nugt-cache-v19";
 //Files to cache - Modular Architecture
 const cacheFiles = [
   './',
   './index.html',
   './css/all.min.css',
-  './css/bootstrap.min.css',
+  './css/custom-framework.css',
   './css/style.css',
-  './js/bootstrap.bundle.min.js',
+
   './js/main.js',
   // Core modules
   './js/modules/app.js',
@@ -32,6 +32,7 @@ const cacheFiles = [
   './js/modules/ui/components.js',
   './js/modules/ui/enhanced-events.js',
   './js/modules/ui/release-notes.js',
+  './js/modules/ui/roster-modal.js',
   // Services
   './js/modules/services/notifications.js',
   './js/modules/services/sharing.js',

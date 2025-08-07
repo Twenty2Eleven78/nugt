@@ -1,6 +1,6 @@
 /**
  * Main Application Module - Initialization and Coordination
- * @version 3.5
+ * @version 4.0
  */
 
 // Import restructured modules
@@ -9,6 +9,8 @@ import { storage, storageHelpers } from './data/storage.js';
 import { domCache } from './shared/dom.js';
 import { formatTime } from './shared/utils.js';
 import { STORAGE_KEYS, EVENT_TYPES } from './shared/constants.js';
+import themeManager from './shared/theme-manager.js';
+import { CustomModal } from './shared/custom-modal.js';
 
 // Import high priority optimizations
 import { ModuleErrorBoundary } from './shared/error-boundary.js';
@@ -24,7 +26,7 @@ import { teamManager } from './match/teams.js';
 import { rosterManager } from './match/roster.js';
 
 // UI modules
-import { bindModalEvents, hideModal } from './ui/modals.js';
+import { bindModalEvents } from './ui/modals.js';
 import { initializeTooltips } from './ui/components.js';
 import { enhancedEventsManager } from './ui/enhanced-events.js';
 import { releaseNotesManager } from './ui/release-notes.js';
@@ -33,14 +35,70 @@ import { matchSaveModal } from './ui/match-save-modal.js';
 import { matchLoadModal } from './ui/match-load-modal.js';
 import { matchSummaryModal } from './ui/match-summary-modal.js';
 import { rawDataModal } from './ui/raw-data-modal.js';
+import teamModals from './ui/team-modals.js';
+import goalModal from './ui/goal-modal.js';
+import eventModals from './ui/event-modals.js';
+import resetModal from './ui/reset-modal.js';
+import rosterModal from './ui/roster-modal.js';
+import attendanceModal from './ui/attendance-modal.js';
+import sharingModal from './ui/sharing-modal.js';
 
 // Services
 import { notificationManager } from './services/notifications.js';
-import { sharingService } from './services/sharing.js';
+// Sharing service is used by sharing modal
 import { pwaUpdater } from './services/pwa-updater.js';
 import { attendanceManager } from './services/attendance.js';
 import { authService } from './services/auth.js';
 import { userMatchesApi } from './services/user-matches-api.js';
+
+// Initialize custom modal system
+function initializeCustomModals() {
+  // Set up modal triggers
+  document.addEventListener('click', (e) => {
+    const trigger = e.target.closest('[data-toggle="modal"]');
+    if (trigger) {
+      e.preventDefault();
+      const targetId = trigger.getAttribute('data-target');
+      if (targetId) {
+        // Special handling for dynamically created modals
+        if (targetId === '#resetConfirmModal') {
+          resetModal.show(() => {
+            resetTracker();
+          });
+        } else if (targetId === '#fixtureModalTeam1') {
+          teamModals.showTeam1Modal();
+        } else if (targetId === '#fixtureModalTeam2') {
+          teamModals.showTeam2Modal();
+        } else if (targetId === '#recordEventModal') {
+          eventModals.showRecordEventModal();
+        } else if (targetId === '#goalModal') {
+          goalModal.show();
+        } else if (targetId === '#releasenotesmodal') {
+          releaseNotesManager.show();
+        } else if (targetId === '#rosterModal') {
+          rosterModal.show();
+        } else if (targetId === '#attendanceModal') {
+          attendanceModal.show();
+        } else if (targetId === '#sharingModal') {
+          sharingModal.show();
+        } else {
+          // Remove the # prefix from targetId for CustomModal
+          const modalId = targetId.startsWith('#') ? targetId.substring(1) : targetId;
+          const modal = CustomModal.getOrCreateInstance(modalId);
+          modal.show();
+        }
+      }
+    }
+  });
+
+  // Initialize all existing modals
+  const modals = document.querySelectorAll('.modal');
+  modals.forEach(modalElement => {
+    CustomModal.getOrCreateInstance(modalElement);
+  });
+
+  console.log('Custom modal system initialized');
+}
 
 // Initialize high priority optimizations
 function initializeOptimizations() {
@@ -113,7 +171,10 @@ function enhanceTouchTargets() {
 
 // Initialize application
 export function initializeApp() {
-  console.log('Initializing NUFC GameTime App v3.7 - Enhanced with High Priority Optimizations');
+  console.log('Initializing NUFC GameTime App v4.0 - Enhanced with Custom Framework');
+
+  // Initialize custom modal system
+  initializeCustomModals();
 
   // Initialize high priority optimizations
   initializeOptimizations();
@@ -153,11 +214,29 @@ export function initializeApp() {
   matchSummaryModal.init();
   rawDataModal.init();
 
+  // Initialize modal modules
+  teamModals.init();
+  goalModal.init();
+  eventModals.init();
+  resetModal.init();
+  rosterModal.init();
+  attendanceModal.init();
+  sharingModal.init();
+
+  // Make modals available globally after initialization
+  window.goalModal = goalModal;
+
+  // Initialize theme manager
+  themeManager.init();
+
   // Initialize timer with enhanced state recovery
   timerController.initialize();
-  
+
   // Make timer controller available globally for beforeunload handler
   window.timerControllerInstance = timerController;
+  
+  // Make goal manager available globally
+  window.goalManager = goalManager;
 
   // Initialize PWA updater
   pwaUpdater.init().then(success => {
@@ -209,9 +288,8 @@ function loadAppState() {
 function bindEventListeners() {
   // Set up cloud save/load button handlers
   const saveBtn = document.getElementById('saveMatchDataBtn');
-  const saveBtnCard = document.getElementById('saveMatchDataBtnCard');
   const loadBtn = document.getElementById('loadMatchDataBtn');
-  
+
   // Save match data to Netlify Blobs - function for both buttons
   const handleSaveMatch = async () => {
     if (!authService.isUserAuthenticated()) {
@@ -226,7 +304,7 @@ function bindEventListeners() {
     const score2 = domCache.get('secondScoreElement')?.textContent || '0';
     const currentDate = new Date().toLocaleDateString('en-GB');
     const defaultTitle = `${team1Name}(${score1}):${team2Name}(${score2}) - ${currentDate}`;
-    
+
     matchSaveModal.show({
       defaultTitle,
       defaultNotes: ''
@@ -248,7 +326,7 @@ function bindEventListeners() {
           attendance: attendanceManager.getMatchAttendance(),
           savedAt: Date.now()
         };
-      
+
         await userMatchesApi.saveMatchData(matchData);
         notificationManager.success('Match saved to cloud!');
       } catch (e) {
@@ -258,13 +336,9 @@ function bindEventListeners() {
     });
   };
 
-  // Bind both save buttons to the same functionality
+  // Bind save button
   if (saveBtn) {
     saveBtn.addEventListener('click', handleSaveMatch);
-  }
-  
-  if (saveBtnCard) {
-    saveBtnCard.addEventListener('click', handleSaveMatch);
   }
 
   // Load match data from Netlify Blobs
@@ -274,7 +348,7 @@ function bindEventListeners() {
         notificationManager.warning('Please sign in to load match data from the cloud');
         return;
       }
-      
+
       try {
         const matches = await userMatchesApi.loadMatchData();
         matchLoadModal.show(matches);
@@ -284,6 +358,21 @@ function bindEventListeners() {
       }
     });
   }
+
+  // Auth button in options card
+  const showAuthButtonCard = document.getElementById('showAuthButtonCard');
+  if (showAuthButtonCard) {
+    showAuthButtonCard.addEventListener('click', () => {
+      authUI.showAuthModal();
+    });
+  }
+
+  // Save button in options card
+  const saveMatchDataBtnCard = document.getElementById('saveMatchDataBtnCard');
+  if (saveMatchDataBtnCard) {
+    saveMatchDataBtnCard.addEventListener('click', handleSaveMatch);
+  }
+
   // Timer controls
   const startPauseButton = domCache.get('startPauseButton');
   if (startPauseButton) {
@@ -306,45 +395,38 @@ function bindEventListeners() {
     opgoalButton.addEventListener('click', () => goalManager.addOppositionGoal());
   }
 
-  const goalForm = domCache.get('goalForm');
-  if (goalForm) {
-    goalForm.addEventListener('submit', (e) => goalManager.addGoal(e));
-  }
 
-  // Team management
-  const updTeam1Btn = domCache.get('updTeam1Btn');
-  if (updTeam1Btn) {
-    updTeam1Btn.addEventListener('click', () => {
-      const teamInput = domCache.get('team1Input');
+
+  // Team management - using event delegation for dynamically created buttons
+  document.addEventListener('click', (e) => {
+    if (e.target.id === 'updTeam1Btn') {
+      const teamInput = document.getElementById('team1Name');
       const teamName = teamInput?.value.trim();
       if (teamName) {
         teamManager.updateTeamName('first', teamName);
         teamInput.value = '';
         // Close the modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('fixtureModalTeam1'));
+        const modal = CustomModal.getInstance(document.getElementById('fixtureModalTeam1'));
         if (modal) {
           modal.hide();
         }
       }
-    });
-  }
+    }
 
-  const updTeam2Btn = domCache.get('updTeam2Btn');
-  if (updTeam2Btn) {
-    updTeam2Btn.addEventListener('click', () => {
-      const teamInput = domCache.get('team2Input');
+    if (e.target.id === 'updTeam2Btn') {
+      const teamInput = document.getElementById('team2Name');
       const teamName = teamInput?.value.trim();
       if (teamName) {
         teamManager.updateTeamName('second', teamName);
         teamInput.value = '';
         // Close the modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('fixtureModalTeam2'));
+        const modal = CustomModal.getInstance(document.getElementById('fixtureModalTeam2'));
         if (modal) {
           modal.hide();
         }
       }
-    });
-  }
+    }
+  });
 
   // Match events
   const recordEventButton = document.getElementById('recordEventButton');
@@ -362,22 +444,20 @@ function bindEventListeners() {
     fullTimeButton.addEventListener('click', () => eventsManager.addMatchEvent(EVENT_TYPES.FULL_TIME));
   }
 
-  // Record event form
-  const recordEventForm = document.getElementById('recordEventForm');
-  if (recordEventForm) {
-    recordEventForm.addEventListener('submit', (e) => {
+  // Record event form - using event delegation for dynamically created form
+  document.addEventListener('submit', (e) => {
+    if (e.target.id === 'recordEventForm') {
       e.preventDefault();
       const eventType = document.getElementById('eventTypeSelect')?.value;
       const notes = document.getElementById('eventNotes')?.value;
 
       if (eventType) {
         eventsManager.addMatchEvent(eventType, notes);
-        recordEventForm.reset();
-
-        hideModal('recordEventModal');
+        e.target.reset();
+        eventModals.hideRecordEventModal();
       }
-    });
-  }
+    }
+  });
 
   // Edit event form
   const editEventForm = document.getElementById('editEventForm');
@@ -389,114 +469,14 @@ function bindEventListeners() {
   const shareButton = domCache.get('shareButton');
   if (shareButton) {
     shareButton.addEventListener('click', () => {
-      const sharingModal = new bootstrap.Modal(document.getElementById('sharingModal'));
       sharingModal.show();
     });
   }
 
-  // Sharing modal event listeners
-  setupSharingModalListeners();
-
-  // Reset button
-  const resetButton = domCache.get('resetButton');
-  if (resetButton) {
-    resetButton.addEventListener('click', resetTracker);
-  }
+  // Reset button is now handled by the reset modal system
 }
 
-// Setup sharing modal event listeners
-function setupSharingModalListeners() {
-  // Handle sharing platform buttons
-  document.addEventListener('click', (e) => {
-    if (e.target.closest('.share-platform-btn')) {
-      const button = e.target.closest('.share-platform-btn');
-      const platform = button.dataset.platform;
-      
-      handleSharingPlatform(platform);
-    }
-    
-    // Handle export buttons
-    if (e.target.closest('.export-btn')) {
-      const button = e.target.closest('.export-btn');
-      const format = button.dataset.format;
-      
-      handleExport(format);
-    }
-  });
-}
 
-// Handle sharing to different platforms
-async function handleSharingPlatform(platform) {
-  try {
-    // Show loading state
-    notificationManager.info('Preparing to share...');
-    
-    switch (platform) {
-      case 'whatsapp':
-        sharingService.shareViaWhatsApp();
-        break;
-      case 'twitter':
-        sharingService.shareViaTwitter();
-        break;
-      case 'facebook':
-        sharingService.shareViaFacebook();
-        break;
-      case 'web-api':
-        await sharingService.shareViaWebAPI();
-        break;
-      case 'clipboard':
-        await sharingService.copyToClipboard();
-        notificationManager.success('Match report copied to clipboard!');
-        break;
-      default:
-        throw new Error(`Unsupported platform: ${platform}`);
-    }
-    
-    // Close the modal after successful sharing
-    const sharingModal = bootstrap.Modal.getInstance(document.getElementById('sharingModal'));
-    if (sharingModal) {
-      sharingModal.hide();
-    }
-    
-  } catch (error) {
-    console.error('Sharing failed:', error);
-    notificationManager.error(error.message || 'Failed to share match report');
-  }
-}
-
-// Handle data export
-function handleExport(format) {
-  try {
-    // Show loading state
-    notificationManager.info('Preparing export...');
-    
-    switch (format) {
-      case 'json':
-        sharingService.exportAsJSON();
-        break;
-      case 'csv':
-        sharingService.exportAsCSV();
-        break;
-      case 'txt':
-        sharingService.exportAsText();
-        break;
-      default:
-        throw new Error(`Unsupported export format: ${format}`);
-    }
-    
-    notificationManager.success(`Match data exported as ${format.toUpperCase()}!`);
-    
-    // Close the modal after successful export
-    const sharingModal = bootstrap.Modal.getInstance(document.getElementById('sharingModal'));
-    if (sharingModal) {
-      sharingModal.hide();
-    }
-    
-  } catch (error) {
-    console.error('Export failed:', error);
-    notificationManager.error(error.message || 'Failed to export match data');
-  }
-}
 
 // Reset the entire application
 function resetTracker() {
@@ -590,17 +570,7 @@ window.AuthModule = {
 
 
 
-// Global functions for backward compatibility
+// Global functions for backward compatibility (only keep essential ones)
 window.showGoalModal = goalManager.showGoalModal;
-window.addGoal = goalManager.addGoal;
-window.opaddGoal = goalManager.addOppositionGoal;
-window.toggleGoalDisallowed = toggleGoalDisallowed;
 window.deleteLogEntry = deleteLogEntry;
 window.openEditEventModal = eventsManager.openEditEventModal;
-window.addMatchEvent = eventsManager.addMatchEvent;
-window.showRecordEventModal = eventsManager.showRecordEventModal;
-window.updatefixtureTeams = teamManager.updateTeamName;
-window.handleEditEventFormSubmission = eventsManager.handleEditEventFormSubmission;
-
-// Global RosterManager for backward compatibility
-window.RosterManager = rosterManager;

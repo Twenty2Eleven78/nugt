@@ -11,8 +11,6 @@ import { getEventIcon } from './components.js';
 // Enhanced Events Manager
 class EnhancedEventsManager {
   constructor() {
-    this.searchTerm = '';
-    this.filterType = 'all';
     this.isInitialized = false;
   }
 
@@ -75,203 +73,32 @@ class EnhancedEventsManager {
     return stats;
   }
 
-  // Apply search and filter to timeline items
+  // Apply filters to timeline items (simplified - no search)
   applyFilters() {
+    // No filtering functionality - just show all items
     const timelineItems = document.querySelectorAll('.timeline-item');
-    
     timelineItems.forEach(item => {
-      const shouldShow = this._shouldShowItem(item);
-      
-      if (shouldShow) {
-        item.classList.remove('filtered-out');
-        
-        // Apply search highlighting
-        if (this.searchTerm && this._itemMatchesSearch(item)) {
-          item.classList.add('search-highlight');
-        } else {
-          item.classList.remove('search-highlight');
-        }
-      } else {
-        item.classList.add('filtered-out');
-        item.classList.remove('search-highlight');
-      }
+      item.classList.remove('filtered-out', 'search-highlight');
     });
-
-    // Update empty state
-    this._updateEmptyState();
   }
 
-  // Check if item should be shown based on filters
-  _shouldShowItem(item) {
-    // Check filter type
-    if (!this._itemMatchesFilter(item)) {
-      return false;
-    }
 
-    // Check search term
-    if (this.searchTerm && !this._itemMatchesSearch(item)) {
-      return false;
-    }
 
-    return true;
-  }
-
-  // Check if item matches current filter
-  _itemMatchesFilter(item) {
-    if (this.filterType === 'all') return true;
-
-    const itemContent = item.textContent.toLowerCase();
-    
-    switch (this.filterType) {
-      case 'goals':
-        return itemContent.includes('goal') && !itemContent.includes('disallowed');
-      case 'cards':
-        return itemContent.includes('card');
-      case 'fouls':
-        return itemContent.includes('foul');
-      case 'penalties':
-        return itemContent.includes('penalty');
-      case 'incidents':
-        return itemContent.includes('incident');
-      default:
-        return true;
-    }
-  }
-
-  // Check if item matches search term
-  _itemMatchesSearch(item) {
-    if (!this.searchTerm) return true;
-    
-    const itemContent = item.textContent.toLowerCase();
-    return itemContent.includes(this.searchTerm.toLowerCase());
-  }
-
-  // Update empty state message
+  // Update empty state message (simplified)
   _updateEmptyState() {
-    const visibleItems = document.querySelectorAll('.timeline-item:not(.filtered-out)');
-    const logElement = document.getElementById('log');
-    
-    if (!logElement) return;
-
-    // Remove existing empty state message
-    const existingEmptyState = logElement.querySelector('.filter-empty-state');
-    if (existingEmptyState) {
-      existingEmptyState.remove();
-    }
-
-    // Show empty state if no visible items
-    if (visibleItems.length === 0 && (this.searchTerm || this.filterType !== 'all')) {
-      const emptyStateMessage = document.createElement('div');
-      emptyStateMessage.className = 'filter-empty-state empty-timeline-message';
-      emptyStateMessage.innerHTML = `
-        <div class="text-center p-4">
-          <i class="fas fa-search fa-3x text-muted mb-3"></i>
-          <h5>No events found</h5>
-          <p class="text-muted">
-            ${this.searchTerm ? `No events match "${this.searchTerm}"` : `No ${this.filterType} events found`}
-          </p>
-          <button class="btn btn-outline-primary btn-sm" id="clear-filters-empty">
-            <i class="fas fa-times me-1"></i>Clear Filters
-          </button>
-        </div>
-      `;
-      
-      logElement.appendChild(emptyStateMessage);
-      
-      // Bind clear filters button
-      const clearBtn = emptyStateMessage.querySelector('#clear-filters-empty');
-      if (clearBtn) {
-        clearBtn.addEventListener('click', () => this.clearFilters());
-      }
-    }
+    // No longer needed since we removed filtering
   }
 
-  // Clear all filters
+  // Clear all filters (simplified)
   clearFilters() {
-    this.searchTerm = '';
-    this.filterType = 'all';
-    
-    // Reset UI controls
-    const searchInput = document.getElementById('event-search');
-    const filterSelect = document.getElementById('event-filter');
-    
-    if (searchInput) searchInput.value = '';
-    if (filterSelect) filterSelect.value = 'all';
-    
-    // Apply filters (which will show all items)
-    this.applyFilters();
+    // No longer needed since we removed filtering
   }
 
-  // Export events data
-  exportEvents() {
-    const allEvents = [
-      ...gameState.goals.map(goal => ({
-        time: goal.timestamp,
-        type: 'Goal',
-        player: goal.goalScorerName,
-        assist: goal.goalAssistName,
-        disallowed: goal.disallowed || false
-      })),
-      ...gameState.matchEvents.map(event => ({
-        time: event.timestamp,
-        type: event.type,
-        notes: event.notes || ''
-      }))
-    ].sort((a, b) => parseInt(a.time) - parseInt(b.time));
 
-    // Create CSV content
-    const csvContent = [
-      'Time,Type,Player,Assist,Notes,Disallowed',
-      ...allEvents.map(event => 
-        `${event.time},"${event.type}","${event.player || ''}","${event.assist || ''}","${event.notes || ''}",${event.disallowed || false}`
-      )
-    ].join('\n');
 
-    // Download CSV file
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `match-events-${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
-  }
-
-  // Bind event listeners
+  // Bind event listeners (simplified)
   _bindEvents() {
-    // Search input
-    const searchInput = document.getElementById('event-search');
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
-        this.searchTerm = e.target.value;
-        this.applyFilters();
-      });
-    }
-
-    // Filter select
-    const filterSelect = document.getElementById('event-filter');
-    if (filterSelect) {
-      filterSelect.addEventListener('change', (e) => {
-        this.filterType = e.target.value;
-        this.applyFilters();
-      });
-    }
-
-    // Clear filters button
-    const clearFiltersBtn = document.getElementById('clear-filters');
-    if (clearFiltersBtn) {
-      clearFiltersBtn.addEventListener('click', () => {
-        this.clearFilters();
-      });
-    }
-
-    // Export events button
-    const exportBtn = document.getElementById('export-events');
-    if (exportBtn) {
-      exportBtn.addEventListener('click', () => {
-        this.exportEvents();
-      });
-    }
+    // No event listeners needed since we removed search and export functionality
   }
 
   // Method to be called when events are updated
@@ -292,7 +119,5 @@ export const enhancedEventsManager = new EnhancedEventsManager();
 export const {
   updateEventStatistics,
   applyFilters,
-  clearFilters,
-  exportEvents,
   onEventsUpdated
 } = enhancedEventsManager;

@@ -215,80 +215,11 @@ class AttendanceManager {
 
   // Bind event listeners
   _bindEvents() {
-    // Bind attendance modal events when it's shown
-    const attendanceModal = document.getElementById('attendanceModal');
-    if (attendanceModal) {
-      attendanceModal.addEventListener('show.bs.modal', () => {
-        this.updateAttendanceList();
-      });
-    }
-
-    // Bind bulk attendance action buttons
-    this._bindBulkAttendanceEvents();
-    
-    // Bind individual attendance toggle events
-    this._bindAttendanceToggleEvents();
+    // Event handling is now done by the attendance modal directly
+    // No need to bind events here since the modal handles button clicks
   }
 
-  // Helper method to create button event handler with debouncing
-  _createButtonHandler(button, action) {
-    return (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      if (button.disabled) return;
-      button.disabled = true;
-      
-      action();
-      
-      setTimeout(() => {
-        button.disabled = false;
-      }, 500);
-    };
-  }
 
-  // Bind bulk attendance events
-  _bindBulkAttendanceEvents() {
-    const buttons = [
-      { id: 'markAllAttendingBtnMain', action: () => this.markAllAttending() },
-      { id: 'markAllAbsentBtnMain', action: () => this.markAllAbsent() },
-      { id: 'clearAttendanceBtnMain', action: () => this.clearAttendance() }
-    ];
-
-    buttons.forEach(({ id, action }) => {
-      const button = document.getElementById(id);
-      if (button) {
-        button.addEventListener('click', this._createButtonHandler(button, action));
-      }
-    });
-  }
-
-  // Bind attendance toggle events using event delegation
-  _bindAttendanceToggleEvents() {
-    const attendanceList = document.getElementById('attendanceList');
-    if (!attendanceList) return;
-
-    attendanceList.addEventListener('click', (e) => {
-      const button = e.target.closest('.toggle-attendance-btn');
-      if (!button) return;
-
-      // Prevent event bubbling and default behavior
-      e.preventDefault();
-      e.stopPropagation();
-
-      // Prevent double-clicking
-      if (button.disabled) return;
-      button.disabled = true;
-
-      const playerName = button.dataset.playerName;
-      this.togglePlayerAttendance(playerName);
-
-      // Re-enable button after processing is complete
-      setTimeout(() => {
-        button.disabled = false;
-      }, 500);
-    });
-  }
 }
 
 // Create and export singleton instance

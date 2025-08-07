@@ -6,6 +6,7 @@
 import { authService } from '../services/auth.js';
 import { notificationManager } from '../services/notifications.js';
 import { hideModal } from './modals.js';
+import { CustomModal } from '../shared/custom-modal.js';
 
 class AuthUI {
   constructor() {
@@ -17,7 +18,7 @@ class AuthUI {
    */
   async init() {
     console.log('Initializing authentication UI');
-    
+
     // Create auth modal if it doesn't exist
     if (!document.getElementById('authModal')) {
       this._createAuthModal();
@@ -67,26 +68,22 @@ class AuthUI {
           `;
         }
       }
-      
+
       try {
-        // Make sure Bootstrap is available
-        if (typeof bootstrap !== 'undefined') {
-          const bsModal = new bootstrap.Modal(authModal);
-          bsModal.show();
-        } else {
-          // Fallback if Bootstrap is not loaded yet
-          console.warn('Bootstrap not loaded, using fallback modal display');
-          authModal.classList.add('show');
-          authModal.style.display = 'block';
-          document.body.classList.add('modal-open');
-          
-          // Create backdrop
-          const backdrop = document.createElement('div');
-          backdrop.className = 'modal-backdrop fade show';
-          document.body.appendChild(backdrop);
-        }
+        // Use custom modal system
+        const modal = CustomModal.getOrCreateInstance(authModal);
+        modal.show();
       } catch (error) {
         console.error('Error showing modal:', error);
+        // Fallback modal display
+        authModal.classList.add('show');
+        authModal.style.display = 'block';
+        document.body.classList.add('modal-open');
+
+        // Create backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade show';
+        document.body.appendChild(backdrop);
       }
     }
   }
@@ -102,7 +99,7 @@ class AuthUI {
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="authModalLabel">NUFC GameTime Authentication</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div class="auth-container">
@@ -150,7 +147,7 @@ class AuthUI {
     document.body.appendChild(modalContainer.firstElementChild);
 
     this.authModalInitialized = true;
-    
+
     // Bind event listeners to the modal buttons
     setTimeout(() => this._bindModalButtons(), 100);
   }
@@ -165,44 +162,92 @@ class AuthUI {
       return;
     }
 
-    // Find the header row
-    const headerRow = document.querySelector('.row.mb-3 .col-12');
-    if (!headerRow) {
+    // Find the header profile container
+    const headerProfileContainer = document.getElementById('header-profile-container');
+    if (!headerProfileContainer) {
       return;
     }
 
     // Create profile button container
     const profileContainer = document.createElement('div');
     profileContainer.className = 'user-profile-container';
-    profileContainer.style.position = 'absolute';
-    profileContainer.style.right = '15px';
-    profileContainer.style.top = '0';
 
     // Create profile button
     const profileButton = document.createElement('button');
     profileButton.id = 'userProfileButton';
-    profileButton.className = 'btn btn-sm btn-outline-secondary';
+    profileButton.className = 'btn btn-sm btn-outline-secondary dropdown-toggle';
     profileButton.innerHTML = '<i class="fas fa-user me-1"></i><span id="profileUsername">Guest</span>';
-    profileButton.setAttribute('data-bs-toggle', 'dropdown');
     profileButton.setAttribute('aria-expanded', 'false');
-    
+
     // Create dropdown menu
-    const dropdownMenu = document.createElement('ul');
+    const dropdownMenu = document.createElement('div');
     dropdownMenu.className = 'dropdown-menu dropdown-menu-end';
+    dropdownMenu.id = 'userProfileDropdown';
     dropdownMenu.setAttribute('aria-labelledby', 'userProfileButton');
-    
+
     // Add dropdown items
     dropdownMenu.innerHTML = `
-      <li><button class="dropdown-item" id="logoutButton">Sign Out</button></li>
+      <button class="dropdown-item" id="logoutButton">
+        <i class="fas fa-sign-out-alt me-2"></i>Sign Out
+      </button>
     `;
-    
+
     // Append elements
     profileContainer.appendChild(profileButton);
     profileContainer.appendChild(dropdownMenu);
-    
-    // Make header position relative for absolute positioning of profile button
-    headerRow.style.position = 'relative';
-    headerRow.appendChild(profileContainer);
+
+    // Add to the header profile container
+    headerProfileContainer.appendChild(profileContainer);
+
+    // Set up dropdown functionality
+    this._setupDropdown(profileButton, dropdownMenu);
+  }
+
+  /**
+   * Set up dropdown functionality
+   * @param {HTMLElement} button - The dropdown button
+   * @param {HTMLElement} menu - The dropdown menu
+   * @private
+   */
+  _setupDropdown(button, menu) {
+    // Toggle dropdown on button click
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const isOpen = menu.classList.contains('show');
+
+      // Close all other dropdowns
+      document.querySelectorAll('.dropdown-menu.show').forEach(dropdown => {
+        dropdown.classList.remove('show');
+      });
+
+      // Toggle this dropdown
+      if (!isOpen) {
+        menu.classList.add('show');
+        button.setAttribute('aria-expanded', 'true');
+      } else {
+        menu.classList.remove('show');
+        button.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!button.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.remove('show');
+        button.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Close dropdown on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && menu.classList.contains('show')) {
+        menu.classList.remove('show');
+        button.setAttribute('aria-expanded', 'false');
+        button.focus();
+      }
+    });
   }
 
   /**
@@ -212,16 +257,56 @@ class AuthUI {
   _bindEventListeners() {
     // Bind modal buttons immediately instead of waiting for DOMContentLoaded
     this._bindModalButtons();
-    
+
     // Add global event listeners for dynamically created elements
     document.body.addEventListener('click', (e) => {
       if (e.target && e.target.id === 'logoutButton') {
-        // Only trigger logout, state change and UI updates will be handled by listeners
+        // Close the dropdown
+        const dropdown = document.getElementById('userProfileDropdown');
+        if (dropdown) {
+          dropdown.classList.remove('show');
+        }
+        const button = document.getElementById('userProfileButton');
+        if (button) {
+          button.setAttribute('aria-expanded', 'false');
+        }
+
+        // Trigger logout
         authService.logout();
+      }
+
+      if (e.target && e.target.id === 'loginButton' && e.target.classList.contains('dropdown-item')) {
+        // Close the dropdown
+        const dropdown = document.getElementById('userProfileDropdown');
+        if (dropdown) {
+          dropdown.classList.remove('show');
+        }
+        const button = document.getElementById('userProfileButton');
+        if (button) {
+          button.setAttribute('aria-expanded', 'false');
+        }
+
+        // Show auth modal
+        this.showAuthModal();
+      }
+
+      if (e.target && e.target.id === 'saveToCloudButton') {
+        // Close the dropdown
+        const dropdown = document.getElementById('userProfileDropdown');
+        if (dropdown) {
+          dropdown.classList.remove('show');
+        }
+        const button = document.getElementById('userProfileButton');
+        if (button) {
+          button.setAttribute('aria-expanded', 'false');
+        }
+
+        // Trigger save to cloud functionality
+        this._handleSaveToCloud();
       }
     });
   }
-  
+
   /**
    * Bind event listeners to modal buttons
    * @private
@@ -232,7 +317,7 @@ class AuthUI {
     if (registerButton) {
       registerButton.onclick = async () => {
         const email = document.getElementById('usernameInput').value.trim();
-        
+
         try {
           console.log('Attempting to register with email:', email);
           const success = await authService.register(email);
@@ -298,31 +383,125 @@ class AuthUI {
   _updateAuthState(isAuthenticated) {
     // Create profile button if it doesn't exist
     this._createProfileButton();
-    
+
     const profileButton = document.getElementById('userProfileButton');
     const profileUsername = document.getElementById('profileUsername');
-    
+    const dropdownMenu = document.getElementById('userProfileDropdown');
+
     if (isAuthenticated) {
       const user = authService.getCurrentUser();
-      
+
       if (profileButton) {
         profileButton.classList.remove('btn-outline-secondary');
         profileButton.classList.add('btn-outline-primary');
       }
-      
+
       if (profileUsername && user) {
         profileUsername.textContent = user.name;
+      }
+
+      // Show options for authenticated users
+      if (dropdownMenu) {
+        dropdownMenu.innerHTML = `
+          <button class="dropdown-item" id="saveToCloudButton">
+            <i class="fas fa-cloud-upload-alt me-2"></i>Save to Cloud
+          </button>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item" id="logoutButton">
+            <i class="fas fa-sign-out-alt me-2"></i>Sign Out
+          </button>
+        `;
       }
     } else {
       if (profileButton) {
         profileButton.classList.remove('btn-outline-primary');
         profileButton.classList.add('btn-outline-secondary');
       }
-      
+
       if (profileUsername) {
         profileUsername.textContent = 'Guest';
       }
+
+      // Show Sign In option for guest users
+      if (dropdownMenu) {
+        dropdownMenu.innerHTML = `
+          <button class="dropdown-item" id="loginButton">
+            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+          </button>
+        `;
+      }
     }
+  }
+
+  /**
+   * Handle save to cloud functionality
+   * @private
+   */
+  _handleSaveToCloud() {
+    // Import required modules
+    Promise.all([
+      import('./match-save-modal.js'),
+      import('../data/state.js'),
+      import('../shared/dom.js'),
+      import('../services/user-matches-api.js'),
+      import('../services/attendance.js')
+    ]).then(([
+      { matchSaveModal },
+      { gameState },
+      { domCache },
+      { userMatchesApi },
+      { attendanceManager }
+    ]) => {
+      // Initialize the modal if not already done
+      matchSaveModal.init();
+
+      // Prepare match info for the modal
+      const team1Name = domCache.get('Team1NameElement')?.textContent || 'Team 1';
+      const team2Name = domCache.get('Team2NameElement')?.textContent || 'Team 2';
+      const score1 = domCache.get('firstScoreElement')?.textContent || '0';
+      const score2 = domCache.get('secondScoreElement')?.textContent || '0';
+      const currentDate = new Date().toLocaleDateString('en-GB');
+      const defaultTitle = `${team1Name}(${score1}):${team2Name}(${score2}) - ${currentDate}`;
+
+      const matchInfo = {
+        defaultTitle,
+        defaultNotes: ''
+      };
+
+      // Define the save callback
+      const onSave = async ({ title, notes }) => {
+        try {
+          // Gather match data
+          const matchData = {
+            title,
+            notes,
+            goals: gameState.goals,
+            matchEvents: gameState.matchEvents,
+            team1History: gameState.team1History,
+            team2History: gameState.team2History,
+            gameTime: gameState.gameTime,
+            team1Name,
+            team2Name,
+            score1,
+            score2,
+            attendance: attendanceManager.getMatchAttendance(),
+            savedAt: Date.now()
+          };
+
+          await userMatchesApi.saveMatchData(matchData);
+          notificationManager.success('Match saved to cloud!');
+        } catch (error) {
+          console.error('Error saving match data:', error);
+          notificationManager.error('Failed to save match data.');
+        }
+      };
+
+      // Show the save modal with proper parameters
+      matchSaveModal.show(matchInfo, onSave);
+    }).catch(error => {
+      console.error('Error loading match save modal:', error);
+      notificationManager.error('Failed to open save dialog');
+    });
   }
 
   /**
@@ -330,16 +509,16 @@ class AuthUI {
    */
   fixModalOverlays() {
     console.log('Fixing modal overlays...');
-    
+
     // Remove all backdrops
     const backdrops = document.querySelectorAll('.modal-backdrop');
     backdrops.forEach(backdrop => backdrop.remove());
-    
+
     // Clean up body
     document.body.classList.remove('modal-open');
     document.body.style.overflow = '';
     document.body.style.paddingRight = '';
-    
+
     // Reset all modals
     const modals = document.querySelectorAll('.modal');
     modals.forEach(modal => {
@@ -349,7 +528,7 @@ class AuthUI {
       modal.removeAttribute('aria-modal');
       modal.removeAttribute('role');
     });
-    
+
     console.log('Modal overlays fixed');
   }
 }

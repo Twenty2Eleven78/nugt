@@ -1,6 +1,6 @@
 /**
  * Roster Management Module
- * @version 3.3
+ * @version 4.0
  */
 
 import { storage } from '../data/storage.js';
@@ -9,6 +9,7 @@ import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from '../ui/modals.js';
 import { rosterUtils } from '../data/default-roster.js';
 import { STORAGE_KEYS } from '../shared/constants.js';
+import { showEditPlayerModal } from '../ui/roster-modal.js';
 
 // Configuration constants
 const ROSTER_CONFIG = {
@@ -136,8 +137,8 @@ class RosterManager {
 
   // Update select dropdowns
   updateSelects() {
-    const goalScorerSelect = domCache.get('goalScorer');
-    const goalAssistSelect = domCache.get('goalAssist');
+    const goalScorerSelect = document.getElementById('goalScorer');
+    const goalAssistSelect = document.getElementById('goalAssist');
 
     if (!goalScorerSelect || !goalAssistSelect) {
       return;
@@ -214,12 +215,22 @@ class RosterManager {
   _refreshUI() {
     this.updateSelects();
     this.updateRosterList();
+    
+    // Update goal modal if it exists
+    if (window.goalModal && window.goalModal.updateRosterData) {
+      window.goalModal.updateRosterData();
+    }
   }
 
   // Helper method to save and refresh after roster changes
   _saveAndRefresh() {
     this._saveRoster();
     this._refreshUI();
+  }
+
+  // Public method to re-bind events (called by roster-modal.js)
+  rebindEvents() {
+    this._bindEvents();
   }
 
   // Helper method to normalize shirt number input
@@ -413,8 +424,8 @@ class RosterManager {
 
   // Handle player removal from select dropdowns
   _handlePlayerRemovalFromSelects(playerName) {
-    const goalScorerSelect = domCache.get('goalScorer');
-    const goalAssistSelect = domCache.get('goalAssist');
+    const goalScorerSelect = document.getElementById('goalScorer');
+    const goalAssistSelect = document.getElementById('goalAssist');
 
     if (goalScorerSelect?.value === playerName) {
       goalScorerSelect.value = '';
@@ -429,8 +440,8 @@ class RosterManager {
 
   // Update selects after player edit
   _updateSelectsAfterEdit(oldName, newName) {
-    const goalScorerSelect = domCache.get('goalScorer');
-    const goalAssistSelect = domCache.get('goalAssist');
+    const goalScorerSelect = document.getElementById('goalScorer');
+    const goalAssistSelect = document.getElementById('goalAssist');
 
     if (goalScorerSelect?.value === oldName) {
       goalScorerSelect.value = newName;
@@ -443,11 +454,15 @@ class RosterManager {
 
   // Bind event listeners
   _bindEvents() {
-    this._bindAddPlayerEvents();
-    this._bindBulkAddEvents();
-    this._bindRosterListEvents();
-    this._bindEditPlayerEvents();
-    this._bindClearRosterEvents();
+    // Only bind events if modal elements exist (for backward compatibility)
+    // The roster-modal.js now handles these events when the modal is shown
+    if (document.getElementById('addPlayerBtn')) {
+      this._bindAddPlayerEvents();
+      this._bindBulkAddEvents();
+      this._bindRosterListEvents();
+      this._bindEditPlayerEvents();
+      this._bindClearRosterEvents();
+    }
   }
 
   // Bind add player events
@@ -530,40 +545,15 @@ class RosterManager {
 
 
 
-  // Show edit player modal
+  // Show edit player modal (now handled by roster modal)
   _showEditPlayerModal(playerName) {
-    const playerToEdit = this.roster.find(p => p.name === playerName);
-    if (!playerToEdit) return;
-
-    const oldNameInput = document.getElementById('editPlayerOldName');
-    const nameInput = document.getElementById('editPlayerName');
-    const shirtNumberInput = document.getElementById('editPlayerShirtNumber');
-
-    if (oldNameInput) oldNameInput.value = playerToEdit.name;
-    if (nameInput) nameInput.value = playerToEdit.name;
-    if (shirtNumberInput) {
-      shirtNumberInput.value = playerToEdit.shirtNumber !== null ? playerToEdit.shirtNumber : '';
-    }
-
-    showModal('editPlayerModal');
+    showEditPlayerModal(playerName);
   }
 
-  // Bind edit player events
+  // Edit player events now handled by roster modal
   _bindEditPlayerEvents() {
-    const editPlayerForm = document.getElementById('editPlayerForm');
-    if (!editPlayerForm) return;
-
-    editPlayerForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      const oldName = document.getElementById('editPlayerOldName')?.value;
-      const newName = document.getElementById('editPlayerName')?.value.trim();
-      const newShirtNumber = document.getElementById('editPlayerShirtNumber')?.value;
-
-      if (this.editPlayer(oldName, newName, newShirtNumber)) {
-        hideModal('editPlayerModal');
-      }
-    });
+    // This functionality is now handled by the roster modal
+    // No need to bind events here
   }
 
   // Bind clear roster events

@@ -278,6 +278,21 @@ class AuthUI {
         // Trigger logout
         authService.logout();
       }
+      
+      if (e.target && e.target.id === 'loginButton' && e.target.classList.contains('dropdown-item')) {
+        // Close the dropdown
+        const dropdown = document.getElementById('userProfileDropdown');
+        if (dropdown) {
+          dropdown.classList.remove('show');
+        }
+        const button = document.getElementById('userProfileButton');
+        if (button) {
+          button.setAttribute('aria-expanded', 'false');
+        }
+
+        // Show auth modal
+        this.showAuthModal();
+      }
     });
   }
 
@@ -360,6 +375,7 @@ class AuthUI {
 
     const profileButton = document.getElementById('userProfileButton');
     const profileUsername = document.getElementById('profileUsername');
+    const dropdownMenu = document.getElementById('userProfileDropdown');
 
     if (isAuthenticated) {
       const user = authService.getCurrentUser();
@@ -372,6 +388,15 @@ class AuthUI {
       if (profileUsername && user) {
         profileUsername.textContent = user.name;
       }
+
+      // Show Sign Out option for authenticated users
+      if (dropdownMenu) {
+        dropdownMenu.innerHTML = `
+          <button class="dropdown-item" id="logoutButton">
+            <i class="fas fa-sign-out-alt me-2"></i>Sign Out
+          </button>
+        `;
+      }
     } else {
       if (profileButton) {
         profileButton.classList.remove('btn-outline-primary');
@@ -380,6 +405,15 @@ class AuthUI {
 
       if (profileUsername) {
         profileUsername.textContent = 'Guest';
+      }
+
+      // Show Sign In option for guest users
+      if (dropdownMenu) {
+        dropdownMenu.innerHTML = `
+          <button class="dropdown-item" id="loginButton">
+            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+          </button>
+        `;
       }
     }
   }

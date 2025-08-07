@@ -328,9 +328,9 @@ const renderCards = (matches) => {
         listItem.style.cursor = 'pointer';
 
         listItem.innerHTML = `
-          <div class="card-body" style="padding: 1rem;">
+          <div class="card-body" style="padding: 1.25rem;">
             <div class="d-flex justify-content-between align-items-start">
-              <div class="flex-grow-1 me-2">
+              <div class="flex-grow-1 me-3">
                 <div class="d-flex align-items-center mb-1">
                   <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-2" 
                        style="width: 28px; height: 28px;">
@@ -346,11 +346,11 @@ const renderCards = (matches) => {
                   <i class="fas fa-calendar me-1"></i>${formattedDate} ${formattedTime}
                 </div>
               </div>
-              <div class="d-flex flex-column gap-1 flex-shrink-0">
+              <div class="d-flex flex-column gap-2 flex-shrink-0" style="padding: 0.25rem;">
                 <button class="btn btn-primary btn-sm view-match-btn" data-match-index="${index}" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" title="View Match">
                   View
                 </button>
-                <div class="d-flex gap-1">
+                <div class="d-flex gap-2">
                   <button class="btn btn-outline-warning btn-sm transfer-match-btn" data-match-index="${index}" style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" title="Transfer">
                     <i class="fas fa-exchange-alt"></i>
                   </button>

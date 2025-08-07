@@ -231,6 +231,9 @@ export function initializeApp() {
 
   // Make timer controller available globally for beforeunload handler
   window.timerControllerInstance = timerController;
+  
+  // Make goal manager available globally for goal modal
+  window.goalManager = goalManager;
 
   // Initialize PWA updater
   pwaUpdater.init().then(success => {

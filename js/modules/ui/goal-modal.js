@@ -120,13 +120,25 @@ class GoalModal {
     // Add single event listener to the new form
     const finalForm = document.getElementById('goalForm');
     if (finalForm) {
-      finalForm.addEventListener('submit', (event) => {
+      finalForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         event.stopPropagation();
 
-        // Call the goal manager's addGoal method
-        if (window.goalManager && window.goalManager.addGoal) {
-          window.goalManager.addGoal(event);
+        try {
+          // Import the goal manager dynamically to ensure it's available
+          const { goalManager } = await import('../match/goals.js');
+          
+          if (goalManager && goalManager.addGoal) {
+            goalManager.addGoal(event);
+          } else {
+            console.error('Goal manager not available');
+            throw new Error('Goal manager not available');
+          }
+        } catch (error) {
+          console.error('Error handling goal submission:', error);
+          // Import notification manager to show error
+          const { notificationManager } = await import('../services/notifications.js');
+          notificationManager.error('Failed to record goal. Please try again.');
         }
       });
     }

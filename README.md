@@ -1,15 +1,30 @@
-# NUFC GameTime App - Release Notes
+## 🚀 Version 4.0 - Enhanced UI & Admin Features
+**Released: August 2025**
 
-## 🚀 Version 3.7 - Mobile-First Layout Optimization
+### 🎨 UI/UX Enhancements
+- **Removal of Bootstrap**: Removed bootstrap and implimented custom CSS
+
+### 🔐 Authentication & Admin Features
+- **Enhanced User Profile**: Added "Save to Cloud" option in user profile dropdown for authenticated users
+- **Improved Sign-In Flow**: Better handling of authentication state changes
+
+### 🛠️ Technical Improvements
+- **Code Cleanup**: Removed redundant code and duplicate functions across the codebase
+- **Error Handling**: Improved error handling for goal modal and form submissions
+- **Modal System**: Enhanced modal initialization and global availability
+- **Performance**: Optimized imports and reduced code duplication
+
+---
+
+## 📋 Previous Versions
+
+### Version 3.7 - Layout Optimization
 **Released: July 2025**
 
 ### 📱 Mobile Layout Revolution
 - **Compact Events Tab**: Redesigned statistics cards for maximum screen space utilization
 - **Streamlined Controls**: Removed search functionality, simplified filter controls
 - **Game Tab Redesign**: Complete mobile-first redesign with improved information hierarchy
-- **Optimized Scoreboard**: Horizontal team-score-team layout for better mobile viewing
-- **Enhanced Game Actions**: Large, touch-friendly action buttons with visual feedback
-- **Repositioned Timer**: Game timer moved to bottom for better workflow
 
 ### 🎯 Mobile-First Improvements
 - **40px+ Space Savings**: Compact statistics cards provide more room for event information

@@ -223,6 +223,9 @@ export function initializeApp() {
   attendanceModal.init();
   sharingModal.init();
 
+  // Make modals available globally after initialization
+  window.goalModal = goalModal;
+
   // Initialize theme manager
   themeManager.init();
 
@@ -232,7 +235,7 @@ export function initializeApp() {
   // Make timer controller available globally for beforeunload handler
   window.timerControllerInstance = timerController;
   
-  // Make goal manager available globally for goal modal
+  // Make goal manager available globally
   window.goalManager = goalManager;
 
   // Initialize PWA updater
@@ -355,6 +358,21 @@ function bindEventListeners() {
       }
     });
   }
+
+  // Auth button in options card
+  const showAuthButtonCard = document.getElementById('showAuthButtonCard');
+  if (showAuthButtonCard) {
+    showAuthButtonCard.addEventListener('click', () => {
+      authUI.showAuthModal();
+    });
+  }
+
+  // Save button in options card
+  const saveMatchDataBtnCard = document.getElementById('saveMatchDataBtnCard');
+  if (saveMatchDataBtnCard) {
+    saveMatchDataBtnCard.addEventListener('click', handleSaveMatch);
+  }
+
   // Timer controls
   const startPauseButton = domCache.get('startPauseButton');
   if (startPauseButton) {

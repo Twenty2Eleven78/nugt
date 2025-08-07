@@ -442,13 +442,66 @@ class AuthUI {
    * @private
    */
   _handleSaveToCloud() {
-    // Import and show the match save modal
-    import('./match-save-modal.js').then(({ matchSaveModal }) => {
+    // Import required modules
+    Promise.all([
+      import('./match-save-modal.js'),
+      import('../data/state.js'),
+      import('../shared/dom.js'),
+      import('../services/user-matches-api.js'),
+      import('../services/attendance.js')
+    ]).then(([
+      { matchSaveModal },
+      { gameState },
+      { domCache },
+      { userMatchesApi },
+      { attendanceManager }
+    ]) => {
       // Initialize the modal if not already done
       matchSaveModal.init();
 
-      // Show the save modal
-      matchSaveModal.show();
+      // Prepare match info for the modal
+      const team1Name = domCache.get('Team1NameElement')?.textContent || 'Team 1';
+      const team2Name = domCache.get('Team2NameElement')?.textContent || 'Team 2';
+      const score1 = domCache.get('firstScoreElement')?.textContent || '0';
+      const score2 = domCache.get('secondScoreElement')?.textContent || '0';
+      const currentDate = new Date().toLocaleDateString('en-GB');
+      const defaultTitle = `${team1Name}(${score1}):${team2Name}(${score2}) - ${currentDate}`;
+
+      const matchInfo = {
+        defaultTitle,
+        defaultNotes: ''
+      };
+
+      // Define the save callback
+      const onSave = async ({ title, notes }) => {
+        try {
+          // Gather match data
+          const matchData = {
+            title,
+            notes,
+            goals: gameState.goals,
+            matchEvents: gameState.matchEvents,
+            team1History: gameState.team1History,
+            team2History: gameState.team2History,
+            gameTime: gameState.gameTime,
+            team1Name,
+            team2Name,
+            score1,
+            score2,
+            attendance: attendanceManager.getMatchAttendance(),
+            savedAt: Date.now()
+          };
+
+          await userMatchesApi.saveMatchData(matchData);
+          notificationManager.success('Match saved to cloud!');
+        } catch (error) {
+          console.error('Error saving match data:', error);
+          notificationManager.error('Failed to save match data.');
+        }
+      };
+
+      // Show the save modal with proper parameters
+      matchSaveModal.show(matchInfo, onSave);
     }).catch(error => {
       console.error('Error loading match save modal:', error);
       notificationManager.error('Failed to open save dialog');

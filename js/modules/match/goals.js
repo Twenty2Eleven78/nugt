@@ -18,11 +18,25 @@ class GoalManager {
   // Show goal modal and capture timestamp
   showGoalModal() {
     stateManager.setPendingGoalTimestamp(getCurrentSeconds());
-    // Use the goal modal's show method which updates roster data
-    if (window.goalModal) {
+    
+    // Try to use the goal modal instance first
+    if (window.goalModal && typeof window.goalModal.show === 'function') {
       window.goalModal.show();
     } else {
-      showModal('goalModal');
+      // Fallback to importing the goal modal dynamically
+      import('../ui/goal-modal.js').then(({ default: goalModal }) => {
+        if (goalModal && typeof goalModal.show === 'function') {
+          goalModal.show();
+          // Make it available globally for next time
+          window.goalModal = goalModal;
+        } else {
+          // Final fallback to basic modal system
+          showModal('goalModal');
+        }
+      }).catch(error => {
+        console.error('Error loading goal modal:', error);
+        showModal('goalModal');
+      });
     }
   }
 

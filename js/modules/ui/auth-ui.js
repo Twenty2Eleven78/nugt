@@ -162,18 +162,15 @@ class AuthUI {
       return;
     }
 
-    // Find the header row
-    const headerRow = document.querySelector('.row.mb-2 .col-12') || document.querySelector('.row.mb-3 .col-12');
-    if (!headerRow) {
+    // Find the header profile container
+    const headerProfileContainer = document.getElementById('header-profile-container');
+    if (!headerProfileContainer) {
       return;
     }
 
     // Create profile button container
     const profileContainer = document.createElement('div');
     profileContainer.className = 'user-profile-container';
-    profileContainer.style.position = 'absolute';
-    profileContainer.style.right = '15px';
-    profileContainer.style.top = '0';
 
     // Create profile button
     const profileButton = document.createElement('button');
@@ -199,9 +196,8 @@ class AuthUI {
     profileContainer.appendChild(profileButton);
     profileContainer.appendChild(dropdownMenu);
 
-    // Make header position relative for absolute positioning of profile button
-    headerRow.style.position = 'relative';
-    headerRow.appendChild(profileContainer);
+    // Add to the header profile container
+    headerProfileContainer.appendChild(profileContainer);
 
     // Set up dropdown functionality
     this._setupDropdown(profileButton, dropdownMenu);

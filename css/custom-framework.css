@@ -857,12 +857,12 @@ html {
     }
 
     .main-container {
-        padding-bottom: 100px;
+        padding-bottom: 140px;
         /* Account for enlarged mobile nav */
     }
 
     .content-wrapper {
-        height: calc(100vh - 160px);
+        height: calc(100vh - 220px);
         /* Account for header and enlarged mobile nav */
     }
 
@@ -1284,7 +1284,7 @@ html {
 
 /* Tab System */
 .content-wrapper {
-    height: calc(100vh - 150px);
+    height: calc(100vh - 180px);
     /* Account for header and bottom nav */
     overflow: hidden;
 }

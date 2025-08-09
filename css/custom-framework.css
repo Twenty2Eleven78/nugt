@@ -858,6 +858,8 @@ html {
 
     .main-container {
         padding-bottom: 160px; /* More space for enlarged mobile nav */
+        overscroll-behavior-y: none;
+        -webkit-overflow-scrolling: touch;
     }
     
     .container-fluid {
@@ -1287,6 +1289,8 @@ html, body {
     overflow: hidden;
     margin: 0;
     padding: 0;
+    overscroll-behavior: none;
+    touch-action: pan-x pan-y;
 }
 
 .main-container {
@@ -1295,6 +1299,12 @@ html, body {
     height: 100vh;
     overflow: hidden;
     padding-bottom: 110px; /* Space for fixed bottom nav */
+    overscroll-behavior: none;
+    touch-action: pan-x pan-y;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
 }
 
 .container-fluid {
@@ -1400,6 +1410,8 @@ html, body {
     overflow: hidden;
     min-height: 0;
     max-height: 100%;
+    overscroll-behavior: none;
+    touch-action: pan-x pan-y;
 }
 
 .scoreboard-card {

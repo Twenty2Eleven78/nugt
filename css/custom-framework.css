@@ -1332,15 +1332,19 @@ html, body {
 .tab-content {
     flex: 1;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    position: relative;
 }
 
 .tab-pane {
     flex: 1;
     overflow: hidden;
-    display: none;
+    display: none !important;
     min-height: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
 #gametab {
@@ -1351,7 +1355,8 @@ html, body {
 }
 
 .tab-pane.active {
-    display: block;
+    display: flex !important;
+    flex-direction: column;
 }
 
 .tab-pane.fade {
@@ -1364,7 +1369,8 @@ html, body {
 }
 
 .tab-pane.show {
-    display: block;
+    display: flex !important;
+    flex-direction: column;
 }
 
 /* Options and Events tabs need scrolling */
@@ -1374,8 +1380,13 @@ html, body {
 }
 
 #optionstab.show,
-#optionstab.active {
-    display: block !important;
+#optionstab.active,
+#gamelogtab.show,
+#gamelogtab.active,
+#gametab.show,
+#gametab.active {
+    display: flex !important;
+    flex-direction: column;
 }
 
 #gamelogtab {

@@ -140,6 +140,9 @@
 .enhanced-timeline {
     min-height: 100px;
     contain: layout;
+    overflow-y: auto;
+    touch-action: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Event statistics - prevent layout shifts */
@@ -1294,8 +1297,8 @@ html, body {
     overflow: hidden;
     margin: 0;
     padding: 0;
-    overscroll-behavior: none;
-    touch-action: pan-x pan-y;
+    overscroll-behavior-y: none;
+    touch-action: manipulation;
 }
 
 .main-container {
@@ -1304,8 +1307,8 @@ html, body {
     height: 100vh;
     overflow: hidden;
     padding-bottom: 110px; /* Space for fixed bottom nav */
-    overscroll-behavior: none;
-    touch-action: pan-x pan-y;
+    overscroll-behavior-y: none;
+    touch-action: manipulation;
     position: fixed;
     top: 0;
     left: 0;
@@ -1382,6 +1385,8 @@ html, body {
 #optionstab {
     overflow-y: auto;
     padding: var(--spacing-sm);
+    touch-action: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 #optionstab.show,
@@ -1397,6 +1402,8 @@ html, body {
 #gamelogtab {
     overflow-y: auto;
     padding: var(--spacing-sm);
+    touch-action: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Options container */
@@ -1415,6 +1422,9 @@ html, body {
     flex-direction: column;
     overflow-y: auto;
     padding: 0 var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
+    overscroll-behavior-y: contain;
+    touch-action: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Game tab stays with no scroll */
@@ -1676,6 +1686,10 @@ html, body {
     border-radius: var(--border-radius-sm);
     border: 1px solid var(--border-color);
     min-height: 200px;
+    overflow-y: auto;
+    touch-action: auto;
+    -webkit-overflow-scrolling: touch;
+    flex: 1;
 }
 
 /* Options Components */

@@ -1396,14 +1396,20 @@ html, body {
 
 /* Options container */
 .options-container {
-    min-height: 100%;
-    padding-bottom: var(--spacing-lg);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 0 var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
 }
 
 /* Events container */
 .events-container {
-    min-height: 100%;
-    padding-bottom: var(--spacing-lg);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 0 var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
 }
 
 /* Game tab stays with no scroll */

@@ -29,6 +29,7 @@ export function getEventCardClass(eventType) {
     [EVENT_TYPES.FOUL]: 'border-warning border-2',
     [EVENT_TYPES.PENALTY]: 'border-primary border-2',
     [EVENT_TYPES.INCIDENT]: 'border-secondary border-2',
+    [EVENT_TYPES.GAME_STARTED]: 'border-success border-2',
     [EVENT_TYPES.HALF_TIME]: 'border-info border-2',
     [EVENT_TYPES.FULL_TIME]: 'border-success border-2'
   };

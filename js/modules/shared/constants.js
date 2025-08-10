@@ -84,6 +84,7 @@ export const EVENT_TYPES = {
   OFFSIDE: 'Offside',
 
   // Game Flow Events
+  GAME_STARTED: 'Game Started',
   HALF_TIME: 'Half Time',
   FULL_TIME: 'Full Time',
   EXTRA_TIME: 'Extra Time',
@@ -112,6 +113,7 @@ export const EVENT_ICONS = {
   [EVENT_TYPES.PENALTY]: 'fas fa-futbol text-danger',
   [EVENT_TYPES.FREE_KICK]: 'fas fa-running text-primary',
   [EVENT_TYPES.CORNER]: 'fas fa-flag text-info',
+  [EVENT_TYPES.GAME_STARTED]: 'fas fa-play text-success',
   [EVENT_TYPES.HALF_TIME]: 'fas fa-pause text-secondary',
   [EVENT_TYPES.FULL_TIME]: 'fas fa-stop text-dark',
   [EVENT_TYPES.INCIDENT]: 'fas fa-exclamation-triangle text-warning',

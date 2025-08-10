@@ -7,8 +7,9 @@ import { gameState, stateManager } from '../data/state.js';
 import { storage, storageHelpers } from '../data/storage.js';
 import { domCache } from '../shared/dom.js';
 import { formatTime, getCurrentSeconds } from '../shared/utils.js';
-import { GAME_CONFIG } from '../shared/constants.js';
+import { GAME_CONFIG, EVENT_TYPES } from '../shared/constants.js';
 import { notificationManager } from '../services/notifications.js';
+import { combinedEventsManager } from '../match/combined-events.js';
 
 // Timer controller class
 class TimerController {
@@ -40,9 +41,29 @@ class TimerController {
       }
     }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
 
-    const buttonText = gameState.seconds > 0 ? 'Game Resumed' : 'Game Started';
+    const isNewGame = gameState.seconds === 0;
+    const buttonText = isNewGame ? 'Game Started' : 'Game Resumed';
     this._updateButtonUI('Game in Progress', 'btn-success', formatTime(gameState.seconds));
     notificationManager.success(buttonText + '!');
+
+    // Log game start event to timeline for new games
+    if (isNewGame) {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-GB', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      const timeStr = now.toLocaleTimeString('en-GB', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      
+      const gameStartNotes = `${dateStr} at ${timeStr}`;
+      combinedEventsManager.addMatchEvent(EVENT_TYPES.GAME_STARTED, gameStartNotes);
+    }
 
     // Save immediately when starting/resuming
     storageHelpers.saveGameStateImmediate(gameState);

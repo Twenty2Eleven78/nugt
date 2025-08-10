@@ -1311,26 +1311,103 @@ html, body {
     display: none; /* WebKit */
 }
 
-/* Swipe gesture enhancements */
+/* Enhanced swipe gesture animations */
 .tab-content {
+    position: relative;
     touch-action: pan-y; /* Allow vertical scrolling but enable horizontal swipes */
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+
+.tab-content .tab-pane {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Active tab positioning */
+.tab-pane.active,
+.tab-pane.show {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Slide animation classes */
+.tab-pane.slide-in-left {
+    transform: translateX(-100%);
+    animation: slideInLeft 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.tab-pane.slide-in-right {
+    transform: translateX(100%);
+    animation: slideInRight 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.tab-pane.slide-out-left {
+    animation: slideOutLeft 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.tab-pane.slide-out-right {
+    animation: slideOutRight 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Keyframe animations */
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutLeft {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
 }
 
 .swipe-indicator {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-/* Add subtle transition effects for tab switching */
-.tab-pane {
-    transition: opacity 0.15s ease-in-out;
-}
-
-.tab-pane.fade:not(.show) {
-    opacity: 0;
-}
-
-.tab-pane.fade.show {
-    opacity: 1;
 }
 
 .main-container {
@@ -1369,68 +1446,34 @@ html, body {
     flex-direction: column;
 }
 
-.tab-content {
-    flex: 1;
-    overflow: hidden;
-    position: relative;
-}
-
+/* Tab content structure - works with slide animations */
 .tab-pane {
     flex: 1;
-    overflow: hidden;
-    display: none !important;
     min-height: 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    display: flex !important;
+    flex-direction: column;
 }
 
+/* Specific tab configurations */
 #gametab {
     flex: 1;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
 }
 
-.tab-pane.active {
-    display: flex !important;
-    flex-direction: column;
+#gamelogtab {
+    overflow-y: auto;
 }
 
-.tab-pane.fade {
-    opacity: 0;
-    transition: opacity 0.15s linear;
-}
-
-.tab-pane.fade.show {
-    opacity: 1;
-}
-
-.tab-pane.show {
-    display: flex !important;
-    flex-direction: column;
-}
-
-/* Options and Events tabs need scrolling */
 #optionstab {
     overflow-y: auto;
     padding: var(--spacing-sm);
 }
 
-#optionstab.show,
-#optionstab.active,
-#gamelogtab.show,
-#gamelogtab.active,
-#gametab.show,
-#gametab.active {
+/* Ensure all tabs are properly displayed with animations */
+.tab-pane.show,
+.tab-pane.active {
     display: flex !important;
     flex-direction: column;
-}
-
-#gamelogtab {
-    overflow-y: scroll !important;
     padding: var(--spacing-sm);
     touch-action: auto !important;
     -webkit-overflow-scrolling: touch;

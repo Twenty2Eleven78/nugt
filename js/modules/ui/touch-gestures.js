@@ -16,7 +16,7 @@ class TouchGestures {
     this.currentTabIndex = 0;
     this.tabs = ['gametab', 'gamelogtab', 'optionstab'];
     this.tabLinks = [];
-    
+
     this.init();
   }
 
@@ -50,7 +50,7 @@ class TouchGestures {
 
   handleTouchStart(e) {
     if (!this.isEnabled) return;
-    
+
     const touch = e.touches[0];
     this.startX = touch.clientX;
     this.startY = touch.clientY;
@@ -58,18 +58,18 @@ class TouchGestures {
 
   handleTouchEnd(e) {
     if (!this.isEnabled) return;
-    
+
     const touch = e.changedTouches[0];
     this.endX = touch.clientX;
     this.endY = touch.clientY;
-    
+
     this.handleSwipe();
   }
 
   handleSwipe() {
     const deltaX = this.endX - this.startX;
     const deltaY = Math.abs(this.endY - this.startY);
-    
+
     // Check if it's a horizontal swipe (not vertical scroll)
     if (Math.abs(deltaX) < this.minSwipeDistance || deltaY > this.maxVerticalDistance) {
       return;
@@ -93,15 +93,64 @@ class TouchGestures {
       targetIndex = 0;
     }
 
-    // Activate the target tab
-    const targetLink = this.tabLinks[targetIndex];
-    if (targetLink) {
-      targetLink.click();
-      this.currentTabIndex = targetIndex;
-      
-      // Add visual feedback
-      this.showSwipeIndicator(targetIndex);
+    // Don't navigate if already on target tab
+    if (targetIndex === this.currentTabIndex) {
+      return;
     }
+
+    // Determine slide direction
+    const isMovingRight = targetIndex > this.currentTabIndex ||
+      (this.currentTabIndex === this.tabs.length - 1 && targetIndex === 0);
+
+    // Perform animated tab transition
+    this.animateTabTransition(this.currentTabIndex, targetIndex, isMovingRight);
+
+    // Update current index
+    this.currentTabIndex = targetIndex;
+  }
+
+  animateTabTransition(fromIndex, toIndex, isMovingRight) {
+    const fromTab = document.getElementById(this.tabs[fromIndex]);
+    const toTab = document.getElementById(this.tabs[toIndex]);
+    const fromLink = this.tabLinks[fromIndex];
+    const toLink = this.tabLinks[toIndex];
+
+    if (!fromTab || !toTab || !fromLink || !toLink) return;
+
+    // Disable gestures during animation
+    this.temporaryDisable(350);
+
+    // Set up animation classes
+    const outClass = isMovingRight ? 'slide-out-left' : 'slide-out-right';
+    const inClass = isMovingRight ? 'slide-in-right' : 'slide-in-left';
+
+    // Update tab link states immediately
+    fromLink.classList.remove('active');
+    toLink.classList.add('active');
+
+    // Prepare target tab for animation
+    toTab.classList.add('show', 'active');
+    toTab.classList.remove('slide-in-left', 'slide-in-right', 'slide-out-left', 'slide-out-right');
+
+    // Start animations
+    requestAnimationFrame(() => {
+      // Animate out current tab
+      fromTab.classList.add(outClass);
+
+      // Animate in target tab
+      toTab.classList.add(inClass);
+    });
+
+    // Clean up after animation
+    setTimeout(() => {
+      // Remove animation classes
+      fromTab.classList.remove('show', 'active', outClass);
+      toTab.classList.remove(inClass);
+
+      // Ensure proper final state
+      fromTab.classList.remove('slide-in-left', 'slide-in-right', 'slide-out-left', 'slide-out-right');
+      toTab.classList.remove('slide-in-left', 'slide-in-right', 'slide-out-left', 'slide-out-right');
+    }, 320);
   }
 
   updateCurrentTabIndex() {
@@ -113,46 +162,7 @@ class TouchGestures {
     });
   }
 
-  showSwipeIndicator(tabIndex) {
-    // Create a brief visual indicator showing which tab was activated
-    const tabNames = ['Game', 'Events', 'Options'];
-    const indicator = document.createElement('div');
-    indicator.className = 'swipe-indicator';
-    indicator.textContent = tabNames[tabIndex];
-    indicator.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.8);
-      color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 500;
-      z-index: 10000;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    `;
 
-    document.body.appendChild(indicator);
-
-    // Animate in
-    requestAnimationFrame(() => {
-      indicator.style.opacity = '1';
-    });
-
-    // Remove after animation
-    setTimeout(() => {
-      indicator.style.opacity = '0';
-      setTimeout(() => {
-        if (indicator.parentNode) {
-          indicator.parentNode.removeChild(indicator);
-        }
-      }, 200);
-    }, 800);
-  }
 
   enable() {
     this.isEnabled = true;

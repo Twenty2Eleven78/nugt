@@ -95,19 +95,42 @@ export function formatMatchTime(seconds, options = {}) {
     if (gameState.isSecondHalf) {
       // Second half
       if (seconds <= fullTime) {
-        displayTime = Math.ceil((seconds - halfTime) / (useMinutes ? 60 : 1));
-        displayTime = Math.max(displayTime, 45); // Start from 45 minutes
+        // Calculate second half time and add to actual half-time duration
+        // Round up: if any seconds past the minute, go to next minute
+        const secondHalfSeconds = seconds - halfTime;
+        const secondHalfMinutes = useMinutes ? 
+          Math.floor(secondHalfSeconds / 60) + (secondHalfSeconds % 60 > 0 ? 1 : 0) :
+          secondHalfSeconds;
+        const actualHalfTimeMinutes = useMinutes ?
+          Math.floor(halfTime / 60) + (halfTime % 60 > 0 ? 1 : 0) :
+          halfTime;
+        displayTime = actualHalfTimeMinutes + Math.max(secondHalfMinutes, 0);
+
       } else {
-        displayTime = Math.ceil(fullTime / (useMinutes ? 60 : 1));
-        extraTime = Math.ceil((seconds - fullTime) / (useMinutes ? 60 : 1));
+        const fullTimeMinutes = useMinutes ? 
+          Math.floor(fullTime / 60) + (fullTime % 60 > 0 ? 1 : 0) :
+          fullTime;
+        displayTime = fullTimeMinutes;
+        const extraSeconds = seconds - fullTime;
+        extraTime = useMinutes ?
+          Math.floor(extraSeconds / 60) + (extraSeconds % 60 > 0 ? 1 : 0) :
+          extraSeconds;
       }
     } else {
       // First half
       if (seconds <= halfTime) {
-        displayTime = Math.ceil(seconds / (useMinutes ? 60 : 1));
+        displayTime = useMinutes ? 
+          Math.floor(seconds / 60) + (seconds % 60 > 0 ? 1 : 0) :
+          seconds;
       } else {
-        displayTime = Math.ceil(halfTime / (useMinutes ? 60 : 1));
-        extraTime = Math.ceil((seconds - halfTime) / (useMinutes ? 60 : 1));
+        const halfTimeMinutes = useMinutes ?
+          Math.floor(halfTime / 60) + (halfTime % 60 > 0 ? 1 : 0) :
+          halfTime;
+        displayTime = halfTimeMinutes;
+        const extraSeconds = seconds - halfTime;
+        extraTime = useMinutes ?
+          Math.floor(extraSeconds / 60) + (extraSeconds % 60 > 0 ? 1 : 0) :
+          extraSeconds;
       }
     }
     

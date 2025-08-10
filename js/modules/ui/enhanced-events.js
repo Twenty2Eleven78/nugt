@@ -17,7 +17,7 @@ class EnhancedEventsManager {
   // Initialize enhanced events functionality
   init() {
     if (this.isInitialized) return;
-    
+
     this._bindEvents();
     this.updateEventStatistics();
     this.isInitialized = true;
@@ -26,7 +26,7 @@ class EnhancedEventsManager {
   // Update event statistics cards
   updateEventStatistics() {
     const stats = this._calculateEventStatistics();
-    
+
     // Update statistics cards
     const goalsCount = document.getElementById('goals-count');
     const cardsCount = document.getElementById('cards-count');
@@ -58,7 +58,7 @@ class EnhancedEventsManager {
     // Count different event types
     gameState.matchEvents.forEach(event => {
       const eventType = event.type.toLowerCase();
-      
+
       if (eventType.includes('card')) {
         stats.cards++;
       } else if (eventType.includes('foul')) {
@@ -104,7 +104,7 @@ class EnhancedEventsManager {
   // Method to be called when events are updated
   onEventsUpdated() {
     this.updateEventStatistics();
-    
+
     // Small delay to ensure DOM is updated
     setTimeout(() => {
       this.applyFilters();

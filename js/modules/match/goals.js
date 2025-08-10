@@ -9,9 +9,8 @@ import { domCache } from '../shared/dom.js';
 import { getCurrentSeconds, formatMatchTime } from '../shared/utils.js';
 import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from '../ui/modals.js';
-import { updateMatchLog } from './events.js';
+import { updateMatchLog, combinedEventsManager } from './combined-events.js';
 import { attendanceManager } from '../services/attendance.js';
-import { enhancedEventsManager } from '../ui/enhanced-events.js';
 
 // Goal management class
 class GoalManager {
@@ -73,7 +72,7 @@ class GoalManager {
 
     // Save and cleanup
     storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
-    enhancedEventsManager.onEventsUpdated();
+    combinedEventsManager.onEventsUpdated();
     this._resetGoalForm();
   }
 
@@ -214,8 +213,8 @@ export function toggleGoalDisallowed(index) {
   // Save updated goals data
   storageHelpers.saveMatchData(gameState);
 
-  // Update enhanced events manager
-  enhancedEventsManager.onEventsUpdated();
+  // Update events display
+  combinedEventsManager.onEventsUpdated();
 
   const goal_updated = gameState.goals[index];
   if (goal_updated.disallowed) {

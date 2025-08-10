@@ -21,14 +21,13 @@ import { timerController } from './game/timer.js';
 
 // Match modules
 import { goalManager, toggleGoalDisallowed } from './match/goals.js';
-import { eventsManager, updateMatchLog, deleteLogEntry } from './match/events.js';
+import { combinedEventsManager as eventsManager, updateMatchLog, deleteLogEntry } from './match/combined-events.js';
 import { teamManager } from './match/teams.js';
 import { rosterManager } from './match/roster.js';
 
 // UI modules
 import { bindModalEvents } from './ui/modals.js';
 import { initializeTooltips } from './ui/components.js';
-import { enhancedEventsManager } from './ui/enhanced-events.js';
 import { releaseNotesManager } from './ui/release-notes.js';
 import { authUI } from './ui/auth-ui.js';
 import { matchSaveModal } from './ui/match-save-modal.js';
@@ -208,7 +207,7 @@ export function initializeApp() {
   bindEventListeners();
   bindModalEvents();
   initializeTooltips();
-  enhancedEventsManager.init();
+  eventsManager.init(); // Combined events manager handles both basic and enhanced functionality
   releaseNotesManager.init();
   matchSaveModal.init();
   matchLoadModal.init();

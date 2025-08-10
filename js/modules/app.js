@@ -35,6 +35,7 @@ import { matchSaveModal } from './ui/match-save-modal.js';
 import { matchLoadModal } from './ui/match-load-modal.js';
 import { matchSummaryModal } from './ui/match-summary-modal.js';
 import { rawDataModal } from './ui/raw-data-modal.js';
+import { touchGestures } from './ui/touch-gestures.js';
 import teamModals from './ui/team-modals.js';
 import goalModal from './ui/goal-modal.js';
 import eventModals from './ui/event-modals.js';

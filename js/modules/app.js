@@ -568,6 +568,25 @@ window.AuthModule = {
   logout: () => authService.logout()
 };
 
+// Debug utilities (for development/troubleshooting)
+window.DebugModule = {
+  // Modal debugging
+  fixModalOverlays: () => authUI.fixModalOverlays(),
+  cleanupModals: () => {
+    import('./ui/modals.js').then(({ cleanupModalOverlays }) => {
+      cleanupModalOverlays();
+    });
+  },
+  
+  // Auth debugging  
+  showAuthModal: () => authUI.showAuthModal(),
+  hideAuthModal: () => authUI.hideModal(),
+  
+  // State debugging
+  getGameState: () => gameState,
+  resetApp: () => resetTracker()
+};
+
 
 
 // Global functions for backward compatibility (only keep essential ones)

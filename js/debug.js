@@ -8,16 +8,16 @@ import { authUI } from './modules/ui/auth-ui.js';
 // Function to fix modal overlay issues
 function fixModalOverlays() {
   console.log('Fixing modal overlays...');
-  
+
   // Remove all backdrops
   const backdrops = document.querySelectorAll('.modal-backdrop');
   backdrops.forEach(backdrop => backdrop.remove());
-  
+
   // Clean up body
   document.body.classList.remove('modal-open');
   document.body.style.overflow = '';
   document.body.style.paddingRight = '';
-  
+
   // Reset all modals
   const modals = document.querySelectorAll('.modal');
   modals.forEach(modal => {
@@ -27,7 +27,7 @@ function fixModalOverlays() {
     modal.removeAttribute('aria-modal');
     modal.removeAttribute('role');
   });
-  
+
   console.log('Modal overlays fixed');
 }
 

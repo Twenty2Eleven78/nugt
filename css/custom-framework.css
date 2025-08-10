@@ -1889,9 +1889,6 @@ html, body {
     }
     
     /* Mobile Options Tab Improvements */
-    #optionstab .row.g-3 {
-        gap: var(--spacing-sm) !important;
-    }
     
     .quick-action-card {
         min-height: 80px;

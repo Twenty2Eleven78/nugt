@@ -582,6 +582,27 @@ window.DebugModule = {
   showAuthModal: () => authUI.showAuthModal(),
   hideAuthModal: () => authUI.hideModal(),
   
+  // Profile debugging
+  checkProfileElements: () => {
+    const container = document.getElementById('header-profile-container');
+    const button = document.getElementById('userProfileButton');
+    const dropdown = document.getElementById('userProfileDropdown');
+    
+    console.log('Profile debugging:', {
+      container: container ? 'EXISTS' : 'MISSING',
+      button: button ? 'EXISTS' : 'MISSING', 
+      dropdown: dropdown ? 'EXISTS' : 'MISSING',
+      containerHTML: container ? container.innerHTML : 'N/A'
+    });
+    
+    return { container, button, dropdown };
+  },
+  
+  // Force create profile
+  forceCreateProfile: () => {
+    authUI._updateAuthState(false);
+  },
+  
   // State debugging
   getGameState: () => gameState,
   resetApp: () => resetTracker()

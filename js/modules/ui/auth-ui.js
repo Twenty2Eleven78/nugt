@@ -42,7 +42,10 @@ class AuthUI {
       return true;
     }
 
-    // Not authenticated - show the auth modal
+    // Not authenticated - still create profile button for guest user
+    this._updateAuthState(false);
+    
+    // Show the auth modal
     requestAnimationFrame(() => {
       this.showAuthModal();
     });
@@ -162,11 +165,18 @@ class AuthUI {
       return;
     }
 
-    // Find the header profile container
+    // Find the header profile container with retry logic
     const headerProfileContainer = document.getElementById('header-profile-container');
     if (!headerProfileContainer) {
+      console.warn('Header profile container not found - retrying in 100ms');
+      // Retry after a short delay in case DOM isn't ready
+      setTimeout(() => {
+        this._createProfileButton();
+      }, 100);
       return;
     }
+
+    console.log('Creating profile button in header');
 
     // Create profile button container
     const profileContainer = document.createElement('div');

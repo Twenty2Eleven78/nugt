@@ -143,14 +143,18 @@ class MatchSummaryModal {
    * Handle admin section display
    * @private
    */
-  _handleAdminSection(matchData, isAdminView) {
+  async _handleAdminSection(matchData, isAdminView) {
     // Remove existing admin section
     const existingAdminSection = document.getElementById('adminInfoSection');
     if (existingAdminSection) {
       existingAdminSection.remove();
     }
 
-    if (isAdminView && matchData._adminInfo) {
+    // Check if user has admin privileges before showing admin section
+    const { authService } = await import('../services/auth.js');
+    const hasAdminAccess = authService.isUserAuthenticated() && authService.isAdmin();
+    
+    if (isAdminView && matchData._adminInfo && hasAdminAccess) {
       const modalBody = document.querySelector('#matchSummaryModal .modal-body');
       if (modalBody) {
         const adminSection = document.createElement('div');

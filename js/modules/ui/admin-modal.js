@@ -917,10 +917,21 @@ const escapeHtml = (text) => {
 };
 
 const show = () => {
-    if (!modalInstance) {
-        init();
-    }
-    modalInstance.show();
+    // Import auth service to check admin status
+    import('../services/auth.js').then(({ authService }) => {
+        if (!authService.isUserAuthenticated() || !authService.isAdmin()) {
+            console.warn('Access denied: Admin privileges required');
+            import('../services/notifications.js').then(({ notificationManager }) => {
+                notificationManager.error('Access denied: Admin privileges required');
+            });
+            return;
+        }
+        
+        if (!modalInstance) {
+            init();
+        }
+        modalInstance.show();
+    });
 };
 
 export const adminModal = {

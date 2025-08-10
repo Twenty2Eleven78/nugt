@@ -603,6 +603,17 @@ window.DebugModule = {
     authUI._updateAuthState(false);
   },
   
+  // Admin debugging (restricted)
+  showAdminModal: () => {
+    if (authService.isUserAuthenticated() && authService.isAdmin()) {
+      import('./ui/admin-modal.js').then(({ adminModal }) => {
+        adminModal.show();
+      });
+    } else {
+      console.warn('Access denied: Admin privileges required');
+    }
+  },
+  
   // State debugging
   getGameState: () => gameState,
   resetApp: () => resetTracker()

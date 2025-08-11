@@ -2121,6 +2121,178 @@ html, body {
     }
 }
 
+/* New Match Modal Styles */
+#newMatchModal .step-section {
+    border-left: 3px solid var(--primary-color);
+    padding-left: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+#newMatchModal .step-section h6 {
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+}
+
+#newMatchModal #playersGrid {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-secondary);
+    margin: 0; /* Remove default row margin */
+}
+
+/* Custom scrollbar for player grid */
+#newMatchModal #playersGrid::-webkit-scrollbar {
+    width: 6px;
+}
+
+#newMatchModal #playersGrid::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+    border-radius: 3px;
+}
+
+#newMatchModal #playersGrid::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+#newMatchModal #playersGrid::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+#newMatchModal #playersGrid .col-lg-4,
+#newMatchModal #playersGrid .col-md-6,
+#newMatchModal #playersGrid .col-sm-12 {
+    padding: var(--spacing-xs); /* Consistent column padding */
+    margin-bottom: var(--spacing-xs);
+}
+
+#newMatchModal .player-card {
+    position: relative;
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    transition: all 0.2s ease;
+    border: 2px solid var(--border-color);
+    background: var(--bg-primary);
+    cursor: pointer;
+    user-select: none;
+    display: block;
+    width: 100%;
+}
+
+#newMatchModal .player-card:hover {
+    background: var(--bg-secondary);
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+#newMatchModal .player-card:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+#newMatchModal .player-card .badge.bg-primary {
+    font-size: 0.75rem;
+    min-width: 2rem;
+    text-align: center;
+    transition: all 0.2s ease;
+    background-color: transparent !important;
+    color: var(--theme-primary) !important;
+    font-weight: bold !important;
+    border: 2px solid var(--theme-primary) !important;
+}
+
+#newMatchModal .player-card .fw-medium {
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+#newMatchModal .player-card .selection-indicator {
+    position: absolute;
+    top: var(--spacing-xs);
+    right: var(--spacing-xs);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--success-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.2s ease;
+}
+
+/* Selected state */
+#newMatchModal .player-card.selected {
+    background: rgba(var(--primary-color-rgb), 0.1);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+}
+
+#newMatchModal .player-card.selected:hover {
+    background: rgba(var(--primary-color-rgb), 0.15);
+    transform: translateY(-1px);
+}
+
+#newMatchModal .player-card.selected .fw-medium {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Badge styling is now consistent for all states */
+
+#newMatchModal .player-card.selected .selection-indicator,
+#newMatchModal .player-card[data-selected="true"] .selection-indicator {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Additional data attribute styling for better reliability */
+#newMatchModal .player-card[data-selected="true"] {
+    background: rgba(var(--primary-color-rgb), 0.1) !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2) !important;
+}
+
+#newMatchModal .player-card[data-selected="true"] .fw-medium {
+    color: var(--primary-color) !important;
+    font-weight: 600 !important;
+}
+
+/* Badge styling is now consistent for all states */
+
+#newMatchModal .form-check-input:checked + .form-check-label {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+#newMatchModal #setupSummary .card {
+    border: 2px solid var(--success-color);
+    background: rgba(var(--success-color-rgb), 0.05);
+}
+
+/* New Match Button Styling */
+#newMatchBtn {
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 8px rgba(var(--success-color-rgb), 0.3);
+    transition: all 0.3s ease;
+}
+
+#newMatchBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--success-color-rgb), 0.4);
+}
+
 /* ====
 = TIMELINE STYLES ===== */
 

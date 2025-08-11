@@ -32,7 +32,10 @@ class AttendanceManager {
     // Create attendance records for all current roster players
     const attendanceMap = new Map();
     savedAttendance.forEach(record => {
-      attendanceMap.set(record.playerName.toLowerCase(), record.attending);
+      // Safety check for valid record structure
+      if (record && record.playerName && typeof record.playerName === 'string') {
+        attendanceMap.set(record.playerName.toLowerCase(), record.attending);
+      }
     });
 
     return roster.map(player => ({
@@ -43,33 +46,42 @@ class AttendanceManager {
   }
 
   // Helper method to save attendance and update UI
-  _saveAndUpdateUI(attendanceData, successMessage) {
+  _saveAndUpdateUI(attendanceData, successMessage, silent = false) {
     this._saveAttendance(attendanceData);
     
     // Use setTimeout to ensure storage is complete before UI update
     setTimeout(() => {
       this.updateAttendanceList();
-      notificationManager.success(successMessage);
+      if (!silent) {
+        notificationManager.success(successMessage);
+      }
     }, 100);
   }
 
   // Helper method to find player by name (case-insensitive)
   _findPlayerByName(attendance, playerName) {
+    if (!playerName || typeof playerName !== 'string') return null;
     const lowerName = playerName.toLowerCase();
-    return attendance.find(p => p.playerName.toLowerCase() === lowerName);
+    return attendance.find(p => p && p.playerName && typeof p.playerName === 'string' && p.playerName.toLowerCase() === lowerName);
   }
 
   // Set player attendance
-  setPlayerAttendance(playerName, attending) {
+  setPlayerAttendance(playerName, attending, silent = false) {
+    if (!playerName || typeof playerName !== 'string') {
+      console.warn('Invalid player name provided to setPlayerAttendance:', playerName);
+      return;
+    }
+    
     const currentAttendance = this.getMatchAttendance();
     const updatedAttendance = currentAttendance.map(record => 
+      record && record.playerName && typeof record.playerName === 'string' && 
       record.playerName.toLowerCase() === playerName.toLowerCase() 
         ? { ...record, attending }
         : record
     );
     
     const status = attending ? 'present' : 'absent';
-    this._saveAndUpdateUI(updatedAttendance, `${playerName} marked as ${status}`);
+    this._saveAndUpdateUI(updatedAttendance, `${playerName} marked as ${status}`, silent);
   }
 
   // Toggle player attendance
@@ -83,33 +95,35 @@ class AttendanceManager {
   }
 
   // Mark all players as attending
-  markAllAttending() {
+  markAllAttending(silent = false) {
     const attendance = this.getMatchAttendance().map(record => ({
       ...record,
       attending: true
     }));
     
-    this._saveAndUpdateUI(attendance, 'All players marked as present');
+    this._saveAndUpdateUI(attendance, 'All players marked as present', silent);
   }
 
   // Mark all players as absent
-  markAllAbsent() {
+  markAllAbsent(silent = false) {
     const attendance = this.getMatchAttendance().map(record => ({
       ...record,
       attending: false
     }));
     
-    this._saveAndUpdateUI(attendance, 'All players marked as absent');
+    this._saveAndUpdateUI(attendance, 'All players marked as absent', silent);
   }
 
   // Clear attendance (reset all to attending)
-  clearAttendance() {
+  clearAttendance(silent = false) {
     storage.remove(STORAGE_KEYS.MATCH_ATTENDANCE);
     
     // Use setTimeout to ensure storage is complete before UI update
     setTimeout(() => {
       this.updateAttendanceList();
-      notificationManager.success('Attendance reset - all players marked as present');
+      if (!silent) {
+        notificationManager.success('Attendance reset - all players marked as present');
+      }
     }, 100);
   }
 

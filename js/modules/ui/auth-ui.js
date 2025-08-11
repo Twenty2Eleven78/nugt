@@ -300,6 +300,21 @@ class AuthUI {
         this.showAuthModal();
       }
 
+      if (e.target && e.target.id === 'newGameButton') {
+        // Close the dropdown
+        const dropdown = document.getElementById('userProfileDropdown');
+        if (dropdown) {
+          dropdown.classList.remove('show');
+        }
+        const button = document.getElementById('userProfileButton');
+        if (button) {
+          button.setAttribute('aria-expanded', 'false');
+        }
+
+        // Show new game modal
+        this._handleNewGame();
+      }
+
       if (e.target && e.target.id === 'saveToCloudButton') {
         // Close the dropdown
         const dropdown = document.getElementById('userProfileDropdown');
@@ -413,6 +428,10 @@ class AuthUI {
       // Show options for authenticated users
       if (dropdownMenu) {
         dropdownMenu.innerHTML = `
+          <button class="dropdown-item" id="newGameButton">
+            <i class="fas fa-plus-circle me-2"></i>New Game
+          </button>
+          <div class="dropdown-divider"></div>
           <button class="dropdown-item" id="saveToCloudButton">
             <i class="fas fa-cloud-upload-alt me-2"></i>Save to Cloud
           </button>
@@ -435,12 +454,30 @@ class AuthUI {
       // Show Sign In option for guest users
       if (dropdownMenu) {
         dropdownMenu.innerHTML = `
+          <button class="dropdown-item" id="newGameButton">
+            <i class="fas fa-plus-circle me-2"></i>New Game
+          </button>
+          <div class="dropdown-divider"></div>
           <button class="dropdown-item" id="loginButton">
             <i class="fas fa-sign-in-alt me-2"></i>Sign In
           </button>
         `;
       }
     }
+  }
+
+  /**
+   * Handle new game functionality
+   * @private
+   */
+  _handleNewGame() {
+    // Import and show the new match modal
+    import('./new-match-modal.js').then(({ showNewMatchModal }) => {
+      showNewMatchModal();
+    }).catch(error => {
+      console.error('Error loading new match modal:', error);
+      notificationManager.error('Failed to open new game dialog');
+    });
   }
 
   /**

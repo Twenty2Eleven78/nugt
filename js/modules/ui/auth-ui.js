@@ -413,7 +413,7 @@ class AuthUI {
       if (dropdownMenu) {
         dropdownMenu.innerHTML = `
           <button class="dropdown-item" id="newGameButton">
-            <i class="fas fa-plus-circle me-2"></i>New Game
+            <i class="fas fa-plus-circle me-2"></i>New Match
           </button>
           <div class="dropdown-divider"></div>
           <button class="dropdown-item" id="saveToCloudButton">
@@ -439,7 +439,7 @@ class AuthUI {
       if (dropdownMenu) {
         dropdownMenu.innerHTML = `
           <button class="dropdown-item" id="newGameButton">
-            <i class="fas fa-plus-circle me-2"></i>New Game
+            <i class="fas fa-plus-circle me-2"></i>New Match
           </button>
           <div class="dropdown-divider"></div>
           <button class="dropdown-item" id="loginButton">

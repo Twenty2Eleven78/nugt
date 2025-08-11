@@ -165,8 +165,12 @@ class NewMatchModal {
         matchDuration?.addEventListener('change', (e) => {
             if (e.target.value === 'custom') {
                 customContainer.style.display = 'block';
+                customContainer.classList.add('show');
             } else {
-                customContainer.style.display = 'none';
+                customContainer.classList.remove('show');
+                setTimeout(() => {
+                    customContainer.style.display = 'none';
+                }, 300);
             }
             requestAnimationFrame(() => {
                 this.updateSummary();
@@ -320,11 +324,11 @@ class NewMatchModal {
             const playerId = index;
             
             return `
-      <div class="col-lg-4 col-md-6 col-sm-12">
+      <div class="col-12 col-sm-6 col-lg-4">
         <div class="player-card" data-player-id="${playerId}">
-          <div class="d-flex align-items-center">
+          <div class="d-flex align-items-center flex-grow-1">
             <span class="badge bg-primary me-2">#${player.shirtNumber || '?'}</span>
-            <div>
+            <div class="flex-grow-1">
               <div class="fw-medium">${player.name}</div>
               ${player.position ? `<small class="text-muted">${player.position}</small>` : ''}
             </div>

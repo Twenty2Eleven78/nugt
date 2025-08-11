@@ -309,6 +309,21 @@ class AuthUI {
         this._handleNewGame();
       }
 
+      if (e.target && e.target.id === 'statisticsButton') {
+        // Close the dropdown
+        const dropdown = document.getElementById('userProfileDropdown');
+        if (dropdown) {
+          dropdown.classList.remove('show');
+        }
+        const button = document.getElementById('userProfileButton');
+        if (button) {
+          button.setAttribute('aria-expanded', 'false');
+        }
+
+        // Show statistics modal
+        this._handleStatistics();
+      }
+
       if (e.target && e.target.id === 'saveToCloudButton') {
         // Close the dropdown
         const dropdown = document.getElementById('userProfileDropdown');
@@ -415,6 +430,9 @@ class AuthUI {
           <button class="dropdown-item" id="newGameButton">
             <i class="fas fa-plus-circle me-2"></i>New Match
           </button>
+          <button class="dropdown-item" id="statisticsButton">
+            <i class="fas fa-chart-bar me-2"></i>Statistics
+          </button>
           <div class="dropdown-divider"></div>
           <button class="dropdown-item" id="saveToCloudButton">
             <i class="fas fa-cloud-upload-alt me-2"></i>Save to Cloud
@@ -441,6 +459,9 @@ class AuthUI {
           <button class="dropdown-item" id="newGameButton">
             <i class="fas fa-plus-circle me-2"></i>New Match
           </button>
+          <button class="dropdown-item" id="statisticsButton">
+            <i class="fas fa-chart-bar me-2"></i>Statistics
+          </button>
           <div class="dropdown-divider"></div>
           <button class="dropdown-item" id="loginButton">
             <i class="fas fa-sign-in-alt me-2"></i>Sign In
@@ -461,6 +482,20 @@ class AuthUI {
     }).catch(error => {
       console.error('Error loading new match modal:', error);
       notificationManager.error('Failed to open new game dialog');
+    });
+  }
+
+  /**
+   * Handle statistics functionality
+   * @private
+   */
+  _handleStatistics() {
+    // Import and show the statistics modal
+    import('./statistics-modal.js').then(({ showStatisticsModal }) => {
+      showStatisticsModal();
+    }).catch(error => {
+      console.error('Error loading statistics modal:', error);
+      notificationManager.error('Failed to open statistics dialog');
     });
   }
 

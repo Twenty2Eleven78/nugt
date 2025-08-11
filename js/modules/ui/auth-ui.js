@@ -17,8 +17,6 @@ class AuthUI {
    * Initialize the authentication UI
    */
   async init() {
-    console.log('Initializing authentication UI');
-
     // Create auth modal if it doesn't exist
     if (!document.getElementById('authModal')) {
       this._createAuthModal();
@@ -29,7 +27,6 @@ class AuthUI {
 
     // Initialize auth service and check authentication status
     const isAuthenticated = await authService.init();
-    console.log('User authenticated:', isAuthenticated);
 
     // Set up auth state change listener
     authService.onAuthStateChange(isAuthenticated => {
@@ -168,15 +165,12 @@ class AuthUI {
     // Find the header profile container with retry logic
     const headerProfileContainer = document.getElementById('header-profile-container');
     if (!headerProfileContainer) {
-      console.warn('Header profile container not found - retrying in 100ms');
       // Retry after a short delay in case DOM isn't ready
       setTimeout(() => {
         this._createProfileButton();
       }, 100);
       return;
     }
-
-    console.log('Creating profile button in header');
 
     // Create profile button container
     const profileContainer = document.createElement('div');
@@ -344,9 +338,7 @@ class AuthUI {
         const email = document.getElementById('usernameInput').value.trim();
 
         try {
-          console.log('Attempting to register with email:', email);
           const success = await authService.register(email);
-          console.log('Registration result:', success);
           if (success) {
             // Clear the email input on success
             const emailInput = document.getElementById('usernameInput');
@@ -357,7 +349,6 @@ class AuthUI {
             this._updateAuthState(true);
           }
         } catch (error) {
-          console.error('Registration error:', error);
           // Let the auth service handle the error notification
           // It has more context about the specific failure reason
         }
@@ -371,21 +362,16 @@ class AuthUI {
     if (loginButton) {
       loginButton.onclick = async () => {
         try {
-          console.log('Attempting to authenticate');
           const success = await authService.authenticate();
-          console.log('Authentication result:', success);
           if (success) {
             hideModal('authModal');
             this._updateAuthState(true);
           }
         } catch (error) {
-          console.error('Authentication error:', error);
           // Let the auth service handle the error notification
           // It has more context about the specific error
         }
       };
-    } else {
-      console.warn('Login button not found');
     }
 
     // Skip auth button
@@ -395,8 +381,6 @@ class AuthUI {
         hideModal('authModal');
         this._updateAuthState(false);
       };
-    } else {
-      console.warn('Skip auth button not found');
     }
   }
 
@@ -555,8 +539,6 @@ class AuthUI {
    * Fix modal overlay issues (useful for debugging)
    */
   fixModalOverlays() {
-    console.log('Fixing modal overlays...');
-
     // Remove all backdrops
     const backdrops = document.querySelectorAll('.modal-backdrop');
     backdrops.forEach(backdrop => backdrop.remove());
@@ -575,8 +557,6 @@ class AuthUI {
       modal.removeAttribute('aria-modal');
       modal.removeAttribute('role');
     });
-
-    console.log('Modal overlays fixed');
   }
 }
 

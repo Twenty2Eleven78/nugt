@@ -112,7 +112,6 @@ function initializeOptimizations() {
   // Add touch target classes to interactive elements
   enhanceTouchTargets();
 
-  console.log('High priority optimizations initialized');
 }
 
 // Wrap critical functions with error boundaries

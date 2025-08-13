@@ -82,9 +82,11 @@ class SharingService {
     const stats = this.generateStats();
     const gameTime = formatTime(gameState.seconds);
     const resultEmoji = this._getResultEmoji(stats.matchResult);
+    const matchTitle = gameState.matchTitle || null;
+    const titleLine = matchTitle ? `🏆 ${matchTitle}\n` : '';
 
     return encodeURIComponent(
-      `${resultEmoji} ${stats.team1Name} ${stats.teamGoals}-${stats.oppositionGoals} ${stats.team2Name}\n` +
+      `${titleLine}${resultEmoji} ${stats.team1Name} ${stats.teamGoals}-${stats.oppositionGoals} ${stats.team2Name}\n` +
       `⏱️ ${gameTime}\n` +
       `⚽ Goals: ${stats.goalScorers.join(', ') || 'None'}\n` +
       `#Football #MatchReport`
@@ -94,9 +96,11 @@ class SharingService {
   formatForFacebook() {
     const stats = this.generateStats();
     const gameTime = formatTime(gameState.seconds);
+    const matchTitle = gameState.matchTitle || null;
+    const titleText = matchTitle ? matchTitle : `${stats.team1Name} vs ${stats.team2Name}`;
 
     return encodeURIComponent(
-      `🏆 Match Report: ${stats.team1Name} vs ${stats.team2Name}\n\n` +
+      `🏆 Match Report: ${titleText}\n\n` +
       `Final Score: ${stats.teamGoals} - ${stats.oppositionGoals}\n` +
       `Game Time: ${gameTime}\n` +
       `Result: ${stats.matchResult}\n\n` +
@@ -286,7 +290,10 @@ class SharingService {
   }
 
   _buildMatchHeader(stats, gameTime) {
-    return `⚽ Match Summary: ${stats.team1Name} vs ${stats.team2Name}\n` +
+    const matchTitle = gameState.matchTitle || null;
+    const titleLine = matchTitle ? `🏆 ${matchTitle}\n` : '';
+    
+    return `${titleLine}⚽ Match Summary: ${stats.team1Name} vs ${stats.team2Name}\n` +
       `⌚ Game Time: ${gameTime}\n` +
       `🔢 Result: ${stats.matchResult} (${stats.teamGoals} - ${stats.oppositionGoals})\n\n`;
   }

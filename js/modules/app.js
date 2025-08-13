@@ -314,6 +314,7 @@ function bindEventListeners() {
         const matchData = {
           title,
           notes,
+          matchTitle: gameState.matchTitle || null, // Include the match title as separate field
           goals: gameState.goals,
           matchEvents: gameState.matchEvents,
           team1History: gameState.team1History,

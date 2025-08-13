@@ -5,7 +5,7 @@
  */
 
 import { storage } from '../data/storage.js';
-import { STORAGE_KEYS } from '../shared/constants.js';
+import { STORAGE_KEYS, GAME_CONFIG } from '../shared/constants.js';
 import { rosterManager } from '../match/roster.js';
 
 class StatisticsService {
@@ -16,11 +16,60 @@ class StatisticsService {
 
     /**
      * Get all saved matches from storage
+     * Loads from cloud data and local fallback
      */
-    getAllMatches() {
+    async getAllMatches() {
         try {
-            const matches = storage.load('savedMatches', []);
-            return Array.isArray(matches) ? matches : [];
+            let matches = [];
+            
+            // First, try to load from cloud if user is authenticated
+            try {
+                const { authService } = await import('../services/auth.js');
+                if (authService.isUserAuthenticated()) {
+                    const { userMatchesApi } = await import('../services/user-matches-api.js');
+                    const cloudData = await userMatchesApi.loadMatchData();
+                    
+                    if (cloudData && Array.isArray(cloudData.matches)) {
+                        matches = cloudData.matches;
+                    }
+                }
+            } catch (cloudError) {
+                console.warn('Could not load cloud data:', cloudError.message);
+            }
+            
+            // If no cloud data, check local storage for any current match data
+            if (matches.length === 0) {
+                const goals = storage.load(STORAGE_KEYS.GOALS, []);
+                const matchEvents = storage.load(STORAGE_KEYS.MATCH_EVENTS, []);
+                const team1Name = storage.load(STORAGE_KEYS.TEAM1_NAME, GAME_CONFIG.DEFAULT_TEAM1_NAME);
+                const team2Name = storage.load(STORAGE_KEYS.TEAM2_NAME, GAME_CONFIG.DEFAULT_TEAM2_NAME);
+                const gameTime = storage.load(STORAGE_KEYS.GAME_TIME, GAME_CONFIG.DEFAULT_GAME_TIME);
+                
+                // If we have any match data, create a current match object
+                if (goals.length > 0 || matchEvents.length > 0 || team1Name !== GAME_CONFIG.DEFAULT_TEAM1_NAME || team2Name !== GAME_CONFIG.DEFAULT_TEAM2_NAME) {
+                    const currentMatch = {
+                        team1Name: team1Name,
+                        team2Name: team2Name,
+                        score1: goals.filter(goal => goal.team === 'first').length,
+                        score2: goals.filter(goal => goal.team === 'second').length,
+                        goals: goals,
+                        matchEvents: matchEvents,
+                        gameTime: gameTime,
+                        savedAt: Date.now(),
+                        attendance: storage.load(STORAGE_KEYS.MATCH_ATTENDANCE, [])
+                    };
+                    
+                    matches = [currentMatch];
+                }
+            }
+            
+            // Fallback to local saved matches
+            if (matches.length === 0) {
+                const localMatches = storage.load('savedMatches', []);
+                matches = Array.isArray(localMatches) ? localMatches : [];
+            }
+            
+            return matches;
         } catch (error) {
             console.error('Error loading matches for statistics:', error);
             return [];
@@ -30,8 +79,8 @@ class StatisticsService {
     /**
      * Calculate comprehensive match statistics
      */
-    calculateMatchStatistics() {
-        const matches = this.getAllMatches();
+    async calculateMatchStatistics() {
+        const matches = await this.getAllMatches();
         
         if (matches.length === 0) {
             return this.getEmptyStats();
@@ -285,8 +334,8 @@ class StatisticsService {
     /**
      * Calculate player statistics across all matches
      */
-    calculatePlayerStatistics() {
-        const matches = this.getAllMatches();
+    async calculatePlayerStatistics() {
+        const matches = await this.getAllMatches();
         const players = {};
         const roster = rosterManager.getRoster();
 
@@ -473,14 +522,52 @@ class StatisticsService {
     }
 
     /**
+     * Create sample match data for testing
+     */
+    createSampleData() {
+        const sampleMatches = [
+            {
+                team1Name: 'Netherton',
+                team2Name: 'City United',
+                score1: 2,
+                score2: 1,
+                goals: [
+                    { team: 'first', scorer: 'John Smith', minute: 15, type: 'goal' },
+                    { team: 'second', scorer: 'Mike Johnson', minute: 32, type: 'goal' },
+                    { team: 'first', scorer: 'David Wilson', minute: 78, type: 'goal' }
+                ],
+                matchEvents: [],
+                gameTime: 4200,
+                savedAt: Date.now() - 86400000 // 1 day ago
+            },
+            {
+                team1Name: 'Netherton',
+                team2Name: 'Rangers FC',
+                score1: 1,
+                score2: 1,
+                goals: [
+                    { team: 'first', scorer: 'John Smith', minute: 25, type: 'goal' },
+                    { team: 'second', scorer: 'Tom Brown', minute: 67, type: 'goal' }
+                ],
+                matchEvents: [],
+                gameTime: 4200,
+                savedAt: Date.now() - 172800000 // 2 days ago
+            }
+        ];
+
+        storage.save('savedMatches', sampleMatches);
+        return sampleMatches;
+    }
+
+    /**
      * Get cached statistics or calculate new ones
      */
-    getStatistics(forceRefresh = false) {
+    async getStatistics(forceRefresh = false) {
         const cacheAge = Date.now() - (this.lastCalculated || 0);
         const cacheExpired = cacheAge > 300000; // 5 minutes
 
         if (forceRefresh || !this.cachedStats || cacheExpired) {
-            return this.calculateMatchStatistics();
+            return await this.calculateMatchStatistics();
         }
 
         return this.cachedStats;
@@ -489,15 +576,16 @@ class StatisticsService {
     /**
      * Export statistics as JSON
      */
-    exportStatistics() {
-        const stats = this.getStatistics();
-        const playerStats = this.calculatePlayerStatistics();
+    async exportStatistics() {
+        const stats = await this.getStatistics();
+        const playerStats = await this.calculatePlayerStatistics();
+        const matches = await this.getAllMatches();
         
         return {
             generatedAt: new Date().toISOString(),
             matchStatistics: stats,
             playerStatistics: playerStats,
-            totalMatches: this.getAllMatches().length
+            totalMatches: matches.length
         };
     }
 }

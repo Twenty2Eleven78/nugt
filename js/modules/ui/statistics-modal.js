@@ -123,7 +123,7 @@ class StatisticsModal {
         showModal('statisticsModal');
     }
 
-    switchTab(tabName) {
+    async switchTab(tabName) {
         // Update active tab
         document.querySelectorAll('#statsTabList .nav-link').forEach(tab => {
             tab.classList.remove('active');
@@ -137,35 +137,113 @@ class StatisticsModal {
         document.getElementById(`${tabName}-content`).classList.add('show', 'active');
 
         this.currentTab = tabName;
-        this.loadTabContent(tabName);
+        await this.loadTabContent(tabName);
     }
 
-    loadStatistics() {
-        this.loadTabContent('overview');
+    async loadStatistics() {
+        await this.loadTabContent('overview');
     }
 
-    loadTabContent(tabName) {
-        const stats = statisticsService.getStatistics();
-        const playerStats = statisticsService.calculatePlayerStatistics();
+    async loadTabContent(tabName) {
+        // Show loading state
+        this.showLoadingState(tabName);
+        
+        try {
+            const stats = await statisticsService.getStatistics();
+            const playerStats = await statisticsService.calculatePlayerStatistics();
 
-        switch (tabName) {
-            case 'overview':
-                this.renderOverviewTab(stats);
-                break;
-            case 'players':
-                this.renderPlayersTab(playerStats);
-                break;
-            case 'opponents':
-                this.renderOpponentsTab(stats.opponents);
-                break;
-            case 'performance':
-                this.renderPerformanceTab(stats);
-                break;
+            switch (tabName) {
+                case 'overview':
+                    this.renderOverviewTab(stats);
+                    break;
+                case 'players':
+                    this.renderPlayersTab(playerStats);
+                    break;
+                case 'opponents':
+                    this.renderOpponentsTab(stats.opponents);
+                    break;
+                case 'performance':
+                    this.renderPerformanceTab(stats);
+                    break;
+            }
+        } catch (error) {
+            console.error('Error loading statistics:', error);
+            this.showErrorState(tabName, error.message);
+        }
+    }
+
+    showLoadingState(tabName) {
+        const contentId = `${tabName === 'overview' ? 'overviewStats' : 
+                          tabName === 'players' ? 'playerStats' : 
+                          tabName === 'opponents' ? 'opponentStats' : 'performanceStats'}`;
+        
+        const element = document.getElementById(contentId);
+        if (element) {
+            element.innerHTML = `
+                <div class="stats-loading">
+                    <i class="fas fa-spinner fa-spin fa-2x me-3"></i>
+                    <span>Loading statistics...</span>
+                </div>
+            `;
+        }
+    }
+
+    showErrorState(tabName, errorMessage) {
+        const contentId = `${tabName === 'overview' ? 'overviewStats' : 
+                          tabName === 'players' ? 'playerStats' : 
+                          tabName === 'opponents' ? 'opponentStats' : 'performanceStats'}`;
+        
+        const element = document.getElementById(contentId);
+        if (element) {
+            element.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                    <h5 class="text-muted mb-3">Error Loading Statistics</h5>
+                    <p class="text-muted mb-3">${errorMessage}</p>
+                    <button class="btn btn-primary" onclick="statisticsModal.loadTabContent('${tabName}')">
+                        <i class="fas fa-retry me-2"></i>Try Again
+                    </button>
+                </div>
+            `;
         }
     }
 
     renderOverviewTab(stats) {
         const { overview, goals, timeline } = stats;
+        
+        // Check if we have any data
+        if (overview.totalMatches === 0) {
+            const html = `
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body text-center py-5">
+                                <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted mb-3">No Match Data Available</h5>
+                                <p class="text-muted mb-4">
+                                    Start playing matches and tracking goals to see your statistics here.<br>
+                                    Your current match data will be included in the statistics.
+                                </p>
+                                <button class="btn btn-primary" id="createSampleDataBtn">
+                                    <i class="fas fa-plus me-2"></i>Create Sample Data
+                                </button>
+                                <p class="small text-muted mt-2">
+                                    Click above to add sample match data for testing the statistics features.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('overviewStats').innerHTML = html;
+            
+            // Bind sample data button
+            document.getElementById('createSampleDataBtn')?.addEventListener('click', () => {
+                statisticsService.createSampleData();
+                this.refreshStatistics();
+            });
+            return;
+        }
         
         const html = `
             <div class="row">
@@ -579,27 +657,30 @@ class StatisticsModal {
         document.getElementById('performanceStats').innerHTML = html;
     }
 
-    refreshStatistics() {
+    async refreshStatistics() {
         const refreshBtn = document.getElementById('refreshStatsBtn');
         const originalText = refreshBtn.innerHTML;
         
         refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Refreshing...';
         refreshBtn.disabled = true;
 
-        setTimeout(() => {
-            statisticsService.getStatistics(true); // Force refresh
-            this.loadTabContent(this.currentTab);
-            
-            refreshBtn.innerHTML = originalText;
-            refreshBtn.disabled = false;
+        try {
+            await statisticsService.getStatistics(true); // Force refresh
+            await this.loadTabContent(this.currentTab);
             
             notificationManager.success('Statistics refreshed successfully');
-        }, 1000);
+        } catch (error) {
+            console.error('Error refreshing statistics:', error);
+            notificationManager.error('Failed to refresh statistics');
+        } finally {
+            refreshBtn.innerHTML = originalText;
+            refreshBtn.disabled = false;
+        }
     }
 
-    exportStatistics() {
+    async exportStatistics() {
         try {
-            const data = statisticsService.exportStatistics();
+            const data = await statisticsService.exportStatistics();
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             

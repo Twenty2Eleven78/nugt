@@ -75,12 +75,14 @@ class CombinedEventsManager {
     // Save data
     storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
 
-    // Show notification with appropriate type
-    const notificationType = this._getNotificationType(eventType);
-    if (notificationType === 'warning') {
-      notificationManager.warning(`${eventType} recorded at ${eventData.timestamp}`);
-    } else {
-      notificationManager.success(`${eventType} recorded at ${eventData.timestamp}`);
+    // Show notification with appropriate type (skip for GAME_STARTED as timer already shows notification)
+    if (eventType !== EVENT_TYPES.GAME_STARTED) {
+      const notificationType = this._getNotificationType(eventType);
+      if (notificationType === 'warning') {
+        notificationManager.warning(`${eventType} recorded at ${eventData.timestamp}`);
+      } else {
+        notificationManager.success(`${eventType} recorded at ${eventData.timestamp}`);
+      }
     }
   }
 

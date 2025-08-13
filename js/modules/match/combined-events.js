@@ -75,8 +75,10 @@ class CombinedEventsManager {
     // Save data
     storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
 
-    // Show notification with appropriate type (skip for GAME_STARTED as timer already shows notification)
-    if (eventType !== EVENT_TYPES.GAME_STARTED) {
+    // Show notification with appropriate type (skip for system events as timer already shows notification)
+    if (eventType !== EVENT_TYPES.GAME_STARTED && 
+        eventType !== EVENT_TYPES.HALF_TIME && 
+        eventType !== EVENT_TYPES.FULL_TIME) {
       const notificationType = this._getNotificationType(eventType);
       if (notificationType === 'warning') {
         notificationManager.warning(`${eventType} recorded at ${eventData.timestamp}`);

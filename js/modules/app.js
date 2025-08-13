@@ -482,6 +482,14 @@ function bindEventListeners() {
     });
   }
 
+  // Statistics button - open statistics modal
+  const statisticsButton = document.getElementById('statisticsButton');
+  if (statisticsButton) {
+    statisticsButton.addEventListener('click', () => {
+      statisticsModal.show();
+    });
+  }
+
   // Reset button is now handled by the reset modal system
 }
 

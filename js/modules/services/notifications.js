@@ -22,17 +22,33 @@ class NotificationManager {
     }
   }
 
+  _getActiveContainer() {
+    // Check if auth modal is open and use its notification container
+    const authModal = document.getElementById('authModal');
+    const authNotificationContainer = document.getElementById('auth-notification-container');
+    
+    if (authModal && authNotificationContainer && 
+        (authModal.classList.contains('show') || authModal.style.display === 'block')) {
+      authNotificationContainer.style.display = 'block';
+      return authNotificationContainer;
+    }
+    
+    return this.container;
+  }
+
   show(message, type = NOTIFICATION_TYPES.INFO, duration = DEFAULT_DURATION) {
     if (!this._validateInput(message, type)) return null;
-    if (!this.container) {
-      console.warn('Cannot show notification: container not available');
+    
+    const activeContainer = this._getActiveContainer();
+    if (!activeContainer) {
+      console.warn('Cannot show notification: no container available');
       return null;
     }
 
     this._enforceMaxNotifications();
 
     const notification = this._createNotification(message, type);
-    this._addNotification(notification);
+    this._addNotification(notification, activeContainer);
 
     if (duration > 0) {
       this._scheduleRemoval(notification, duration);
@@ -61,8 +77,12 @@ class NotificationManager {
     notification.classList.remove('show');
 
     setTimeout(() => {
+      // Check both containers for the notification
+      const authContainer = document.getElementById('auth-notification-container');
       if (this.container && this.container.contains(notification)) {
         this.container.removeChild(notification);
+      } else if (authContainer && authContainer.contains(notification)) {
+        authContainer.removeChild(notification);
       }
       this.notifications.delete(notification);
     }, ANIMATION_DURATION);
@@ -111,8 +131,9 @@ class NotificationManager {
     }
   }
 
-  _addNotification(notification) {
-    this.container.appendChild(notification);
+  _addNotification(notification, container = null) {
+    const targetContainer = container || this.container;
+    targetContainer.appendChild(notification);
     this.notifications.add(notification);
 
     requestAnimationFrame(() => {

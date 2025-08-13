@@ -102,6 +102,9 @@ class AuthUI {
               <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+              <!-- Auth modal notification container -->
+              <div id="auth-notification-container" class="mb-3" style="display: none;"></div>
+              
               <div class="auth-container">
                 <div id="authMessage" class="mb-3">
                   <p>Welcome to NUFC GameTime! Please sign in to track your usage.</p>

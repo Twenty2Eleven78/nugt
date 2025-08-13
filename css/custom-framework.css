@@ -44,6 +44,11 @@
     align-items: center;
     gap: var(--spacing-xs);
     padding: var(--spacing-sm);
+    z-index: 1060; /* Higher than Bootstrap modals (1050) */
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    pointer-events: none; /* Allow clicks to pass through container */
 }
 
 /* Modal backdrop - prevent layout shifts */
@@ -1863,6 +1868,7 @@ html, body {
     gap: var(--spacing-sm);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    pointer-events: auto; /* Allow interactions with notifications */
 }
 
 .notification.show {

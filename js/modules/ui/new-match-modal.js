@@ -474,6 +474,9 @@ class NewMatchModal {
                 durationSeconds = parseInt(durationSelect);
             }
 
+            // Get match title before reset
+            const matchTitle = document.getElementById('matchTitle')?.value.trim();
+
             // Reset current game state
             await this.resetGameState();
 
@@ -484,8 +487,7 @@ class NewMatchModal {
             // Set match duration
             stateManager.setGameTime(durationSeconds);
 
-            // Set match title if provided
-            const matchTitle = document.getElementById('matchTitle')?.value.trim();
+            // Set match title if provided (after reset)
             if (matchTitle) {
                 gameState.matchTitle = matchTitle;
             }

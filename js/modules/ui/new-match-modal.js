@@ -5,7 +5,7 @@
  */
 
 import { gameState, stateManager } from '../data/state.js';
-import { storageHelpers } from '../data/storage.js';
+import { storage, storageHelpers } from '../data/storage.js';
 import { domCache } from '../shared/dom.js';
 import { GAME_CONFIG } from '../shared/constants.js';
 import { notificationManager } from '../services/notifications.js';
@@ -14,6 +14,9 @@ import { rosterManager } from '../match/roster.js';
 import { timerController } from '../game/timer.js';
 import { teamManager } from '../match/teams.js';
 import { attendanceManager } from '../services/attendance.js';
+import { combinedEventsManager } from '../match/combined-events.js';
+import { formatTime } from '../shared/utils.js';
+import { updateMatchLog } from '../match/match-log.js';
 
 class NewMatchModal {
     constructor() {
@@ -531,13 +534,100 @@ class NewMatchModal {
     }
 
     async resetGameState() {
-        // Stop timer if running
+        // Stop timer if running and clean up interval
         if (gameState.isRunning) {
             timerController.toggleTimer();
         }
+        
+        // Clean up timer interval to prevent memory leaks
+        timerController.cleanup();
 
-        // Reset all game state
+        // Reset all game state (timer, match data, teams)
         stateManager.resetAll();
+
+        // Clear all stored game data from localStorage
+        // This ensures no previous match data persists
+        storage.clear();
+
+        // Reset UI elements to initial state
+        this.resetUIElements();
+
+        // Clear any pending notifications or temporary state
+        this.clearTemporaryState();
+    }
+
+    resetUIElements() {
+        // Reset timer display
+        timerController.updateDisplay();
+        
+        // Reset scoreboard displays
+        const firstScoreElement = domCache.get('firstScoreElement');
+        const secondScoreElement = domCache.get('secondScoreElement');
+        
+        if (firstScoreElement) firstScoreElement.textContent = '0';
+        if (secondScoreElement) secondScoreElement.textContent = '0';
+        
+        // Reset team name displays to defaults
+        const team1Element = domCache.get('Team1NameElement');
+        const team2Element = domCache.get('Team2NameElement');
+        
+        if (team1Element) team1Element.textContent = 'Team 1';
+        if (team2Element) team2Element.textContent = 'Team 2';
+
+        // Reset teams via team manager
+        teamManager.resetTeams();
+
+        // Reset start/pause button UI
+        const startPauseButton = domCache.get('startPauseButton');
+        if (startPauseButton) {
+            startPauseButton.className = 'btn btn-danger timer-btn-inline';
+            startPauseButton.innerHTML = `Start Game <span id="stopwatch" role="timer" class="timer-badge">${formatTime(0)}</span>`;
+        }
+
+        // Clear any event displays or match logs
+        this.clearEventDisplays();
+
+        // Update match log display
+        updateMatchLog();
+
+        // Update event displays to reflect the clean state
+        if (combinedEventsManager.updateMatchLog) {
+            combinedEventsManager.updateMatchLog();
+        }
+        if (combinedEventsManager.updateEventStatistics) {
+            combinedEventsManager.updateEventStatistics();
+        }
+    }
+
+    clearEventDisplays() {
+        // Clear match log display
+        const logElement = domCache.get('log');
+        if (logElement) {
+            logElement.innerHTML = '';
+        }
+
+        // Clear any event statistics or counters
+        const eventStatsElements = document.querySelectorAll('[data-event-stat]');
+        eventStatsElements.forEach(element => {
+            element.textContent = '0';
+        });
+
+        // Clear any goal displays or score counters
+        const scoreElements = document.querySelectorAll('[data-score], [data-goals]');
+        scoreElements.forEach(element => {
+            element.textContent = '0';
+        });
+    }
+
+    clearTemporaryState() {
+        // Clear any editing states
+        stateManager.clearEditingEvent();
+        
+        // Clear pending goal timestamps
+        stateManager.setPendingGoalTimestamp(null);
+        
+        // Clear any temporary selections or UI state
+        this.selectedPlayers.clear();
     }
 
     updateTeamNamesInUI(team1Name, team2Name) {

@@ -2969,8 +2969,9 @@ x auth modal button layering and positioning */
 
 #authModal #registerForm {
     margin-bottom: 12px; /* Extra space between register button and OR text */
-}/* Lo
-ad match modal - add padding to first card to avoid overlap with search */
+}
+
+/* Load match modal - add padding to first card to avoid overlap with search */
 #matchLoadModal .match-card:first-child {
-    margin-top: 15px;
+    margin-top: 30px;
 }

@@ -1,5 +1,5 @@
 //Cache Name
-const CACHE_NAME = "nugt-cache-v96";
+const CACHE_NAME = "nugt-cache-v97";
 //Files to cache - Modular Architecture
 const cacheFiles = [
   './',
@@ -17,6 +17,7 @@ const cacheFiles = [
   './js/modules/shared/error-boundary.js',
   './js/modules/shared/storage-manager.js',
   './js/modules/shared/custom-modal.js',
+  './js/modules/shared/modal-factory.js',
   // Data modules
   './js/modules/data/state.js',
   './js/modules/data/storage.js',

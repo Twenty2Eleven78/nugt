@@ -12,6 +12,7 @@ class NotificationManager {
     this.container = null;
     this.notifications = new Set();
     this.timeouts = new Map();
+    this.cachedElements = {}; // Cache for frequently accessed DOM elements
     this._initializeContainer();
   }
 
@@ -22,10 +23,17 @@ class NotificationManager {
     }
   }
 
+  _getCachedElement(id) {
+    if (!this.cachedElements[id]) {
+      this.cachedElements[id] = document.getElementById(id);
+    }
+    return this.cachedElements[id];
+  }
+
   _getActiveContainer() {
     // Check if auth modal is open and use its notification container
-    const authModal = document.getElementById('authModal');
-    const authNotificationContainer = document.getElementById('auth-notification-container');
+    const authModal = this._getCachedElement('authModal');
+    const authNotificationContainer = this._getCachedElement('auth-notification-container');
     
     if (authModal && authNotificationContainer && 
         (authModal.classList.contains('show') || authModal.style.display === 'block')) {
@@ -77,8 +85,8 @@ class NotificationManager {
     notification.classList.remove('show');
 
     setTimeout(() => {
-      // Check both containers for the notification
-      const authContainer = document.getElementById('auth-notification-container');
+      // Check both containers for the notification using cached elements
+      const authContainer = this._getCachedElement('auth-notification-container');
       if (this.container && this.container.contains(notification)) {
         this.container.removeChild(notification);
       } else if (authContainer && authContainer.contains(notification)) {

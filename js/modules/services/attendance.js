@@ -14,6 +14,14 @@ import { STORAGE_KEYS } from '../shared/constants.js';
 class AttendanceManager {
   constructor() {
     this.isInitialized = false;
+    this.cachedElements = {}; // Cache for frequently accessed DOM elements
+  }
+
+  _getCachedElement(id) {
+    if (!this.cachedElements[id]) {
+      this.cachedElements[id] = document.getElementById(id);
+    }
+    return this.cachedElements[id];
   }
 
   // Initialize attendance manager
@@ -129,8 +137,8 @@ class AttendanceManager {
 
   // Update attendance list in modal
   updateAttendanceList() {
-    const attendanceList = document.getElementById('attendanceList');
-    const noPlayersMessage = document.getElementById('noPlayersMessage');
+    const attendanceList = this._getCachedElement('attendanceList');
+    const noPlayersMessage = this._getCachedElement('noPlayersMessage');
     
     if (!attendanceList || !noPlayersMessage) return;
 
@@ -183,7 +191,7 @@ class AttendanceManager {
 
   // Update attendance summary display
   updateAttendanceSummary() {
-    const summaryElement = document.getElementById('attendanceSummaryMain');
+    const summaryElement = this._getCachedElement('attendanceSummaryMain');
     if (!summaryElement) return;
 
     const summary = this.getAttendanceSummary();

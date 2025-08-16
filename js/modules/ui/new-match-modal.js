@@ -15,13 +15,15 @@ import { timerController } from '../game/timer.js';
 import { teamManager } from '../match/teams.js';
 import { attendanceManager } from '../services/attendance.js';
 import { combinedEventsManager, updateMatchLog } from '../match/combined-events.js';
-import { formatTime } from '../shared/utils.js';
+import { formatTime, debounce } from '../shared/utils.js';
 
 class NewMatchModal {
     constructor() {
         this.isInitialized = false;
         this.selectedPlayers = new Set();
         this.isProcessingClick = false; // Prevent double-clicks
+        this.cachedElements = {}; // Cache frequently accessed DOM elements
+        this.debouncedUpdateSummary = debounce(() => this.updateSummary(), 150); // Debounced updates
     }
 
     init() {
@@ -240,35 +242,25 @@ class NewMatchModal {
         // Use event delegation on the modal container
         const modal = document.getElementById('newMatchModal');
         if (modal) {
-            // Handle input events for real-time updates
+            // Handle input events with debounced updates for better performance
+            const updateFields = ['newMatchTeam1Name', 'newMatchTeam2Name', 'matchTitle', 'customDuration'];
+            
             modal.addEventListener('input', (e) => {
-                const targetId = e.target.id;
-                if (['newMatchTeam1Name', 'newMatchTeam2Name', 'matchTitle', 'customDuration'].includes(targetId)) {
-                    // Use setTimeout to ensure DOM is fully updated
-                    setTimeout(() => {
-                        this.updateSummary();
-                    }, 5);
+                if (updateFields.includes(e.target.id)) {
+                    this.debouncedUpdateSummary();
                 }
             });
 
-            // Also handle keyup for immediate feedback
             modal.addEventListener('keyup', (e) => {
-                const targetId = e.target.id;
-                if (['newMatchTeam1Name', 'newMatchTeam2Name', 'matchTitle', 'customDuration'].includes(targetId)) {
-                    setTimeout(() => {
-                        this.updateSummary();
-                    }, 5);
+                if (updateFields.includes(e.target.id)) {
+                    this.debouncedUpdateSummary();
                 }
             });
 
-            // Handle paste events
             modal.addEventListener('paste', (e) => {
-                const targetId = e.target.id;
-                if (['newMatchTeam1Name', 'newMatchTeam2Name', 'matchTitle', 'customDuration'].includes(targetId)) {
-                    // Longer delay for paste to process
-                    setTimeout(() => {
-                        this.updateSummary();
-                    }, 20);
+                if (updateFields.includes(e.target.id)) {
+                    // Immediate update for paste, then debounced
+                    setTimeout(() => this.debouncedUpdateSummary(), 20);
                 }
             });
         }

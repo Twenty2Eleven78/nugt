@@ -353,18 +353,34 @@ class SharingService {
 
   _buildCSVData(stats) {
     const headers = ['Player', 'Goals', 'Assists'];
-    const players = new Set([
-      ...stats.goalScorers.map(scorer => scorer.split(':')[0]),
-      ...stats.assists.map(assist => assist.split(':')[0])
-    ]);
+    
+    // Optimized: Single-pass data collection (O(n) instead of O(n²))
+    const playerData = new Map();
+    
+    // Process goal scorers
+    for (const scorer of stats.goalScorers) {
+      const [name, count] = scorer.split(':');
+      const playerName = name.trim();
+      playerData.set(playerName, { 
+        goals: count.trim(), 
+        assists: playerData.get(playerName)?.assists || '0' 
+      });
+    }
+    
+    // Process assists
+    for (const assist of stats.assists) {
+      const [name, count] = assist.split(':');
+      const playerName = name.trim();
+      const existing = playerData.get(playerName) || { goals: '0', assists: '0' };
+      existing.assists = count.trim();
+      playerData.set(playerName, existing);
+    }
 
+    // Build CSV rows
     const rows = [headers.join(',')];
-
-    players.forEach(player => {
-      const goals = stats.goalScorers.find(s => s.startsWith(player))?.split(':')[1]?.trim() || '0';
-      const assists = stats.assists.find(a => a.startsWith(player))?.split(':')[1]?.trim() || '0';
-      rows.push(`${player},${goals},${assists}`);
-    });
+    for (const [player, data] of playerData) {
+      rows.push(`${player},${data.goals},${data.assists}`);
+    }
 
     return rows.join('\n');
   }

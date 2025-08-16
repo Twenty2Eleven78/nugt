@@ -2991,4 +2991,20 @@ x auth modal button layering and positioning */
 
 #admin-modal .modal-backdrop {
     z-index: 1050 !important;
+}/*
+ Ensure delete confirmation modal appears above admin modal */
+#delete-confirm-modal {
+    z-index: 1070 !important;
+}
+
+#delete-confirm-modal .modal-backdrop {
+    z-index: 1065 !important;
+}/* E
+nsure transfer match modal appears above admin modal */
+#transfer-match-modal {
+    z-index: 1070 !important;
+}
+
+#transfer-match-modal .modal-backdrop {
+    z-index: 1065 !important;
 }

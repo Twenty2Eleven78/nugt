@@ -177,7 +177,14 @@ class AuthUI {
 
     // Create profile button container
     const profileContainer = document.createElement('div');
-    profileContainer.className = 'user-profile-container';
+    profileContainer.className = 'user-profile-container d-flex align-items-center gap-2';
+
+    // Create "Start New Match" button
+    const newMatchButton = document.createElement('button');
+    newMatchButton.id = 'headerNewMatchBtn';
+    newMatchButton.className = 'btn btn-sm btn-primary';
+    newMatchButton.innerHTML = '<i class="fas fa-plus me-1"></i>New Match';
+    newMatchButton.title = 'Start New Match';
 
     // Create profile button
     const profileButton = document.createElement('button');
@@ -200,11 +207,22 @@ class AuthUI {
     `;
 
     // Append elements
+    profileContainer.appendChild(newMatchButton);
     profileContainer.appendChild(profileButton);
     profileContainer.appendChild(dropdownMenu);
 
     // Add to the header profile container
     headerProfileContainer.appendChild(profileContainer);
+
+    // Set up new match button functionality
+    newMatchButton.addEventListener('click', () => {
+      // Import and show new match modal
+      import('./new-match-modal.js').then(({ newMatchModal }) => {
+        newMatchModal.show();
+      }).catch(error => {
+        console.error('Error loading new match modal:', error);
+      });
+    });
 
     // Set up dropdown functionality
     this._setupDropdown(profileButton, dropdownMenu);

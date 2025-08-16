@@ -2090,6 +2090,7 @@ body {
     position: relative;
     display: flex;
     align-items: center;
+    align-items: center;
 }
 
 .user-profile-container {
@@ -3015,4 +3016,23 @@ nsure transfer match modal appears above admin modal */
 
 #rawDataModal .modal-backdrop {
     z-index: 1075 !important;
+}
+
+/* Header new match button styling */
+#headerNewMatchBtn {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    white-space: nowrap;
+    height: auto;
+}
+
+#headerNewMatchBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-profile-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }

@@ -3007,4 +3007,12 @@ nsure transfer match modal appears above admin modal */
 
 #transfer-match-modal .modal-backdrop {
     z-index: 1065 !important;
+}/*
+ Ensure raw data modal appears above match summary modal */
+#rawDataModal {
+    z-index: 1080 !important;
+}
+
+#rawDataModal .modal-backdrop {
+    z-index: 1075 !important;
 }

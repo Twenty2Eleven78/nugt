@@ -1,5 +1,5 @@
 //Cache Name
-const CACHE_NAME = "nugt-cache-v91";
+const CACHE_NAME = "nugt-cache-v92";
 //Files to cache - Modular Architecture
 const cacheFiles = [
   './',
@@ -8,6 +8,7 @@ const cacheFiles = [
   './css/custom-framework.css',
   './css/style.css',
   './js/main.js',
+  './js/debug.js',
   // Core modules
   './js/modules/app.js',
   './js/modules/shared/constants.js',
@@ -15,6 +16,7 @@ const cacheFiles = [
   './js/modules/shared/dom.js',
   './js/modules/shared/error-boundary.js',
   './js/modules/shared/storage-manager.js',
+  './js/modules/shared/custom-modal.js',
   // Data modules
   './js/modules/data/state.js',
   './js/modules/data/storage.js',
@@ -29,7 +31,14 @@ const cacheFiles = [
   // UI modules
   './js/modules/ui/modals.js',
   './js/modules/ui/components.js',
-
+  './js/modules/ui/auth-ui.js',
+  './js/modules/ui/new-match-modal.js',
+  './js/modules/ui/match-save-modal.js',
+  './js/modules/ui/match-load-modal.js',
+  './js/modules/ui/match-summary-modal.js',
+  './js/modules/ui/admin-modal.js',
+  './js/modules/ui/sharing-modal.js',
+  './js/modules/ui/reset-modal.js',
   './js/modules/ui/release-notes.js',
   './js/modules/ui/roster-modal.js',
   // Services
@@ -37,6 +46,8 @@ const cacheFiles = [
   './js/modules/services/sharing.js',
   './js/modules/services/pwa-updater.js',
   './js/modules/services/attendance.js',
+  './js/modules/services/auth.js',
+  './js/modules/services/user-matches-api.js',
   // Assets
   './webfonts/fa-regular-400.woff2',
   './webfonts/fa-solid-900.woff2',

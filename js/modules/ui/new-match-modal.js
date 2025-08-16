@@ -581,8 +581,9 @@ class NewMatchModal {
         // Reset start/pause button UI
         const startPauseButton = domCache.get('startPauseButton');
         if (startPauseButton) {
-            startPauseButton.className = 'btn btn-danger timer-btn-inline';
-            startPauseButton.innerHTML = `Start Game <span id="stopwatch" role="timer" class="timer-badge">${formatTime(0)}</span>`;
+            startPauseButton.className = 'btn timer-btn-compact touch-target btn-danger';
+            startPauseButton.style.touchAction = 'manipulation';
+            startPauseButton.innerHTML = `<i class="fa-regular fa-clock me-2"></i><span class="timer-text">Start Game</span><span id="stopwatch" role="timer" class="timer-display" style="min-width: 4ch;">${formatTime(0)}</span>`;
         }
 
         // Clear any event displays or match logs

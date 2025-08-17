@@ -89,8 +89,23 @@ const getTeamStats = () => {
     allMatches.forEach(match => {
         const team1 = match.team1Name || 'Team 1';
         const team2 = match.team2Name || 'Team 2';
-        const score1 = match.team1Score || 0;
-        const score2 = match.team2Score || 0;
+
+        let score1 = 0;
+        let score2 = 0;
+
+        if (match.events) {
+            match.events.forEach(event => {
+                if (event.type === 'Goal') {
+                    // Assuming the player name is in the details and team2History exists
+                    if (match.team2History && match.team2History.includes(event.details.player)) {
+                        score2++;
+                    } else {
+                        score1++;
+                    }
+                }
+            });
+        }
+
 
         if (!teamStats[team1]) teamStats[team1] = { wins: 0, losses: 0, draws: 0, goalsFor: 0, goalsAgainst: 0, matches: 0 };
         if (!teamStats[team2]) teamStats[team2] = { wins: 0, losses: 0, draws: 0, goalsFor: 0, goalsAgainst: 0, matches: 0 };

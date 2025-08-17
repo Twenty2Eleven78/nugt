@@ -41,6 +41,24 @@ class ThemeManager {
         primary: '#fd7e14',
         primaryLight: '#ff8c42',
         primaryDark: '#e8590c'
+      },
+      yellow: {
+        name: 'Yellow',
+        primary: '#ffc107',
+        primaryLight: '#ffca2c',
+        primaryDark: '#e0a800'
+      },
+      cyan: {
+        name: 'Cyan',
+        primary: '#17a2b8',
+        primaryLight: '#20c9d9',
+        primaryDark: '#138496'
+      },
+      pink: {
+        name: 'Pink',
+        primary: '#e83e8c',
+        primaryLight: '#f065a8',
+        primaryDark: '#d63384'
       }
     };
   }

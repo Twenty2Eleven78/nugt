@@ -1279,6 +1279,30 @@ html {
     --theme-primary-rgb: 253, 126, 20;
 }
 
+/* Yellow Theme */
+[data-theme="yellow"] {
+    --theme-primary: #ffc107;
+    --theme-primary-light: #ffca2c;
+    --theme-primary-dark: #e0a800;
+    --theme-primary-rgb: 253, 126, 20;
+}
+
+/* Cyan Theme */
+[data-theme="cyan"] {
+    --theme-primary: #17a2b8;
+    --theme-primary-light: #20c9d9;
+    --theme-primary-dark: #138496;
+    --theme-primary-rgb: 253, 126, 20;
+}
+
+/* Pink Theme */
+[data-theme="pink"] {
+    --theme-primary: #e83e8c;
+    --theme-primary-light: #f065a8;
+    --theme-primary-dark: #d63384;
+    --theme-primary-rgb: 253, 126, 20;
+}
+
 /* Dark Mode - Applied to any color theme */
 .theme-dark {
     --bg-primary: #212529;

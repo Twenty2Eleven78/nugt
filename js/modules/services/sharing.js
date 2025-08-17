@@ -219,6 +219,34 @@ class SharingService {
     this.lastStatsUpdate = 0;
   }
 
+  async shareData(text, title) {
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: title,
+                text: text,
+            });
+            return true;
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                console.error('Error sharing data:', error);
+                throw error;
+            }
+            return false;
+        }
+    } else {
+        try {
+            await navigator.clipboard.writeText(text);
+            // Consider showing a notification that the text was copied.
+            console.log('Copied to clipboard');
+            return true;
+        } catch (error) {
+            console.error('Error copying to clipboard:', error);
+            throw new Error('Failed to copy data to clipboard');
+        }
+    }
+  }
+
   // Private helper methods
   _processGoalsData() {
     const goalScorers = new Map();

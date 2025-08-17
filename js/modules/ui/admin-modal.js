@@ -1,6 +1,7 @@
 import { userMatchesApi } from '../services/user-matches-api.js';
 import { notificationManager } from '../services/notifications.js';
 import { matchSummaryModal } from './match-summary-modal.js';
+import { statisticsModal } from './statistics-modal.js';
 import { CustomModal } from '../shared/custom-modal.js';
 
 const modalHtml = `
@@ -18,7 +19,7 @@ const modalHtml = `
                     <input type="text" class="form-control mb-2" id="admin-search" 
                            placeholder="Search matches...">
                     <div class="row g-2">
-                        <div class="col-6">
+                        <div class="col-md-4">
                             <select class="form-select" id="filter-select">
                                 <option value="">All Matches</option>
                                 <option value="today">Today</option>
@@ -26,9 +27,14 @@ const modalHtml = `
                                 <option value="month">This Month</option>
                             </select>
                         </div>
-                        <div class="col-6">
+                        <div class="col-6 col-md-4">
                             <button class="btn btn-primary w-100" id="refresh-data-btn">
                                 <i class="fas fa-sync-alt me-1"></i>Refresh
+                            </button>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <button class="btn btn-secondary w-100" id="stats-btn">
+                                <i class="fas fa-chart-bar me-1"></i>Statistics
                             </button>
                         </div>
                     </div>
@@ -154,6 +160,9 @@ const init = () => {
     // Initialize match summary modal
     matchSummaryModal.init();
 
+    // Initialize statistics modal
+    statisticsModal.init();
+
     // Add search functionality
     const searchInput = document.getElementById('admin-search');
     if (searchInput) {
@@ -173,6 +182,14 @@ const init = () => {
     if (filterSelect) {
         filterSelect.addEventListener('change', (e) => {
             applyFilter(e.target.value);
+        });
+    }
+
+    // Add stats button functionality
+    const statsBtn = document.getElementById('stats-btn');
+    if (statsBtn) {
+        statsBtn.addEventListener('click', () => {
+            statisticsModal.show(allMatches);
         });
     }
 

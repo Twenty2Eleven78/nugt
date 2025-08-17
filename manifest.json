@@ -2,7 +2,7 @@
     "name": "Netherton United Game Time App",
     "short_name": "NUGT",
     "start_url": "./",
-    "theme_color": "#8B0000",
+    "theme_color": "#ffffff",
     "background_color": "#fff",
     "display": "standalone",
     "description": "Advanced football match tracker with attendance, statistics, and enhanced event management",

@@ -18,9 +18,7 @@ function testUserIdGeneration() {
     }
 
     const testEmails = [
-        'coach@netherton.com',
-        'admin@nugt.app',
-        'player@example.com'
+        'admin@nugt.app'
     ];
 
     testEmails.forEach(email => {

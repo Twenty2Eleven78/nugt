@@ -5,6 +5,9 @@
 import { CustomModal } from '../shared/custom-modal.js';
 import { matchSummaryModal } from './match-summary-modal.js';
 import { rawDataModal } from './raw-data-modal.js';
+import { userMatchesApi } from '../services/user-matches-api.js';
+import { authService } from '../services/auth.js';
+import { notificationManager } from '../services/notifications.js';
 
 class MatchLoadModal {
   constructor() {
@@ -92,6 +95,9 @@ class MatchLoadModal {
                 <button class="btn btn-outline-secondary btn-sm raw-data-btn" data-match-index="${index}" title="View Raw Data" style="width: 36px;">
                   <i class="fas fa-code"></i>
                 </button>
+                <button class="btn btn-outline-danger btn-sm delete-btn" data-match-index="${index}" title="Delete Match" style="width: 36px;">
+                  <i class="fas fa-trash"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -106,6 +112,11 @@ class MatchLoadModal {
         listItem.querySelector('.raw-data-btn').addEventListener('click', (e) => {
           e.stopPropagation();
           rawDataModal.show(match);
+        });
+
+        listItem.querySelector('.delete-btn').addEventListener('click', (e) => {
+          e.stopPropagation();
+          this._handleDeleteMatch(match, index);
         });
 
         // Add hover effects
@@ -250,6 +261,44 @@ class MatchLoadModal {
       : this.allMatches;
 
     this._renderMatches(filteredMatches);
+  }
+
+  /**
+   * Handle delete match with confirmation
+   * @private
+   */
+  async _handleDeleteMatch(match, matchIndex) {
+    const matchTitle = match.title || 'Untitled Match';
+    
+    // Show confirmation dialog
+    const confirmed = confirm(`Are you sure you want to delete "${matchTitle}"?\n\nThis action cannot be undone.`);
+    
+    if (!confirmed) return;
+
+    try {
+      const currentUser = authService.getCurrentUser();
+      if (!currentUser) {
+        notificationManager.error('Authentication required to delete matches');
+        return;
+      }
+
+      // Show loading state
+      notificationManager.info('Deleting match...');
+
+      // Call API to delete the match
+      await userMatchesApi.deleteMatchData(currentUser.id, matchIndex);
+
+      // Remove from local array
+      this.allMatches.splice(matchIndex, 1);
+
+      // Re-render the matches
+      this._renderMatches(this.allMatches);
+
+      notificationManager.success('Match deleted successfully');
+    } catch (error) {
+      console.error('Error deleting match:', error);
+      notificationManager.error('Failed to delete match: ' + (error.message || 'Unknown error'));
+    }
   }
 }
 

@@ -578,20 +578,56 @@ class StatisticsModal {
                 console.log(`  Current playerStatsMap keys:`, Array.from(playerStatsMap.keys()));
                 match.attendance.forEach((attendee, attendeeIndex) => {
                     console.log(`    Attendee ${attendeeIndex + 1}:`, attendee);
-                    
-                    if (attendee.name && attendee.present) {
-                        const playerKey = attendee.name.toLowerCase().trim();
-                        console.log(`    Player present: "${attendee.name}" (key: "${playerKey}")`);
+                    console.log(`    Attendee keys:`, Object.keys(attendee));
+                    console.log(`    Attendee type:`, typeof attendee);
+
+                    // Try different possible field names and values for attendance
+                    const name = attendee.name || attendee.playerName || attendee.player;
+                    const isPresent = attendee.present === true ||
+                        attendee.present === 'true' ||
+                        attendee.attended === true ||
+                        attendee.attended === 'true' ||
+                        attendee.status === 'present' ||
+                        attendee.status === 'attended';
+
+                    console.log(`    Name: "${name}", Present: ${isPresent} (original present field: ${attendee.present})`);
+
+                    // Check if attendee is just a string (player name)
+                    if (typeof attendee === 'string' && attendee.trim()) {
+                        const playerKey = attendee.toLowerCase().trim();
+                        console.log(`    Treating as player name string: "${attendee}" (key: "${playerKey}")`);
+                        
+                        if (playerStatsMap.has(playerKey)) {
+                            const player = playerStatsMap.get(playerKey);
+                            player.matchesPlayed.add(matchIndex);
+                            console.log(`      ✓ Updated existing player from string: ${attendee} (now has ${player.matchesPlayed.size} appearances)`);
+                        } else {
+                            // Add non-roster player who attended
+                            playerStatsMap.set(playerKey, {
+                                name: attendee.trim(),
+                                shirtNumber: null,
+                                goals: 0,
+                                assists: 0,
+                                appearances: 0,
+                                matchesWithGoals: new Set(),
+                                matchesWithAssists: new Set(),
+                                matchesPlayed: new Set([matchIndex])
+                            });
+                            console.log(`      ✓ Added new player from string: ${attendee}`);
+                        }
+                    } else if (name && isPresent) {
+                        const playerKey = name.toLowerCase().trim();
+                        console.log(`    Player present: "${name}" (key: "${playerKey}")`);
                         console.log(`    Checking if key exists in map:`, playerStatsMap.has(playerKey));
 
                         if (playerStatsMap.has(playerKey)) {
                             const player = playerStatsMap.get(playerKey);
                             player.matchesPlayed.add(matchIndex);
-                            console.log(`      ✓ Updated existing player: ${attendee.name} (now has ${player.matchesPlayed.size} appearances)`);
+                            console.log(`      ✓ Updated existing player: ${name} (now has ${player.matchesPlayed.size} appearances)`);
                         } else {
                             // Add non-roster player who attended
                             playerStatsMap.set(playerKey, {
-                                name: attendee.name.trim(),
+                                name: name.trim(),
                                 shirtNumber: null,
                                 goals: 0,
                                 assists: 0,
@@ -600,13 +636,14 @@ class StatisticsModal {
                                 matchesWithAssists: new Set(),
                                 matchesPlayed: new Set([matchIndex])
                             });
-                            console.log(`      ✓ Added new player from attendance: ${attendee.name}`);
+                            console.log(`      ✓ Added new player from attendance: ${name}`);
                         }
                     } else {
-                        console.log(`    ✗ Player not present or invalid: name="${attendee.name}", present=${attendee.present}`);
+                        console.log(`    ✗ Player not present or invalid: name="${name}", present=${isPresent}`);
+                        console.log(`    ✗ Raw attendee data:`, JSON.stringify(attendee));
                     }
                 });
-                
+
                 // Summary after processing attendance
                 const playersWithAppearances = Array.from(playerStatsMap.values()).filter(p => p.matchesPlayed.has(matchIndex));
                 console.log(`  Match ${matchIndex + 1} attendance summary: ${playersWithAppearances.length} players marked as present`);

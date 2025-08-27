@@ -81,7 +81,17 @@ class StatisticsModal {
             // Debug: Log match data structure
             console.log('Statistics: Loaded match data:', this.matchData.length, 'matches');
             if (this.matchData.length > 0) {
-                console.log('Sample match structure:', this.matchData[0]);
+                console.log('Sample match structure:', JSON.stringify(this.matchData[0], null, 2));
+
+                // Log all matches to see their structure
+                this.matchData.forEach((match, index) => {
+                    console.log(`Match ${index + 1} (${match.title || 'Untitled'}):`, {
+                        goals: match.goals,
+                        matchEvents: match.matchEvents,
+                        attendance: match.attendance,
+                        keys: Object.keys(match)
+                    });
+                });
             }
 
             if (this.matchData.length === 0) {
@@ -273,6 +283,16 @@ class StatisticsModal {
                     <h5 class="text-muted">No Player Data Available</h5>
                     <p class="text-muted">Player statistics will appear here when you have matches with goal scorer data.</p>
                     <p class="text-muted small">Make sure your saved matches include goal information with player names.</p>
+                    <div class="alert alert-info mt-3 text-start">
+                        <h6>Debug Information:</h6>
+                        <p><strong>Matches loaded:</strong> ${this.matchData.length}</p>
+                        <p><strong>Roster size:</strong> ${rosterManager.getRoster().length}</p>
+                        ${this.matchData.length > 0 ? `
+                            <p><strong>Sample match keys:</strong> ${Object.keys(this.matchData[0]).join(', ')}</p>
+                            <p><strong>Check console for detailed match data structure</strong></p>
+                            <p><strong>Open browser console to see detailed analysis</strong></p>
+                        ` : ''}
+                    </div>
                 </div>
             `;
             return;
@@ -566,17 +586,34 @@ class StatisticsModal {
             // Analyze goals from different possible sources
             let goals = [];
 
-            if (match.goals && Array.isArray(match.goals)) {
+            // Check match.goals first
+            if (match.goals && Array.isArray(match.goals) && match.goals.length > 0) {
                 goals = match.goals;
-                console.log(`  Found ${goals.length} goals in match.goals`);
-            } else if (match.matchEvents && Array.isArray(match.matchEvents)) {
-                // Check if goals are stored in match events
-                goals = match.matchEvents.filter(event =>
-                    event.type === 'goal' ||
-                    event.eventType === 'goal' ||
-                    (event.scorer && event.scorer.trim())
-                );
-                console.log(`  Found ${goals.length} goals in match.matchEvents`);
+                console.log(`  Found ${goals.length} goals in match.goals:`, goals);
+            }
+            // Check match.matchEvents for goal events
+            else if (match.matchEvents && Array.isArray(match.matchEvents)) {
+                goals = match.matchEvents.filter(event => {
+                    const isGoalEvent = event.type === 'goal' ||
+                        event.eventType === 'goal' ||
+                        event.event === 'goal' ||
+                        (event.scorer && event.scorer.trim()) ||
+                        (event.player && event.player.trim());
+                    return isGoalEvent;
+                });
+                console.log(`  Found ${goals.length} goal events in match.matchEvents:`, goals);
+            }
+            // Check if goals might be stored differently
+            else {
+                console.log(`  No goals found. Match structure:`, {
+                    hasGoals: !!match.goals,
+                    goalsType: typeof match.goals,
+                    goalsLength: Array.isArray(match.goals) ? match.goals.length : 'not array',
+                    hasMatchEvents: !!match.matchEvents,
+                    matchEventsType: typeof match.matchEvents,
+                    matchEventsLength: Array.isArray(match.matchEvents) ? match.matchEvents.length : 'not array',
+                    allKeys: Object.keys(match)
+                });
             }
 
             // Process each goal
@@ -585,8 +622,8 @@ class StatisticsModal {
                 console.log(`    Goal ${goalIndex + 1}:`, goal);
 
                 // Try different possible scorer field names
-                const scorer = goal.scorer || goal.player || goal.playerName || goal.name;
-                const assist = goal.assist || goal.assistedBy || goal.assistBy;
+                const scorer = goal.scorer || goal.player || goal.playerName || goal.name || goal.goalScorer;
+                const assist = goal.assist || goal.assistedBy || goal.assistBy || goal.assistPlayer || goal.goalAssist;
 
                 if (scorer && scorer.trim() && scorer !== 'Own Goal') {
                     const scorerKey = scorer.trim().toLowerCase();
@@ -652,6 +689,8 @@ class StatisticsModal {
         console.log(`  Total goals found: ${totalGoalsFound}`);
         console.log(`  Total assists found: ${totalAssistsFound}`);
         console.log(`  Total players (roster + non-roster): ${playerStatsMap.size}`);
+        console.log(`  Players with goals:`, Array.from(playerStatsMap.values()).filter(p => p.goals > 0).map(p => `${p.name}: ${p.goals}`));
+        console.log(`  Players with assists:`, Array.from(playerStatsMap.values()).filter(p => p.assists > 0).map(p => `${p.name}: ${p.assists}`));
 
         // Convert to array and calculate additional stats
         const playerStats = Array.from(playerStatsMap.values()).map(player => {
@@ -773,6 +812,15 @@ class StatisticsModal {
         const div = document.createElement('div');
         div.textContent = text || '';
         return div.innerHTML;
+    }
+
+    /**
+     * Debug method to expose match data
+     */
+    getMatchDataForDebugging() {
+        console.log('Current match data:', this.matchData);
+        window.debugMatchData = this.matchData;
+        return this.matchData;
     }
 
     /**
@@ -902,3 +950,6 @@ class StatisticsModal {
 
 // Create and export singleton instance
 export const statisticsModal = new StatisticsModal();
+
+// Expose for debugging
+window.statisticsModal = statisticsModal;

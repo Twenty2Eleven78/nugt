@@ -56,7 +56,7 @@ class StatisticsModal {
      * Load match data and analyze statistics
      * @private
      */
-    async _loadAndAnalyzeData() {
+    async _loadAndAnalyzeData(forceRefresh = false) {
         const loadingElement = document.getElementById('statisticsContent');
         if (loadingElement) {
             loadingElement.innerHTML = `
@@ -70,7 +70,18 @@ class StatisticsModal {
         }
 
         try {
+            // Clear cache if refresh is requested
+            if (forceRefresh) {
+                userMatchesApi.clearCache();
+            }
+
             this.matchData = await userMatchesApi.loadMatchData() || [];
+            
+            // Debug: Log match data structure
+            console.log('Statistics: Loaded match data:', this.matchData.length, 'matches');
+            if (this.matchData.length > 0) {
+                console.log('Sample match structure:', this.matchData[0]);
+            }
 
             if (this.matchData.length === 0) {
                 this._showNoDataMessage();
@@ -250,11 +261,25 @@ class StatisticsModal {
         if (!content) return;
 
         if (playerStats.length === 0) {
+            // Show debugging info to help understand the data structure
+            const sampleMatch = this.matchData.length > 0 ? this.matchData[0] : null;
+            const debugInfo = sampleMatch ? `
+                <div class="alert alert-info mt-3">
+                    <h6>Debug Info:</h6>
+                    <p><strong>Total matches:</strong> ${this.matchData.length}</p>
+                    <p><strong>Sample match keys:</strong> ${Object.keys(sampleMatch).join(', ')}</p>
+                    ${sampleMatch.goals ? `<p><strong>Goals structure:</strong> ${JSON.stringify(sampleMatch.goals, null, 2)}</p>` : ''}
+                    ${sampleMatch.matchEvents ? `<p><strong>Match events:</strong> ${sampleMatch.matchEvents.length} events</p>` : ''}
+                </div>
+            ` : '';
+
             content.innerHTML = `
         <div class="text-center py-5">
           <i class="fas fa-users fa-3x text-muted mb-3"></i>
           <h5 class="text-muted">No Player Data Available</h5>
           <p class="text-muted">Player statistics will appear here when you have matches with goal scorer data.</p>
+          <p class="text-muted small">Make sure your saved matches include goal information with player names.</p>
+          ${debugInfo}
         </div>
       `;
             return;
@@ -419,23 +444,49 @@ class StatisticsModal {
      */
     _calculatePlayerStats() {
         const playerMap = new Map();
+        let totalGoalsFound = 0;
 
-        this.matchData.forEach(match => {
-            if (match.goals && Array.isArray(match.goals)) {
-                match.goals.forEach(goal => {
-                    if (goal.scorer && goal.scorer.trim()) {
-                        const playerName = goal.scorer.trim();
-                        if (!playerMap.has(playerName)) {
-                            playerMap.set(playerName, { goals: 0, matches: new Set() });
-                        }
-
-                        const player = playerMap.get(playerName);
-                        player.goals++;
-                        player.matches.add(match.savedAt || match.title); // Use unique identifier
-                    }
-                });
+        this.matchData.forEach((match, matchIndex) => {
+            // Debug: Log match structure for first few matches
+            if (matchIndex < 3) {
+                console.log(`Match ${matchIndex} goals structure:`, match.goals);
             }
+
+            // Check different possible goal data structures
+            let goals = [];
+            
+            if (match.goals && Array.isArray(match.goals)) {
+                goals = match.goals;
+            } else if (match.matchEvents && Array.isArray(match.matchEvents)) {
+                // Check if goals are stored in match events
+                goals = match.matchEvents.filter(event => 
+                    event.type === 'goal' || 
+                    event.eventType === 'goal' ||
+                    event.scorer
+                );
+            }
+
+            goals.forEach(goal => {
+                totalGoalsFound++;
+                
+                // Try different possible scorer field names
+                const scorer = goal.scorer || goal.player || goal.playerName || goal.name;
+                
+                if (scorer && scorer.trim()) {
+                    const playerName = scorer.trim();
+                    if (!playerMap.has(playerName)) {
+                        playerMap.set(playerName, { goals: 0, matches: new Set() });
+                    }
+
+                    const player = playerMap.get(playerName);
+                    player.goals++;
+                    player.matches.add(match.savedAt || match.title || matchIndex); // Use unique identifier
+                }
+            });
         });
+
+        console.log(`Statistics: Found ${totalGoalsFound} total goals across ${this.matchData.length} matches`);
+        console.log(`Statistics: Found ${playerMap.size} unique players`);
 
         // Convert to array and calculate goals per match
         const playerStats = Array.from(playerMap.entries()).map(([name, data]) => ({
@@ -593,6 +644,9 @@ class StatisticsModal {
               </div>
             </div>
             <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary" id="refreshStatisticsBtn">
+                <i class="fas fa-sync-alt me-1"></i>Refresh Data
+              </button>
               <button type="button" class="btn btn-secondary" id="closeStatisticsBtn">Close</button>
             </div>
           </div>
@@ -617,6 +671,11 @@ class StatisticsModal {
             if (e.target.id === 'closeStatisticsBtn') {
                 this.hide();
             }
+            
+            // Handle refresh button
+            if (e.target.id === 'refreshStatisticsBtn') {
+                this._handleRefresh();
+            }
         });
 
         // Handle tab navigation
@@ -638,6 +697,28 @@ class StatisticsModal {
                 }
             }
         });
+    }
+
+    /**
+     * Handle refresh button click
+     * @private
+     */
+    async _handleRefresh() {
+        const refreshBtn = document.getElementById('refreshStatisticsBtn');
+        const originalText = refreshBtn.innerHTML;
+        
+        try {
+            refreshBtn.disabled = true;
+            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Refreshing...';
+            
+            await this._loadAndAnalyzeData(true); // Force refresh
+            notificationManager.success('Statistics refreshed successfully');
+        } catch (error) {
+            notificationManager.error('Failed to refresh statistics');
+        } finally {
+            refreshBtn.disabled = false;
+            refreshBtn.innerHTML = originalText;
+        }
     }
 }
 

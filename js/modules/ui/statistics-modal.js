@@ -587,8 +587,12 @@ class StatisticsModal {
                         attendee.present === 'true' ||
                         attendee.attended === true ||
                         attendee.attended === 'true' ||
+                        attendee.attending === true ||
+                        attendee.attending === 'true' ||
                         attendee.status === 'present' ||
-                        attendee.status === 'attended';
+                        attendee.status === 'attended' ||
+                        attendee.isPresent === true ||
+                        attendee.isAttending === true;
 
                     console.log(`    Name: "${name}", Present: ${isPresent} (original present field: ${attendee.present})`);
 
@@ -596,7 +600,7 @@ class StatisticsModal {
                     if (typeof attendee === 'string' && attendee.trim()) {
                         const playerKey = attendee.toLowerCase().trim();
                         console.log(`    Treating as player name string: "${attendee}" (key: "${playerKey}")`);
-                        
+
                         if (playerStatsMap.has(playerKey)) {
                             const player = playerStatsMap.get(playerKey);
                             player.matchesPlayed.add(matchIndex);

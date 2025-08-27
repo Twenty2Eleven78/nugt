@@ -572,15 +572,33 @@ class StatisticsModal {
 
             // Track players who appeared in this match (from attendance if available)
             if (match.attendance && Array.isArray(match.attendance)) {
+                console.log(`  Processing attendance for match ${matchIndex + 1}:`, match.attendance);
                 match.attendance.forEach(attendee => {
                     if (attendee.name && attendee.present) {
                         const playerKey = attendee.name.toLowerCase();
+                        console.log(`    Player present: ${attendee.name}`);
+
                         if (playerStatsMap.has(playerKey)) {
                             playerStatsMap.get(playerKey).matchesPlayed.add(matchIndex);
-                            playerStatsMap.get(playerKey).appearances++;
+                            // Don't increment appearances here, we'll calculate it from matchesPlayed.size
+                        } else {
+                            // Add non-roster player who attended
+                            playerStatsMap.set(playerKey, {
+                                name: attendee.name,
+                                shirtNumber: null,
+                                goals: 0,
+                                assists: 0,
+                                appearances: 0, // Will be calculated later
+                                matchesWithGoals: new Set(),
+                                matchesWithAssists: new Set(),
+                                matchesPlayed: new Set([matchIndex])
+                            });
+                            console.log(`    Added new player from attendance: ${attendee.name}`);
                         }
                     }
                 });
+            } else {
+                console.log(`  No attendance data found for match ${matchIndex + 1}`);
             }
 
             // Analyze goals from different possible sources
@@ -642,7 +660,7 @@ class StatisticsModal {
                             shirtNumber: null,
                             goals: 1,
                             assists: 0,
-                            appearances: 1,
+                            appearances: 0, // Will be calculated from matchesPlayed
                             matchesWithGoals: new Set([matchIndex]),
                             matchesWithAssists: new Set(),
                             matchesPlayed: new Set([matchIndex])
@@ -669,7 +687,7 @@ class StatisticsModal {
                                 shirtNumber: null,
                                 goals: 0,
                                 assists: 1,
-                                appearances: 1,
+                                appearances: 0, // Will be calculated from matchesPlayed
                                 matchesWithGoals: new Set(),
                                 matchesWithAssists: new Set([matchIndex]),
                                 matchesPlayed: new Set([matchIndex])
@@ -694,15 +712,15 @@ class StatisticsModal {
 
         // Convert to array and calculate additional stats
         const playerStats = Array.from(playerStatsMap.values()).map(player => {
-            const totalMatches = player.matchesPlayed.size;
+            const appearances = player.matchesPlayed.size; // Appearances = number of matches attended
             return {
                 name: player.name,
                 shirtNumber: player.shirtNumber,
                 goals: player.goals,
                 assists: player.assists,
-                appearances: Math.max(player.appearances, totalMatches), // Use the higher value
-                goalsPerMatch: totalMatches > 0 ? (player.goals / totalMatches).toFixed(2) : '0.00',
-                assistsPerMatch: totalMatches > 0 ? (player.assists / totalMatches).toFixed(2) : '0.00',
+                appearances: appearances,
+                goalsPerMatch: appearances > 0 ? (player.goals / appearances).toFixed(2) : '0.00',
+                assistsPerMatch: appearances > 0 ? (player.assists / appearances).toFixed(2) : '0.00',
                 totalContributions: player.goals + player.assists,
                 isRosterPlayer: player.shirtNumber !== null || roster.some(r => r.name.toLowerCase() === player.name.toLowerCase())
             };

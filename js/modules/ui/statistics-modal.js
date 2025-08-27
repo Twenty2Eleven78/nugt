@@ -78,21 +78,7 @@ class StatisticsModal {
 
             this.matchData = await userMatchesApi.loadMatchData() || [];
 
-            // Debug: Log match data structure
-            console.log('Statistics: Loaded match data:', this.matchData.length, 'matches');
-            if (this.matchData.length > 0) {
-                console.log('Sample match structure:', JSON.stringify(this.matchData[0], null, 2));
-
-                // Log all matches to see their structure
-                this.matchData.forEach((match, index) => {
-                    console.log(`Match ${index + 1} (${match.title || 'Untitled'}):`, {
-                        goals: match.goals,
-                        matchEvents: match.matchEvents,
-                        attendance: match.attendance,
-                        keys: Object.keys(match)
-                    });
-                });
-            }
+            console.log(`Statistics: Analyzing ${this.matchData.length} matches`);
 
             if (this.matchData.length === 0) {
                 this._showNoDataMessage();
@@ -562,7 +548,7 @@ class StatisticsModal {
                 matchesWithAssists: new Set(),
                 matchesPlayed: new Set()
             });
-            console.log(`Initialized roster player: "${player.name}" with key: "${playerKey}"`);
+            // Roster player initialized
         });
 
         let totalGoalsFound = 0;
@@ -570,16 +556,13 @@ class StatisticsModal {
 
         // Analyze each match
         this.matchData.forEach((match, matchIndex) => {
-            console.log(`Analyzing match ${matchIndex + 1}:`, match.title || `Match ${matchIndex + 1}`);
+            // Analyzing match data
 
             // Track players who appeared in this match (from attendance if available)
             if (match.attendance && Array.isArray(match.attendance)) {
-                console.log(`  Processing attendance for match ${matchIndex + 1}:`, match.attendance);
-                console.log(`  Current playerStatsMap keys:`, Array.from(playerStatsMap.keys()));
+                // Processing attendance data
                 match.attendance.forEach((attendee, attendeeIndex) => {
-                    console.log(`    Attendee ${attendeeIndex + 1}:`, attendee);
-                    console.log(`    Attendee keys:`, Object.keys(attendee));
-                    console.log(`    Attendee type:`, typeof attendee);
+                    // Processing attendee
 
                     // Try different possible field names and values for attendance
                     const name = attendee.name || attendee.playerName || attendee.player;
@@ -594,17 +577,17 @@ class StatisticsModal {
                         attendee.isPresent === true ||
                         attendee.isAttending === true;
 
-                    console.log(`    Name: "${name}", Present: ${isPresent} (original present field: ${attendee.present})`);
+                    // Checking attendance status
 
                     // Check if attendee is just a string (player name)
                     if (typeof attendee === 'string' && attendee.trim()) {
                         const playerKey = attendee.toLowerCase().trim();
-                        console.log(`    Treating as player name string: "${attendee}" (key: "${playerKey}")`);
+                        // Processing string attendee
 
                         if (playerStatsMap.has(playerKey)) {
                             const player = playerStatsMap.get(playerKey);
                             player.matchesPlayed.add(matchIndex);
-                            console.log(`      ✓ Updated existing player from string: ${attendee} (now has ${player.matchesPlayed.size} appearances)`);
+                            // Updated player attendance
                         } else {
                             // Add non-roster player who attended
                             playerStatsMap.set(playerKey, {
@@ -617,17 +600,16 @@ class StatisticsModal {
                                 matchesWithAssists: new Set(),
                                 matchesPlayed: new Set([matchIndex])
                             });
-                            console.log(`      ✓ Added new player from string: ${attendee}`);
+                            // Added new player
                         }
                     } else if (name && isPresent) {
                         const playerKey = name.toLowerCase().trim();
-                        console.log(`    Player present: "${name}" (key: "${playerKey}")`);
-                        console.log(`    Checking if key exists in map:`, playerStatsMap.has(playerKey));
+                        // Player present
 
                         if (playerStatsMap.has(playerKey)) {
                             const player = playerStatsMap.get(playerKey);
                             player.matchesPlayed.add(matchIndex);
-                            console.log(`      ✓ Updated existing player: ${name} (now has ${player.matchesPlayed.size} appearances)`);
+                            // Updated existing player
                         } else {
                             // Add non-roster player who attended
                             playerStatsMap.set(playerKey, {
@@ -640,28 +622,18 @@ class StatisticsModal {
                                 matchesWithAssists: new Set(),
                                 matchesPlayed: new Set([matchIndex])
                             });
-                            console.log(`      ✓ Added new player from attendance: ${name}`);
+                            // Added new player from attendance
                         }
                     } else {
-                        console.log(`    ✗ Player not present or invalid: name="${name}", present=${isPresent}`);
-                        console.log(`    ✗ Raw attendee data:`, JSON.stringify(attendee));
+                        // Player not attending
                     }
                 });
 
                 // Summary after processing attendance
                 const playersWithAppearances = Array.from(playerStatsMap.values()).filter(p => p.matchesPlayed.has(matchIndex));
-                console.log(`  Match ${matchIndex + 1} attendance summary: ${playersWithAppearances.length} players marked as present`);
+                // Attendance processed
             } else {
-                console.log(`  No attendance data found for match ${matchIndex + 1}. Match structure:`, {
-                    hasAttendance: !!match.attendance,
-                    attendanceType: typeof match.attendance,
-                    attendanceLength: Array.isArray(match.attendance) ? match.attendance.length : 'not array',
-                    matchKeys: Object.keys(match),
-                    // Check for alternative attendance field names
-                    hasAttendees: !!match.attendees,
-                    hasPlayers: !!match.players,
-                    hasRoster: !!match.roster
-                });
+                // No attendance data available
             }
 
             // Analyze goals from different possible sources
@@ -670,7 +642,7 @@ class StatisticsModal {
             // Check match.goals first
             if (match.goals && Array.isArray(match.goals) && match.goals.length > 0) {
                 goals = match.goals;
-                console.log(`  Found ${goals.length} goals in match.goals:`, goals);
+                // Goals found in match data
             }
             // Check match.matchEvents for goal events
             else if (match.matchEvents && Array.isArray(match.matchEvents)) {
@@ -682,25 +654,17 @@ class StatisticsModal {
                         (event.player && event.player.trim());
                     return isGoalEvent;
                 });
-                console.log(`  Found ${goals.length} goal events in match.matchEvents:`, goals);
+                // Goal events found
             }
             // Check if goals might be stored differently
             else {
-                console.log(`  No goals found. Match structure:`, {
-                    hasGoals: !!match.goals,
-                    goalsType: typeof match.goals,
-                    goalsLength: Array.isArray(match.goals) ? match.goals.length : 'not array',
-                    hasMatchEvents: !!match.matchEvents,
-                    matchEventsType: typeof match.matchEvents,
-                    matchEventsLength: Array.isArray(match.matchEvents) ? match.matchEvents.length : 'not array',
-                    allKeys: Object.keys(match)
-                });
+                // No goals found in match
             }
 
             // Process each goal
             goals.forEach((goal, goalIndex) => {
                 totalGoalsFound++;
-                console.log(`    Goal ${goalIndex + 1}:`, goal);
+                // Processing goal
 
                 // Try different possible scorer field names
                 const scorer = goal.scorer || goal.player || goal.playerName || goal.name || goal.goalScorer || goal.goalScorerName;
@@ -715,7 +679,7 @@ class StatisticsModal {
                         player.goals++;
                         player.matchesWithGoals.add(matchIndex);
                         player.matchesPlayed.add(matchIndex);
-                        console.log(`      Credited goal to: ${scorer}`);
+                        // Goal credited
                     } else {
                         // Add non-roster player
                         playerStatsMap.set(scorerKey, {
@@ -728,7 +692,7 @@ class StatisticsModal {
                             matchesWithAssists: new Set(),
                             matchesPlayed: new Set([matchIndex])
                         });
-                        console.log(`      Added new player from goal: ${scorer}`);
+                        // New goal scorer added
                     }
                 }
 
@@ -741,7 +705,7 @@ class StatisticsModal {
                         player.assists++;
                         player.matchesWithAssists.add(matchIndex);
                         player.matchesPlayed.add(matchIndex);
-                        console.log(`      Credited assist to: ${assist}`);
+                        // Assist credited
                     } else {
                         // Add non-roster player for assist
                         if (!playerStatsMap.has(assistKey)) {
@@ -759,20 +723,14 @@ class StatisticsModal {
                             playerStatsMap.get(assistKey).assists++;
                             playerStatsMap.get(assistKey).matchesWithAssists.add(matchIndex);
                         }
-                        console.log(`      Added new player from assist: ${assist}`);
+                        // New assist provider added
                     }
                 }
             });
         });
 
-        console.log(`Statistics Summary:`);
-        console.log(`  Total matches analyzed: ${this.matchData.length}`);
-        console.log(`  Total goals found: ${totalGoalsFound}`);
-        console.log(`  Total assists found: ${totalAssistsFound}`);
-        console.log(`  Total players (roster + non-roster): ${playerStatsMap.size}`);
-        console.log(`  Players with goals:`, Array.from(playerStatsMap.values()).filter(p => p.goals > 0).map(p => `${p.name}: ${p.goals}`));
-        console.log(`  Players with assists:`, Array.from(playerStatsMap.values()).filter(p => p.assists > 0).map(p => `${p.name}: ${p.assists}`));
-        console.log(`  Players with appearances:`, Array.from(playerStatsMap.values()).filter(p => p.matchesPlayed.size > 0).map(p => `${p.name}: ${p.matchesPlayed.size} matches`));
+        // Statistics processing complete
+        console.log(`Statistics: Processed ${this.matchData.length} matches, ${totalGoalsFound} goals, ${totalAssistsFound} assists`);
 
         // Convert to array and calculate additional stats
         const playerStats = Array.from(playerStatsMap.values()).map(player => {
@@ -900,7 +858,7 @@ class StatisticsModal {
      * Debug method to expose match data
      */
     getMatchDataForDebugging() {
-        console.log('Current match data:', this.matchData);
+        // Debug method for match data
         window.debugMatchData = this.matchData;
         return this.matchData;
     }

@@ -76,6 +76,20 @@ exports.handler = async function(event, context) {
 
     if (event.httpMethod === 'GET') {
       const isAdmin = event.queryStringParameters?.admin === 'true';
+      const checkAdmin = event.queryStringParameters?.checkAdmin === 'true';
+
+      // Handle admin status check
+      if (checkAdmin) {
+        const adminStatus = isAdminUser(userId, userEmail);
+        return {
+          statusCode: 200,
+          body: JSON.stringify({
+            isAdmin: adminStatus,
+            userId: userId,
+            userEmail: userEmail
+          })
+        };
+      }
 
       if (isAdmin) {
         // Verify admin permissions

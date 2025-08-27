@@ -69,6 +69,15 @@ class AuthService {
       return false;
     }
 
+    // Check if we need to migrate to consistent user ID
+    const expectedUserId = this._generateUserId(userData.email);
+    if (userData.userId !== expectedUserId) {
+      console.log('Migrating user ID from', userData.userId, 'to', expectedUserId);
+      // Update stored user ID to be consistent across devices
+      storage.saveImmediate(AUTH_STORAGE_KEYS.USER_ID, expectedUserId);
+      userData.userId = expectedUserId;
+    }
+
     this._setAuthenticatedState(userData);
     this._updateAdminUI();
     this.trackUsage('app_open');
@@ -88,7 +97,7 @@ class AuthService {
       }
 
       const displayName = email.split('@')[0];
-      const userId = this._generateUserId();
+      const userId = this._generateUserId(email);
 
       await this._attemptWebAuthnRegistration(userId, email, displayName);
       this._saveUserData(userId, email, displayName);
@@ -221,15 +230,37 @@ class AuthService {
     return this.currentUser;
   }
 
-  isAdmin() {
-    // In a real application, this should be a proper role check on the server
-    const isAdminUser = this.currentUser && this.currentUser.email === 'admin@nugt.app';
-    console.log('Admin check:', {
-      hasCurrentUser: !!this.currentUser,
-      userEmail: this.currentUser?.email,
-      isAdmin: isAdminUser
-    });
-    return isAdminUser;
+  async isAdmin() {
+    if (!this.currentUser || !this.currentUser.email) {
+      return false;
+    }
+
+    // Check admin status via backend API call
+    // This keeps admin emails secure on the server side
+    try {
+      const token = await this.getAuthToken();
+      const response = await fetch('/.netlify/functions/user-matches?checkAdmin=true', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        const isAdminUser = result.isAdmin || false;
+        console.log('Admin check (secure):', {
+          hasCurrentUser: !!this.currentUser,
+          userEmail: this.currentUser?.email,
+          isAdmin: isAdminUser
+        });
+        return isAdminUser;
+      }
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+    }
+
+    return false;
   }
 
   /**
@@ -358,7 +389,15 @@ class AuthService {
     }
   }
 
-  _generateUserId() {
+  _generateUserId(email) {
+    // Generate consistent user ID based on email to ensure cross-device sync
+    if (email) {
+      // Create a consistent hash-like ID from email
+      const emailPart = email.split('@')[0];
+      const domain = email.split('@')[1];
+      return `user_${emailPart}_${domain.replace(/\./g, '_')}`;
+    }
+    // Fallback to random ID if no email provided
     return 'user_' + Math.random().toString(36).substring(2, 15);
   }
 

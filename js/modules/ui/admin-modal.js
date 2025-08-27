@@ -2,6 +2,7 @@ import { userMatchesApi } from '../services/user-matches-api.js';
 import { notificationManager } from '../services/notifications.js';
 import { matchSummaryModal } from './match-summary-modal.js';
 import { CustomModal } from '../shared/custom-modal.js';
+import { authService } from '../services/auth.js';
 
 const modalHtml = `
 <div class="modal fade" id="admin-modal" tabindex="-1" aria-labelledby="admin-modal-label" aria-hidden="true">
@@ -229,7 +230,25 @@ const init = () => {
     }
 
     modalElement.addEventListener('modal.show', async () => {
-        await loadMatchesData();
+        console.log('Admin modal opening, current user:', authService.getCurrentUser());
+        
+        // Verify admin access before loading data
+        try {
+            const isAdmin = await authService.isAdmin();
+            console.log('Is admin:', isAdmin);
+            
+            if (!isAdmin) {
+                notificationManager.error('Access denied. Admin privileges required.');
+                modalInstance.hide();
+                return;
+            }
+            
+            await loadMatchesData();
+        } catch (error) {
+            console.error('Error verifying admin access:', error);
+            notificationManager.error('Unable to verify admin access. Please try again.');
+            modalInstance.hide();
+        }
     });
 
     // Clean up when admin modal is hidden
@@ -260,8 +279,17 @@ const loadMatchesData = async () => {
             `;
         }
 
+        // Clear cache to ensure fresh data
+        userMatchesApi.clearCache();
+
         const matches = await userMatchesApi.loadAllMatchData();
         allMatches = matches || [];
+
+        console.log('Admin dashboard loaded matches:', {
+            totalMatches: allMatches.length,
+            uniqueUsers: new Set(allMatches.map(m => m.userEmail || m.userId)).size,
+            sampleMatch: allMatches[0]
+        });
 
         if (allMatches.length > 0) {
             renderCards(allMatches);
@@ -631,11 +659,15 @@ const handleDeleteConfirm = async () => {
 
         console.log('Deleting match with userId:', currentDeleteMatch.data.userId, 'matchIndex:', matchIndexToDelete);
 
+        // Clear cache before deletion to ensure fresh data
+        userMatchesApi.clearCache();
+
         await userMatchesApi.deleteMatchData(
             currentDeleteMatch.data.userId,
             matchIndexToDelete
         );
 
+        // Remove from local array
         allMatches.splice(currentDeleteMatch.index, 1);
 
         // Re-render the cards view and stats
@@ -651,6 +683,11 @@ const handleDeleteConfirm = async () => {
         notificationManager.success(`Match "${matchTitle}" has been deleted successfully.`);
 
         currentDeleteMatch = null;
+
+        // Refresh data to ensure consistency
+        setTimeout(() => {
+            loadMatchesData();
+        }, 1000);
 
     } catch (error) {
         console.error('Error deleting match:', error);
@@ -926,7 +963,7 @@ const show = () => {
             });
             return;
         }
-        
+
         if (!modalInstance) {
             init();
         }

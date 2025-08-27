@@ -575,16 +575,19 @@ class StatisticsModal {
             // Track players who appeared in this match (from attendance if available)
             if (match.attendance && Array.isArray(match.attendance)) {
                 console.log(`  Processing attendance for match ${matchIndex + 1}:`, match.attendance);
+                console.log(`  Current playerStatsMap keys:`, Array.from(playerStatsMap.keys()));
                 match.attendance.forEach((attendee, attendeeIndex) => {
                     console.log(`    Attendee ${attendeeIndex + 1}:`, attendee);
                     
                     if (attendee.name && attendee.present) {
                         const playerKey = attendee.name.toLowerCase().trim();
                         console.log(`    Player present: "${attendee.name}" (key: "${playerKey}")`);
+                        console.log(`    Checking if key exists in map:`, playerStatsMap.has(playerKey));
 
                         if (playerStatsMap.has(playerKey)) {
-                            playerStatsMap.get(playerKey).matchesPlayed.add(matchIndex);
-                            console.log(`      Updated existing player: ${attendee.name}`);
+                            const player = playerStatsMap.get(playerKey);
+                            player.matchesPlayed.add(matchIndex);
+                            console.log(`      ✓ Updated existing player: ${attendee.name} (now has ${player.matchesPlayed.size} appearances)`);
                         } else {
                             // Add non-roster player who attended
                             playerStatsMap.set(playerKey, {
@@ -597,14 +600,27 @@ class StatisticsModal {
                                 matchesWithAssists: new Set(),
                                 matchesPlayed: new Set([matchIndex])
                             });
-                            console.log(`      Added new player from attendance: ${attendee.name}`);
+                            console.log(`      ✓ Added new player from attendance: ${attendee.name}`);
                         }
                     } else {
-                        console.log(`    Player not present or invalid: name="${attendee.name}", present=${attendee.present}`);
+                        console.log(`    ✗ Player not present or invalid: name="${attendee.name}", present=${attendee.present}`);
                     }
                 });
+                
+                // Summary after processing attendance
+                const playersWithAppearances = Array.from(playerStatsMap.values()).filter(p => p.matchesPlayed.has(matchIndex));
+                console.log(`  Match ${matchIndex + 1} attendance summary: ${playersWithAppearances.length} players marked as present`);
             } else {
-                console.log(`  No attendance data found for match ${matchIndex + 1}`);
+                console.log(`  No attendance data found for match ${matchIndex + 1}. Match structure:`, {
+                    hasAttendance: !!match.attendance,
+                    attendanceType: typeof match.attendance,
+                    attendanceLength: Array.isArray(match.attendance) ? match.attendance.length : 'not array',
+                    matchKeys: Object.keys(match),
+                    // Check for alternative attendance field names
+                    hasAttendees: !!match.attendees,
+                    hasPlayers: !!match.players,
+                    hasRoster: !!match.roster
+                });
             }
 
             // Analyze goals from different possible sources

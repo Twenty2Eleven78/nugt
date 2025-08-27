@@ -7,6 +7,7 @@ import { CustomModal } from '../shared/custom-modal.js';
 import { userMatchesApi } from '../services/user-matches-api.js';
 import { authService } from '../services/auth.js';
 import { notificationManager } from '../services/notifications.js';
+import { rosterManager } from '../match/roster.js';
 
 class StatisticsModal {
     constructor() {
@@ -260,72 +261,153 @@ class StatisticsModal {
 
         if (!content) return;
 
-        if (playerStats.length === 0) {
-            // Show debugging info to help understand the data structure
-            const sampleMatch = this.matchData.length > 0 ? this.matchData[0] : null;
-            const debugInfo = sampleMatch ? `
-                <div class="alert alert-info mt-3">
-                    <h6>Debug Info:</h6>
-                    <p><strong>Total matches:</strong> ${this.matchData.length}</p>
-                    <p><strong>Sample match keys:</strong> ${Object.keys(sampleMatch).join(', ')}</p>
-                    ${sampleMatch.goals ? `<p><strong>Goals structure:</strong> ${JSON.stringify(sampleMatch.goals, null, 2)}</p>` : ''}
-                    ${sampleMatch.matchEvents ? `<p><strong>Match events:</strong> ${sampleMatch.matchEvents.length} events</p>` : ''}
-                </div>
-            ` : '';
+        // Separate roster and non-roster players
+        const rosterPlayers = playerStats.filter(p => p.isRosterPlayer);
+        const nonRosterPlayers = playerStats.filter(p => !p.isRosterPlayer);
+        const totalRosterSize = rosterManager.getRoster().length;
 
+        if (playerStats.length === 0) {
             content.innerHTML = `
-        <div class="text-center py-5">
-          <i class="fas fa-users fa-3x text-muted mb-3"></i>
-          <h5 class="text-muted">No Player Data Available</h5>
-          <p class="text-muted">Player statistics will appear here when you have matches with goal scorer data.</p>
-          <p class="text-muted small">Make sure your saved matches include goal information with player names.</p>
-          ${debugInfo}
-        </div>
-      `;
+                <div class="text-center py-5">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No Player Data Available</h5>
+                    <p class="text-muted">Player statistics will appear here when you have matches with goal scorer data.</p>
+                    <p class="text-muted small">Make sure your saved matches include goal information with player names.</p>
+                </div>
+            `;
             return;
         }
 
         content.innerHTML = `
-      <div class="card">
-        <div class="card-header">
-          <h6 class="mb-0"><i class="fas fa-users me-2"></i>Player Statistics</h6>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>Player</th>
-                  <th class="text-center">Goals</th>
-                  <th class="text-center">Matches</th>
-                  <th class="text-center">Goals/Match</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${playerStats.map((player, index) => `
-                  <tr>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-2" 
-                             style="width: 32px; height: 32px;">
-                          <span class="fw-bold text-primary" style="font-size: 0.8rem;">${index + 1}</span>
+            <!-- Summary Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body py-3">
+                            <i class="fas fa-users text-primary fa-2x mb-2"></i>
+                            <h5 class="card-title text-primary mb-1">${totalRosterSize}</h5>
+                            <p class="card-text small text-muted mb-0">Roster Size</p>
                         </div>
-                        <strong>${this._escapeHtml(player.name)}</strong>
-                      </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body py-3">
+                            <i class="fas fa-running text-success fa-2x mb-2"></i>
+                            <h5 class="card-title text-success mb-1">${rosterPlayers.filter(p => p.appearances > 0).length}</h5>
+                            <p class="card-text small text-muted mb-0">Active Players</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body py-3">
+                            <i class="fas fa-futbol text-warning fa-2x mb-2"></i>
+                            <h5 class="card-title text-warning mb-1">${playerStats.filter(p => p.goals > 0).length}</h5>
+                            <p class="card-text small text-muted mb-0">Goal Scorers</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body py-3">
+                            <i class="fas fa-hands-helping text-info fa-2x mb-2"></i>
+                            <h5 class="card-title text-info mb-1">${playerStats.filter(p => p.assists > 0).length}</h5>
+                            <p class="card-text small text-muted mb-0">Assist Providers</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player Statistics Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-table me-2"></i>Player Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 40px;">#</th>
+                                    <th>Player</th>
+                                    <th class="text-center" style="width: 80px;">Shirt</th>
+                                    <th class="text-center" style="width: 80px;">Apps</th>
+                                    <th class="text-center" style="width: 80px;">Goals</th>
+                                    <th class="text-center" style="width: 80px;">Assists</th>
+                                    <th class="text-center" style="width: 80px;">G+A</th>
+                                    <th class="text-center" style="width: 100px;">Goals/Game</th>
+                                    <th class="text-center" style="width: 100px;">Assists/Game</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${this._renderPlayerRows(rosterPlayers, 'roster')}
+                                ${nonRosterPlayers.length > 0 ? `
+                                    <tr class="table-secondary">
+                                        <td colspan="9" class="text-center fw-bold py-2">
+                                            <i class="fas fa-user-plus me-1"></i>Non-Roster Players
+                                        </td>
+                                    </tr>
+                                    ${this._renderPlayerRows(nonRosterPlayers, 'non-roster')}
+                                ` : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    ${playerStats.length > 10 ? `
+                        <div class="mt-3 text-center">
+                            <small class="text-muted">
+                                Showing ${playerStats.length} players • 
+                                ${rosterPlayers.length} roster players • 
+                                ${nonRosterPlayers.length} non-roster players
+                            </small>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render player table rows
+     * @private
+     */
+    _renderPlayerRows(players, type) {
+        return players.map((player, index) => {
+            const rowClass = type === 'roster' ? '' : 'table-warning';
+            const position = type === 'roster' ? index + 1 : '•';
+            
+            return `
+                <tr class="${rowClass}">
+                    <td class="text-center">
+                        <span class="badge ${type === 'roster' ? 'bg-primary' : 'bg-warning'}">${position}</span>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <strong>${this._escapeHtml(player.name)}</strong>
+                            ${!player.isRosterPlayer ? '<i class="fas fa-user-plus text-warning ms-1" title="Non-roster player"></i>' : ''}
+                        </div>
                     </td>
                     <td class="text-center">
-                      <span class="badge bg-success">${player.goals}</span>
+                        ${player.shirtNumber !== null ? `<span class="badge bg-secondary">${player.shirtNumber}</span>` : '<span class="text-muted">-</span>'}
                     </td>
-                    <td class="text-center">${player.matches}</td>
-                    <td class="text-center">${player.goalsPerMatch}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    `;
+                    <td class="text-center">
+                        <span class="badge ${player.appearances > 0 ? 'bg-info' : 'bg-light text-dark'}">${player.appearances}</span>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge ${player.goals > 0 ? 'bg-success' : 'bg-light text-dark'}">${player.goals}</span>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge ${player.assists > 0 ? 'bg-primary' : 'bg-light text-dark'}">${player.assists}</span>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge ${player.totalContributions > 0 ? 'bg-warning text-dark' : 'bg-light text-dark'}">${player.totalContributions}</span>
+                    </td>
+                    <td class="text-center text-muted small">${player.goalsPerMatch}</td>
+                    <td class="text-center text-muted small">${player.assistsPerMatch}</td>
+                </tr>
+            `;
+        }).join('');
     }
 
     /**
@@ -439,65 +521,161 @@ class StatisticsModal {
     }
 
     /**
-     * Calculate player statistics from goals data
+     * Calculate player statistics from goals data and roster
      * @private
      */
     _calculatePlayerStats() {
-        const playerMap = new Map();
-        let totalGoalsFound = 0;
+        // Get all rostered players
+        const roster = rosterManager.getRoster();
+        const playerStatsMap = new Map();
+        
+        // Initialize all roster players with zero stats
+        roster.forEach(player => {
+            playerStatsMap.set(player.name.toLowerCase(), {
+                name: player.name,
+                shirtNumber: player.shirtNumber,
+                goals: 0,
+                assists: 0,
+                appearances: 0,
+                matchesWithGoals: new Set(),
+                matchesWithAssists: new Set(),
+                matchesPlayed: new Set()
+            });
+        });
 
+        let totalGoalsFound = 0;
+        let totalAssistsFound = 0;
+
+        // Analyze each match
         this.matchData.forEach((match, matchIndex) => {
-            // Debug: Log match structure for first few matches
-            if (matchIndex < 3) {
-                console.log(`Match ${matchIndex} goals structure:`, match.goals);
+            console.log(`Analyzing match ${matchIndex + 1}:`, match.title || `Match ${matchIndex + 1}`);
+            
+            // Track players who appeared in this match (from attendance if available)
+            if (match.attendance && Array.isArray(match.attendance)) {
+                match.attendance.forEach(attendee => {
+                    if (attendee.name && attendee.present) {
+                        const playerKey = attendee.name.toLowerCase();
+                        if (playerStatsMap.has(playerKey)) {
+                            playerStatsMap.get(playerKey).matchesPlayed.add(matchIndex);
+                            playerStatsMap.get(playerKey).appearances++;
+                        }
+                    }
+                });
             }
 
-            // Check different possible goal data structures
+            // Analyze goals from different possible sources
             let goals = [];
             
             if (match.goals && Array.isArray(match.goals)) {
                 goals = match.goals;
+                console.log(`  Found ${goals.length} goals in match.goals`);
             } else if (match.matchEvents && Array.isArray(match.matchEvents)) {
                 // Check if goals are stored in match events
                 goals = match.matchEvents.filter(event => 
                     event.type === 'goal' || 
                     event.eventType === 'goal' ||
-                    event.scorer
+                    (event.scorer && event.scorer.trim())
                 );
+                console.log(`  Found ${goals.length} goals in match.matchEvents`);
             }
 
-            goals.forEach(goal => {
+            // Process each goal
+            goals.forEach((goal, goalIndex) => {
                 totalGoalsFound++;
+                console.log(`    Goal ${goalIndex + 1}:`, goal);
                 
                 // Try different possible scorer field names
                 const scorer = goal.scorer || goal.player || goal.playerName || goal.name;
+                const assist = goal.assist || goal.assistedBy || goal.assistBy;
                 
-                if (scorer && scorer.trim()) {
-                    const playerName = scorer.trim();
-                    if (!playerMap.has(playerName)) {
-                        playerMap.set(playerName, { goals: 0, matches: new Set() });
+                if (scorer && scorer.trim() && scorer !== 'Own Goal') {
+                    const scorerKey = scorer.trim().toLowerCase();
+                    
+                    // Check if scorer is in roster
+                    if (playerStatsMap.has(scorerKey)) {
+                        const player = playerStatsMap.get(scorerKey);
+                        player.goals++;
+                        player.matchesWithGoals.add(matchIndex);
+                        player.matchesPlayed.add(matchIndex);
+                        console.log(`      Credited goal to: ${scorer}`);
+                    } else {
+                        // Add non-roster player
+                        playerStatsMap.set(scorerKey, {
+                            name: scorer.trim(),
+                            shirtNumber: null,
+                            goals: 1,
+                            assists: 0,
+                            appearances: 1,
+                            matchesWithGoals: new Set([matchIndex]),
+                            matchesWithAssists: new Set(),
+                            matchesPlayed: new Set([matchIndex])
+                        });
+                        console.log(`      Added new player from goal: ${scorer}`);
                     }
+                }
 
-                    const player = playerMap.get(playerName);
-                    player.goals++;
-                    player.matches.add(match.savedAt || match.title || matchIndex); // Use unique identifier
+                if (assist && assist.trim() && assist !== 'N/A') {
+                    totalAssistsFound++;
+                    const assistKey = assist.trim().toLowerCase();
+                    
+                    if (playerStatsMap.has(assistKey)) {
+                        const player = playerStatsMap.get(assistKey);
+                        player.assists++;
+                        player.matchesWithAssists.add(matchIndex);
+                        player.matchesPlayed.add(matchIndex);
+                        console.log(`      Credited assist to: ${assist}`);
+                    } else {
+                        // Add non-roster player for assist
+                        if (!playerStatsMap.has(assistKey)) {
+                            playerStatsMap.set(assistKey, {
+                                name: assist.trim(),
+                                shirtNumber: null,
+                                goals: 0,
+                                assists: 1,
+                                appearances: 1,
+                                matchesWithGoals: new Set(),
+                                matchesWithAssists: new Set([matchIndex]),
+                                matchesPlayed: new Set([matchIndex])
+                            });
+                        } else {
+                            playerStatsMap.get(assistKey).assists++;
+                            playerStatsMap.get(assistKey).matchesWithAssists.add(matchIndex);
+                        }
+                        console.log(`      Added new player from assist: ${assist}`);
+                    }
                 }
             });
         });
 
-        console.log(`Statistics: Found ${totalGoalsFound} total goals across ${this.matchData.length} matches`);
-        console.log(`Statistics: Found ${playerMap.size} unique players`);
+        console.log(`Statistics Summary:`);
+        console.log(`  Total matches analyzed: ${this.matchData.length}`);
+        console.log(`  Total goals found: ${totalGoalsFound}`);
+        console.log(`  Total assists found: ${totalAssistsFound}`);
+        console.log(`  Total players (roster + non-roster): ${playerStatsMap.size}`);
 
-        // Convert to array and calculate goals per match
-        const playerStats = Array.from(playerMap.entries()).map(([name, data]) => ({
-            name,
-            goals: data.goals,
-            matches: data.matches.size,
-            goalsPerMatch: data.matches.size > 0 ? (data.goals / data.matches.size).toFixed(1) : '0.0'
-        }));
+        // Convert to array and calculate additional stats
+        const playerStats = Array.from(playerStatsMap.values()).map(player => {
+            const totalMatches = player.matchesPlayed.size;
+            return {
+                name: player.name,
+                shirtNumber: player.shirtNumber,
+                goals: player.goals,
+                assists: player.assists,
+                appearances: Math.max(player.appearances, totalMatches), // Use the higher value
+                goalsPerMatch: totalMatches > 0 ? (player.goals / totalMatches).toFixed(2) : '0.00',
+                assistsPerMatch: totalMatches > 0 ? (player.assists / totalMatches).toFixed(2) : '0.00',
+                totalContributions: player.goals + player.assists,
+                isRosterPlayer: player.shirtNumber !== null || roster.some(r => r.name.toLowerCase() === player.name.toLowerCase())
+            };
+        });
 
-        // Sort by goals (descending)
-        return playerStats.sort((a, b) => b.goals - a.goals);
+        // Sort by total contributions (goals + assists), then by goals
+        return playerStats.sort((a, b) => {
+            if (b.totalContributions !== a.totalContributions) {
+                return b.totalContributions - a.totalContributions;
+            }
+            return b.goals - a.goals;
+        });
     }
 
     /**

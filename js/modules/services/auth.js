@@ -249,11 +249,10 @@ class AuthService {
       if (response.ok) {
         const result = await response.json();
         const isAdminUser = result.isAdmin || false;
-        console.log('Admin check (secure):', {
-          hasCurrentUser: !!this.currentUser,
-          userEmail: this.currentUser?.email,
-          isAdmin: isAdminUser
-        });
+        // Only log admin status changes or errors, not every check
+        if (isAdminUser) {
+          console.log('Admin access granted for:', this.currentUser?.email);
+        }
         return isAdminUser;
       }
     } catch (error) {

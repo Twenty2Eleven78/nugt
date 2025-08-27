@@ -4,9 +4,29 @@
 async function testMatchDataAccess() {
     console.log('=== MATCH DATA ACCESS TEST ===');
     
-    if (typeof authService === 'undefined' || typeof userMatchesApi === 'undefined') {
-        console.log('❌ Required services not available');
-        return;
+    // Try to get services from global scope first, then import dynamically
+    let authService, userMatchesApi;
+    
+    if (window.authService && window.userMatchesApi) {
+        authService = window.authService;
+        userMatchesApi = window.userMatchesApi;
+        console.log('✅ Services found in global scope');
+    } else {
+        try {
+            console.log('Services not in global scope, importing dynamically...');
+            const authModule = await import('./js/modules/services/auth.js');
+            const apiModule = await import('./js/modules/services/user-matches-api.js');
+            
+            authService = authModule.authService;
+            userMatchesApi = apiModule.userMatchesApi;
+            
+            console.log('✅ Services loaded via dynamic import');
+        } catch (error) {
+            console.log('❌ Error loading services:', error.message);
+            console.log('Make sure you are running this from the correct domain/localhost');
+            console.log('Try refreshing the page and waiting a moment for services to load');
+            return;
+        }
     }
     
     const currentUser = authService.getCurrentUser();

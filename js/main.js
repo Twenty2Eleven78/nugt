@@ -92,6 +92,18 @@ window.addEventListener('pagehide', (event) => {
 // Service Worker registration is handled by PWA updater in app.js
 // This ensures proper update management and avoids conflicts
 
+// Expose services globally for testing (development only)
+if (window.location.hostname === 'localhost' || window.location.hostname.includes('netlify.app')) {
+  import('./modules/services/user-matches-api.js').then(module => {
+    window.userMatchesApi = module.userMatchesApi;
+    console.log('userMatchesApi exposed globally for testing');
+  });
+  
+  // authService is already imported above, expose it
+  window.authService = authService;
+  console.log('authService exposed globally for testing');
+}
+
 // Preload authentication modules for faster startup
 import('./modules/services/auth.js').then(module => {
   console.log('Auth service preloaded');

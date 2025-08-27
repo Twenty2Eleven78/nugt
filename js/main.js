@@ -60,7 +60,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // Handle page refresh/reload events
-window.addEventListener('beforeunload', (event) => {
+window.addEventListener('beforeunload', () => {
   // Save current timer state before page unloads - must be synchronous
   try {
     // Access the already loaded timer controller from the global scope
@@ -81,7 +81,7 @@ window.addEventListener('focus', () => {
 });
 
 // Add pagehide event as additional safety net (more reliable than beforeunload on mobile)
-window.addEventListener('pagehide', (event) => {
+window.addEventListener('pagehide', () => {
   if (window.timerControllerInstance) {
     window.timerControllerInstance.saveCurrentState();
   }
@@ -92,25 +92,15 @@ window.addEventListener('pagehide', (event) => {
 // Service Worker registration is handled by PWA updater in app.js
 // This ensures proper update management and avoids conflicts
 
-// Expose services globally for testing (development only)
-if (window.location.hostname === 'localhost' || window.location.hostname.includes('netlify.app')) {
-  import('./modules/services/user-matches-api.js').then(module => {
-    window.userMatchesApi = module.userMatchesApi;
-    console.log('userMatchesApi exposed globally for testing');
-  });
-  
-  // authService is already imported above, expose it
-  window.authService = authService;
-  console.log('authService exposed globally for testing');
-}
+
 
 // Preload authentication modules for faster startup
-import('./modules/services/auth.js').then(module => {
-  console.log('Auth service preloaded');
+import('./modules/services/auth.js').then(() => {
+  // Auth service preloaded
 });
 
 import('./modules/ui/auth-ui.js').then(module => {
-  console.log('Auth UI preloaded');
+  // Auth UI preloaded
   // Create auth modal early
   setTimeout(() => {
     if (module.authUI && typeof module.authUI.init === 'function') {

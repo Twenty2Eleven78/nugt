@@ -98,7 +98,7 @@ function initializeCustomModals() {
     CustomModal.getOrCreateInstance(modalElement);
   });
 
-  console.log('Custom modal system initialized');
+  // Custom modal system initialized
 }
 
 // Initialize high priority optimizations
@@ -241,7 +241,7 @@ export function initializeApp() {
   // Initialize PWA updater
   pwaUpdater.init().then(success => {
     if (success) {
-      console.log('PWA updater initialized successfully');
+      // PWA updater initialized successfully
     }
   });
 

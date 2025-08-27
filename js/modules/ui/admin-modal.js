@@ -230,12 +230,9 @@ const init = () => {
     }
 
     modalElement.addEventListener('modal.show', async () => {
-        console.log('Admin modal opening, current user:', authService.getCurrentUser());
-        
         // Verify admin access before loading data
         try {
             const isAdmin = await authService.isAdmin();
-            console.log('Is admin:', isAdmin);
             
             if (!isAdmin) {
                 notificationManager.error('Access denied. Admin privileges required.');
@@ -245,7 +242,6 @@ const init = () => {
             
             await loadMatchesData();
         } catch (error) {
-            console.error('Error verifying admin access:', error);
             notificationManager.error('Unable to verify admin access. Please try again.');
             modalInstance.hide();
         }
@@ -285,12 +281,6 @@ const loadMatchesData = async () => {
         const matches = await userMatchesApi.loadAllMatchData();
         allMatches = matches || [];
 
-        console.log('Admin dashboard loaded matches:', {
-            totalMatches: allMatches.length,
-            uniqueUsers: new Set(allMatches.map(m => m.userEmail || m.userId)).size,
-            sampleMatch: allMatches[0]
-        });
-
         if (allMatches.length > 0) {
             renderCards(allMatches);
             renderStats(allMatches, statsCardsContainer);
@@ -300,7 +290,6 @@ const loadMatchesData = async () => {
             showNoDataMessage();
         }
     } catch (error) {
-        console.error('Error loading matches:', error);
         showErrorMessage(error.message);
         notificationManager.error(`Failed to load match data: ${error.message}`);
     } finally {
@@ -518,8 +507,6 @@ const handleTransferConfirm = async () => {
             return;
         }
 
-        console.log('Transferring match from', currentTransferMatch.data.userId, 'to', targetUser);
-
         // Create the match data for the new user
         const transferredMatch = {
             ...currentTransferMatch.data,
@@ -570,7 +557,6 @@ const handleTransferConfirm = async () => {
         currentTransferMatch = null;
 
     } catch (error) {
-        console.error('Error transferring match:', error);
         notificationManager.error(`Failed to transfer match: ${error.message}`);
     } finally {
         confirmBtn.disabled = false;
@@ -623,11 +609,6 @@ const handleDeleteConfirm = async () => {
         confirmBtn.disabled = true;
         confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
 
-        console.log('Attempting to delete match:', currentDeleteMatch.data);
-        console.log('Match userId:', currentDeleteMatch.data.userId);
-        console.log('Match index:', currentDeleteMatch.index);
-        console.log('Match blobKey:', currentDeleteMatch.data.blobKey);
-
         if (!currentDeleteMatch.data.userId || currentDeleteMatch.data.userId === 'unknown') {
             notificationManager.warning('This match has missing or invalid userId. It may be orphaned data that cannot be deleted through the normal API.');
 
@@ -656,8 +637,6 @@ const handleDeleteConfirm = async () => {
         const matchIndexToDelete = currentDeleteMatch.data.matchIndex !== undefined
             ? currentDeleteMatch.data.matchIndex
             : currentDeleteMatch.index;
-
-        console.log('Deleting match with userId:', currentDeleteMatch.data.userId, 'matchIndex:', matchIndexToDelete);
 
         // Clear cache before deletion to ensure fresh data
         userMatchesApi.clearCache();
@@ -690,7 +669,6 @@ const handleDeleteConfirm = async () => {
         }, 1000);
 
     } catch (error) {
-        console.error('Error deleting match:', error);
         notificationManager.error(`Failed to delete match: ${error.message}`);
     } finally {
         confirmBtn.disabled = false;
@@ -880,7 +858,6 @@ const showErrorMessage = (errorMessage) => {
 
 // Updated showMatchDetails function to use matchSummaryModal
 const showMatchDetails = (matchData, matchIndex) => {
-    console.log('Showing match details for:', matchData);
 
     // Prepare the match data with admin information
     const enrichedMatchData = {
@@ -924,8 +901,6 @@ const showMatchDetails = (matchData, matchIndex) => {
                 const lastBackdrop = allBackdrops[allBackdrops.length - 1];
                 lastBackdrop.style.zIndex = (targetZIndex - 1).toString();
             }
-
-            console.log(`Set match summary modal z-index to ${targetZIndex}`);
         }
     }, 50);
 };

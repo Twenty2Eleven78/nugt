@@ -18,7 +18,7 @@ class TeamModals {
     this.createTeam1Modal();
     this.createTeam2Modal();
     this.bindEvents();
-    console.log('Team modals initialized');
+    // Team modals initialized
   }
 
   /**

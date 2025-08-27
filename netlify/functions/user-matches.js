@@ -50,12 +50,6 @@ exports.handler = async function(event, context) {
 
     // Helper function to check if user is admin
     const isAdminUser = (userId, userEmail) => {
-      console.log('=== ADMIN CHECK START ===');
-      console.log('Checking admin access for userId:', userId, 'email:', userEmail);
-      console.log('Environment variables available:', {
-        ADMIN_EMAILS: !!process.env.ADMIN_EMAILS,
-        ADMIN_USER_IDS: !!process.env.ADMIN_USER_IDS
-      });
   
       // Get admin identifiers from environment variables
       const adminEmails = process.env.ADMIN_EMAILS ? 
@@ -66,13 +60,9 @@ exports.handler = async function(event, context) {
         process.env.ADMIN_USER_IDS.split(',').map(id => id.trim()) : 
         [];
       
-      console.log('Admin emails from env:', adminEmails);
-      console.log('Admin user IDs from env:', adminUserIds);
-      
       // SECURITY: If no admin emails/IDs are configured, deny access
       if (adminEmails.length === 0 && adminUserIds.length === 0) {
-        console.log('❌ NO ADMIN CONFIGURATION FOUND - DENYING ACCESS');
-        console.log('=== ADMIN CHECK END ===');
+        console.log('Admin access denied: No admin configuration found');
         return false;
       }
   

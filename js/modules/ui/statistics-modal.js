@@ -622,8 +622,8 @@ class StatisticsModal {
                 console.log(`    Goal ${goalIndex + 1}:`, goal);
 
                 // Try different possible scorer field names
-                const scorer = goal.scorer || goal.player || goal.playerName || goal.name || goal.goalScorer;
-                const assist = goal.assist || goal.assistedBy || goal.assistBy || goal.assistPlayer || goal.goalAssist;
+                const scorer = goal.scorer || goal.player || goal.playerName || goal.name || goal.goalScorer || goal.goalScorerName;
+                const assist = goal.assist || goal.assistedBy || goal.assistBy || goal.assistPlayer || goal.goalAssist || goal.goalAssistName;
 
                 if (scorer && scorer.trim() && scorer !== 'Own Goal') {
                     const scorerKey = scorer.trim().toLowerCase();

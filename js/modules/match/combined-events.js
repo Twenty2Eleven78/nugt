@@ -296,7 +296,7 @@ class CombinedEventsManager {
   // Bind enhanced events functionality
   _bindEvents() {
     // This method can be extended for additional event bindings
-    console.log('Combined events manager initialized');
+    // Combined events manager initialized
   }
 
   // Called when events are updated (for external integrations)

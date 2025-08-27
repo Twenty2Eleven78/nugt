@@ -17,7 +17,7 @@ class ResetModal {
   init() {
     this.createModal();
     this.setupEventListeners();
-    console.log('Reset modal initialized');
+    // Reset modal initialized
   }
 
   /**

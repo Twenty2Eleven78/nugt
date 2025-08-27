@@ -23,9 +23,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Update visibility based on auth state
-    const updateAdminButtonVisibility = () => {
-      if (authService.isUserAuthenticated() && authService.isAdmin()) {
-        adminModalButton.classList.remove('d-none');
+    const updateAdminButtonVisibility = async () => {
+      if (authService.isUserAuthenticated()) {
+        try {
+          const isAdmin = await authService.isAdmin();
+          if (isAdmin) {
+            adminModalButton.classList.remove('d-none');
+          } else {
+            adminModalButton.classList.add('d-none');
+          }
+        } catch (error) {
+          console.error('Error checking admin status:', error);
+          adminModalButton.classList.add('d-none');
+        }
       } else {
         adminModalButton.classList.add('d-none');
       }
@@ -50,7 +60,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // Handle page refresh/reload events
-window.addEventListener('beforeunload', (event) => {
+window.addEventListener('beforeunload', () => {
   // Save current timer state before page unloads - must be synchronous
   try {
     // Access the already loaded timer controller from the global scope
@@ -71,7 +81,7 @@ window.addEventListener('focus', () => {
 });
 
 // Add pagehide event as additional safety net (more reliable than beforeunload on mobile)
-window.addEventListener('pagehide', (event) => {
+window.addEventListener('pagehide', () => {
   if (window.timerControllerInstance) {
     window.timerControllerInstance.saveCurrentState();
   }
@@ -82,13 +92,15 @@ window.addEventListener('pagehide', (event) => {
 // Service Worker registration is handled by PWA updater in app.js
 // This ensures proper update management and avoids conflicts
 
+
+
 // Preload authentication modules for faster startup
-import('./modules/services/auth.js').then(module => {
-  console.log('Auth service preloaded');
+import('./modules/services/auth.js').then(() => {
+  // Auth service preloaded
 });
 
 import('./modules/ui/auth-ui.js').then(module => {
-  console.log('Auth UI preloaded');
+  // Auth UI preloaded
   // Create auth modal early
   setTimeout(() => {
     if (module.authUI && typeof module.authUI.init === 'function') {

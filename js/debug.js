@@ -7,8 +7,6 @@ import { authUI } from './modules/ui/auth-ui.js';
 
 // Function to fix modal overlay issues
 function fixModalOverlays() {
-  console.log('Fixing modal overlays...');
-
   // Remove all backdrops
   const backdrops = document.querySelectorAll('.modal-backdrop');
   backdrops.forEach(backdrop => backdrop.remove());
@@ -27,8 +25,6 @@ function fixModalOverlays() {
     modal.removeAttribute('aria-modal');
     modal.removeAttribute('role');
   });
-
-  console.log('Modal overlays fixed');
 }
 
 // Expose debug functions to global scope

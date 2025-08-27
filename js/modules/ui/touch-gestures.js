@@ -45,7 +45,7 @@ class TouchGestures {
       }
     });
 
-    console.log('Touch gestures initialized for tab navigation');
+    // Touch gestures initialized for tab navigation
   }
 
   handleTouchStart(e) {

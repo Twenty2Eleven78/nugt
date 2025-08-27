@@ -5,12 +5,17 @@
 import { CustomModal } from '../shared/custom-modal.js';
 import { matchSummaryModal } from './match-summary-modal.js';
 import { rawDataModal } from './raw-data-modal.js';
+import { userMatchesApi } from '../services/user-matches-api.js';
+import { authService } from '../services/auth.js';
+import { notificationManager } from '../services/notifications.js';
 
 class MatchLoadModal {
   constructor() {
     this.modal = null;
+    this.deleteModal = null;
     this.isInitialized = false;
     this.onLoad = null;
+    this.currentDeleteMatch = null;
   }
 
   /**
@@ -92,6 +97,9 @@ class MatchLoadModal {
                 <button class="btn btn-outline-secondary btn-sm raw-data-btn" data-match-index="${index}" title="View Raw Data" style="width: 36px;">
                   <i class="fas fa-code"></i>
                 </button>
+                <button class="btn btn-outline-danger btn-sm delete-btn" data-match-index="${index}" title="Delete Match" style="width: 36px;">
+                  <i class="fas fa-trash"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -106,6 +114,11 @@ class MatchLoadModal {
         listItem.querySelector('.raw-data-btn').addEventListener('click', (e) => {
           e.stopPropagation();
           rawDataModal.show(match);
+        });
+
+        listItem.querySelector('.delete-btn').addEventListener('click', (e) => {
+          e.stopPropagation();
+          this._handleDeleteMatch(match, index);
         });
 
         // Add hover effects
@@ -196,13 +209,43 @@ class MatchLoadModal {
           </div>
         </div>
       </div>
+
+      <!-- Delete Confirmation Modal -->
+      <div class="modal fade" id="matchLoadDeleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title">
+                <i class="fas fa-trash"></i> Confirm Deletion
+              </h5>
+              <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p>Are you sure you want to delete this match?</p>
+              <div class="alert alert-warning">
+                <strong>Warning:</strong> This action cannot be undone.
+              </div>
+              <div id="matchLoadDeleteDetails">
+                <!-- Match details will be shown here -->
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" id="cancelMatchLoadDeleteBtn">Cancel</button>
+              <button type="button" class="btn btn-danger" id="confirmMatchLoadDeleteBtn">
+                <i class="fas fa-trash"></i> Delete Match
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     `;
 
     // Add modal to DOM
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-    // Initialize custom modal
+    // Initialize custom modals
     this.modal = CustomModal.getOrCreateInstance('matchLoadModal');
+    this.deleteModal = CustomModal.getOrCreateInstance('matchLoadDeleteModal');
   }
 
   /**
@@ -214,6 +257,16 @@ class MatchLoadModal {
     document.addEventListener('click', (e) => {
       if (e.target.id === 'cancelMatchLoadBtn') {
         this.hide();
+      }
+      
+      // Handle delete confirmation buttons
+      if (e.target.id === 'cancelMatchLoadDeleteBtn') {
+        this.deleteModal.hide();
+        this.currentDeleteMatch = null;
+      }
+      
+      if (e.target.id === 'confirmMatchLoadDeleteBtn') {
+        this._handleDeleteConfirm();
       }
     });
 
@@ -250,6 +303,86 @@ class MatchLoadModal {
       : this.allMatches;
 
     this._renderMatches(filteredMatches);
+  }
+
+  /**
+   * Handle delete match with confirmation
+   * @private
+   */
+  _handleDeleteMatch(match, matchIndex) {
+    this.currentDeleteMatch = { data: match, index: matchIndex };
+
+    // Populate match details in the confirmation modal
+    const detailsDiv = document.getElementById('matchLoadDeleteDetails');
+    if (detailsDiv) {
+      const matchTitle = match.title || 'Untitled Match';
+      const matchDate = new Date(match.savedAt);
+      const formattedDate = matchDate.toLocaleDateString();
+      const formattedTime = matchDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      // Create team vs team display
+      const teamsDisplay = match.team1Name && match.team2Name
+        ? `${match.team1Name} vs ${match.team2Name}`
+        : '';
+
+      detailsDiv.innerHTML = `
+        <div class="card">
+          <div class="card-body">
+            <h6 class="card-title">${this._escapeHtml(matchTitle)}</h6>
+            ${teamsDisplay ? `<p class="card-text mb-1"><strong>Teams:</strong> ${this._escapeHtml(teamsDisplay)}</p>` : ''}
+            <p class="card-text mb-0"><strong>Saved:</strong> ${formattedDate} at ${formattedTime}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // Show the delete confirmation modal
+    this.deleteModal.show();
+  }
+
+  /**
+   * Handle delete confirmation
+   * @private
+   */
+  async _handleDeleteConfirm() {
+    if (!this.currentDeleteMatch) return;
+
+    const confirmBtn = document.getElementById('confirmMatchLoadDeleteBtn');
+    const originalText = confirmBtn.innerHTML;
+
+    try {
+      const currentUser = authService.getCurrentUser();
+      if (!currentUser) {
+        notificationManager.error('Authentication required to delete matches');
+        return;
+      }
+
+      confirmBtn.disabled = true;
+      confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+
+      // Call API to delete the match
+      await userMatchesApi.deleteMatchData(currentUser.id, this.currentDeleteMatch.index);
+
+      // Remove from local array
+      this.allMatches.splice(this.currentDeleteMatch.index, 1);
+
+      // Re-render the matches
+      this._renderMatches(this.allMatches);
+
+      // Hide the delete modal
+      this.deleteModal.hide();
+
+      const matchTitle = this.currentDeleteMatch.data.title || 'Untitled Match';
+      notificationManager.success(`Match "${matchTitle}" deleted successfully`);
+
+      this.currentDeleteMatch = null;
+    } catch (error) {
+      console.error('Error deleting match:', error);
+      notificationManager.error('Failed to delete match: ' + (error.message || 'Unknown error'));
+    } finally {
+      confirmBtn.disabled = false;
+      confirmBtn.innerHTML = originalText;
+    }
   }
 }
 

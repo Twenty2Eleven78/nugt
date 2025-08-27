@@ -2,6 +2,7 @@ import { userMatchesApi } from '../services/user-matches-api.js';
 import { notificationManager } from '../services/notifications.js';
 import { matchSummaryModal } from './match-summary-modal.js';
 import { CustomModal } from '../shared/custom-modal.js';
+import { authService } from '../services/auth.js';
 
 const modalHtml = `
 <div class="modal fade" id="admin-modal" tabindex="-1" aria-labelledby="admin-modal-label" aria-hidden="true">
@@ -229,7 +230,21 @@ const init = () => {
     }
 
     modalElement.addEventListener('modal.show', async () => {
-        await loadMatchesData();
+        // Verify admin access before loading data
+        try {
+            const isAdmin = await authService.isAdmin();
+            
+            if (!isAdmin) {
+                notificationManager.error('Access denied. Admin privileges required.');
+                modalInstance.hide();
+                return;
+            }
+            
+            await loadMatchesData();
+        } catch (error) {
+            notificationManager.error('Unable to verify admin access. Please try again.');
+            modalInstance.hide();
+        }
     });
 
     // Clean up when admin modal is hidden
@@ -260,6 +275,9 @@ const loadMatchesData = async () => {
             `;
         }
 
+        // Clear cache to ensure fresh data
+        userMatchesApi.clearCache();
+
         const matches = await userMatchesApi.loadAllMatchData();
         allMatches = matches || [];
 
@@ -272,7 +290,6 @@ const loadMatchesData = async () => {
             showNoDataMessage();
         }
     } catch (error) {
-        console.error('Error loading matches:', error);
         showErrorMessage(error.message);
         notificationManager.error(`Failed to load match data: ${error.message}`);
     } finally {
@@ -490,8 +507,6 @@ const handleTransferConfirm = async () => {
             return;
         }
 
-        console.log('Transferring match from', currentTransferMatch.data.userId, 'to', targetUser);
-
         // Create the match data for the new user
         const transferredMatch = {
             ...currentTransferMatch.data,
@@ -542,7 +557,6 @@ const handleTransferConfirm = async () => {
         currentTransferMatch = null;
 
     } catch (error) {
-        console.error('Error transferring match:', error);
         notificationManager.error(`Failed to transfer match: ${error.message}`);
     } finally {
         confirmBtn.disabled = false;
@@ -595,11 +609,6 @@ const handleDeleteConfirm = async () => {
         confirmBtn.disabled = true;
         confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
 
-        console.log('Attempting to delete match:', currentDeleteMatch.data);
-        console.log('Match userId:', currentDeleteMatch.data.userId);
-        console.log('Match index:', currentDeleteMatch.index);
-        console.log('Match blobKey:', currentDeleteMatch.data.blobKey);
-
         if (!currentDeleteMatch.data.userId || currentDeleteMatch.data.userId === 'unknown') {
             notificationManager.warning('This match has missing or invalid userId. It may be orphaned data that cannot be deleted through the normal API.');
 
@@ -629,13 +638,15 @@ const handleDeleteConfirm = async () => {
             ? currentDeleteMatch.data.matchIndex
             : currentDeleteMatch.index;
 
-        console.log('Deleting match with userId:', currentDeleteMatch.data.userId, 'matchIndex:', matchIndexToDelete);
+        // Clear cache before deletion to ensure fresh data
+        userMatchesApi.clearCache();
 
         await userMatchesApi.deleteMatchData(
             currentDeleteMatch.data.userId,
             matchIndexToDelete
         );
 
+        // Remove from local array
         allMatches.splice(currentDeleteMatch.index, 1);
 
         // Re-render the cards view and stats
@@ -652,8 +663,12 @@ const handleDeleteConfirm = async () => {
 
         currentDeleteMatch = null;
 
+        // Refresh data to ensure consistency
+        setTimeout(() => {
+            loadMatchesData();
+        }, 1000);
+
     } catch (error) {
-        console.error('Error deleting match:', error);
         notificationManager.error(`Failed to delete match: ${error.message}`);
     } finally {
         confirmBtn.disabled = false;
@@ -843,7 +858,6 @@ const showErrorMessage = (errorMessage) => {
 
 // Updated showMatchDetails function to use matchSummaryModal
 const showMatchDetails = (matchData, matchIndex) => {
-    console.log('Showing match details for:', matchData);
 
     // Prepare the match data with admin information
     const enrichedMatchData = {
@@ -887,8 +901,6 @@ const showMatchDetails = (matchData, matchIndex) => {
                 const lastBackdrop = allBackdrops[allBackdrops.length - 1];
                 lastBackdrop.style.zIndex = (targetZIndex - 1).toString();
             }
-
-            console.log(`Set match summary modal z-index to ${targetZIndex}`);
         }
     }, 50);
 };
@@ -926,7 +938,7 @@ const show = () => {
             });
             return;
         }
-        
+
         if (!modalInstance) {
             init();
         }

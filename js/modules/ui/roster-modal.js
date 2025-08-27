@@ -21,7 +21,7 @@ class RosterModal {
     this.createModal();
     this._bindEvents();
     this.isInitialized = true;
-    console.log('Roster modal initialized');
+    // Roster modal initialized
   }
 
   /**

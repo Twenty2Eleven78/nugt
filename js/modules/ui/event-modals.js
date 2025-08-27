@@ -17,7 +17,7 @@ class EventModals {
   init() {
     this.createRecordEventModal();
     this.createEditEventModal();
-    console.log('Event modals initialized');
+    // Event modals initialized
   }
 
   /**

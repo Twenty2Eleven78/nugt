@@ -551,7 +551,8 @@ class StatisticsModal {
 
         // Initialize all roster players with zero stats
         roster.forEach(player => {
-            playerStatsMap.set(player.name.toLowerCase(), {
+            const playerKey = player.name.toLowerCase().trim();
+            playerStatsMap.set(playerKey, {
                 name: player.name,
                 shirtNumber: player.shirtNumber,
                 goals: 0,
@@ -561,6 +562,7 @@ class StatisticsModal {
                 matchesWithAssists: new Set(),
                 matchesPlayed: new Set()
             });
+            console.log(`Initialized roster player: "${player.name}" with key: "${playerKey}"`);
         });
 
         let totalGoalsFound = 0;
@@ -573,18 +575,20 @@ class StatisticsModal {
             // Track players who appeared in this match (from attendance if available)
             if (match.attendance && Array.isArray(match.attendance)) {
                 console.log(`  Processing attendance for match ${matchIndex + 1}:`, match.attendance);
-                match.attendance.forEach(attendee => {
+                match.attendance.forEach((attendee, attendeeIndex) => {
+                    console.log(`    Attendee ${attendeeIndex + 1}:`, attendee);
+                    
                     if (attendee.name && attendee.present) {
-                        const playerKey = attendee.name.toLowerCase();
-                        console.log(`    Player present: ${attendee.name}`);
+                        const playerKey = attendee.name.toLowerCase().trim();
+                        console.log(`    Player present: "${attendee.name}" (key: "${playerKey}")`);
 
                         if (playerStatsMap.has(playerKey)) {
                             playerStatsMap.get(playerKey).matchesPlayed.add(matchIndex);
-                            // Don't increment appearances here, we'll calculate it from matchesPlayed.size
+                            console.log(`      Updated existing player: ${attendee.name}`);
                         } else {
                             // Add non-roster player who attended
                             playerStatsMap.set(playerKey, {
-                                name: attendee.name,
+                                name: attendee.name.trim(),
                                 shirtNumber: null,
                                 goals: 0,
                                 assists: 0,
@@ -593,8 +597,10 @@ class StatisticsModal {
                                 matchesWithAssists: new Set(),
                                 matchesPlayed: new Set([matchIndex])
                             });
-                            console.log(`    Added new player from attendance: ${attendee.name}`);
+                            console.log(`      Added new player from attendance: ${attendee.name}`);
                         }
+                    } else {
+                        console.log(`    Player not present or invalid: name="${attendee.name}", present=${attendee.present}`);
                     }
                 });
             } else {
@@ -709,6 +715,7 @@ class StatisticsModal {
         console.log(`  Total players (roster + non-roster): ${playerStatsMap.size}`);
         console.log(`  Players with goals:`, Array.from(playerStatsMap.values()).filter(p => p.goals > 0).map(p => `${p.name}: ${p.goals}`));
         console.log(`  Players with assists:`, Array.from(playerStatsMap.values()).filter(p => p.assists > 0).map(p => `${p.name}: ${p.assists}`));
+        console.log(`  Players with appearances:`, Array.from(playerStatsMap.values()).filter(p => p.matchesPlayed.size > 0).map(p => `${p.name}: ${p.matchesPlayed.size} matches`));
 
         // Convert to array and calculate additional stats
         const playerStats = Array.from(playerStatsMap.values()).map(player => {

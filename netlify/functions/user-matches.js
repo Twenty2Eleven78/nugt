@@ -50,7 +50,12 @@ exports.handler = async function(event, context) {
 
     // Helper function to check if user is admin
     const isAdminUser = (userId, userEmail) => {
+      console.log('=== ADMIN CHECK START ===');
       console.log('Checking admin access for userId:', userId, 'email:', userEmail);
+      console.log('Environment variables available:', {
+        ADMIN_EMAILS: !!process.env.ADMIN_EMAILS,
+        ADMIN_USER_IDS: !!process.env.ADMIN_USER_IDS
+      });
   
       // Get admin identifiers from environment variables
       const adminEmails = process.env.ADMIN_EMAILS ? 
@@ -61,16 +66,28 @@ exports.handler = async function(event, context) {
         process.env.ADMIN_USER_IDS.split(',').map(id => id.trim()) : 
         [];
       
-      console.log('Checking against admin emails:', adminEmails);
-      console.log('Checking against admin user IDs:', adminUserIds);
+      console.log('Admin emails from env:', adminEmails);
+      console.log('Admin user IDs from env:', adminUserIds);
+      
+      // SECURITY: If no admin emails/IDs are configured, deny access
+      if (adminEmails.length === 0 && adminUserIds.length === 0) {
+        console.log('❌ NO ADMIN CONFIGURATION FOUND - DENYING ACCESS');
+        console.log('=== ADMIN CHECK END ===');
+        return false;
+      }
   
       // Check if userEmail matches any admin email OR userId matches any admin user ID
-      const isAdminByEmail = adminEmails.includes(userEmail.toLowerCase());
-      const isAdminByUserId = adminUserIds.includes(userId);
+      const isAdminByEmail = adminEmails.length > 0 && adminEmails.includes(userEmail.toLowerCase());
+      const isAdminByUserId = adminUserIds.length > 0 && adminUserIds.includes(userId);
       const isAdmin = isAdminByEmail || isAdminByUserId;
   
-      console.log('Admin access:', isAdmin ? 'granted' : 'denied', 
-                  `(by email: ${isAdminByEmail}, by userId: ${isAdminByUserId})`);
+      console.log('Admin check results:', {
+        isAdminByEmail,
+        isAdminByUserId,
+        finalResult: isAdmin
+      });
+      console.log('Admin access:', isAdmin ? '✅ GRANTED' : '❌ DENIED');
+      console.log('=== ADMIN CHECK END ===');
       return isAdmin;
 };
 
@@ -80,14 +97,26 @@ exports.handler = async function(event, context) {
 
       // Handle admin status check
       if (checkAdmin) {
+        console.log('=== ADMIN STATUS CHECK REQUEST ===');
         const adminStatus = isAdminUser(userId, userEmail);
+        
+        const response = {
+          isAdmin: adminStatus,
+          userId: userId,
+          userEmail: userEmail,
+          debug: {
+            hasAdminEmails: !!process.env.ADMIN_EMAILS,
+            hasAdminUserIds: !!process.env.ADMIN_USER_IDS,
+            timestamp: new Date().toISOString()
+          }
+        };
+        
+        console.log('Admin check response:', response);
+        console.log('=== ADMIN STATUS CHECK COMPLETE ===');
+        
         return {
           statusCode: 200,
-          body: JSON.stringify({
-            isAdmin: adminStatus,
-            userId: userId,
-            userEmail: userEmail
-          })
+          body: JSON.stringify(response)
         };
       }
 

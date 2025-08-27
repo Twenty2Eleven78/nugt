@@ -20,12 +20,38 @@
 ## Configuration Steps
 
 ### 1. Configure Netlify Environment Variables (SECURE METHOD)
-In your Netlify dashboard, go to Site Settings > Environment Variables and add:
 
-```
-ADMIN_EMAILS=admin@nugt.app,coach@netherton.com,your-email@example.com
-ADMIN_USER_IDS=user_admin_nugt_app,user_coach_netherton_com
-```
+**CRITICAL**: You MUST set these environment variables or NO ONE will have admin access.
+
+#### Step-by-Step Setup:
+
+1. **Go to Netlify Dashboard**
+   - Log into your Netlify account
+   - Select your site
+   - Go to Site Settings > Environment Variables
+
+2. **Add Admin Configuration**
+   ```
+   ADMIN_EMAILS=your-actual-email@example.com,coach@netherton.com
+   ADMIN_USER_IDS=user_youremail_example_com,user_coach_netherton_com
+   ```
+
+3. **Get Your User ID**
+   - Sign into your app
+   - Open browser console
+   - Run: `authService.getCurrentUser()`
+   - Copy the `id` field value
+
+4. **Example Configuration**
+   If your email is `john@example.com`, set:
+   ```
+   ADMIN_EMAILS=john@example.com
+   ADMIN_USER_IDS=user_john_example_com
+   ```
+
+5. **Deploy Changes**
+   - Save the environment variables
+   - Trigger a new deployment (or wait for next deployment)
 
 **IMPORTANT SECURITY UPDATE**: Admin emails are now stored ONLY on the server side in environment variables. They are no longer visible in the client-side code, making your admin access secure from code inspection.
 
@@ -51,9 +77,18 @@ When users sign in after this update, their user IDs will automatically migrate 
 ## Troubleshooting
 
 ### Admin Dashboard Not Showing
-1. Check that your email is in the admin emails list
-2. Sign out and sign in again
-3. Check browser console for any errors
+1. **Check Environment Variables**: Run `check-admin-config.js` in browser console
+2. **Verify Configuration**: Visit `/.netlify/functions/debug-admin` (development only)
+3. **Check User ID**: Make sure your user ID matches the one in `ADMIN_USER_IDS`
+4. **Redeploy**: Environment variable changes require a new deployment
+5. **Sign out and sign in again**
+6. **Check browser console for any errors**
+
+### Everyone Shows as Admin
+This happens when environment variables are not set correctly:
+1. **Missing Variables**: If `ADMIN_EMAILS` and `ADMIN_USER_IDS` are not set, the system denies all access
+2. **Wrong Format**: Make sure emails are comma-separated with no extra spaces
+3. **Case Sensitivity**: Email comparison is case-insensitive, but user IDs are case-sensitive
 
 ### Matches Not Appearing
 1. Click the "Refresh" button in the admin dashboard

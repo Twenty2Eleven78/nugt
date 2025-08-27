@@ -137,9 +137,33 @@ exports.handler = async function(event, context) {
         console.log('Access token exists:', !!ACCESS_TOKEN);
         
         try {
-          // The API returned stores, not blobs. We need to query the store directly.
+          // Check if required environment variables are set
+          if (!SITE_ID || !ACCESS_TOKEN) {
+            console.error('Missing required environment variables:', {
+              SITE_ID: !!SITE_ID,
+              ACCESS_TOKEN: !!ACCESS_TOKEN
+            });
+            return {
+              statusCode: 500,
+              body: JSON.stringify({
+                error: 'Server configuration error',
+                debug: {
+                  missingSiteId: !SITE_ID,
+                  missingAccessToken: !ACCESS_TOKEN
+                }
+              })
+            };
+          }
+
+          // Try different store query approaches
           const storeUrl = `${NETLIFY_BLOBS_API}/${SITE_ID}/user-data`;
           console.log('Querying store directly:', storeUrl);
+          console.log('Full API URL breakdown:', {
+            baseApi: NETLIFY_BLOBS_API,
+            siteId: SITE_ID,
+            store: 'user-data',
+            fullUrl: storeUrl
+          });
           
           const res = await fetch(storeUrl, {
             headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
@@ -152,6 +176,19 @@ exports.handler = async function(event, context) {
             console.error('Failed to query store:', res.status, res.statusText);
             const errorText = await res.text();
             console.error('Store error response:', errorText);
+            
+            // Try alternative approach - list all stores first
+            console.log('Trying alternative approach - listing all stores...');
+            const allStoresUrl = `${NETLIFY_BLOBS_API}/${SITE_ID}`;
+            const storesRes = await fetch(allStoresUrl, {
+              headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
+            });
+            
+            if (storesRes.ok) {
+              const storesData = await storesRes.json();
+              console.log('Available stores:', storesData);
+            }
+            
             return { 
               statusCode: 500,
               body: JSON.stringify({ 
@@ -159,30 +196,53 @@ exports.handler = async function(event, context) {
                 debug: {
                   siteId: SITE_ID,
                   hasToken: !!ACCESS_TOKEN,
-                  storeUrl
+                  storeUrl,
+                  responseStatus: res.status,
+                  responseText: errorText
                 }
               })
             };
           }
 
           const storeData = await res.json();
-          console.log('Store response data:', storeData);
+          console.log('Store response data structure:', {
+            hasBlobs: !!storeData.blobs,
+            blobsType: typeof storeData.blobs,
+            blobsLength: storeData.blobs?.length,
+            storeDataKeys: Object.keys(storeData)
+          });
           
           const blobs = storeData.blobs || [];
           console.log('Total blobs found in store:', blobs.length);
-          console.log('All blob keys:', blobs.map(b => b.key));
           
-          // Filter blobs that contain match data
+          if (blobs.length > 0) {
+            console.log('All blob keys:', blobs.map(b => b.key));
+            console.log('Sample blob structure:', blobs[0]);
+          } else {
+            console.log('No blobs found in store. Full store data:', storeData);
+          }
+          
+          // Filter blobs that contain match data - be more inclusive
           const matchBlobs = blobs.filter(blob => {
-            const isMatchFile = blob.key.includes('matches.json') || 
-                               blob.key.includes('/matches') ||
-                               blob.key.endsWith('.json');
-            console.log(`Blob ${blob.key}: isMatchFile=${isMatchFile}`);
+            const key = blob.key || '';
+            const isMatchFile = key.includes('matches.json') || 
+                               key.includes('/matches') ||
+                               key.endsWith('.json') ||
+                               key.includes('user-data/') ||
+                               key.match(/user_.*\/matches/);
+            console.log(`Blob "${key}": isMatchFile=${isMatchFile}`);
             return isMatchFile;
           });
           
           console.log('Match blobs after filtering:', matchBlobs.length);
-          console.log('Match blob keys:', matchBlobs.map(b => b.key));
+          if (matchBlobs.length > 0) {
+            console.log('Match blob keys:', matchBlobs.map(b => b.key));
+          } else {
+            console.log('No match blobs found after filtering. This might indicate:');
+            console.log('1. No match data has been saved yet');
+            console.log('2. Different blob key structure than expected');
+            console.log('3. Data is stored in a different store name');
+          }
           
           const allMatches = [];
           let processedCount = 0;

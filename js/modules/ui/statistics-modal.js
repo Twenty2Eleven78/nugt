@@ -77,7 +77,7 @@ class StatisticsModal {
             }
 
             this.matchData = await userMatchesApi.loadMatchData() || [];
-            
+
             // Debug: Log match data structure
             console.log('Statistics: Loaded match data:', this.matchData.length, 'matches');
             if (this.matchData.length > 0) {
@@ -376,7 +376,7 @@ class StatisticsModal {
         return players.map((player, index) => {
             const rowClass = type === 'roster' ? '' : 'table-warning';
             const position = type === 'roster' ? index + 1 : '•';
-            
+
             return `
                 <tr class="${rowClass}">
                     <td class="text-center">
@@ -528,7 +528,7 @@ class StatisticsModal {
         // Get all rostered players
         const roster = rosterManager.getRoster();
         const playerStatsMap = new Map();
-        
+
         // Initialize all roster players with zero stats
         roster.forEach(player => {
             playerStatsMap.set(player.name.toLowerCase(), {
@@ -549,7 +549,7 @@ class StatisticsModal {
         // Analyze each match
         this.matchData.forEach((match, matchIndex) => {
             console.log(`Analyzing match ${matchIndex + 1}:`, match.title || `Match ${matchIndex + 1}`);
-            
+
             // Track players who appeared in this match (from attendance if available)
             if (match.attendance && Array.isArray(match.attendance)) {
                 match.attendance.forEach(attendee => {
@@ -565,14 +565,14 @@ class StatisticsModal {
 
             // Analyze goals from different possible sources
             let goals = [];
-            
+
             if (match.goals && Array.isArray(match.goals)) {
                 goals = match.goals;
                 console.log(`  Found ${goals.length} goals in match.goals`);
             } else if (match.matchEvents && Array.isArray(match.matchEvents)) {
                 // Check if goals are stored in match events
-                goals = match.matchEvents.filter(event => 
-                    event.type === 'goal' || 
+                goals = match.matchEvents.filter(event =>
+                    event.type === 'goal' ||
                     event.eventType === 'goal' ||
                     (event.scorer && event.scorer.trim())
                 );
@@ -583,14 +583,14 @@ class StatisticsModal {
             goals.forEach((goal, goalIndex) => {
                 totalGoalsFound++;
                 console.log(`    Goal ${goalIndex + 1}:`, goal);
-                
+
                 // Try different possible scorer field names
                 const scorer = goal.scorer || goal.player || goal.playerName || goal.name;
                 const assist = goal.assist || goal.assistedBy || goal.assistBy;
-                
+
                 if (scorer && scorer.trim() && scorer !== 'Own Goal') {
                     const scorerKey = scorer.trim().toLowerCase();
-                    
+
                     // Check if scorer is in roster
                     if (playerStatsMap.has(scorerKey)) {
                         const player = playerStatsMap.get(scorerKey);
@@ -617,7 +617,7 @@ class StatisticsModal {
                 if (assist && assist.trim() && assist !== 'N/A') {
                     totalAssistsFound++;
                     const assistKey = assist.trim().toLowerCase();
-                    
+
                     if (playerStatsMap.has(assistKey)) {
                         const player = playerStatsMap.get(assistKey);
                         player.assists++;
@@ -849,7 +849,7 @@ class StatisticsModal {
             if (e.target.id === 'closeStatisticsBtn') {
                 this.hide();
             }
-            
+
             // Handle refresh button
             if (e.target.id === 'refreshStatisticsBtn') {
                 this._handleRefresh();
@@ -884,11 +884,11 @@ class StatisticsModal {
     async _handleRefresh() {
         const refreshBtn = document.getElementById('refreshStatisticsBtn');
         const originalText = refreshBtn.innerHTML;
-        
+
         try {
             refreshBtn.disabled = true;
             refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Refreshing...';
-            
+
             await this._loadAndAnalyzeData(true); // Force refresh
             notificationManager.success('Statistics refreshed successfully');
         } catch (error) {

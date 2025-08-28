@@ -61,9 +61,7 @@ class StatisticsModal {
             const stored = localStorage.getItem('generatedStatistics');
             if (stored) {
                 this.statistics = JSON.parse(stored);
-                console.log('Loaded statistics:', this.statistics);
             } else {
-                console.log('No statistics found in localStorage');
                 this.statistics = null;
             }
         } catch (error) {
@@ -317,7 +315,6 @@ class StatisticsModal {
         if (!this.statistics) return this._renderNoDataMessage();
 
         const playerStats = this.statistics.playerStats;
-        console.log('Player stats in render:', playerStats);
         
         if (!playerStats || !Array.isArray(playerStats)) {
             return '<p class="text-muted">No player statistics available</p>';
@@ -325,9 +322,6 @@ class StatisticsModal {
         
         const rosterPlayers = playerStats.filter(p => p.isRosterPlayer);
         const nonRosterPlayers = playerStats.filter(p => !p.isRosterPlayer);
-        
-        console.log('Roster players:', rosterPlayers);
-        console.log('Non-roster players:', nonRosterPlayers);
 
         return `
             <!-- Summary Cards -->
@@ -443,26 +437,14 @@ class StatisticsModal {
      * @private
      */
     _renderTopScorers(playerStats) {
-        console.log('Player stats for top scorers:', playerStats);
-        
         if (!playerStats || !Array.isArray(playerStats)) {
             return '<p class="text-muted">No player data available</p>';
         }
-        
-        // Debug: Show first few players with their goals
-        console.log('Sample player data:', playerStats.slice(0, 3).map(p => ({
-            name: p.name,
-            goals: p.goals,
-            assists: p.assists,
-            appearances: p.appearances
-        })));
         
         const topScorers = playerStats
             .filter(p => p.goals > 0)
             .sort((a, b) => b.goals - a.goals)
             .slice(0, 5);
-
-        console.log('Top scorers found:', topScorers);
 
         if (topScorers.length === 0) {
             return '<p class="text-muted">No goals recorded</p>';
@@ -484,25 +466,14 @@ class StatisticsModal {
      * @private
      */
     _renderTopAssists(playerStats) {
-        console.log('Player stats for top assists:', playerStats);
-        
         if (!playerStats || !Array.isArray(playerStats)) {
             return '<p class="text-muted">No player data available</p>';
         }
-        
-        // Debug: Show goals and assists for all players
-        console.log('All players goals/assists:', playerStats.map(p => ({
-            name: p.name,
-            goals: p.goals,
-            assists: p.assists
-        })));
         
         const topAssists = playerStats
             .filter(p => p.assists > 0)
             .sort((a, b) => b.assists - a.assists)
             .slice(0, 5);
-
-        console.log('Top assists found:', topAssists);
 
         if (topAssists.length === 0) {
             return '<p class="text-muted">No assists recorded</p>';

@@ -1173,14 +1173,7 @@ const calculateStatisticsFromMatches = async (matches) => {
     let totalAssistsFound = 0;
 
     // Process each approved match
-    console.log('Processing matches for statistics:', matches.length);
     matches.forEach((match, matchIndex) => {
-        console.log(`Processing match ${matchIndex}:`, {
-            title: match.title || match.matchTitle,
-            goals: match.goals,
-            matchEvents: match.matchEvents,
-            attendance: match.attendance
-        });
         // Process attendance
         if (match.attendance && Array.isArray(match.attendance)) {
             match.attendance.forEach(attendee => {
@@ -1220,22 +1213,18 @@ const calculateStatisticsFromMatches = async (matches) => {
         let goals = [];
         if (match.goals && Array.isArray(match.goals)) {
             goals = match.goals;
-            console.log(`Match ${matchIndex} - Found goals array:`, goals);
         } else if (match.matchEvents && Array.isArray(match.matchEvents)) {
             goals = match.matchEvents.filter(event => 
                 event.type === 'goal' || event.eventType === 'goal'
             );
-            console.log(`Match ${matchIndex} - Found goals from events:`, goals);
-        } else {
-            console.log(`Match ${matchIndex} - No goals found. Available properties:`, Object.keys(match));
         }
 
         goals.forEach(goal => {
             totalGoalsFound++;
             
-            // Process scorer
-            const scorer = goal.scorer || goal.player || goal.goalScorer;
-            if (scorer && scorer.trim()) {
+            // Process scorer - use the correct property names from the actual data
+            const scorer = goal.goalScorerName || goal.scorer || goal.player || goal.goalScorer;
+            if (scorer && scorer.trim() && scorer !== 'Opposition') {
                 const playerKey = scorer.toLowerCase().trim();
                 
                 if (playerStatsMap.has(playerKey)) {
@@ -1246,7 +1235,7 @@ const calculateStatisticsFromMatches = async (matches) => {
                 } else {
                     playerStatsMap.set(playerKey, {
                         name: scorer.trim(),
-                        shirtNumber: null,
+                        shirtNumber: goal.goalScorerShirtNumber || null,
                         goals: 1,
                         assists: 0,
                         appearances: 0,
@@ -1258,35 +1247,31 @@ const calculateStatisticsFromMatches = async (matches) => {
                 }
             }
 
-            // Process assists
-            const assists = goal.assists || goal.assist || (goal.assistedBy ? [goal.assistedBy] : []);
-            const assistArray = Array.isArray(assists) ? assists : [assists];
-            
-            assistArray.forEach(assist => {
-                if (assist && assist.trim()) {
-                    totalAssistsFound++;
-                    const playerKey = assist.toLowerCase().trim();
-                    
-                    if (playerStatsMap.has(playerKey)) {
-                        const player = playerStatsMap.get(playerKey);
-                        player.assists++;
-                        player.matchesWithAssists.add(matchIndex);
-                        player.matchesPlayed.add(matchIndex);
-                    } else {
-                        playerStatsMap.set(playerKey, {
-                            name: assist.trim(),
-                            shirtNumber: null,
-                            goals: 0,
-                            assists: 1,
-                            appearances: 0,
-                            matchesWithGoals: new Set(),
-                            matchesWithAssists: new Set([matchIndex]),
-                            matchesPlayed: new Set([matchIndex]),
-                            isRosterPlayer: false
-                        });
-                    }
+            // Process assists - use the correct property names from the actual data
+            const assistName = goal.goalAssistName || goal.assists || goal.assist || goal.assistedBy;
+            if (assistName && assistName.trim() && assistName !== 'Opposition') {
+                totalAssistsFound++;
+                const playerKey = assistName.toLowerCase().trim();
+                
+                if (playerStatsMap.has(playerKey)) {
+                    const player = playerStatsMap.get(playerKey);
+                    player.assists++;
+                    player.matchesWithAssists.add(matchIndex);
+                    player.matchesPlayed.add(matchIndex);
+                } else {
+                    playerStatsMap.set(playerKey, {
+                        name: assistName.trim(),
+                        shirtNumber: goal.goalAssistShirtNumber || null,
+                        goals: 0,
+                        assists: 1,
+                        appearances: 0,
+                        matchesWithGoals: new Set(),
+                        matchesWithAssists: new Set([matchIndex]),
+                        matchesPlayed: new Set([matchIndex]),
+                        isRosterPlayer: false
+                    });
                 }
-            });
+            }
         });
     });
 

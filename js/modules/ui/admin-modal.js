@@ -351,8 +351,16 @@ const renderCards = (matches) => {
             ? `${match.team1Name} vs ${match.team2Name}`
             : '';
 
-        // Check approval status
-        const isApproved = match.approvedForStats === true;
+        // Check approval status (from localStorage or match data)
+        const storedApproval = getApprovalStatus(match);
+        const isApproved = storedApproval ? storedApproval.approved : (match.approvedForStats === true);
+        
+        // Debug logging for approval status
+        const matchKey = getMatchApprovalKey(match);
+        console.log(`Match approval check - Key: ${matchKey}, Stored: ${JSON.stringify(storedApproval)}, Final: ${isApproved}`);
+        
+        // Update match object with current approval status
+        match.approvedForStats = isApproved;
         const approvalClass = isApproved ? 'border-success' : 'border-warning';
 
         const listItem = document.createElement('div');
@@ -989,21 +997,85 @@ const show = () => {
     });
 };
 
+// Helper functions for managing approval status
+const getMatchApprovalKey = (matchData) => {
+    // Create a unique key for this match based on multiple identifiers
+    const userId = matchData.userId || 'unknown';
+    const userEmail = matchData.userEmail || 'unknown';
+    const savedAt = matchData.savedAt || matchData.timestamp || Date.now();
+    const matchTitle = matchData.title || matchData.matchTitle || 'untitled';
+    
+    // Use a combination of identifiers to create a more stable key
+    const keyComponents = [userId, userEmail.split('@')[0], savedAt, matchTitle.substring(0, 10)];
+    return `match_approval_${keyComponents.join('_').replace(/[^a-zA-Z0-9_]/g, '_')}`;
+};
+
+const saveApprovalStatus = async (matchData, approved) => {
+    const key = getMatchApprovalKey(matchData);
+    let approvedBy = null;
+    
+    if (approved) {
+        try {
+            const currentUser = await authService.getCurrentUser();
+            approvedBy = currentUser?.email || null;
+        } catch (error) {
+            console.warn('Could not get current user for approval:', error);
+        }
+    }
+    
+    const approvalData = {
+        approved,
+        approvedAt: approved ? Date.now() : null,
+        approvedBy
+    };
+    
+    console.log(`Saving approval status - Key: ${key}, Data: ${JSON.stringify(approvalData)}`);
+    localStorage.setItem(key, JSON.stringify(approvalData));
+    
+    // Verify it was saved
+    const verification = localStorage.getItem(key);
+    console.log(`Verification - Saved data: ${verification}`);
+};
+
+const getApprovalStatus = (matchData) => {
+    const key = getMatchApprovalKey(matchData);
+    const stored = localStorage.getItem(key);
+    if (stored) {
+        try {
+            return JSON.parse(stored);
+        } catch (e) {
+            return null;
+        }
+    }
+    return null;
+};
+
 const toggleMatchApproval = async (matchData, matchIndex) => {
     try {
         const currentApproval = matchData.approvedForStats === true;
         const newApproval = !currentApproval;
         
-        // Update the match data
+        // Save approval status to localStorage
+        await saveApprovalStatus(matchData, newApproval);
+        
+        // Get current user for local update
+        let approvedBy = null;
+        if (newApproval) {
+            try {
+                const currentUser = await authService.getCurrentUser();
+                approvedBy = currentUser?.email || null;
+            } catch (error) {
+                console.warn('Could not get current user for approval:', error);
+            }
+        }
+        
+        // Update the match data locally
         const updatedMatch = {
             ...matchData,
             approvedForStats: newApproval,
             approvedAt: newApproval ? Date.now() : null,
-            approvedBy: newApproval ? (await authService.getCurrentUser())?.email : null
+            approvedBy
         };
-
-        // Save the updated match
-        await userMatchesApi.saveMatchData(updatedMatch);
         
         // Update local data
         allMatches[matchIndex] = updatedMatch;

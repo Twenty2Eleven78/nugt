@@ -106,6 +106,40 @@ class UserMatchesAPI {
     return response;
   }
 
+  async updateMatchData(matchData, originalUserId) {
+    if (!matchData || typeof matchData !== 'object') {
+      throw new Error('Invalid match data provided');
+    }
+
+    const token = await this._getAuthToken();
+    
+    // For admin updates, we need to preserve the original user info
+    const updatedMatch = {
+      ...matchData,
+      // Preserve original user information
+      userEmail: matchData.userEmail,
+      userName: matchData.userName,
+      userId: originalUserId || matchData.userId,
+      // Add admin update tracking
+      lastUpdatedBy: (await authService.getCurrentUser())?.email,
+      lastUpdatedAt: new Date().toISOString()
+    };
+
+    const requestOptions = {
+      method: HTTP_METHODS.PUT,
+      headers: this._buildHeaders(token, true),
+      body: JSON.stringify({
+        ...updatedMatch,
+        _adminUpdate: true,
+        _targetUserId: originalUserId || matchData.userId
+      })
+    };
+
+    const response = await this._makeRequest(API_ENDPOINTS.USER_MATCHES, requestOptions);
+    this._clearCache(); // Clear all caches after update
+    return response.data;
+  }
+
   // Clear all cached data
   clearCache() {
     this._clearCache();

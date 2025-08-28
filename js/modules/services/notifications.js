@@ -31,6 +31,16 @@ class NotificationManager {
   }
 
   _getActiveContainer() {
+    // Check if admin modal is open and use its notification container
+    const adminModal = this._getCachedElement('admin-modal');
+    const adminNotificationContainer = this._getCachedElement('admin-notification-container');
+    
+    if (adminModal && adminNotificationContainer && 
+        (adminModal.classList.contains('show') || adminModal.style.display === 'block')) {
+      adminNotificationContainer.style.display = 'block';
+      return adminNotificationContainer;
+    }
+    
     // Check if auth modal is open and use its notification container
     const authModal = this._getCachedElement('authModal');
     const authNotificationContainer = this._getCachedElement('auth-notification-container');
@@ -85,12 +95,16 @@ class NotificationManager {
     notification.classList.remove('show');
 
     setTimeout(() => {
-      // Check both containers for the notification using cached elements
+      // Check all containers for the notification using cached elements
       const authContainer = this._getCachedElement('auth-notification-container');
+      const adminContainer = this._getCachedElement('admin-notification-container');
+      
       if (this.container && this.container.contains(notification)) {
         this.container.removeChild(notification);
       } else if (authContainer && authContainer.contains(notification)) {
         authContainer.removeChild(notification);
+      } else if (adminContainer && adminContainer.contains(notification)) {
+        adminContainer.removeChild(notification);
       }
       this.notifications.delete(notification);
     }, ANIMATION_DURATION);

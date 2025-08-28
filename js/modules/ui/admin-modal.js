@@ -14,6 +14,9 @@ const modalHtml = `
             </div>
             
             <div class="modal-body">
+                <!-- Admin Notification Container -->
+                <div id="admin-notification-container" style="display: none;"></div>
+                
                 <!-- Search and Controls -->
                 <div class="mb-3">
                     <input type="text" class="form-control mb-2" id="admin-search" 
@@ -388,19 +391,15 @@ const renderCards = (matches) => {
                 <button class="btn btn-primary btn-sm view-match-btn" data-match-index="${index}" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" title="View Match">
                   View
                 </button>
-                <div class="d-flex gap-1 mb-1">
+                <div class="d-flex gap-2 mb-1">
                   <button class="btn ${isApproved ? 'btn-outline-secondary' : 'btn-success'} btn-sm approve-match-btn" 
                           data-match-index="${index}" 
                           style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" 
-                          title="${isApproved ? 'Remove from Stats' : 'Approve for Stats'}"
-                          ${isApproved ? '' : ''}>
+                          title="${isApproved ? 'Remove from Stats' : 'Approve for Stats'}">
                     <i class="fas ${isApproved ? 'fa-times' : 'fa-check'}"></i>
                   </button>
-                  <button class="btn btn-outline-info btn-sm generate-stats-btn" data-match-index="${index}" style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" title="Generate Stats">
-                    <i class="fas fa-chart-bar"></i>
-                  </button>
                 </div>
-                <div class="d-flex gap-1">
+                <div class="d-flex gap-2">
                   <button class="btn btn-outline-warning btn-sm transfer-match-btn" data-match-index="${index}" style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" title="Transfer">
                     <i class="fas fa-exchange-alt"></i>
                   </button>
@@ -468,14 +467,6 @@ const addEventListeners = () => {
             const matchIndex = parseInt(e.target.closest('button').getAttribute('data-match-index'));
             const matchData = allMatches[matchIndex];
             toggleMatchApproval(matchData, matchIndex);
-        });
-    });
-
-    // Generate stats buttons
-    document.querySelectorAll('.generate-stats-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const matchIndex = parseInt(e.target.closest('button').getAttribute('data-match-index'));
-            generateStatistics();
         });
     });
 };

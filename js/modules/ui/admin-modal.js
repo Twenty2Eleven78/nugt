@@ -1174,8 +1174,11 @@ const calculateStatisticsFromMatches = async (matches) => {
 
     // Process each approved match
     matches.forEach((match, matchIndex) => {
+        console.log(`Processing match ${matchIndex}:`, match.date || match.matchDate);
+        
         // Process attendance
         if (match.attendance && Array.isArray(match.attendance)) {
+            console.log(`Match ${matchIndex} attendance:`, match.attendance);
             match.attendance.forEach(attendee => {
                 let name, isPresent;
                 
@@ -1188,8 +1191,11 @@ const calculateStatisticsFromMatches = async (matches) => {
                     isPresent = attendee.attendance === true || attendee.present === true || attendee.attended === true;
                 }
 
+                console.log(`Attendee:`, attendee, `Name: ${name}, Present: ${isPresent}`);
+                
                 if (name && isPresent) {
                     const playerKey = name.toLowerCase().trim();
+                    console.log(`Adding attendance for player: ${name}`);
                     
                     if (playerStatsMap.has(playerKey)) {
                         playerStatsMap.get(playerKey).matchesPlayed.add(matchIndex);
@@ -1277,8 +1283,11 @@ const calculateStatisticsFromMatches = async (matches) => {
     });
 
     // Calculate final statistics
+    console.log('Final playerStatsMap:', Array.from(playerStatsMap.entries()));
+    
     const playerStats = Array.from(playerStatsMap.values()).map(player => {
         player.appearances = player.matchesPlayed.size;
+        console.log(`Final stats - ${player.name}: ${player.appearances} appearances, ${player.goals} goals, ${player.assists} assists`);
         player.totalContributions = player.goals + player.assists;
         player.goalsPerMatch = player.appearances > 0 ? (player.goals / player.appearances).toFixed(2) : '0.00';
         player.assistsPerMatch = player.appearances > 0 ? (player.assists / player.appearances).toFixed(2) : '0.00';

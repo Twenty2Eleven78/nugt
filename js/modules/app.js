@@ -214,7 +214,7 @@ export function initializeApp() {
   matchLoadModal.init();
   matchSummaryModal.init();
   rawDataModal.init();
-  statisticsPage.init();
+  statisticsModal.init();
 
   // Initialize modal modules
   teamModals.init();

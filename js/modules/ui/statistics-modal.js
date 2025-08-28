@@ -335,7 +335,6 @@ class StatisticsModal {
                         <table class="table table-hover table-sm">
                             <thead class="table-light">
                                 <tr>
-                                    <th style="width: 40px;">#</th>
                                     <th>Player</th>
                                     <th class="text-center" style="width: 80px;">Shirt</th>
                                     <th class="text-center" style="width: 80px;">Apps</th>
@@ -350,7 +349,7 @@ class StatisticsModal {
                                 ${this._renderPlayerRows(rosterPlayers, 'roster')}
                                 ${nonRosterPlayers.length > 0 ? `
                                     <tr class="table-secondary">
-                                        <td colspan="9" class="text-center fw-bold py-2">
+                                        <td colspan="8" class="text-center fw-bold py-2">
                                             <i class="fas fa-user-plus me-1"></i>Non-Roster Players
                                         </td>
                                     </tr>
@@ -385,9 +384,6 @@ class StatisticsModal {
 
             return `
                 <tr class="${rowClass}">
-                    <td class="text-center">
-                        <span class="badge ${type === 'roster' ? 'bg-primary' : 'bg-warning'}">${position}</span>
-                    </td>
                     <td>
                         <div class="d-flex align-items-center">
                             <strong>${this._escapeHtml(player.name)}</strong>
@@ -395,20 +391,12 @@ class StatisticsModal {
                         </div>
                     </td>
                     <td class="text-center">
-                        ${player.shirtNumber !== null ? `<span class="badge bg-secondary">${player.shirtNumber}</span>` : '<span class="text-muted">-</span>'}
+                        ${player.shirtNumber !== null ? player.shirtNumber : '<span class="text-muted">-</span>'}
                     </td>
-                    <td class="text-center">
-                        <span class="badge ${player.appearances > 0 ? 'bg-info' : 'bg-light text-dark'}">${player.appearances}</span>
-                    </td>
-                    <td class="text-center">
-                        <span class="badge ${player.goals > 0 ? 'bg-success' : 'bg-light text-dark'}">${player.goals}</span>
-                    </td>
-                    <td class="text-center">
-                        <span class="badge ${player.assists > 0 ? 'bg-primary' : 'bg-light text-dark'}">${player.assists}</span>
-                    </td>
-                    <td class="text-center">
-                        <span class="badge ${player.totalContributions > 0 ? 'bg-warning text-dark' : 'bg-light text-dark'}">${player.totalContributions}</span>
-                    </td>
+                    <td class="text-center">${player.appearances}</td>
+                    <td class="text-center">${player.goals}</td>
+                    <td class="text-center">${player.assists}</td>
+                    <td class="text-center">${player.totalContributions}</td>
                     <td class="text-center text-muted small">${player.goalsPerMatch}</td>
                     <td class="text-center text-muted small">${player.assistsPerMatch}</td>
                 </tr>

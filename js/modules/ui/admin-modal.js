@@ -1184,7 +1184,8 @@ const calculateStatisticsFromMatches = async (matches) => {
                     isPresent = true;
                 } else if (attendee && typeof attendee === 'object') {
                     name = attendee.name || attendee.playerName || attendee.player;
-                    isPresent = attendee.present === true || attendee.attended === true;
+                    // Check for attendance: true property
+                    isPresent = attendee.attendance === true || attendee.present === true || attendee.attended === true;
                 }
 
                 if (name && isPresent) {
@@ -1301,11 +1302,69 @@ const calculateStatisticsFromMatches = async (matches) => {
         return b.assists - a.assists;
     });
 
+    // Calculate team statistics
+    let wins = 0, draws = 0, losses = 0, goalsFor = 0, goalsAgainst = 0;
+    let totalAttendance = 0;
+    
+    matches.forEach(match => {
+        // Count goals for and against
+        if (match.goals && Array.isArray(match.goals)) {
+            match.goals.forEach(goal => {
+                if (goal.goalScorerName && goal.goalScorerName !== 'Opposition') {
+                    goalsFor++;
+                } else if (goal.goalScorerName === 'Opposition') {
+                    goalsAgainst++;
+                }
+            });
+        }
+        
+        // Count attendance
+        if (match.attendance && Array.isArray(match.attendance)) {
+            const attendedCount = match.attendance.filter(attendee => {
+                if (typeof attendee === 'string') return true;
+                return attendee && (attendee.attendance === true || attendee.present === true || attendee.attended === true);
+            }).length;
+            totalAttendance += attendedCount;
+        }
+        
+        // Determine match result (simplified - you might want to enhance this)
+        const matchGoalsFor = match.goals ? match.goals.filter(g => g.goalScorerName !== 'Opposition').length : 0;
+        const matchGoalsAgainst = match.goals ? match.goals.filter(g => g.goalScorerName === 'Opposition').length : 0;
+        
+        if (matchGoalsFor > matchGoalsAgainst) {
+            wins++;
+        } else if (matchGoalsFor === matchGoalsAgainst) {
+            draws++;
+        } else {
+            losses++;
+        }
+    });
+    
+    const totalMatches = matches.length;
+    const winPercentage = totalMatches > 0 ? Math.round((wins / totalMatches) * 100) : 0;
+    const avgGoalsFor = totalMatches > 0 ? (goalsFor / totalMatches).toFixed(1) : '0.0';
+    const avgGoalsAgainst = totalMatches > 0 ? (goalsAgainst / totalMatches).toFixed(1) : '0.0';
+    const avgAttendance = totalMatches > 0 ? (totalAttendance / totalMatches).toFixed(1) : '0.0';
+    const avgAssists = totalMatches > 0 ? (totalAssistsFound / totalMatches).toFixed(1) : '0.0';
+
     return {
         playerStats,
         totalMatches: matches.length,
         totalGoals: totalGoalsFound,
         totalAssists: totalAssistsFound,
+        teamStats: {
+            totalMatches,
+            wins,
+            draws,
+            losses,
+            goalsFor,
+            goalsAgainst,
+            winPercentage,
+            avgGoalsFor,
+            avgGoalsAgainst,
+            avgAttendance,
+            avgAssists
+        },
         generatedAt: Date.now(),
         generatedBy: (await authService.getCurrentUser())?.email,
         approvedMatchIds: matches.map(m => m.id || m.savedAt).filter(Boolean)

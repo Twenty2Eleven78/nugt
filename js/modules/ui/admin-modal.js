@@ -19,7 +19,7 @@ const modalHtml = `
                     <input type="text" class="form-control mb-2" id="admin-search" 
                            placeholder="Search matches...">
                     <div class="row g-2">
-                        <div class="col-6">
+                        <div class="col-4">
                             <select class="form-select" id="filter-select">
                                 <option value="">All Matches</option>
                                 <option value="today">Today</option>
@@ -27,9 +27,14 @@ const modalHtml = `
                                 <option value="month">This Month</option>
                             </select>
                         </div>
-                        <div class="col-6">
+                        <div class="col-4">
                             <button class="btn btn-primary w-100" id="refresh-data-btn">
                                 <i class="fas fa-sync-alt me-1"></i>Refresh
+                            </button>
+                        </div>
+                        <div class="col-4">
+                            <button class="btn btn-success w-100" id="generate-stats-btn">
+                                <i class="fas fa-chart-bar me-1"></i>Generate Stats
                             </button>
                         </div>
                     </div>
@@ -167,6 +172,12 @@ const init = () => {
     const refreshBtn = document.getElementById('refresh-data-btn');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', loadMatchesData);
+    }
+
+    // Add generate statistics button functionality
+    const generateStatsBtn = document.getElementById('generate-stats-btn');
+    if (generateStatsBtn) {
+        generateStatsBtn.addEventListener('click', generateStatistics);
     }
 
     // Add filter functionality
@@ -337,10 +348,14 @@ const renderCards = (matches) => {
             ? `${match.team1Name} vs ${match.team2Name}`
             : '';
 
+        // Check approval status
+        const isApproved = match.approvedForStats === true;
+        const approvalClass = isApproved ? 'border-success' : 'border-warning';
+
         const listItem = document.createElement('div');
-        listItem.className = 'card shadow-sm mb-3';
+        listItem.className = `card shadow-sm mb-3 ${approvalClass}`;
         listItem.style.borderRadius = '12px';
-        listItem.style.border = '1px solid #e0e0e0';
+        listItem.style.border = `2px solid`;
         listItem.style.transition = 'all 0.2s ease';
         listItem.style.cursor = 'pointer';
 
@@ -362,12 +377,30 @@ const renderCards = (matches) => {
                 <div class="text-muted" style="font-size: 0.75rem;">
                   <i class="fas fa-calendar me-1"></i>${formattedDate} ${formattedTime}
                 </div>
+                <div class="mt-1">
+                  <span class="badge ${isApproved ? 'bg-success' : 'bg-warning'}" style="font-size: 0.65rem;">
+                    <i class="fas ${isApproved ? 'fa-check-circle' : 'fa-clock'} me-1"></i>
+                    ${isApproved ? 'Approved for Stats' : 'Pending Approval'}
+                  </span>
+                </div>
               </div>
               <div class="d-flex flex-column gap-2 flex-shrink-0" style="padding: 0.25rem;">
                 <button class="btn btn-primary btn-sm view-match-btn" data-match-index="${index}" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" title="View Match">
                   View
                 </button>
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-1 mb-1">
+                  <button class="btn ${isApproved ? 'btn-outline-secondary' : 'btn-success'} btn-sm approve-match-btn" 
+                          data-match-index="${index}" 
+                          style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" 
+                          title="${isApproved ? 'Remove from Stats' : 'Approve for Stats'}"
+                          ${isApproved ? '' : ''}>
+                    <i class="fas ${isApproved ? 'fa-times' : 'fa-check'}"></i>
+                  </button>
+                  <button class="btn btn-outline-info btn-sm generate-stats-btn" data-match-index="${index}" style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" title="Generate Stats">
+                    <i class="fas fa-chart-bar"></i>
+                  </button>
+                </div>
+                <div class="d-flex gap-1">
                   <button class="btn btn-outline-warning btn-sm transfer-match-btn" data-match-index="${index}" style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" title="Transfer">
                     <i class="fas fa-exchange-alt"></i>
                   </button>
@@ -426,6 +459,23 @@ const addEventListeners = () => {
             const matchIndex = parseInt(e.target.closest('button').getAttribute('data-match-index'));
             const matchData = allMatches[matchIndex];
             showDeleteConfirmation(matchData, matchIndex);
+        });
+    });
+
+    // Approval buttons
+    document.querySelectorAll('.approve-match-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const matchIndex = parseInt(e.target.closest('button').getAttribute('data-match-index'));
+            const matchData = allMatches[matchIndex];
+            toggleMatchApproval(matchData, matchIndex);
+        });
+    });
+
+    // Generate stats buttons
+    document.querySelectorAll('.generate-stats-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const matchIndex = parseInt(e.target.closest('button').getAttribute('data-match-index'));
+            generateStatistics();
         });
     });
 };
@@ -944,6 +994,239 @@ const show = () => {
         }
         modalInstance.show();
     });
+};
+
+const toggleMatchApproval = async (matchData, matchIndex) => {
+    try {
+        const currentApproval = matchData.approvedForStats === true;
+        const newApproval = !currentApproval;
+        
+        // Update the match data
+        const updatedMatch = {
+            ...matchData,
+            approvedForStats: newApproval,
+            approvedAt: newApproval ? Date.now() : null,
+            approvedBy: newApproval ? (await authService.getCurrentUser())?.email : null
+        };
+
+        // Save the updated match
+        await userMatchesApi.saveMatchData(updatedMatch);
+        
+        // Update local data
+        allMatches[matchIndex] = updatedMatch;
+        
+        // Re-render the cards
+        renderCards(allMatches);
+        
+        const action = newApproval ? 'approved for' : 'removed from';
+        notificationManager.success(`Match ${action} statistics generation`);
+        
+    } catch (error) {
+        console.error('Error updating match approval:', error);
+        notificationManager.error('Failed to update match approval status');
+    }
+};
+
+const generateStatistics = async () => {
+    try {
+        // Get all approved matches
+        const approvedMatches = allMatches.filter(match => match.approvedForStats === true);
+        
+        if (approvedMatches.length === 0) {
+            notificationManager.warning('No matches have been approved for statistics generation');
+            return;
+        }
+
+        // Generate statistics from approved matches
+        const statistics = await calculateStatisticsFromMatches(approvedMatches);
+        
+        // Save statistics to storage/API
+        await saveGeneratedStatistics(statistics);
+        
+        notificationManager.success(`Statistics generated from ${approvedMatches.length} approved matches`);
+        
+    } catch (error) {
+        console.error('Error generating statistics:', error);
+        notificationManager.error('Failed to generate statistics');
+    }
+};
+
+const calculateStatisticsFromMatches = async (matches) => {
+    // Import the statistics calculation logic
+    const { rosterManager } = await import('../match/roster.js');
+    
+    const playerStatsMap = new Map();
+    const roster = rosterManager.getRoster();
+    
+    // Initialize roster players
+    roster.forEach(player => {
+        const playerKey = player.name.toLowerCase().trim();
+        playerStatsMap.set(playerKey, {
+            name: player.name,
+            shirtNumber: player.shirtNumber,
+            goals: 0,
+            assists: 0,
+            appearances: 0,
+            matchesWithGoals: new Set(),
+            matchesWithAssists: new Set(),
+            matchesPlayed: new Set(),
+            isRosterPlayer: true
+        });
+    });
+
+    let totalGoalsFound = 0;
+    let totalAssistsFound = 0;
+
+    // Process each approved match
+    matches.forEach((match, matchIndex) => {
+        // Process attendance
+        if (match.attendance && Array.isArray(match.attendance)) {
+            match.attendance.forEach(attendee => {
+                let name, isPresent;
+                
+                if (typeof attendee === 'string' && attendee.trim()) {
+                    name = attendee.trim();
+                    isPresent = true;
+                } else if (attendee && typeof attendee === 'object') {
+                    name = attendee.name || attendee.playerName || attendee.player;
+                    isPresent = attendee.present === true || attendee.attended === true;
+                }
+
+                if (name && isPresent) {
+                    const playerKey = name.toLowerCase().trim();
+                    
+                    if (playerStatsMap.has(playerKey)) {
+                        playerStatsMap.get(playerKey).matchesPlayed.add(matchIndex);
+                    } else {
+                        playerStatsMap.set(playerKey, {
+                            name: name.trim(),
+                            shirtNumber: null,
+                            goals: 0,
+                            assists: 0,
+                            appearances: 0,
+                            matchesWithGoals: new Set(),
+                            matchesWithAssists: new Set(),
+                            matchesPlayed: new Set([matchIndex]),
+                            isRosterPlayer: false
+                        });
+                    }
+                }
+            });
+        }
+
+        // Process goals
+        let goals = [];
+        if (match.goals && Array.isArray(match.goals)) {
+            goals = match.goals;
+        } else if (match.matchEvents && Array.isArray(match.matchEvents)) {
+            goals = match.matchEvents.filter(event => 
+                event.type === 'goal' || event.eventType === 'goal'
+            );
+        }
+
+        goals.forEach(goal => {
+            totalGoalsFound++;
+            
+            // Process scorer
+            const scorer = goal.scorer || goal.player || goal.goalScorer;
+            if (scorer && scorer.trim()) {
+                const playerKey = scorer.toLowerCase().trim();
+                
+                if (playerStatsMap.has(playerKey)) {
+                    const player = playerStatsMap.get(playerKey);
+                    player.goals++;
+                    player.matchesWithGoals.add(matchIndex);
+                    player.matchesPlayed.add(matchIndex);
+                } else {
+                    playerStatsMap.set(playerKey, {
+                        name: scorer.trim(),
+                        shirtNumber: null,
+                        goals: 1,
+                        assists: 0,
+                        appearances: 0,
+                        matchesWithGoals: new Set([matchIndex]),
+                        matchesWithAssists: new Set(),
+                        matchesPlayed: new Set([matchIndex]),
+                        isRosterPlayer: false
+                    });
+                }
+            }
+
+            // Process assists
+            const assists = goal.assists || goal.assist || (goal.assistedBy ? [goal.assistedBy] : []);
+            const assistArray = Array.isArray(assists) ? assists : [assists];
+            
+            assistArray.forEach(assist => {
+                if (assist && assist.trim()) {
+                    totalAssistsFound++;
+                    const playerKey = assist.toLowerCase().trim();
+                    
+                    if (playerStatsMap.has(playerKey)) {
+                        const player = playerStatsMap.get(playerKey);
+                        player.assists++;
+                        player.matchesWithAssists.add(matchIndex);
+                        player.matchesPlayed.add(matchIndex);
+                    } else {
+                        playerStatsMap.set(playerKey, {
+                            name: assist.trim(),
+                            shirtNumber: null,
+                            goals: 0,
+                            assists: 1,
+                            appearances: 0,
+                            matchesWithGoals: new Set(),
+                            matchesWithAssists: new Set([matchIndex]),
+                            matchesPlayed: new Set([matchIndex]),
+                            isRosterPlayer: false
+                        });
+                    }
+                }
+            });
+        });
+    });
+
+    // Calculate final statistics
+    const playerStats = Array.from(playerStatsMap.values()).map(player => {
+        player.appearances = player.matchesPlayed.size;
+        player.totalContributions = player.goals + player.assists;
+        player.goalsPerMatch = player.appearances > 0 ? (player.goals / player.appearances).toFixed(2) : '0.00';
+        player.assistsPerMatch = player.appearances > 0 ? (player.assists / player.appearances).toFixed(2) : '0.00';
+        
+        // Clean up Set objects for storage
+        delete player.matchesWithGoals;
+        delete player.matchesWithAssists;
+        delete player.matchesPlayed;
+        
+        return player;
+    });
+
+    // Sort by total contributions, then goals, then assists
+    playerStats.sort((a, b) => {
+        if (b.totalContributions !== a.totalContributions) {
+            return b.totalContributions - a.totalContributions;
+        }
+        if (b.goals !== a.goals) {
+            return b.goals - a.goals;
+        }
+        return b.assists - a.assists;
+    });
+
+    return {
+        playerStats,
+        totalMatches: matches.length,
+        totalGoals: totalGoalsFound,
+        totalAssists: totalAssistsFound,
+        generatedAt: Date.now(),
+        generatedBy: (await authService.getCurrentUser())?.email,
+        approvedMatchIds: matches.map(m => m.id || m.savedAt).filter(Boolean)
+    };
+};
+
+const saveGeneratedStatistics = async (statistics) => {
+    // Save to localStorage for now, could be extended to save to cloud
+    localStorage.setItem('generatedStatistics', JSON.stringify(statistics));
+    
+    // Could also save to cloud storage here
+    // await userMatchesApi.saveStatistics(statistics);
 };
 
 const refreshData = async () => {

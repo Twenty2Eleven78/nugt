@@ -35,7 +35,7 @@ import { matchLoadModal } from './ui/match-load-modal.js';
 import { matchSummaryModal } from './ui/match-summary-modal.js';
 import { rawDataModal } from './ui/raw-data-modal.js';
 import { newMatchModal } from './ui/new-match-modal.js';
-import { statisticsModal } from './ui/statistics-modal.js';
+import { statisticsPage } from './ui/statistics-page.js';
 import { touchGestures } from './ui/touch-gestures.js';
 import teamModals from './ui/team-modals.js';
 import goalModal from './ui/goal-modal.js';
@@ -214,7 +214,7 @@ export function initializeApp() {
   matchLoadModal.init();
   matchSummaryModal.init();
   rawDataModal.init();
-  statisticsModal.init();
+  statisticsPage.init();
 
   // Initialize modal modules
   teamModals.init();
@@ -411,8 +411,7 @@ function bindEventListeners() {
   const statisticsBtn = document.getElementById('statisticsBtn');
   if (statisticsBtn) {
     statisticsBtn.addEventListener('click', () => {
-      // Always force refresh to ensure latest data
-      statisticsModal.show(true);
+      statisticsPage.show();
     });
   }
 

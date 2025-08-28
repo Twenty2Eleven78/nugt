@@ -449,6 +449,14 @@ class StatisticsModal {
             return '<p class="text-muted">No player data available</p>';
         }
         
+        // Debug: Show first few players with their goals
+        console.log('Sample player data:', playerStats.slice(0, 3).map(p => ({
+            name: p.name,
+            goals: p.goals,
+            assists: p.assists,
+            appearances: p.appearances
+        })));
+        
         const topScorers = playerStats
             .filter(p => p.goals > 0)
             .sort((a, b) => b.goals - a.goals)
@@ -481,6 +489,13 @@ class StatisticsModal {
         if (!playerStats || !Array.isArray(playerStats)) {
             return '<p class="text-muted">No player data available</p>';
         }
+        
+        // Debug: Show goals and assists for all players
+        console.log('All players goals/assists:', playerStats.map(p => ({
+            name: p.name,
+            goals: p.goals,
+            assists: p.assists
+        })));
         
         const topAssists = playerStats
             .filter(p => p.assists > 0)

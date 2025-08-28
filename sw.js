@@ -1,5 +1,5 @@
 //Cache Name
-const CACHE_NAME = "nugt-cache-v109";
+const CACHE_NAME = "nugt-cache-v110";
 //Files to cache - Modular Architecture
 const cacheFiles = [
   './',
@@ -126,6 +126,41 @@ self.addEventListener('message', function (event) {
       if (event.ports && event.ports[0]) {
         event.ports[0].postMessage({ success: true });
       }
+    } else if (event.data && event.data.type === 'CLEAR_API_CACHE') {
+      console.log('Received CLEAR_API_CACHE message');
+
+      // Clear all caches that might contain API responses
+      caches.keys().then(cacheNames => {
+        return Promise.all(
+          cacheNames.map(cacheName => {
+            return caches.open(cacheName).then(cache => {
+              return cache.keys().then(requests => {
+                return Promise.all(
+                  requests.map(request => {
+                    // Clear any API-related requests
+                    if (request.url.includes('/api/') ||
+                      request.url.includes('user-matches') ||
+                      request.url.includes('match')) {
+                      console.log('Clearing cached API request:', request.url);
+                      return cache.delete(request);
+                    }
+                  })
+                );
+              });
+            });
+          })
+        );
+      }).then(() => {
+        console.log('API cache cleared successfully');
+        if (event.ports && event.ports[0]) {
+          event.ports[0].postMessage({ success: true, type: 'CACHE_CLEARED' });
+        }
+      }).catch(error => {
+        console.error('Failed to clear API cache:', error);
+        if (event.ports && event.ports[0]) {
+          event.ports[0].postMessage({ success: false, error: error.message });
+        }
+      });
     }
   } catch (error) {
     console.error('Service worker message handling error:', error);

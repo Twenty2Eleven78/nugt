@@ -289,8 +289,9 @@ const loadMatchesData = async () => {
             `;
         }
 
-        // Clear cache to ensure fresh data
+        // Clear all caches to ensure fresh data
         userMatchesApi.clearCache();
+        await clearServiceWorkerCache();
 
         const matches = await userMatchesApi.loadAllMatchData();
         allMatches = matches || [];
@@ -689,8 +690,9 @@ const handleDeleteConfirm = async () => {
             ? currentDeleteMatch.data.matchIndex
             : currentDeleteMatch.index;
 
-        // Clear cache before deletion to ensure fresh data
+        // Clear all caches before deletion to ensure fresh data
         userMatchesApi.clearCache();
+        await clearServiceWorkerCache();
 
         await userMatchesApi.deleteMatchData(
             currentDeleteMatch.data.userId,
@@ -714,10 +716,14 @@ const handleDeleteConfirm = async () => {
 
         currentDeleteMatch = null;
 
-        // Refresh data to ensure consistency
+        // Clear caches again and refresh data to ensure consistency
+        userMatchesApi.clearCache();
+        await clearServiceWorkerCache();
+        
+        // Immediate refresh to ensure the UI is updated
         setTimeout(() => {
             loadMatchesData();
-        }, 1000);
+        }, 500);
 
     } catch (error) {
         notificationManager.error(`Failed to delete match: ${error.message}`);
@@ -994,6 +1000,30 @@ const show = () => {
             init();
         }
         modalInstance.show();
+    });
+};
+
+// Helper function to clear service worker cache
+const clearServiceWorkerCache = () => {
+    return new Promise((resolve) => {
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            const messageChannel = new MessageChannel();
+            
+            messageChannel.port1.onmessage = (event) => {
+                console.log('Service worker cache clear response:', event.data);
+                resolve(event.data.success);
+            };
+            
+            navigator.serviceWorker.controller.postMessage(
+                { type: 'CLEAR_API_CACHE' },
+                [messageChannel.port2]
+            );
+            
+            // Timeout after 2 seconds
+            setTimeout(() => resolve(false), 2000);
+        } else {
+            resolve(false);
+        }
     });
 };
 

@@ -1347,6 +1347,50 @@ const calculateStatisticsFromMatches = async (matches) => {
     const avgAttendance = totalMatches > 0 ? (totalAttendance / totalMatches).toFixed(1) : '0.0';
     const avgAssists = totalMatches > 0 ? (totalAssistsFound / totalMatches).toFixed(1) : '0.0';
 
+    // Generate per-match statistics
+    const matchStats = matches.map((match, index) => {
+        const matchGoalsFor = match.goals ? match.goals.filter(g => g.goalScorerName && g.goalScorerName !== 'Opposition').length : 0;
+        const matchGoalsAgainst = match.goals ? match.goals.filter(g => g.goalScorerName === 'Opposition').length : 0;
+        const matchAssists = match.goals ? match.goals.filter(g => g.goalAssistName && g.goalAssistName !== 'Opposition').length : 0;
+        
+        // Count attendance for this match
+        let matchAttendance = 0;
+        if (match.attendance && Array.isArray(match.attendance)) {
+            matchAttendance = match.attendance.filter(attendee => {
+                if (typeof attendee === 'string') return true;
+                return attendee && (attendee.attendance === true || attendee.present === true || attendee.attended === true || attendee.attending === true);
+            }).length;
+        }
+        
+        // Find top scorer for this match
+        const matchGoals = match.goals ? match.goals.filter(g => g.goalScorerName && g.goalScorerName !== 'Opposition') : [];
+        const scorerCounts = {};
+        matchGoals.forEach(goal => {
+            const scorer = goal.goalScorerName;
+            scorerCounts[scorer] = (scorerCounts[scorer] || 0) + 1;
+        });
+        
+        let topScorer = 'None';
+        let maxGoals = 0;
+        Object.entries(scorerCounts).forEach(([scorer, goals]) => {
+            if (goals > maxGoals) {
+                maxGoals = goals;
+                topScorer = `${scorer} (${goals})`;
+            }
+        });
+        
+        return {
+            date: match.date || match.matchDate || match.savedAt,
+            opposition: match.opposition || match.opponent || 'Unknown',
+            ourGoals: matchGoalsFor,
+            theirGoals: matchGoalsAgainst,
+            assists: matchAssists,
+            attendance: matchAttendance,
+            topScorer: topScorer,
+            matchIndex: index
+        };
+    });
+
     return {
         playerStats,
         totalMatches: matches.length,
@@ -1365,6 +1409,7 @@ const calculateStatisticsFromMatches = async (matches) => {
             avgAttendance,
             avgAssists
         },
+        matchStats,
         generatedAt: Date.now(),
         generatedBy: (await authService.getCurrentUser())?.email,
         approvedMatchIds: matches.map(m => m.id || m.savedAt).filter(Boolean)

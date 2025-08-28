@@ -105,9 +105,14 @@ class StatisticsModal {
                                         <i class="fas fa-users me-1"></i>Players
                                     </button>
                                 </li>
-                                <li class="nav-item">
+                                <li class="nav-item me-2">
                                     <button class="nav-link" data-view="teams">
                                         <i class="fas fa-shield-alt me-1"></i>Teams
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link" data-view="matches">
+                                        <i class="fas fa-calendar-alt me-1"></i>Per Match
                                     </button>
                                 </li>
                             </ul>
@@ -612,6 +617,157 @@ class StatisticsModal {
     }
 
     /**
+     * Render per-match statistics
+     * @private
+     */
+    _renderPerMatchStats() {
+        if (!this.statistics) return this._renderNoDataMessage();
+
+        const stats = this.statistics;
+        const matchStats = stats.matchStats || [];
+
+        if (!matchStats || matchStats.length === 0) {
+            return `
+                <div class="text-center py-5">
+                    <i class="fas fa-calendar-alt fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted mb-3">No Match Data Available</h4>
+                    <p class="text-muted">Individual match statistics are not available in the current data.</p>
+                </div>
+            `;
+        }
+
+        return `
+            <!-- Match Statistics Summary -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body py-3">
+                            <i class="fas fa-futbol text-primary fa-2x mb-2"></i>
+                            <h5 class="card-title text-primary mb-1">${matchStats.length}</h5>
+                            <p class="card-text small text-muted mb-0">Total Matches</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body py-3">
+                            <i class="fas fa-bullseye text-success fa-2x mb-2"></i>
+                            <h5 class="card-title text-success mb-1">${stats.totalGoals}</h5>
+                            <p class="card-text small text-muted mb-0">Total Goals</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body py-3">
+                            <i class="fas fa-users text-info fa-2x mb-2"></i>
+                            <h5 class="card-title text-info mb-1">${Math.round(matchStats.reduce((sum, m) => sum + (m.attendance || 0), 0) / matchStats.length) || 0}</h5>
+                            <p class="card-text small text-muted mb-0">Avg Attendance</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body py-3">
+                            <i class="fas fa-chart-line text-warning fa-2x mb-2"></i>
+                            <h5 class="card-title text-warning mb-1">${(stats.totalGoals / matchStats.length).toFixed(1)}</h5>
+                            <p class="card-text small text-muted mb-0">Goals Per Match</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Match Details Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-list me-2"></i>Match by Match Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 120px;">Date</th>
+                                    <th>Opposition</th>
+                                    <th class="text-center" style="width: 80px;">Result</th>
+                                    <th class="text-center" style="width: 80px;">Goals</th>
+                                    <th class="text-center" style="width: 80px;">Assists</th>
+                                    <th class="text-center" style="width: 100px;">Attendance</th>
+                                    <th>Top Scorer</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${this._renderMatchRows(matchStats)}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render match table rows
+     * @private
+     */
+    _renderMatchRows(matchStats) {
+        return matchStats.map((match, index) => {
+            const date = match.date || match.matchDate || 'Unknown';
+            const opposition = match.opposition || match.opponent || 'Unknown';
+            const ourGoals = match.ourGoals || match.goalsFor || 0;
+            const theirGoals = match.theirGoals || match.goalsAgainst || 0;
+            const attendance = match.attendance || 0;
+            const topScorer = match.topScorer || 'None';
+            
+            // Determine result styling
+            let resultClass = 'text-muted';
+            let resultText = `${ourGoals}-${theirGoals}`;
+            
+            if (ourGoals > theirGoals) {
+                resultClass = 'text-success fw-bold';
+                resultText = `W ${ourGoals}-${theirGoals}`;
+            } else if (ourGoals < theirGoals) {
+                resultClass = 'text-danger fw-bold';
+                resultText = `L ${ourGoals}-${theirGoals}`;
+            } else if (ourGoals === theirGoals && ourGoals > 0) {
+                resultClass = 'text-warning fw-bold';
+                resultText = `D ${ourGoals}-${theirGoals}`;
+            }
+
+            return `
+                <tr>
+                    <td class="text-muted small">${this._formatDate(date)}</td>
+                    <td>
+                        <strong>${this._escapeHtml(opposition)}</strong>
+                    </td>
+                    <td class="text-center ${resultClass}">${resultText}</td>
+                    <td class="text-center">${ourGoals}</td>
+                    <td class="text-center">${match.assists || 0}</td>
+                    <td class="text-center">${attendance}</td>
+                    <td class="text-muted small">${this._escapeHtml(topScorer)}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    /**
+     * Format date for display
+     * @private
+     */
+    _formatDate(dateStr) {
+        try {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-GB', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: '2-digit' 
+            });
+        } catch (error) {
+            return dateStr;
+        }
+    }
+
+    /**
      * Render no data message
      * @private
      */
@@ -668,6 +824,9 @@ class StatisticsModal {
                 break;
             case 'teams':
                 html = this._renderTeamStats();
+                break;
+            case 'matches':
+                html = this._renderPerMatchStats();
                 break;
             default:
                 html = await this._renderInitialContent();

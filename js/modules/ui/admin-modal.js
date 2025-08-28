@@ -1173,7 +1173,14 @@ const calculateStatisticsFromMatches = async (matches) => {
     let totalAssistsFound = 0;
 
     // Process each approved match
+    console.log('Processing matches for statistics:', matches.length);
     matches.forEach((match, matchIndex) => {
+        console.log(`Processing match ${matchIndex}:`, {
+            title: match.title || match.matchTitle,
+            goals: match.goals,
+            matchEvents: match.matchEvents,
+            attendance: match.attendance
+        });
         // Process attendance
         if (match.attendance && Array.isArray(match.attendance)) {
             match.attendance.forEach(attendee => {
@@ -1213,10 +1220,14 @@ const calculateStatisticsFromMatches = async (matches) => {
         let goals = [];
         if (match.goals && Array.isArray(match.goals)) {
             goals = match.goals;
+            console.log(`Match ${matchIndex} - Found goals array:`, goals);
         } else if (match.matchEvents && Array.isArray(match.matchEvents)) {
             goals = match.matchEvents.filter(event => 
                 event.type === 'goal' || event.eventType === 'goal'
             );
+            console.log(`Match ${matchIndex} - Found goals from events:`, goals);
+        } else {
+            console.log(`Match ${matchIndex} - No goals found. Available properties:`, Object.keys(match));
         }
 
         goals.forEach(goal => {

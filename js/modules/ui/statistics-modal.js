@@ -30,8 +30,9 @@ class StatisticsModal {
 
     /**
      * Show the statistics modal
+     * @param {boolean} forceRefresh - Force refresh of data from server
      */
-    async show() {
+    async show(forceRefresh = false) {
         if (!this.modal) return;
 
         if (!authService.isUserAuthenticated()) {
@@ -41,7 +42,7 @@ class StatisticsModal {
 
         // Show modal first, then load data
         this.modal.show();
-        await this._loadAndAnalyzeData();
+        await this._loadAndAnalyzeData(forceRefresh);
     }
 
     /**

@@ -39,7 +39,7 @@ class UserMatchesAPI {
     };
 
     const response = await this._makeRequest(API_ENDPOINTS.USER_MATCHES, requestOptions);
-    this._clearCache(); // Clear cache after save
+    this._clearCache(); // Clear all caches after save (including admin data)
     return response.data;
   }
 
@@ -102,7 +102,7 @@ class UserMatchesAPI {
     };
 
     const response = await this._makeRequest(url, requestOptions);
-    this._clearCache(); // Clear cache after delete
+    this._clearCache(); // Clear all caches after delete (including admin data)
     return response;
   }
 

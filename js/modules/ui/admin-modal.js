@@ -946,7 +946,14 @@ const show = () => {
     });
 };
 
+const refreshData = async () => {
+    if (modalInstance && modalInstance.isVisible) {
+        await loadMatchesData();
+    }
+};
+
 export const adminModal = {
     init,
-    show
+    show,
+    refreshData
 };

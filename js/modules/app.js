@@ -331,6 +331,27 @@ function bindEventListeners() {
         };
 
         await userMatchesApi.saveMatchData(matchData);
+        
+        // Clear all caches to ensure fresh data
+        userMatchesApi.clearCache();
+        
+        // Refresh any open admin dashboard
+        setTimeout(() => {
+          // Check if admin modal is open and refresh it
+          const adminModalElement = document.getElementById('admin-modal');
+          if (adminModalElement) {
+            const adminModalInstance = CustomModal.getInstance(adminModalElement);
+            if (adminModalInstance && adminModalInstance.isVisible) {
+              // Dynamically import and refresh admin modal if it's open
+              import('./ui/admin-modal.js').then(({ adminModal }) => {
+                if (adminModal && typeof adminModal.refreshData === 'function') {
+                  adminModal.refreshData();
+                }
+              });
+            }
+          }
+        }, 500);
+        
         notificationManager.success('Match saved to cloud!');
       } catch (e) {
         console.error('Error saving match data:', e);
@@ -361,6 +382,8 @@ function bindEventListeners() {
       }
 
       try {
+        // Clear cache to ensure fresh data
+        userMatchesApi.clearCache();
         const matches = await userMatchesApi.loadMatchData();
         matchLoadModal.show(matches);
       } catch (error) {
@@ -388,7 +411,8 @@ function bindEventListeners() {
   const statisticsBtn = document.getElementById('statisticsBtn');
   if (statisticsBtn) {
     statisticsBtn.addEventListener('click', () => {
-      statisticsModal.show();
+      // Always force refresh to ensure latest data
+      statisticsModal.show(true);
     });
   }
 

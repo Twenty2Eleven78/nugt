@@ -36,8 +36,8 @@ const modalHtml = `
                             </button>
                         </div>
                         <div class="col-4">
-                            <button class="btn btn-success w-100" id="generate-stats-btn">
-                                <i class="fas fa-chart-bar me-1"></i>Generate Stats
+                            <button class="btn btn-success w-100" id="generate-stats-btn" title="Generate Statistics">
+                                <i class="fas fa-chart-bar me-1"></i>Stats
                             </button>
                         </div>
                     </div>
@@ -387,24 +387,26 @@ const renderCards = (matches) => {
                   </span>
                 </div>
               </div>
-              <div class="d-flex flex-column gap-2 flex-shrink-0" style="padding: 0.25rem;">
-                <button class="btn btn-primary btn-sm view-match-btn" data-match-index="${index}" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" title="View Match">
-                  View
-                </button>
-                <div class="d-flex gap-2 mb-1">
+              <div class="d-flex flex-column gap-1 flex-shrink-0" style="padding: 0.25rem;">
+                <!-- View and Delete on same line -->
+                <div class="d-flex gap-1">
+                  <button class="btn btn-primary btn-sm view-match-btn" data-match-index="${index}" style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" title="View Match">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="btn btn-outline-danger btn-sm delete-match-btn" data-match-index="${index}" style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" title="Delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+                <!-- Transfer and Approve on next line -->
+                <div class="d-flex gap-1">
+                  <button class="btn btn-outline-warning btn-sm transfer-match-btn" data-match-index="${index}" style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" title="Transfer">
+                    <i class="fas fa-exchange-alt"></i>
+                  </button>
                   <button class="btn ${isApproved ? 'btn-outline-secondary' : 'btn-success'} btn-sm approve-match-btn" 
                           data-match-index="${index}" 
                           style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" 
                           title="${isApproved ? 'Remove from Stats' : 'Approve for Stats'}">
                     <i class="fas ${isApproved ? 'fa-times' : 'fa-check'}"></i>
-                  </button>
-                </div>
-                <div class="d-flex gap-2">
-                  <button class="btn btn-outline-warning btn-sm transfer-match-btn" data-match-index="${index}" style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" title="Transfer">
-                    <i class="fas fa-exchange-alt"></i>
-                  </button>
-                  <button class="btn btn-outline-danger btn-sm delete-match-btn" data-match-index="${index}" style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" title="Delete">
-                    <i class="fas fa-trash"></i>
                   </button>
                 </div>
               </div>

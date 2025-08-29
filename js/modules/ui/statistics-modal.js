@@ -638,7 +638,7 @@ class StatisticsModal {
 
         return `
             <!-- Match Statistics Summary -->
-            <div class="row g-2 mb-3">
+            <div class="row g-3 mb-4">
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
                         <div class="card-body py-2">

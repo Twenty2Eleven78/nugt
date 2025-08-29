@@ -638,40 +638,40 @@ class StatisticsModal {
 
         return `
             <!-- Match Statistics Summary -->
-            <div class="row g-3 mb-4">
+            <div class="row g-2 mb-3">
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
-                        <div class="card-body py-3">
-                            <i class="fas fa-futbol text-primary fa-2x mb-2"></i>
-                            <h5 class="card-title text-primary mb-1">${matchStats.length}</h5>
-                            <p class="card-text small text-muted mb-0">Total Matches</p>
+                        <div class="card-body py-2">
+                            <i class="fas fa-futbol text-primary mb-1"></i>
+                            <h6 class="card-title text-primary mb-0">${matchStats.length}</h6>
+                            <p class="card-text small text-muted mb-0">Matches</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
-                        <div class="card-body py-3">
-                            <i class="fas fa-bullseye text-success fa-2x mb-2"></i>
-                            <h5 class="card-title text-success mb-1">${stats.totalGoals}</h5>
-                            <p class="card-text small text-muted mb-0">Total Goals</p>
+                        <div class="card-body py-2">
+                            <i class="fas fa-bullseye text-success mb-1"></i>
+                            <h6 class="card-title text-success mb-0">${stats.totalGoals}</h6>
+                            <p class="card-text small text-muted mb-0">Goals</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
-                        <div class="card-body py-3">
-                            <i class="fas fa-users text-info fa-2x mb-2"></i>
-                            <h5 class="card-title text-info mb-1">${Math.round(matchStats.reduce((sum, m) => sum + (m.attendance || 0), 0) / matchStats.length) || 0}</h5>
-                            <p class="card-text small text-muted mb-0">Avg Attendance</p>
+                        <div class="card-body py-2">
+                            <i class="fas fa-users text-info mb-1"></i>
+                            <h6 class="card-title text-info mb-0">${Math.round(matchStats.reduce((sum, m) => sum + (m.attendance || 0), 0) / matchStats.length) || 0}</h6>
+                            <p class="card-text small text-muted mb-0">Avg Att.</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
-                        <div class="card-body py-3">
-                            <i class="fas fa-chart-line text-warning fa-2x mb-2"></i>
-                            <h5 class="card-title text-warning mb-1">${(stats.totalGoals / matchStats.length).toFixed(1)}</h5>
-                            <p class="card-text small text-muted mb-0">Goals Per Match</p>
+                        <div class="card-body py-2">
+                            <i class="fas fa-chart-line text-warning mb-1"></i>
+                            <h6 class="card-title text-warning mb-0">${(stats.totalGoals / matchStats.length).toFixed(1)}</h6>
+                            <p class="card-text small text-muted mb-0">G/Match</p>
                         </div>
                     </div>
                 </div>
@@ -682,18 +682,18 @@ class StatisticsModal {
                 <div class="card-header">
                     <h6 class="mb-0"><i class="fas fa-list me-2"></i>Match by Match Statistics</h6>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-2">
                     <div class="table-responsive">
-                        <table class="table table-hover table-sm">
+                        <table class="table table-hover table-sm mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th style="width: 120px;">Date</th>
-                                    <th>Opposition</th>
-                                    <th class="text-center" style="width: 80px;">Result</th>
-                                    <th class="text-center" style="width: 80px;">Goals</th>
-                                    <th class="text-center" style="width: 80px;">Assists</th>
-                                    <th class="text-center" style="width: 100px;">Attendance</th>
-                                    <th>Top Scorer</th>
+                                    <th style="width: 90px;" class="small">Date</th>
+                                    <th class="small">Opposition</th>
+                                    <th class="text-center small" style="width: 70px;">Result</th>
+                                    <th class="text-center small" style="width: 50px;">G</th>
+                                    <th class="text-center small" style="width: 50px;">A</th>
+                                    <th class="text-center small" style="width: 60px;">Att.</th>
+                                    <th class="small" style="width: 120px;">Top Scorer</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -736,15 +736,15 @@ class StatisticsModal {
 
             return `
                 <tr>
-                    <td class="text-muted small">${this._formatDate(date)}</td>
-                    <td>
-                        <strong>${this._escapeHtml(opposition)}</strong>
+                    <td class="text-muted small py-2">${this._formatDate(date)}</td>
+                    <td class="py-2">
+                        <span class="fw-bold small">${this._escapeHtml(opposition)}</span>
                     </td>
-                    <td class="text-center ${resultClass}">${resultText}</td>
-                    <td class="text-center">${ourGoals}</td>
-                    <td class="text-center">${match.assists || 0}</td>
-                    <td class="text-center">${attendance}</td>
-                    <td class="text-muted small">${this._escapeHtml(topScorer)}</td>
+                    <td class="text-center ${resultClass} py-2 small">${resultText}</td>
+                    <td class="text-center py-2">${ourGoals}</td>
+                    <td class="text-center py-2">${match.assists || 0}</td>
+                    <td class="text-center py-2">${attendance}</td>
+                    <td class="text-muted small py-2">${this._escapeHtml(topScorer)}</td>
                 </tr>
             `;
         }).join('');

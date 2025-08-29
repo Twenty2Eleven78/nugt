@@ -1381,7 +1381,7 @@ const calculateStatisticsFromMatches = async (matches) => {
         
         return {
             date: match.date || match.matchDate || match.savedAt,
-            opposition: match.opposition || match.opponent || 'Unknown',
+            opposition: match.team2name || match.opposition || match.opponent || 'Unknown',
             ourGoals: matchGoalsFor,
             theirGoals: matchGoalsAgainst,
             assists: matchAssists,

@@ -651,7 +651,7 @@ class StatisticsModal {
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
                         <div class="card-body py-2">
-                            <i class="fas fa-bullseye text-success mb-1"></i>
+                            <i class="fas fa-bullseye text-success fa-2x mb-2"></i>
                             <h4 class="card-title text-success mb-0">${stats.totalGoals}</h4>
                             <p class="card-text small text-muted mb-0">Goals</p>
                         </div>
@@ -660,7 +660,7 @@ class StatisticsModal {
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
                         <div class="card-body py-2">
-                            <i class="fas fa-users text-info mb-1"></i>
+                            <i class="fas fa-users text-info fa-2x mb-2"></i>
                             <h4 class="card-title text-info mb-0">${Math.round(matchStats.reduce((sum, m) => sum + (m.attendance || 0), 0) / matchStats.length) || 0}</h4>
                             <p class="card-text small text-muted mb-0">Avg Att.</p>
                         </div>
@@ -669,7 +669,7 @@ class StatisticsModal {
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
                         <div class="card-body py-2">
-                            <i class="fas fa-chart-line text-warning mb-1"></i>
+                            <i class="fas fa-chart-line text-warning fa-2x mb-2"></i>
                             <h4 class="card-title text-warning mb-0">${(stats.totalGoals / matchStats.length).toFixed(1)}</h4>
                             <p class="card-text small text-muted mb-0">G/Match</p>
                         </div>

@@ -642,8 +642,8 @@ class StatisticsModal {
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
                         <div class="card-body py-2">
-                            <i class="fas fa-futbol text-primary mb-1"></i>
-                            <h6 class="card-title text-primary mb-0">${matchStats.length}</h6>
+                            <i class="fas fa-futbol text-primary mb-2"></i>
+                            <h4 class="card-title text-primary mb-0">${matchStats.length}</h4>
                             <p class="card-text small text-muted mb-0">Matches</p>
                         </div>
                     </div>

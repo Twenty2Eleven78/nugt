@@ -642,7 +642,7 @@ class StatisticsModal {
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
                         <div class="card-body py-2">
-                            <i class="fas fa-futbol text-primary mb-2"></i>
+                            <i class="fas fa-futbol text-primary fa-2x mb-2"></i>
                             <h4 class="card-title text-primary mb-0">${matchStats.length}</h4>
                             <p class="card-text small text-muted mb-0">Matches</p>
                         </div>
@@ -652,7 +652,7 @@ class StatisticsModal {
                     <div class="card text-center">
                         <div class="card-body py-2">
                             <i class="fas fa-bullseye text-success mb-1"></i>
-                            <h6 class="card-title text-success mb-0">${stats.totalGoals}</h6>
+                            <h4 class="card-title text-success mb-0">${stats.totalGoals}</h4>
                             <p class="card-text small text-muted mb-0">Goals</p>
                         </div>
                     </div>
@@ -661,7 +661,7 @@ class StatisticsModal {
                     <div class="card text-center">
                         <div class="card-body py-2">
                             <i class="fas fa-users text-info mb-1"></i>
-                            <h6 class="card-title text-info mb-0">${Math.round(matchStats.reduce((sum, m) => sum + (m.attendance || 0), 0) / matchStats.length) || 0}</h6>
+                            <h4 class="card-title text-info mb-0">${Math.round(matchStats.reduce((sum, m) => sum + (m.attendance || 0), 0) / matchStats.length) || 0}</h4>
                             <p class="card-text small text-muted mb-0">Avg Att.</p>
                         </div>
                     </div>
@@ -670,7 +670,7 @@ class StatisticsModal {
                     <div class="card text-center">
                         <div class="card-body py-2">
                             <i class="fas fa-chart-line text-warning mb-1"></i>
-                            <h6 class="card-title text-warning mb-0">${(stats.totalGoals / matchStats.length).toFixed(1)}</h6>
+                            <h4 class="card-title text-warning mb-0">${(stats.totalGoals / matchStats.length).toFixed(1)}</h4>
                             <p class="card-text small text-muted mb-0">G/Match</p>
                         </div>
                     </div>

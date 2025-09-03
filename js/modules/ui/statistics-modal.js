@@ -97,28 +97,27 @@ class StatisticsModal {
                             <div class="d-flex justify-content-center mb-3">
                                 <ul class="nav nav-tabs flex-nowrap" id="statsNavTabs" style="overflow-x: auto;">
                                     <li class="nav-item me-1">
-                                        <button class="nav-link active px-2 px-sm-3 py-2 text-center" data-view="overview" style="min-width: 70px;">
+                                        <button class="nav-link active px-1 px-sm-3 py-2 text-center" data-view="overview" style="min-width: 60px; font-size: 0.8rem;">
                                             <i class="fas fa-tachometer-alt d-none d-sm-inline me-sm-1"></i>
-                                            <span class="small">Over</span>
-                                            <span class="d-none d-sm-inline">view</span>
+                                            <span>Over</span>
                                         </button>
                                     </li>
                                     <li class="nav-item me-1">
-                                        <button class="nav-link px-2 px-sm-3 py-2 text-center" data-view="players" style="min-width: 70px;">
+                                        <button class="nav-link px-1 px-sm-3 py-2 text-center" data-view="players" style="min-width: 60px; font-size: 0.8rem;">
                                             <i class="fas fa-users d-none d-sm-inline me-sm-1"></i>
-                                            <span class="small">Players</span>
+                                            <span>Play</span>
                                         </button>
                                     </li>
                                     <li class="nav-item me-1">
-                                        <button class="nav-link px-2 px-sm-3 py-2 text-center" data-view="teams" style="min-width: 70px;">
+                                        <button class="nav-link px-1 px-sm-3 py-2 text-center" data-view="teams" style="min-width: 60px; font-size: 0.8rem;">
                                             <i class="fas fa-shield-alt d-none d-sm-inline me-sm-1"></i>
-                                            <span class="small">Teams</span>
+                                            <span>Team</span>
                                         </button>
                                     </li>
                                     <li class="nav-item">
-                                        <button class="nav-link px-2 px-sm-3 py-2 text-center" data-view="matches" style="min-width: 70px;">
+                                        <button class="nav-link px-1 px-sm-3 py-2 text-center" data-view="matches" style="min-width: 60px; font-size: 0.8rem;">
                                             <i class="fas fa-calendar-alt d-none d-sm-inline me-sm-1"></i>
-                                            <span class="small">Matches</span>
+                                            <span>Match</span>
                                         </button>
                                     </li>
                                 </ul>

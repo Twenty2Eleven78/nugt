@@ -97,27 +97,28 @@ class StatisticsModal {
                             <div class="d-flex justify-content-center mb-3">
                                 <ul class="nav nav-tabs flex-nowrap" id="statsNavTabs" style="overflow-x: auto;">
                                     <li class="nav-item me-1">
-                                        <button class="nav-link active px-3 py-2 text-center" data-view="overview">
-                                            <i class="fas fa-tachometer-alt d-block d-sm-inline me-sm-1"></i>
-                                            <span class="d-block d-sm-inline small">Overview</span>
+                                        <button class="nav-link active px-2 px-sm-3 py-2 text-center" data-view="overview" style="min-width: 70px;">
+                                            <i class="fas fa-tachometer-alt d-none d-sm-inline me-sm-1"></i>
+                                            <span class="small">Over</span>
+                                            <span class="d-none d-sm-inline">view</span>
                                         </button>
                                     </li>
                                     <li class="nav-item me-1">
-                                        <button class="nav-link px-3 py-2 text-center" data-view="players">
-                                            <i class="fas fa-users d-block d-sm-inline me-sm-1"></i>
-                                            <span class="d-block d-sm-inline small">Players</span>
+                                        <button class="nav-link px-2 px-sm-3 py-2 text-center" data-view="players" style="min-width: 70px;">
+                                            <i class="fas fa-users d-none d-sm-inline me-sm-1"></i>
+                                            <span class="small">Players</span>
                                         </button>
                                     </li>
                                     <li class="nav-item me-1">
-                                        <button class="nav-link px-3 py-2 text-center" data-view="teams">
-                                            <i class="fas fa-shield-alt d-block d-sm-inline me-sm-1"></i>
-                                            <span class="d-block d-sm-inline small">Teams</span>
+                                        <button class="nav-link px-2 px-sm-3 py-2 text-center" data-view="teams" style="min-width: 70px;">
+                                            <i class="fas fa-shield-alt d-none d-sm-inline me-sm-1"></i>
+                                            <span class="small">Teams</span>
                                         </button>
                                     </li>
                                     <li class="nav-item">
-                                        <button class="nav-link px-3 py-2 text-center" data-view="matches">
-                                            <i class="fas fa-calendar-alt d-block d-sm-inline me-sm-1"></i>
-                                            <span class="d-block d-sm-inline small">Matches</span>
+                                        <button class="nav-link px-2 px-sm-3 py-2 text-center" data-view="matches" style="min-width: 70px;">
+                                            <i class="fas fa-calendar-alt d-none d-sm-inline me-sm-1"></i>
+                                            <span class="small">Matches</span>
                                         </button>
                                     </li>
                                 </ul>
@@ -523,70 +524,69 @@ class StatisticsModal {
 
         const stats = this.statistics;
         const teamStats = stats.teamStats || {};
+        const matchStats = stats.matchStats || [];
+
+        // Get unique opponents
+        const opponents = [...new Set(matchStats.map(match => match.opposition))].filter(opp => opp && opp !== 'Unknown');
 
         return `
             <!-- Team Summary Cards -->
-            <div class="row g-3 mb-4">
+            <div class="row g-2 mb-3">
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
-                        <div class="card-body">
-                            <i class="fas fa-futbol text-primary fa-2x mb-2"></i>
-                            <h4 class="card-title text-primary">${teamStats.totalMatches || stats.totalMatches}</h4>
-                            <p class="card-text small text-muted">Matches Played</p>
+                        <div class="card-body py-2 py-md-3">
+                            <i class="fas fa-futbol text-primary mb-1 d-none d-sm-block"></i>
+                            <h5 class="card-title text-primary mb-0">${teamStats.totalMatches || stats.totalMatches}</h5>
+                            <p class="card-text small text-muted mb-0">Matches</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
-                        <div class="card-body">
-                            <i class="fas fa-trophy text-success fa-2x mb-2"></i>
-                            <h4 class="card-title text-success">${teamStats.wins || 0}</h4>
-                            <p class="card-text small text-muted">Wins</p>
+                        <div class="card-body py-2 py-md-3">
+                            <i class="fas fa-trophy text-success mb-1 d-none d-sm-block"></i>
+                            <h5 class="card-title text-success mb-0">${teamStats.wins || 0}</h5>
+                            <p class="card-text small text-muted mb-0">Wins</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
-                        <div class="card-body">
-                            <i class="fas fa-handshake text-warning fa-2x mb-2"></i>
-                            <h4 class="card-title text-warning">${teamStats.draws || 0}</h4>
-                            <p class="card-text small text-muted">Draws</p>
+                        <div class="card-body py-2 py-md-3">
+                            <i class="fas fa-handshake text-warning mb-1 d-none d-sm-block"></i>
+                            <h5 class="card-title text-warning mb-0">${teamStats.draws || 0}</h5>
+                            <p class="card-text small text-muted mb-0">Draws</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
-                        <div class="card-body">
-                            <i class="fas fa-times text-danger fa-2x mb-2"></i>
-                            <h4 class="card-title text-danger">${teamStats.losses || 0}</h4>
-                            <p class="card-text small text-muted">Losses</p>
+                        <div class="card-body py-2 py-md-3">
+                            <i class="fas fa-times text-danger mb-1 d-none d-sm-block"></i>
+                            <h5 class="card-title text-danger mb-0">${teamStats.losses || 0}</h5>
+                            <p class="card-text small text-muted mb-0">Losses</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Team Performance -->
-            <div class="row g-3 mb-4">
+            <div class="row g-3 mb-3">
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-header">
-                            <h6 class="mb-0"><i class="fas fa-bullseye me-2"></i>Goals</h6>
+                            <h6 class="mb-0"><i class="fas fa-bullseye me-2"></i>Goals Summary</h6>
                         </div>
-                        <div class="card-body">
-                            <div class="row text-center">
-                                <div class="col-6">
-                                    <h4 class="text-success">${teamStats.goalsFor || stats.totalGoals}</h4>
-                                    <small class="text-muted">Goals For</small>
-                                </div>
-                                <div class="col-6">
-                                    <h4 class="text-danger">${teamStats.goalsAgainst || 0}</h4>
-                                    <small class="text-muted">Goals Against</small>
-                                </div>
+                        <div class="card-body p-2 p-sm-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-success fw-bold">${teamStats.goalsFor || stats.totalGoals} For</span>
+                                <span class="text-muted">vs</span>
+                                <span class="text-danger fw-bold">${teamStats.goalsAgainst || 0} Against</span>
                             </div>
-                            <hr>
                             <div class="text-center">
-                                <h5 class="mb-0">${(teamStats.goalsFor || stats.totalGoals) - (teamStats.goalsAgainst || 0)}</h5>
-                                <small class="text-muted">Goal Difference</small>
+                                <span class="badge ${(teamStats.goalsFor || stats.totalGoals) - (teamStats.goalsAgainst || 0) >= 0 ? 'bg-success' : 'bg-danger'} fs-6">
+                                    ${(teamStats.goalsFor || stats.totalGoals) - (teamStats.goalsAgainst || 0) >= 0 ? '+' : ''}${(teamStats.goalsFor || stats.totalGoals) - (teamStats.goalsAgainst || 0)} Goal Difference
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -596,9 +596,9 @@ class StatisticsModal {
                         <div class="card-header">
                             <h6 class="mb-0"><i class="fas fa-percentage me-2"></i>Win Rate</h6>
                         </div>
-                        <div class="card-body text-center">
-                            <h2 class="text-primary mb-2">${teamStats.winPercentage || '0'}%</h2>
-                            <p class="text-muted mb-0">
+                        <div class="card-body text-center p-2 p-sm-3">
+                            <h3 class="text-primary mb-1">${teamStats.winPercentage || '0'}%</h3>
+                            <p class="text-muted mb-0 small">
                                 ${teamStats.wins || 0} wins out of ${teamStats.totalMatches || stats.totalMatches} matches
                             </p>
                         </div>
@@ -606,28 +606,52 @@ class StatisticsModal {
                 </div>
             </div>
 
+            <!-- Opponents Played -->
+            ${opponents.length > 0 ? `
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-users me-2"></i>Teams Played Against (${opponents.length})</h6>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="d-flex flex-wrap gap-1">
+                            ${opponents.map(opponent => `
+                                <span class="badge bg-secondary text-wrap">${this._escapeHtml(opponent)}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            ` : ''}
+
             <!-- Average Statistics -->
             <div class="card">
                 <div class="card-header">
                     <h6 class="mb-0"><i class="fas fa-chart-line me-2"></i>Averages Per Match</h6>
                 </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-3">
-                            <h5 class="text-success">${teamStats.avgGoalsFor || '0.0'}</h5>
-                            <small class="text-muted">Goals Scored</small>
+                <div class="card-body p-2">
+                    <div class="row text-center g-2">
+                        <div class="col-6 col-sm-3">
+                            <div class="p-2">
+                                <h6 class="text-success mb-0">${teamStats.avgGoalsFor || '0.0'}</h6>
+                                <small class="text-muted">Goals Scored</small>
+                            </div>
                         </div>
-                        <div class="col-3">
-                            <h5 class="text-danger">${teamStats.avgGoalsAgainst || '0.0'}</h5>
-                            <small class="text-muted">Goals Conceded</small>
+                        <div class="col-6 col-sm-3">
+                            <div class="p-2">
+                                <h6 class="text-danger mb-0">${teamStats.avgGoalsAgainst || '0.0'}</h6>
+                                <small class="text-muted">Goals Conceded</small>
+                            </div>
                         </div>
-                        <div class="col-3">
-                            <h5 class="text-info">${teamStats.avgAttendance || '0.0'}</h5>
-                            <small class="text-muted">Attendance</small>
+                        <div class="col-6 col-sm-3">
+                            <div class="p-2">
+                                <h6 class="text-info mb-0">${teamStats.avgAttendance || '0.0'}</h6>
+                                <small class="text-muted">Attendance</small>
+                            </div>
                         </div>
-                        <div class="col-3">
-                            <h5 class="text-warning">${teamStats.avgAssists || '0.0'}</h5>
-                            <small class="text-muted">Assists</small>
+                        <div class="col-6 col-sm-3">
+                            <div class="p-2">
+                                <h6 class="text-warning mb-0">${teamStats.avgAssists || '0.0'}</h6>
+                                <small class="text-muted">Assists</small>
+                            </div>
                         </div>
                     </div>
                 </div>

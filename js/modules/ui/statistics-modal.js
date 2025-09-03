@@ -94,36 +94,34 @@ class StatisticsModal {
                             </div>
                             
                             <!-- Navigation Tabs -->
-                            <ul class="nav nav-tabs mb-3 flex-nowrap" id="statsNavTabs" style="overflow-x: auto;">
-                                <li class="nav-item me-1">
-                                    <button class="nav-link active px-2 py-2" data-view="overview">
-                                        <i class="fas fa-tachometer-alt me-1 d-none d-sm-inline"></i>
-                                        <span class="d-none d-sm-inline">Overview</span>
-                                        <span class="d-sm-none">Over</span>
-                                    </button>
-                                </li>
-                                <li class="nav-item me-1">
-                                    <button class="nav-link px-2 py-2" data-view="players">
-                                        <i class="fas fa-users me-1 d-none d-sm-inline"></i>
-                                        <span class="d-none d-sm-inline">Players</span>
-                                        <span class="d-sm-none">Play</span>
-                                    </button>
-                                </li>
-                                <li class="nav-item me-1">
-                                    <button class="nav-link px-2 py-2" data-view="teams">
-                                        <i class="fas fa-shield-alt me-1 d-none d-sm-inline"></i>
-                                        <span class="d-none d-sm-inline">Teams</span>
-                                        <span class="d-sm-none">Team</span>
-                                    </button>
-                                </li>
-                                <li class="nav-item">
-                                    <button class="nav-link px-2 py-2" data-view="matches">
-                                        <i class="fas fa-calendar-alt me-1 d-none d-sm-inline"></i>
-                                        <span class="d-none d-sm-inline">Per Match</span>
-                                        <span class="d-sm-none">Match</span>
-                                    </button>
-                                </li>
-                            </ul>
+                            <div class="d-flex justify-content-center mb-3">
+                                <ul class="nav nav-tabs flex-nowrap" id="statsNavTabs" style="overflow-x: auto;">
+                                    <li class="nav-item me-1">
+                                        <button class="nav-link active px-3 py-2 text-center" data-view="overview">
+                                            <i class="fas fa-tachometer-alt d-block d-sm-inline me-sm-1"></i>
+                                            <span class="d-block d-sm-inline small">Overview</span>
+                                        </button>
+                                    </li>
+                                    <li class="nav-item me-1">
+                                        <button class="nav-link px-3 py-2 text-center" data-view="players">
+                                            <i class="fas fa-users d-block d-sm-inline me-sm-1"></i>
+                                            <span class="d-block d-sm-inline small">Players</span>
+                                        </button>
+                                    </li>
+                                    <li class="nav-item me-1">
+                                        <button class="nav-link px-3 py-2 text-center" data-view="teams">
+                                            <i class="fas fa-shield-alt d-block d-sm-inline me-sm-1"></i>
+                                            <span class="d-block d-sm-inline small">Teams</span>
+                                        </button>
+                                    </li>
+                                    <li class="nav-item">
+                                        <button class="nav-link px-3 py-2 text-center" data-view="matches">
+                                            <i class="fas fa-calendar-alt d-block d-sm-inline me-sm-1"></i>
+                                            <span class="d-block d-sm-inline small">Matches</span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
 
                             <!-- Content Area -->
                             <div id="statistics-content">

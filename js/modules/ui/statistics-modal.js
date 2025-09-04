@@ -20,7 +20,7 @@ class StatisticsModal {
      */
     init() {
         if (this.isInitialized) return;
-        
+
         this._createModal();
         this.isInitialized = true;
     }
@@ -32,13 +32,13 @@ class StatisticsModal {
         if (!this.isInitialized) {
             this.init();
         }
-        
+
         // Load generated statistics
         await this._loadGeneratedStatistics();
-        
+
         // Update modal content
         await this._updateModalContent();
-        
+
         // Show the modal
         this.modalInstance.show();
     }
@@ -77,7 +77,7 @@ class StatisticsModal {
     _createModal() {
         const modalHtml = `
             <div class="modal fade" id="statistics-modal" tabindex="-1" aria-labelledby="statistics-modal-label" aria-hidden="true">
-                <div class="modal-dialog modal-fullscreen-lg-down modal-xl">
+                <div class="modal-dialog modal-fullscreen-sm-down modal-xl">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="statistics-modal-label">
@@ -94,28 +94,34 @@ class StatisticsModal {
                             </div>
                             
                             <!-- Navigation Tabs -->
-                            <ul class="nav nav-tabs mb-3" id="statsNavTabs">
-                                <li class="nav-item me-2">
-                                    <button class="nav-link active" data-view="overview">
-                                        <i class="fas fa-tachometer-alt me-1"></i>Overview
-                                    </button>
-                                </li>
-                                <li class="nav-item me-2">
-                                    <button class="nav-link" data-view="players">
-                                        <i class="fas fa-users me-1"></i>Players
-                                    </button>
-                                </li>
-                                <li class="nav-item me-2">
-                                    <button class="nav-link" data-view="teams">
-                                        <i class="fas fa-shield-alt me-1"></i>Teams
-                                    </button>
-                                </li>
-                                <li class="nav-item">
-                                    <button class="nav-link" data-view="matches">
-                                        <i class="fas fa-calendar-alt me-1"></i>Per Match
-                                    </button>
-                                </li>
-                            </ul>
+                            <div class="d-flex justify-content-center mb-3">
+                                <ul class="nav nav-tabs flex-nowrap" id="statsNavTabs" style="overflow-x: auto;">
+                                    <li class="nav-item me-1">
+                                        <button class="nav-link active px-1 px-sm-3 py-2 text-center" data-view="overview" style="min-width: 60px; font-size: 0.8rem;">
+                                            <i class="fas fa-tachometer-alt d-none d-sm-inline me-sm-1"></i>
+                                            <span>Over</span>
+                                        </button>
+                                    </li>
+                                    <li class="nav-item me-1">
+                                        <button class="nav-link px-1 px-sm-3 py-2 text-center" data-view="players" style="min-width: 60px; font-size: 0.8rem;">
+                                            <i class="fas fa-users d-none d-sm-inline me-sm-1"></i>
+                                            <span>Play</span>
+                                        </button>
+                                    </li>
+                                    <li class="nav-item me-1">
+                                        <button class="nav-link px-1 px-sm-3 py-2 text-center" data-view="teams" style="min-width: 60px; font-size: 0.8rem;">
+                                            <i class="fas fa-shield-alt d-none d-sm-inline me-sm-1"></i>
+                                            <span>Team</span>
+                                        </button>
+                                    </li>
+                                    <li class="nav-item">
+                                        <button class="nav-link px-1 px-sm-3 py-2 text-center" data-view="matches" style="min-width: 60px; font-size: 0.8rem;">
+                                            <i class="fas fa-calendar-alt d-none d-sm-inline me-sm-1"></i>
+                                            <span>Match</span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
 
                             <!-- Content Area -->
                             <div id="statistics-content">
@@ -135,10 +141,10 @@ class StatisticsModal {
         `;
 
         document.body.insertAdjacentHTML('beforeend', modalHtml);
-        
+
         const modalElement = document.getElementById('statistics-modal');
         this.modalInstance = CustomModal.getOrCreateInstance(modalElement);
-        
+
         this._bindEventListeners();
     }
 
@@ -152,7 +158,7 @@ class StatisticsModal {
         if (infoContainer) {
             infoContainer.innerHTML = await this._renderStatisticsInfo();
         }
-        
+
         // Update refresh button for admins
         const refreshContainer = document.getElementById('refresh-btn-container');
         if (refreshContainer) {
@@ -163,7 +169,7 @@ class StatisticsModal {
                         <i class="fas fa-sync-alt me-1"></i>Refresh
                     </button>
                 `;
-                
+
                 // Bind refresh button
                 const refreshBtn = document.getElementById('refreshStatsBtn');
                 if (refreshBtn) {
@@ -176,7 +182,7 @@ class StatisticsModal {
                 }
             }
         }
-        
+
         // Render initial content
         this._renderCurrentView();
     }
@@ -245,40 +251,48 @@ class StatisticsModal {
 
         return `
             <!-- Summary Cards -->
-            <div class="row g-3 mb-4">
+            <div class="row g-2 mb-3">
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
-                        <div class="card-body">
-                            <i class="fas fa-futbol text-primary fa-2x mb-2"></i>
-                            <h4 class="card-title text-primary">${stats.totalMatches}</h4>
-                            <p class="card-text small text-muted">Approved Matches</p>
+                        <div class="card-body py-2 py-md-3">
+                            <i class="fas fa-futbol text-primary mb-1 d-none d-sm-block"></i>
+                            <h5 class="card-title text-primary mb-0">${stats.totalMatches}</h5>
+                            <p class="card-text small text-muted mb-0">
+                                <span class="d-none d-sm-inline">Approved </span>Matches
+                            </p>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
-                        <div class="card-body">
-                            <i class="fas fa-bullseye text-success fa-2x mb-2"></i>
-                            <h4 class="card-title text-success">${stats.totalGoals}</h4>
-                            <p class="card-text small text-muted">Total Goals</p>
+                        <div class="card-body py-2 py-md-3">
+                            <i class="fas fa-bullseye text-success mb-1 d-none d-sm-block"></i>
+                            <h5 class="card-title text-success mb-0">${stats.totalGoals}</h5>
+                            <p class="card-text small text-muted mb-0">
+                                <span class="d-none d-sm-inline">Total </span>Goals
+                            </p>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
-                        <div class="card-body">
-                            <i class="fas fa-hands-helping text-info fa-2x mb-2"></i>
-                            <h4 class="card-title text-info">${stats.totalAssists}</h4>
-                            <p class="card-text small text-muted">Total Assists</p>
+                        <div class="card-body py-2 py-md-3">
+                            <i class="fas fa-hands-helping text-info mb-1 d-none d-sm-block"></i>
+                            <h5 class="card-title text-info mb-0">${stats.totalAssists}</h5>
+                            <p class="card-text small text-muted mb-0">
+                                <span class="d-none d-sm-inline">Total </span>Assists
+                            </p>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
-                        <div class="card-body">
-                            <i class="fas fa-users text-warning fa-2x mb-2"></i>
-                            <h4 class="card-title text-warning">${stats.playerStats.length}</h4>
-                            <p class="card-text small text-muted">Total Players</p>
+                        <div class="card-body py-2 py-md-3">
+                            <i class="fas fa-users text-warning mb-1 d-none d-sm-block"></i>
+                            <h5 class="card-title text-warning mb-0">${stats.playerStats.length}</h5>
+                            <p class="card-text small text-muted mb-0">
+                                <span class="d-none d-sm-inline">Total </span>Players
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -320,11 +334,11 @@ class StatisticsModal {
         if (!this.statistics) return this._renderNoDataMessage();
 
         const playerStats = this.statistics.playerStats;
-        
+
         if (!playerStats || !Array.isArray(playerStats)) {
             return '<p class="text-muted">No player statistics available</p>';
         }
-        
+
         const rosterPlayers = playerStats.filter(p => p.isRosterPlayer);
         const nonRosterPlayers = playerStats.filter(p => !p.isRosterPlayer);
 
@@ -374,26 +388,26 @@ class StatisticsModal {
                 <div class="card-header">
                     <h6 class="mb-0"><i class="fas fa-table me-2"></i>Player Statistics</h6>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-1 p-sm-3">
                     <div class="table-responsive">
                         <table class="table table-hover table-sm">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Player</th>
-                                    <th class="text-center" style="width: 80px;">Shirt</th>
-                                    <th class="text-center" style="width: 80px;">Apps</th>
-                                    <th class="text-center" style="width: 80px;">Goals</th>
-                                    <th class="text-center" style="width: 80px;">Assists</th>
-                                    <th class="text-center" style="width: 80px;">G+A</th>
-                                    <th class="text-center" style="width: 100px;">Goals/Game</th>
-                                    <th class="text-center" style="width: 100px;">Assists/Game</th>
+                                    <th class="small">Player</th>
+                                    <th class="text-center small d-none d-md-table-cell" style="width: 60px;">Shirt</th>
+                                    <th class="text-center small" style="width: 50px;">Apps</th>
+                                    <th class="text-center small" style="width: 50px;">G</th>
+                                    <th class="text-center small" style="width: 50px;">A</th>
+                                    <th class="text-center small" style="width: 50px;">G+A</th>
+                                    <th class="text-center small d-none d-lg-table-cell" style="width: 80px;">G/Game</th>
+                                    <th class="text-center small d-none d-lg-table-cell" style="width: 80px;">A/Game</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 ${this._renderPlayerRows(rosterPlayers, 'roster')}
                                 ${nonRosterPlayers.length > 0 ? `
                                     <tr class="table-secondary">
-                                        <td colspan="8" class="text-center fw-bold py-2">
+                                        <td colspan="8" class="text-center fw-bold py-2 small">
                                             <i class="fas fa-user-plus me-1"></i>Non-Roster Players
                                         </td>
                                     </tr>
@@ -417,21 +431,26 @@ class StatisticsModal {
 
             return `
                 <tr class="${rowClass}">
-                    <td>
+                    <td class="py-2">
                         <div class="d-flex align-items-center">
-                            <strong>${this._escapeHtml(player.name)}</strong>
-                            ${!player.isRosterPlayer ? '<i class="fas fa-user-plus text-warning ms-1" title="Non-roster player"></i>' : ''}
+                            <div>
+                                <div class="fw-bold small">${this._escapeHtml(player.name)}</div>
+                                <div class="d-md-none text-muted" style="font-size: 0.75rem;">
+                                    ${player.shirtNumber !== null ? `#${player.shirtNumber}` : ''}
+                                    ${!player.isRosterPlayer ? '<i class="fas fa-user-plus text-warning ms-1" title="Non-roster"></i>' : ''}
+                                </div>
+                            </div>
                         </div>
                     </td>
-                    <td class="text-center">
+                    <td class="text-center py-2 d-none d-md-table-cell">
                         ${player.shirtNumber !== null ? player.shirtNumber : '<span class="text-muted">-</span>'}
                     </td>
-                    <td class="text-center">${player.appearances}</td>
-                    <td class="text-center">${player.goals}</td>
-                    <td class="text-center">${player.assists}</td>
-                    <td class="text-center">${player.totalContributions}</td>
-                    <td class="text-center text-muted small">${player.goalsPerMatch}</td>
-                    <td class="text-center text-muted small">${player.assistsPerMatch}</td>
+                    <td class="text-center py-2">${player.appearances}</td>
+                    <td class="text-center py-2">${player.goals}</td>
+                    <td class="text-center py-2">${player.assists}</td>
+                    <td class="text-center py-2 fw-bold">${player.totalContributions}</td>
+                    <td class="text-center text-muted small py-2 d-none d-lg-table-cell">${player.goalsPerMatch}</td>
+                    <td class="text-center text-muted small py-2 d-none d-lg-table-cell">${player.assistsPerMatch}</td>
                 </tr>
             `;
         }).join('');
@@ -445,7 +464,7 @@ class StatisticsModal {
         if (!playerStats || !Array.isArray(playerStats)) {
             return '<p class="text-muted">No player data available</p>';
         }
-        
+
         const topScorers = playerStats
             .filter(p => p.goals > 0)
             .sort((a, b) => b.goals - a.goals)
@@ -474,7 +493,7 @@ class StatisticsModal {
         if (!playerStats || !Array.isArray(playerStats)) {
             return '<p class="text-muted">No player data available</p>';
         }
-        
+
         const topAssists = playerStats
             .filter(p => p.assists > 0)
             .sort((a, b) => b.assists - a.assists)
@@ -504,70 +523,69 @@ class StatisticsModal {
 
         const stats = this.statistics;
         const teamStats = stats.teamStats || {};
+        const matchStats = stats.matchStats || [];
+
+        // Get unique opponents
+        const opponents = [...new Set(matchStats.map(match => match.opposition))].filter(opp => opp && opp !== 'Unknown');
 
         return `
             <!-- Team Summary Cards -->
-            <div class="row g-3 mb-4">
+            <div class="row g-2 mb-3">
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
-                        <div class="card-body">
-                            <i class="fas fa-futbol text-primary fa-2x mb-2"></i>
-                            <h4 class="card-title text-primary">${teamStats.totalMatches || stats.totalMatches}</h4>
-                            <p class="card-text small text-muted">Matches Played</p>
+                        <div class="card-body py-2 py-md-3">
+                            <i class="fas fa-futbol text-primary mb-1 d-none d-sm-block"></i>
+                            <h5 class="card-title text-primary mb-0">${teamStats.totalMatches || stats.totalMatches}</h5>
+                            <p class="card-text small text-muted mb-0">Matches</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
-                        <div class="card-body">
-                            <i class="fas fa-trophy text-success fa-2x mb-2"></i>
-                            <h4 class="card-title text-success">${teamStats.wins || 0}</h4>
-                            <p class="card-text small text-muted">Wins</p>
+                        <div class="card-body py-2 py-md-3">
+                            <i class="fas fa-trophy text-success mb-1 d-none d-sm-block"></i>
+                            <h5 class="card-title text-success mb-0">${teamStats.wins || 0}</h5>
+                            <p class="card-text small text-muted mb-0">Wins</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
-                        <div class="card-body">
-                            <i class="fas fa-handshake text-warning fa-2x mb-2"></i>
-                            <h4 class="card-title text-warning">${teamStats.draws || 0}</h4>
-                            <p class="card-text small text-muted">Draws</p>
+                        <div class="card-body py-2 py-md-3">
+                            <i class="fas fa-handshake text-warning mb-1 d-none d-sm-block"></i>
+                            <h5 class="card-title text-warning mb-0">${teamStats.draws || 0}</h5>
+                            <p class="card-text small text-muted mb-0">Draws</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="card text-center">
-                        <div class="card-body">
-                            <i class="fas fa-times text-danger fa-2x mb-2"></i>
-                            <h4 class="card-title text-danger">${teamStats.losses || 0}</h4>
-                            <p class="card-text small text-muted">Losses</p>
+                        <div class="card-body py-2 py-md-3">
+                            <i class="fas fa-times text-danger mb-1 d-none d-sm-block"></i>
+                            <h5 class="card-title text-danger mb-0">${teamStats.losses || 0}</h5>
+                            <p class="card-text small text-muted mb-0">Losses</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Team Performance -->
-            <div class="row g-3 mb-4">
+            <div class="row g-3 mb-3">
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-header">
-                            <h6 class="mb-0"><i class="fas fa-bullseye me-2"></i>Goals</h6>
+                            <h6 class="mb-0"><i class="fas fa-bullseye me-2"></i>Goals Summary</h6>
                         </div>
-                        <div class="card-body">
-                            <div class="row text-center">
-                                <div class="col-6">
-                                    <h4 class="text-success">${teamStats.goalsFor || stats.totalGoals}</h4>
-                                    <small class="text-muted">Goals For</small>
-                                </div>
-                                <div class="col-6">
-                                    <h4 class="text-danger">${teamStats.goalsAgainst || 0}</h4>
-                                    <small class="text-muted">Goals Against</small>
-                                </div>
+                        <div class="card-body p-2 p-sm-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-success fw-bold">${teamStats.goalsFor || stats.totalGoals} For</span>
+                                <span class="text-muted">vs</span>
+                                <span class="text-danger fw-bold">${teamStats.goalsAgainst || 0} Against</span>
                             </div>
-                            <hr>
                             <div class="text-center">
-                                <h5 class="mb-0">${(teamStats.goalsFor || stats.totalGoals) - (teamStats.goalsAgainst || 0)}</h5>
-                                <small class="text-muted">Goal Difference</small>
+                                <span class="badge ${(teamStats.goalsFor || stats.totalGoals) - (teamStats.goalsAgainst || 0) >= 0 ? 'bg-success' : 'bg-danger'} fs-6">
+                                    ${(teamStats.goalsFor || stats.totalGoals) - (teamStats.goalsAgainst || 0) >= 0 ? '+' : ''}${(teamStats.goalsFor || stats.totalGoals) - (teamStats.goalsAgainst || 0)} Goal Difference
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -577,9 +595,9 @@ class StatisticsModal {
                         <div class="card-header">
                             <h6 class="mb-0"><i class="fas fa-percentage me-2"></i>Win Rate</h6>
                         </div>
-                        <div class="card-body text-center">
-                            <h2 class="text-primary mb-2">${teamStats.winPercentage || '0'}%</h2>
-                            <p class="text-muted mb-0">
+                        <div class="card-body text-center p-2 p-sm-3">
+                            <h3 class="text-primary mb-1">${teamStats.winPercentage || '0'}%</h3>
+                            <p class="text-muted mb-0 small">
                                 ${teamStats.wins || 0} wins out of ${teamStats.totalMatches || stats.totalMatches} matches
                             </p>
                         </div>
@@ -587,28 +605,52 @@ class StatisticsModal {
                 </div>
             </div>
 
+            <!-- Opponents Played -->
+            ${opponents.length > 0 ? `
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-users me-2"></i>Teams Played Against (${opponents.length})</h6>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="d-flex flex-wrap gap-1">
+                            ${opponents.map(opponent => `
+                                <span class="badge bg-secondary text-wrap">${this._escapeHtml(opponent)}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            ` : ''}
+
             <!-- Average Statistics -->
             <div class="card">
                 <div class="card-header">
                     <h6 class="mb-0"><i class="fas fa-chart-line me-2"></i>Averages Per Match</h6>
                 </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-3">
-                            <h5 class="text-success">${teamStats.avgGoalsFor || '0.0'}</h5>
-                            <small class="text-muted">Goals Scored</small>
+                <div class="card-body p-2">
+                    <div class="row text-center g-2">
+                        <div class="col-6 col-sm-3">
+                            <div class="p-2">
+                                <h6 class="text-success mb-0">${teamStats.avgGoalsFor || '0.0'}</h6>
+                                <small class="text-muted">Goals Scored</small>
+                            </div>
                         </div>
-                        <div class="col-3">
-                            <h5 class="text-danger">${teamStats.avgGoalsAgainst || '0.0'}</h5>
-                            <small class="text-muted">Goals Conceded</small>
+                        <div class="col-6 col-sm-3">
+                            <div class="p-2">
+                                <h6 class="text-danger mb-0">${teamStats.avgGoalsAgainst || '0.0'}</h6>
+                                <small class="text-muted">Goals Conceded</small>
+                            </div>
                         </div>
-                        <div class="col-3">
-                            <h5 class="text-info">${teamStats.avgAttendance || '0.0'}</h5>
-                            <small class="text-muted">Attendance</small>
+                        <div class="col-6 col-sm-3">
+                            <div class="p-2">
+                                <h6 class="text-info mb-0">${teamStats.avgAttendance || '0.0'}</h6>
+                                <small class="text-muted">Attendance</small>
+                            </div>
                         </div>
-                        <div class="col-3">
-                            <h5 class="text-warning">${teamStats.avgAssists || '0.0'}</h5>
-                            <small class="text-muted">Assists</small>
+                        <div class="col-6 col-sm-3">
+                            <div class="p-2">
+                                <h6 class="text-warning mb-0">${teamStats.avgAssists || '0.0'}</h6>
+                                <small class="text-muted">Assists</small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -682,28 +724,100 @@ class StatisticsModal {
                 <div class="card-header">
                     <h6 class="mb-0"><i class="fas fa-list me-2"></i>Match by Match Statistics</h6>
                 </div>
-                <div class="card-body p-2">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-sm mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th style="width: 90px;" class="small">Date</th>
-                                    <th class="small">Opposition</th>
-                                    <th class="text-center small" style="width: 70px;">Result</th>
-                                    <th class="text-center small" style="width: 50px;">G</th>
-                                    <th class="text-center small" style="width: 50px;">A</th>
-                                    <th class="text-center small" style="width: 60px;">Att.</th>
-                                    <th class="small" style="width: 120px;">Top Scorer</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${this._renderMatchRows(matchStats)}
-                            </tbody>
-                        </table>
+                <div class="card-body p-1 p-sm-2">
+                    <!-- Mobile Card View (visible on small screens) -->
+                    <div class="d-sm-none">
+                        ${this._renderMatchCards(matchStats)}
+                    </div>
+                    
+                    <!-- Desktop Table View (hidden on small screens) -->
+                    <div class="d-none d-sm-block">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-sm mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 90px;" class="small">Date</th>
+                                        <th class="small">Opposition</th>
+                                        <th class="text-center small" style="width: 70px;">Result</th>
+                                        <th class="text-center small" style="width: 50px;">G</th>
+                                        <th class="text-center small" style="width: 50px;">A</th>
+                                        <th class="text-center small" style="width: 60px;">Att.</th>
+                                        <th class="small" style="width: 120px;">Top Scorer</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${this._renderMatchRows(matchStats)}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
+    }
+
+    /**
+     * Render match cards for mobile view
+     * @private
+     */
+    _renderMatchCards(matchStats) {
+        return matchStats.map((match, index) => {
+            const date = match.date || match.matchDate || 'Unknown';
+            const opposition = match.opposition || match.opponent || 'Unknown';
+            const ourGoals = match.ourGoals || match.goalsFor || 0;
+            const theirGoals = match.theirGoals || match.goalsAgainst || 0;
+            const attendance = match.attendance || 0;
+            const topScorer = match.topScorer || 'None';
+
+            // Determine result styling
+            let resultClass = 'text-muted';
+            let resultText = `${ourGoals}-${theirGoals}`;
+            let resultBadge = 'secondary';
+
+            if (ourGoals > theirGoals) {
+                resultClass = 'text-success fw-bold';
+                resultText = `W ${ourGoals}-${theirGoals}`;
+                resultBadge = 'success';
+            } else if (ourGoals < theirGoals) {
+                resultClass = 'text-danger fw-bold';
+                resultText = `L ${ourGoals}-${theirGoals}`;
+                resultBadge = 'danger';
+            } else if (ourGoals === theirGoals && ourGoals > 0) {
+                resultClass = 'text-warning fw-bold';
+                resultText = `D ${ourGoals}-${theirGoals}`;
+                resultBadge = 'warning';
+            }
+
+            return `
+                <div class="card mb-2 border-start border-3 border-${resultBadge}">
+                    <div class="card-body p-2">
+                        <div class="row align-items-center">
+                            <div class="col-8">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <h6 class="mb-0 fw-bold">${this._escapeHtml(opposition)}</h6>
+                                    <span class="badge bg-${resultBadge} ms-2">${resultText}</span>
+                                </div>
+                                <small class="text-muted">${this._formatDate(date)}</small>
+                            </div>
+                            <div class="col-4 text-end">
+                                <div class="small">
+                                    <div><i class="fas fa-bullseye text-success me-1"></i>${ourGoals}</div>
+                                    <div><i class="fas fa-hands-helping text-info me-1"></i>${match.assists || 0}</div>
+                                    <div><i class="fas fa-users text-warning me-1"></i>${attendance}</div>
+                                </div>
+                            </div>
+                        </div>
+                        ${topScorer !== 'None' ? `
+                            <div class="mt-1">
+                                <small class="text-muted">
+                                    <i class="fas fa-trophy me-1"></i>${this._escapeHtml(topScorer)}
+                                </small>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
     }
 
     /**
@@ -718,11 +832,11 @@ class StatisticsModal {
             const theirGoals = match.theirGoals || match.goalsAgainst || 0;
             const attendance = match.attendance || 0;
             const topScorer = match.topScorer || 'None';
-            
+
             // Determine result styling
             let resultClass = 'text-muted';
             let resultText = `${ourGoals}-${theirGoals}`;
-            
+
             if (ourGoals > theirGoals) {
                 resultClass = 'text-success fw-bold';
                 resultText = `W ${ourGoals}-${theirGoals}`;
@@ -757,10 +871,10 @@ class StatisticsModal {
     _formatDate(dateStr) {
         try {
             const date = new Date(dateStr);
-            return date.toLocaleDateString('en-GB', { 
-                day: '2-digit', 
-                month: '2-digit', 
-                year: '2-digit' 
+            return date.toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: '2-digit'
             });
         } catch (error) {
             return dateStr;
@@ -792,12 +906,12 @@ class StatisticsModal {
             modalElement.addEventListener('click', (e) => {
                 if (e.target.matches('#statsNavTabs .nav-link')) {
                     e.preventDefault();
-                    
+
                     // Update active tab
                     const tabButtons = modalElement.querySelectorAll('#statsNavTabs .nav-link');
                     tabButtons.forEach(btn => btn.classList.remove('active'));
                     e.target.classList.add('active');
-                    
+
                     // Update current view
                     this.currentView = e.target.getAttribute('data-view');
                     this._renderCurrentView();
@@ -831,7 +945,7 @@ class StatisticsModal {
             default:
                 html = await this._renderInitialContent();
         }
-        
+
         content.innerHTML = html;
     }
 

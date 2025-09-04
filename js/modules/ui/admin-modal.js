@@ -1379,9 +1379,12 @@ const calculateStatisticsFromMatches = async (matches) => {
             }
         });
         
+        const opposition = match.team2name || match.opposition || match.opponent || 'Unknown';
+        console.log(`Match ${index}: team2name="${match.team2name}", opposition="${match.opposition}", opponent="${match.opponent}", final="${opposition}"`);
+        
         return {
             date: match.date || match.matchDate || match.savedAt,
-            opposition: match.team2name || match.opposition || match.opponent || 'Unknown',
+            opposition: opposition,
             ourGoals: matchGoalsFor,
             theirGoals: matchGoalsAgainst,
             assists: matchAssists,

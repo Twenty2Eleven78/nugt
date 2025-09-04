@@ -10,7 +10,9 @@ const modalHtml = `
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="admin-modal-label">Admin Dashboard</h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn btn-danger btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-times" style="font-size: 14px;"></i>
+                </button>
             </div>
             
             <div class="modal-body">
@@ -71,7 +73,9 @@ const modalHtml = `
                 <h5 class="modal-title">
                     <i class="fas fa-trash"></i> Confirm Deletion
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn btn-light btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-times text-danger" style="font-size: 14px;"></i>
+                </button>
             </div>
             <div class="modal-body">
                 <p>Are you sure you want to delete this match?</p>
@@ -100,7 +104,9 @@ const modalHtml = `
                 <h5 class="modal-title">
                     <i class="fas fa-exchange-alt"></i> Transfer Match
                 </h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn btn-danger btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-times text-white" style="font-size: 14px;"></i>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">

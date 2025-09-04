@@ -46,7 +46,9 @@ class RosterModal {
               <h4 class="modal-title modal-title-enhanced">
                 <i class="fas fa-users me-2"></i>Team Roster Management
               </h4>
-              <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn btn-danger btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-times" style="font-size: 14px;"></i>
+              </button>
             </div>
             <div class="modal-body">
               <h5>Add New Player</h5>
@@ -103,7 +105,9 @@ class RosterModal {
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="editPlayerModalLabel"><i class="fas fa-user-edit me-2"></i>Edit Player</h5>
-              <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn btn-danger btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-times" style="font-size: 14px;"></i>
+              </button>
             </div>
             <div class="modal-body">
               <form id="editPlayerForm">

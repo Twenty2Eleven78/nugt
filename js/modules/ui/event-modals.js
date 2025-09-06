@@ -68,9 +68,12 @@ class EventModals {
 
     // Add modal to DOM
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
+
     // Initialize custom modal
     this.recordEventModal = CustomModal.getOrCreateInstance('recordEventModal');
+
+    // Note: Form submission is handled by the unified event manager
+    // The event listener is bound in the unified-events.js _bindModalEvents method
   }
 
   /**
@@ -125,21 +128,12 @@ class EventModals {
 
     // Add modal to DOM
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
+
     // Initialize custom modal
     this.editEventModal = CustomModal.getOrCreateInstance('editEventModal');
-    
-    // Attach form submission event listener
-    const editEventForm = document.getElementById('editEventForm');
-    if (editEventForm) {
-      editEventForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        // Import the events manager dynamically to avoid circular imports
-        const { combinedEventsManager } = await import('../match/combined-events.js');
-        combinedEventsManager.handleEditEventFormSubmission(e);
-      });
-    }
+
+    // Note: Form submission is handled by the unified event manager
+    // The event listener is bound in the unified-events.js _bindModalEvents method
   }
 
   /**
@@ -162,7 +156,7 @@ class EventModals {
       if (timeInput && eventData) {
         timeInput.value = eventData.time || '';
       }
-      
+
       this.editEventModal.show();
     }
   }
@@ -202,7 +196,7 @@ class EventModals {
   getRecordEventFormData() {
     const eventType = document.getElementById('eventTypeSelect')?.value;
     const notes = document.getElementById('eventNotes')?.value;
-    
+
     return {
       eventType,
       notes: notes || ''
@@ -215,7 +209,7 @@ class EventModals {
    */
   getEditEventFormData() {
     const time = document.getElementById('editEventTime')?.value;
-    
+
     return {
       time: parseInt(time) || 0
     };

@@ -21,7 +21,7 @@ import { timerController } from './game/timer.js';
 
 // Match modules
 import { goalManager, toggleGoalDisallowed } from './match/goals.js';
-import { combinedEventsManager as eventsManager, updateMatchLog, deleteLogEntry } from './match/combined-events.js';
+import { eventManager as eventsManager, updateMatchLog, deleteLogEntry } from './match/unified-events.js';
 import { teamManager } from './match/teams.js';
 import { rosterManager } from './match/roster.js';
 

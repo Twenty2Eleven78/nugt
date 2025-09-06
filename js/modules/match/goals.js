@@ -9,7 +9,7 @@ import { domCache } from '../shared/dom.js';
 import { getCurrentSeconds, formatMatchTime } from '../shared/utils.js';
 import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from '../ui/modals.js';
-import { updateMatchLog, combinedEventsManager } from './combined-events.js';
+import { updateMatchLog, eventManager as combinedEventsManager } from './unified-events.js';
 import { attendanceManager } from '../services/attendance.js';
 
 // Goal management class

@@ -8,7 +8,7 @@ import { storage } from '../data/storage.js';
 import { domCache } from '../shared/dom.js';
 import { STORAGE_KEYS, GAME_CONFIG } from '../shared/constants.js';
 import { notificationManager } from '../services/notifications.js';
-import { updateMatchLog } from './combined-events.js';
+import { updateMatchLog } from './unified-events.js';
 
 // Team management class
 class TeamManager {

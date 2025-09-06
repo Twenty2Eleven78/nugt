@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Integration Test</title>
+</head>
+<body>
+    <h1>EventsModule Global Integration Test</h1>
+    
+    <div id="test-results"></div>
+    
+    <!-- Test buttons that simulate the HTML onclick handlers -->
+    <button onclick="testEventModuleIntegration()">Test EventsModule Integration</button>
+    <button onclick="testGoalsModuleIntegration()">Test GoalsModule Integration</button>
+    
+    <!-- Simulate the actual onclick handlers used in the timeline -->
+    <button onclick="window.EventsModule.openEditEventModal(0, 'matchEvent')">Test Edit Event</button>
+    <button onclick="window.EventsModule.deleteLogEntry(0, 'matchEvent')">Test Delete Event</button>
+    <button onclick="window.EventsModule.showRecordEventModal()">Test Record Event</button>
+    <button onclick="window.GoalsModule.toggleGoalDisallowed(0)">Test Toggle Goal</button>
+
+    <script type="module">
+        // Import the unified events module to test global integration
+        import './js/modules/match/unified-events.js';
+        
+        // Test functions
+        window.testEventModuleIntegration = function() {
+            const results = document.getElementById('test-results');
+            
+            if (window.EventsModule) {
+                results.innerHTML += '<p>✅ window.EventsModule exists</p>';
+                
+                // Test critical methods
+                const methods = ['openEditEventModal', 'deleteLogEntry', 'showRecordEventModal', 'addMatchEvent'];
+                methods.forEach(method => {
+                    if (typeof window.EventsModule[method] === 'function') {
+                        results.innerHTML += `<p>✅ window.EventsModule.${method} is available</p>`;
+                    } else {
+                        results.innerHTML += `<p>❌ window.EventsModule.${method} is missing</p>`;
+                    }
+                });
+                
+                // Test the built-in integration test
+                if (typeof window.EventsModule.testGlobalIntegration === 'function') {
+                    const testResult = window.EventsModule.testGlobalIntegration();
+                    results.innerHTML += `<p>🧪 Integration test result: ${testResult.success ? '✅ PASSED' : '❌ FAILED'}</p>`;
+                }
+            } else {
+                results.innerHTML += '<p>❌ window.EventsModule not found</p>';
+            }
+        };
+        
+        window.testGoalsModuleIntegration = function() {
+            const results = document.getElementById('test-results');
+            
+            if (window.GoalsModule && typeof window.GoalsModule.toggleGoalDisallowed === 'function') {
+                results.innerHTML += '<p>✅ window.GoalsModule.toggleGoalDisallowed is available</p>';
+            } else {
+                results.innerHTML += '<p>⚠️ window.GoalsModule.toggleGoalDisallowed not available (expected until goals.js loads)</p>';
+            }
+        };
+        
+        // Auto-run tests when module loads
+        setTimeout(() => {
+            testEventModuleIntegration();
+            testGoalsModuleIntegration();
+        }, 100);
+    </script>
+</body>
+</html>

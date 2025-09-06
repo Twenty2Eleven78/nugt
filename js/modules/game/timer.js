@@ -9,7 +9,7 @@ import { domCache } from '../shared/dom.js';
 import { formatTime, getCurrentSeconds } from '../shared/utils.js';
 import { GAME_CONFIG, EVENT_TYPES } from '../shared/constants.js';
 import { notificationManager } from '../services/notifications.js';
-import { combinedEventsManager } from '../match/combined-events.js';
+import { eventManager as combinedEventsManager } from '../match/unified-events.js';
 
 // Timer controller class
 class TimerController {

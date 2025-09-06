@@ -14,7 +14,7 @@ import { rosterManager } from '../match/roster.js';
 import { timerController } from '../game/timer.js';
 import { teamManager } from '../match/teams.js';
 import { attendanceManager } from '../services/attendance.js';
-import { combinedEventsManager, updateMatchLog } from '../match/combined-events.js';
+import { eventManager as combinedEventsManager, updateMatchLog } from '../match/unified-events.js';
 import { formatTime, debounce } from '../shared/utils.js';
 
 class NewMatchModal {

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Integration Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { margin: 5px; padding: 10px 15px; }
+    </style>
+</head>
+<body>
+    <h1>Modal Integration Test</h1>
+    <div id="test-results"></div>
+    
+    <h2>Manual Tests</h2>
+    <button onclick="testShowRecordModal()">Test Show Record Modal</button>
+    <button onclick="testShowEditModal()">Test Show Edit Modal</button>
+    <button onclick="testGetEventModals()">Test Get Event Modals</button>
+
+    <script type="module">
+        import { eventManager } from './js/modules/match/unified-events.js';
+        
+        const results = document.getElementById('test-results');
+        
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+        
+        // Test 1: Check if eventManager is available
+        try {
+            if (eventManager) {
+                addResult('✓ Event manager imported successfully', 'success');
+            } else {
+                addResult('✗ Event manager not available', 'error');
+            }
+        } catch (error) {
+            addResult(`✗ Error importing event manager: ${error.message}`, 'error');
+        }
+        
+        // Test 2: Check if modal methods exist
+        try {
+            if (typeof eventManager.showRecordEventModal === 'function') {
+                addResult('✓ showRecordEventModal method available', 'success');
+            } else {
+                addResult('✗ showRecordEventModal method missing', 'error');
+            }
+            
+            if (typeof eventManager.openEditEventModal === 'function') {
+                addResult('✓ openEditEventModal method available', 'success');
+            } else {
+                addResult('✗ openEditEventModal method missing', 'error');
+            }
+            
+            if (typeof eventManager.getEventModals === 'function') {
+                addResult('✓ getEventModals method available', 'success');
+            } else {
+                addResult('✗ getEventModals method missing', 'error');
+            }
+        } catch (error) {
+            addResult(`✗ Error checking methods: ${error.message}`, 'error');
+        }
+        
+        // Test 3: Initialize event manager
+        try {
+            eventManager.init();
+            addResult('✓ Event manager initialized successfully', 'success');
+        } catch (error) {
+            addResult(`✗ Error initializing event manager: ${error.message}`, 'error');
+        }
+        
+        // Test 4: Check if event modals instance is available
+        try {
+            const modals = eventManager.getEventModals();
+            if (modals) {
+                addResult('✓ Event modals instance available', 'success');
+            } else {
+                addResult('✗ Event modals instance not available', 'error');
+            }
+        } catch (error) {
+            addResult(`✗ Error getting event modals: ${error.message}`, 'error');
+        }
+        
+        // Make functions available globally for button tests
+        window.testShowRecordModal = function() {
+            try {
+                eventManager.showRecordEventModal();
+                addResult('✓ Show record modal called successfully', 'success');
+            } catch (error) {
+                addResult(`✗ Error showing record modal: ${error.message}`, 'error');
+            }
+        };
+        
+        window.testShowEditModal = function() {
+            try {
+                // Test with dummy data
+                eventManager.openEditEventModal(0, 'matchEvent');
+                addResult('✓ Show edit modal called successfully', 'success');
+            } catch (error) {
+                addResult(`✗ Error showing edit modal: ${error.message}`, 'error');
+            }
+        };
+        
+        window.testGetEventModals = function() {
+            try {
+                const modals = eventManager.getEventModals();
+                addResult(`✓ Event modals retrieved: ${typeof modals}`, 'success');
+            } catch (error) {
+                addResult(`✗ Error getting event modals: ${error.message}`, 'error');
+            }
+        };
+    </script>
+</body>
+</html>

@@ -2418,6 +2418,110 @@ body {
 }
 
 /* Marker Variants */
+
+/* Event Type Specific Markers */
+.card-event-marker {
+    background: var(--warning-color);
+    box-shadow: 0 0 0 3px rgba(var(--warning-color-rgb), 0.3);
+}
+
+.foul-event-marker {
+    background: var(--warning-color);
+    box-shadow: 0 0 0 3px rgba(var(--warning-color-rgb), 0.2);
+}
+
+.penalty-event-marker {
+    background: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.3);
+}
+
+.incident-event-marker {
+    background: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(var(--secondary-color-rgb), 0.3);
+}
+
+.system-event-marker {
+    background: var(--info-color);
+    box-shadow: 0 0 0 3px rgba(var(--info-color-rgb), 0.3);
+}
+
+.disciplinary-event-marker {
+    background: var(--info-color);
+    box-shadow: 0 0 0 3px rgba(var(--info-color-rgb), 0.3);
+}
+
+.general-event-marker {
+    background: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(var(--secondary-color-rgb), 0.2);
+}
+
+/* Goal Specific Markers */
+.goal-marker-team {
+    background: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(var(--success-color-rgb), 0.4);
+}
+
+.goal-marker-opposition {
+    background: var(--danger-color);
+    box-shadow: 0 0 0 3px rgba(var(--danger-color-rgb), 0.4);
+}
+
+.goal-marker-disallowed {
+    background: var(--warning-color);
+    box-shadow: 0 0 0 3px rgba(var(--warning-color-rgb), 0.4);
+}
+
+/* Event Type Specific Content Styling */
+.card-event {
+    border-left: 4px solid var(--warning-color);
+}
+
+.foul-event {
+    border-left: 4px solid var(--warning-color);
+}
+
+.penalty-event {
+    border-left: 4px solid var(--primary-color);
+}
+
+.incident-event {
+    border-left: 4px solid var(--secondary-color);
+}
+
+.system-event {
+    border-left: 4px solid var(--info-color);
+    background: rgba(var(--info-color-rgb), 0.05);
+}
+
+.disciplinary-event {
+    border-left: 4px solid var(--info-color);
+}
+
+.general-event {
+    border-left: 4px solid var(--secondary-color);
+}
+
+.goal-event {
+    border-left: 4px solid var(--success-color);
+}
+
+.goal-event.border-danger {
+    border-left-color: var(--danger-color);
+}
+
+.goal-event.border-warning {
+    border-left-color: var(--warning-color);
+}
+
+/* Optimized Timeline Performance */
+.optimized-timeline {
+    will-change: transform;
+    contain: layout style paint;
+}
+
+.optimized-timeline .timeline-item {
+    contain: layout style;
+}
 .marker-success {
     background: var(--success-color);
     box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.3);
@@ -3103,4 +3207,108 @@ nsure transfer match modal appears above admin modal */
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+/* ===== DOM OPTIMIZATION STYLES ===== */
+
+/* Statistics update animation */
+.stat-updated {
+    animation: statUpdate 0.3s ease-out;
+}
+
+@keyframes statUpdate {
+    0% {
+        transform: scale(1);
+        background-color: var(--bg-card);
+    }
+    50% {
+        transform: scale(1.05);
+        background-color: rgba(var(--theme-primary-rgb), 0.1);
+    }
+    100% {
+        transform: scale(1);
+        background-color: var(--bg-card);
+    }
+}
+
+/* Timeline optimization classes */
+.optimized-timeline {
+    contain: layout style;
+    will-change: transform;
+}
+
+.timeline-item {
+    contain: layout;
+}
+
+/* Cache indicator for development */
+.cache-indicator {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    padding: 4px 8px;
+    font-size: 10px;
+    border-radius: 4px;
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.cache-indicator.cached {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.cache-indicator.fresh {
+    background-color: var(--warning-color);
+    color: black;
+}
+
+/* Performance optimization hints */
+.timeline-item-left,
+.timeline-item-right {
+    transform: translateZ(0); /* Force hardware acceleration */
+}
+
+/* Smooth scrolling for timeline */
+.enhanced-timeline {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Button interaction optimizations */
+.btn {
+    transform: translateZ(0); /* Force hardware acceleration */
+}
+
+.btn:active {
+    transform: translateZ(0) scale(0.98);
+}
+
+/* Modal performance optimizations */
+.modal {
+    contain: layout style;
+}
+
+.modal-content {
+    will-change: transform, opacity;
+}
+
+/* Statistics container optimizations */
+.statistics-container,
+.stats-panel {
+    contain: layout style;
+}
+
+/* Event delegation optimization - reduce pointer events on non-interactive elements */
+.timeline-content {
+    pointer-events: none;
+}
+
+.timeline-content .event-actions {
+    pointer-events: auto;
+}
+
+.timeline-content .btn {
+    pointer-events: auto;
 }

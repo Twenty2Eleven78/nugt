@@ -7,7 +7,9 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "start": "netlify dev"
+    "start": "netlify dev",
+    "test": "node test-event-operations.js",
+    "test:events": "node test-event-operations.js"
   },
   "dependencies": {},
   "devDependencies": {

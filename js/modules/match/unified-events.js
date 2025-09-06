@@ -1563,8 +1563,8 @@ class EventManager {
                 this._updateCacheIndicator(stats);
             }, 'statistics_update');
 
-            // Log cache performance in development
-            if (process.env.NODE_ENV === 'development') {
+            // Log cache performance in development (browser-compatible check)
+            if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
                 const cacheInfo = stats.fromCache ? 'cached' : stats.calculationMethod || 'calculated';
                 console.log(`Statistics updated (${cacheInfo}):`, {
                     ...stats,
@@ -1584,7 +1584,7 @@ class EventManager {
     _updateCacheIndicator(stats) {
         try {
             // Only show cache indicator in development or if explicitly enabled
-            if (process.env.NODE_ENV !== 'development' && !this.cacheConfig.showCacheIndicator) {
+            if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && !this.cacheConfig.showCacheIndicator) {
                 return;
             }
 
@@ -3264,7 +3264,7 @@ class EventManager {
             this.updateMatchLog();
 
             // Log update for debugging
-            if (process.env.NODE_ENV === 'development') {
+            if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
                 console.log('Events updated - displays refreshed');
             }
         } catch (error) {

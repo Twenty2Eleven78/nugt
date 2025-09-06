@@ -3331,28 +3331,26 @@ class EventManager {
 // Create and export singleton instance
 export const eventManager = new EventManager();
 
-// Export convenience methods for backward compatibility
-export const {
-    addMatchEvent,
-    updateEvent,
-    deleteEvent,
-    showRecordEventModal,
-    openEditEventModal,
-    handleEditEventFormSubmission,
-    updateEventStatistics,
-    updateMatchLog,
-    renderTimeline,
-    calculateStatistics,
-    onEventsUpdated,
-    applyFilters,
-    clearFilters,
-    cleanup,
-    getEventModals,
-    // Enhanced caching methods
-    configureCaching,
-    getCacheMetrics,
-    clearStatisticsCache
-} = eventManager;
+// Export convenience methods for backward compatibility (properly bound)
+export const addMatchEvent = (...args) => eventManager.addMatchEvent(...args);
+export const updateEvent = (...args) => eventManager.updateEvent(...args);
+export const deleteEvent = (...args) => eventManager.deleteEvent(...args);
+export const showRecordEventModal = (...args) => eventManager.showRecordEventModal(...args);
+export const openEditEventModal = (...args) => eventManager.openEditEventModal(...args);
+export const handleEditEventFormSubmission = (...args) => eventManager.handleEditEventFormSubmission(...args);
+export const updateEventStatistics = (...args) => eventManager.updateEventStatistics(...args);
+export const updateMatchLog = (...args) => eventManager.updateMatchLog(...args);
+export const renderTimeline = (...args) => eventManager.renderTimeline(...args);
+export const calculateStatistics = (...args) => eventManager.calculateStatistics(...args);
+export const onEventsUpdated = (...args) => eventManager.onEventsUpdated(...args);
+export const applyFilters = (...args) => eventManager.applyFilters(...args);
+export const clearFilters = (...args) => eventManager.clearFilters(...args);
+export const cleanup = (...args) => eventManager.cleanup(...args);
+export const getEventModals = (...args) => eventManager.getEventModals(...args);
+// Enhanced caching methods
+export const configureCaching = (...args) => eventManager.configureCaching(...args);
+export const getCacheMetrics = (...args) => eventManager.getCacheMetrics(...args);
+export const clearStatisticsCache = (...args) => eventManager.clearStatisticsCache(...args);
 
 // Additional method aliases for backward compatibility with combined-events.js
 export const init = () => eventManager.init();

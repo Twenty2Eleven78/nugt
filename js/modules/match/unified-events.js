@@ -40,6 +40,22 @@ class EventManager {
         this.statisticsCache = null;
         this.lastCacheUpdate = null;
         this.cacheKey = null;
+        this._timelineVisible = true; // Initialize as visible by default
+        
+        // DOM element cache for frequently accessed elements
+        this._domElementCache = new Map();
+        this._cacheTimestamps = new Map();
+        this._cacheTimeout = 10000; // 10 seconds
+        this._animationFrameId = null;
+        this._pendingUpdates = new Set();
+        
+        // DOM element cache for timeline optimization
+        this._timelineCache = {
+            logElement: null,
+            lastCacheTime: null,
+            cacheTimeout: 5000 // 5 seconds
+        };
+        
         this.cacheConfig = {
             maxAge: 30000, // 30 seconds
             enableLazyCalculation: true,
@@ -2374,14 +2390,7 @@ class EventManager {
         return typeClassMap[eventType] || 'general-event';
     }
 
-    /**
-     * DOM element cache for timeline optimization
-     */
-    _timelineCache = {
-        logElement: null,
-        lastCacheTime: null,
-        cacheTimeout: 5000 // 5 seconds
-    };
+
 
     /**
      * Get cached DOM element or fetch and cache it
@@ -2516,14 +2525,7 @@ class EventManager {
 
     // ===== PERFORMANCE OPTIMIZATIONS =====
 
-    /**
-     * DOM element cache for frequently accessed elements
-     */
-    _domElementCache = new Map();
-    _cacheTimestamps = new Map();
-    _cacheTimeout = 10000; // 10 seconds
-    _animationFrameId = null;
-    _pendingUpdates = new Set();
+
 
     /**
      * Optimize DOM operations with enhanced caching and batching

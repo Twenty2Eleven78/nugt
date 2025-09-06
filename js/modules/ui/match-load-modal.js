@@ -190,7 +190,9 @@ class MatchLoadModal {
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="matchLoadModalLabel">Load Match from Cloud</h5>
-              <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn btn-danger btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-times" style="font-size: 14px;"></i>
+                </button>
             </div>
             <div class="modal-body">
               <div class="mb-3">

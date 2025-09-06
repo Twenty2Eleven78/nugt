@@ -1185,26 +1185,31 @@ class EventManager {
      */
     updateMatchLog() {
         try {
+            console.log('🔄 updateMatchLog called');
+
             // Skip update if timeline is not visible (performance optimization)
             if (this._timelineVisible === false) {
+                console.log('⏸️ Timeline not visible, skipping update');
                 return;
             }
 
             // Use cached element for better performance
             const logElement = this._getCachedDOMElement('log');
             if (!logElement) {
-                console.warn('Log element not found');
+                console.warn('❌ Log element not found');
                 return;
             }
+            console.log('✅ Log element found:', logElement);
 
             const currentTeam1Name = this._getCachedDOMElement('Team1NameElement')?.textContent;
             const currentTeam2Name = this._getCachedDOMElement('Team2NameElement')?.textContent;
 
             // Validate team names
             if (!currentTeam1Name || !currentTeam2Name) {
-                console.warn('Team names not found for timeline rendering');
+                console.warn('❌ Team names not found for timeline rendering', { currentTeam1Name, currentTeam2Name });
                 return;
             }
+            console.log('✅ Team names found:', { currentTeam1Name, currentTeam2Name });
 
             // Combine and sort all events by time
             const allEvents = [
@@ -1220,8 +1225,16 @@ class EventManager {
                 }))
             ].sort((a, b) => a.rawTime - b.rawTime);
 
+            console.log('📊 Events to render:', {
+                goals: gameState.goals.length,
+                matchEvents: gameState.matchEvents.length,
+                totalEvents: allEvents.length,
+                events: allEvents
+            });
+
             // Handle empty state with enhanced UI
             if (allEvents.length === 0) {
+                console.log('📝 No events to display, rendering empty timeline');
                 this._batchDOMUpdate(() => {
                     this._renderEmptyTimeline(logElement);
                 }, 'timeline_empty');
@@ -1229,12 +1242,15 @@ class EventManager {
             }
 
             // Use optimized rendering with requestAnimationFrame for better performance
+            console.log('🎨 Starting timeline render with', allEvents.length, 'events');
             this._batchDOMUpdate(() => {
                 this._optimizedTimelineRender(allEvents, logElement, currentTeam1Name, currentTeam2Name);
+                console.log('✅ Timeline render completed');
             }, 'timeline_update');
 
         } catch (error) {
-            console.error('Error updating match log:', error);
+            console.error('❌ Error updating match log:', error);
+            console.error('Stack trace:', error.stack);
             notificationManager.error('Error updating timeline display');
         }
     }

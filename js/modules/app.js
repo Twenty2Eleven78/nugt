@@ -501,11 +501,7 @@ function bindEventListeners() {
     }
   });
 
-  // Edit event form
-  const editEventForm = document.getElementById('editEventForm');
-  if (editEventForm) {
-    editEventForm.addEventListener('submit', (e) => eventsManager.handleEditEventFormSubmission(e));
-  }
+  // Edit event form - now handled in event-modals.js
 
   // Share button - open sharing modal
   const shareButton = domCache.get('shareButton');

@@ -128,6 +128,18 @@ class EventModals {
     
     // Initialize custom modal
     this.editEventModal = CustomModal.getOrCreateInstance('editEventModal');
+    
+    // Attach form submission event listener
+    const editEventForm = document.getElementById('editEventForm');
+    if (editEventForm) {
+      editEventForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Import the events manager dynamically to avoid circular imports
+        const { combinedEventsManager } = await import('../match/combined-events.js');
+        combinedEventsManager.handleEditEventFormSubmission(e);
+      });
+    }
   }
 
   /**

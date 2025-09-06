@@ -41,7 +41,7 @@ class EventManager {
         this.statisticsCache = null;
         this.lastCacheUpdate = null;
         this.cacheKey = null;
-        this._timelineVisible = true; // Initialize as visible by default
+        // Note: Removed _timelineVisible - timeline always updates when events are added
         this._statisticsVisible = true; // Initialize as visible by default
 
         // DOM element cache for frequently accessed elements
@@ -1185,13 +1185,9 @@ class EventManager {
      */
     updateMatchLog() {
         try {
-            console.log('🔄 updateMatchLog called');
+            console.log('🔄 updateMatchLog called - timeline will always update');
 
-            // Skip update if timeline is not visible (performance optimization)
-            if (this._timelineVisible === false) {
-                console.log('⏸️ Timeline not visible, skipping update');
-                return;
-            }
+            // Note: Removed timeline visibility check to ensure updates always happen when events are added
 
             // Use cached element for better performance
             const logElement = this._getCachedDOMElement('log');
@@ -2742,11 +2738,8 @@ class EventManager {
 
         this._intersectionObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.target.id === 'log') {
-                    // Timeline is visible, enable real-time updates
-                    this._timelineVisible = entry.isIntersecting;
-                }
-
+                // Note: Removed timeline visibility tracking - timeline always updates when events are added
+                
                 if (entry.target.classList.contains('statistics-container')) {
                     // Statistics are visible, enable real-time updates
                     this._statisticsVisible = entry.isIntersecting;
@@ -2757,13 +2750,9 @@ class EventManager {
             rootMargin: '50px'
         });
 
-        // Observe timeline and statistics containers
-        const timeline = this._getCachedDOMElement('log');
+        // Observe statistics containers (timeline always updates regardless of visibility)
         const statsContainer = document.querySelector('.statistics-container, .stats-panel');
 
-        if (timeline) {
-            this._intersectionObserver.observe(timeline);
-        }
         if (statsContainer) {
             this._intersectionObserver.observe(statsContainer);
         }

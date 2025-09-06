@@ -494,6 +494,18 @@ export function updateMatchLog() {
 
 // Delete log entry function for global access
 export function deleteLogEntry(index, type) {
+  // Show confirmation dialog
+  const itemType = type === 'goal' ? 'goal' : 'event';
+  const itemName = type === 'goal' ? 
+    (gameState.goals[index]?.goalScorerName || 'Unknown') : 
+    (gameState.matchEvents[index]?.type || 'Unknown');
+  
+  const confirmed = confirm(`Are you sure you want to delete this ${itemType}?\n\n${itemName}`);
+  
+  if (!confirmed) {
+    return; // User cancelled
+  }
+
   if (type === 'goal') {
     if (index < 0 || index >= gameState.goals.length) return;
     stateManager.removeGoal(index);
@@ -508,5 +520,5 @@ export function deleteLogEntry(index, type) {
   combinedEventsManager.updateEventStatistics();
   
   storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
-  notificationManager.error('Entry deleted');
+  notificationManager.success(`${itemType.charAt(0).toUpperCase() + itemType.slice(1)} deleted`);
 }

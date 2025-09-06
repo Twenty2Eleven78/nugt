@@ -236,7 +236,7 @@ export function initializeApp() {
 
   // Make timer controller available globally for beforeunload handler
   window.timerControllerInstance = timerController;
-  
+
   // Make goal manager available globally
   window.goalManager = goalManager;
 
@@ -331,10 +331,10 @@ function bindEventListeners() {
         };
 
         await userMatchesApi.saveMatchData(matchData);
-        
+
         // Clear all caches to ensure fresh data
         userMatchesApi.clearCache();
-        
+
         // Refresh any open admin dashboard
         setTimeout(() => {
           // Check if admin modal is open and refresh it
@@ -351,7 +351,7 @@ function bindEventListeners() {
             }
           }
         }, 500);
-        
+
         notificationManager.success('Match saved to cloud!');
       } catch (e) {
         console.error('Error saving match data:', e);
@@ -619,32 +619,32 @@ window.DebugModule = {
       cleanupModalOverlays();
     });
   },
-  
+
   // Auth debugging  
   showAuthModal: () => authUI.showAuthModal(),
   hideAuthModal: () => authUI.hideModal(),
-  
+
   // Profile debugging
   checkProfileElements: () => {
     const container = document.getElementById('header-profile-container');
     const button = document.getElementById('userProfileButton');
     const dropdown = document.getElementById('userProfileDropdown');
-    
+
     console.log('Profile debugging:', {
       container: container ? 'EXISTS' : 'MISSING',
-      button: button ? 'EXISTS' : 'MISSING', 
+      button: button ? 'EXISTS' : 'MISSING',
       dropdown: dropdown ? 'EXISTS' : 'MISSING',
       containerHTML: container ? container.innerHTML : 'N/A'
     });
-    
+
     return { container, button, dropdown };
   },
-  
+
   // Force create profile
   forceCreateProfile: () => {
     authUI._updateAuthState(false);
   },
-  
+
   // Admin debugging (restricted)
   showAdminModal: () => {
     if (authService.isUserAuthenticated() && authService.isAdmin()) {
@@ -655,7 +655,7 @@ window.DebugModule = {
       console.warn('Access denied: Admin privileges required');
     }
   },
-  
+
   // State debugging
   getGameState: () => gameState,
   resetApp: () => resetTracker()

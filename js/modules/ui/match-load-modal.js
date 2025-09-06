@@ -80,30 +80,58 @@ class MatchLoadModal {
         listItem.style.cursor = 'pointer';
 
         listItem.innerHTML = `
-          <div class="card-body" style="padding: 1.5rem;">
+          <div class="card-body" style="padding: 1.25rem;">
             <div class="d-flex justify-content-between align-items-start">
               <div class="flex-grow-1 me-3">
-                <h6 class="card-title mb-2 fw-bold">${this._escapeHtml(match.title)}</h6>
-                ${teamsDisplay ? `<div class="text-primary small mb-1"><i class="fas fa-futbol me-1"></i>${this._escapeHtml(teamsDisplay)}${scoreDisplay}</div>` : ''}
-                <div class="text-muted small mb-1">
-                  <i class="fas fa-calendar me-1"></i>${formattedDate} at ${formattedTime}
+                <div class="d-flex align-items-center mb-1">
+                  <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-2" 
+                       style="width: 28px; height: 28px;">
+                    <i class="fas fa-user text-primary" style="font-size: 0.7rem;"></i>
+                  </div>
+                  <div class="min-width-0">
+                    <div class="fw-bold text-truncate" style="font-size: 0.9rem;">${this._escapeHtml(match.title)}</div>
+                    <div class="text-muted text-truncate" style="font-size: 0.75rem;">Personal Match</div>
+                  </div>
                 </div>
-                ${match.notes ? `<div class="text-muted small"><i class="fas fa-sticky-note me-1"></i>${this._escapeHtml(match.notes.substring(0, 60))}${match.notes.length > 60 ? '...' : ''}</div>` : ''}
+                ${teamsDisplay ? `<div class="text-primary mb-1" style="font-size: 0.8rem;"><i class="fas fa-futbol me-1"></i>${this._escapeHtml(teamsDisplay)}${scoreDisplay}</div>` : ''}
+                <div class="text-muted" style="font-size: 0.75rem;">
+                  <i class="fas fa-calendar me-1"></i>${formattedDate} ${formattedTime}
+                </div>
+                ${match.notes ? `<div class="text-muted mt-1" style="font-size: 0.75rem;"><i class="fas fa-sticky-note me-1"></i>${this._escapeHtml(match.notes.substring(0, 50))}${match.notes.length > 50 ? '...' : ''}</div>` : ''}
               </div>
-              <div class="d-flex gap-2 flex-shrink-0" style="padding: 0.25rem;">
-                <button class="btn btn-primary btn-sm view-btn" data-match-index="${index}" style="min-width: 60px;">
-                  View
-                </button>
-                <button class="btn btn-outline-secondary btn-sm raw-data-btn" data-match-index="${index}" title="View Raw Data" style="width: 36px;">
-                  <i class="fas fa-code"></i>
-                </button>
-                <button class="btn btn-outline-danger btn-sm delete-btn" data-match-index="${index}" title="Delete Match" style="width: 36px;">
-                  <i class="fas fa-trash"></i>
-                </button>
+              <div class="d-flex flex-column gap-1 flex-shrink-0" style="padding: 0.25rem;">
+                <!-- View and Raw Data on same line -->
+                <div class="d-flex gap-1">
+                  <button class="btn btn-primary btn-sm view-btn" data-match-index="${index}" style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" title="View Match">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="btn btn-outline-secondary btn-sm raw-data-btn" data-match-index="${index}" style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" title="View Raw Data">
+                    <i class="fas fa-code"></i>
+                  </button>
+                </div>
+                <!-- Delete on next line -->
+                <div class="d-flex gap-1">
+                  <button class="btn btn-outline-danger btn-sm delete-btn" data-match-index="${index}" style="width: 28px; height: 28px; padding: 0; font-size: 0.7rem;" title="Delete Match">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         `;
+
+        // Add hover effects
+        listItem.addEventListener('mouseenter', () => {
+          listItem.style.transform = 'translateY(-2px)';
+          listItem.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+          listItem.style.borderColor = '#c0c0c0';
+        });
+
+        listItem.addEventListener('mouseleave', () => {
+          listItem.style.transform = 'translateY(0)';
+          listItem.style.boxShadow = '';
+          listItem.style.borderColor = '#e0e0e0';
+        });
 
         // Add click handlers
         listItem.querySelector('.view-btn').addEventListener('click', (e) => {

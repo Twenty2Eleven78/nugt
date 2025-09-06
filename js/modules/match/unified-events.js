@@ -2772,8 +2772,20 @@ class EventManager {
      * @param {number} value - Value to display
      */
     _updateStatisticsElement(elementId, value) {
-        const element = this._getCachedDOMElement(elementId);
-        console.log(`🔍 Updating ${elementId}:`, { element: !!element, value, currentText: element?.textContent });
+        let element = this._getCachedDOMElement(elementId);
+        
+        // Fallback to direct DOM query if cached version fails
+        if (!element) {
+            console.log(`🔄 Cached element not found for ${elementId}, trying direct query...`);
+            element = document.getElementById(elementId);
+        }
+        
+        console.log(`🔍 Updating ${elementId}:`, { 
+            element: !!element, 
+            value, 
+            currentText: element?.textContent,
+            elementExists: !!document.getElementById(elementId)
+        });
         
         if (element && element.textContent !== value.toString()) {
             console.log(`✏️ ${elementId} needs update: "${element.textContent}" → "${value}"`);
@@ -2789,7 +2801,10 @@ class EventManager {
                 console.log(`✅ ${elementId} updated to: ${value}`);
             }, `stats_${elementId}`);
         } else if (!element) {
-            console.warn(`❌ Element not found: ${elementId}`);
+            console.warn(`❌ Element not found: ${elementId} (even with direct query)`);
+            // List all elements with similar IDs for debugging
+            const allElements = Array.from(document.querySelectorAll('[id*="count"]'));
+            console.log('📋 Available count elements:', allElements.map(el => el.id));
         } else {
             console.log(`⏭️ ${elementId} already has correct value: ${value}`);
         }

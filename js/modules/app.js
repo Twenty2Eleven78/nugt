@@ -305,7 +305,7 @@ function bindEventListeners() {
     const score1 = domCache.get('firstScoreElement')?.textContent || '0';
     const score2 = domCache.get('secondScoreElement')?.textContent || '0';
     const currentDate = new Date().toLocaleDateString('en-GB');
-    const defaultTitle = `${team1Name}(${score1}):${team2Name}(${score2}) - ${currentDate}`;
+    const defaultTitle = `${team1Name}:${team2Name} - ${currentDate}`;
 
     matchSaveModal.show({
       defaultTitle,

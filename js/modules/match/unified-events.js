@@ -42,7 +42,7 @@ class EventManager {
         this.lastCacheUpdate = null;
         this.cacheKey = null;
         // Note: Removed _timelineVisible - timeline always updates when events are added
-        this._statisticsVisible = true; // Initialize as visible by default
+        // Note: Removed _statisticsVisible - statistics always update when events are added
 
         // DOM element cache for frequently accessed elements
         this._domElementCache = new Map();
@@ -1570,15 +1570,16 @@ class EventManager {
      */
     updateEventStatistics() {
         try {
-            // Skip update if statistics are not visible (performance optimization)
-            if (this._statisticsVisible === false) {
-                return;
-            }
+            console.log('📊 updateEventStatistics called - statistics will always update');
+            
+            // Note: Removed statistics visibility check to ensure updates always happen when events are added
 
             const stats = this.calculateStatistics();
+            console.log('📈 Calculated statistics:', stats);
 
             // Batch all statistics updates for better performance
             this._batchDOMUpdate(() => {
+                console.log('🎯 Updating statistics elements...');
                 // Update statistics cards with error handling
                 this._updateStatisticsElement('goals-count', stats.goals);
                 this._updateStatisticsElement('cards-count', stats.cards);
@@ -1591,6 +1592,7 @@ class EventManager {
 
                 // Add cache indicator for development/debugging
                 this._updateCacheIndicator(stats);
+                console.log('✅ Statistics update completed');
             }, 'statistics_update');
 
             // Log cache performance in development (browser-compatible check)
@@ -2046,18 +2048,7 @@ class EventManager {
      * @param {string} elementId - ID of element to update
      * @param {number} value - Value to set
      */
-    _updateStatisticsElement(elementId, value) {
-        try {
-            const element = document.getElementById(elementId);
-            if (element) {
-                // Validate value is a number
-                const numValue = typeof value === 'number' ? value : 0;
-                element.textContent = numValue.toString();
-            }
-        } catch (error) {
-            console.error(`Error updating statistics element ${elementId}:`, error);
-        }
-    }
+    // Note: Removed duplicate _updateStatisticsElement method - using the cached version below
 
     // ===== MODAL INTEGRATION =====
 
@@ -2737,25 +2728,13 @@ class EventManager {
         }
 
         this._intersectionObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                // Note: Removed timeline visibility tracking - timeline always updates when events are added
-                
-                if (entry.target.classList.contains('statistics-container')) {
-                    // Statistics are visible, enable real-time updates
-                    this._statisticsVisible = entry.isIntersecting;
-                }
-            });
+            // Note: Intersection observer no longer needed - both timeline and statistics always update
         }, {
             threshold: 0.1,
             rootMargin: '50px'
         });
 
-        // Observe statistics containers (timeline always updates regardless of visibility)
-        const statsContainer = document.querySelector('.statistics-container, .stats-panel');
-
-        if (statsContainer) {
-            this._intersectionObserver.observe(statsContainer);
-        }
+        // Note: No longer observing elements - both timeline and statistics always update when events are added
     }
 
     /**
@@ -2794,7 +2773,10 @@ class EventManager {
      */
     _updateStatisticsElement(elementId, value) {
         const element = this._getCachedDOMElement(elementId);
+        console.log(`🔍 Updating ${elementId}:`, { element: !!element, value, currentText: element?.textContent });
+        
         if (element && element.textContent !== value.toString()) {
+            console.log(`✏️ ${elementId} needs update: "${element.textContent}" → "${value}"`);
             // Only update if value has changed
             this._batchDOMUpdate(() => {
                 element.textContent = value;
@@ -2804,7 +2786,12 @@ class EventManager {
                 setTimeout(() => {
                     element.classList.remove('stat-updated');
                 }, 300);
+                console.log(`✅ ${elementId} updated to: ${value}`);
             }, `stats_${elementId}`);
+        } else if (!element) {
+            console.warn(`❌ Element not found: ${elementId}`);
+        } else {
+            console.log(`⏭️ ${elementId} already has correct value: ${value}`);
         }
     }
 

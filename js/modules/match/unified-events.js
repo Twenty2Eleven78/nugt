@@ -2446,11 +2446,11 @@ class EventManager {
             Match events and goals will appear here as they happen.
           </p>
           <div class="d-flex justify-content-center gap-2 flex-wrap">
-            <span class="badge bg-success">Goals</span>
-            <span class="badge bg-warning">Cards</span>
-            <span class="badge bg-info">Fouls</span>
-            <span class="badge bg-primary">Penalties</span>
-            <span class="badge bg-secondary">Incidents</span>
+            <span class="">Goals</span>
+            <span class="">Cards</span>
+            <span class="">Fouls</span>
+            <span class="">Penalties</span>
+            <span class="">Incidents</span>
           </div>
           <small class="text-muted d-block mt-2">
             Use the event recording buttons to add match events

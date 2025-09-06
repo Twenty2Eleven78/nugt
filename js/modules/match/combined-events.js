@@ -135,21 +135,34 @@ class CombinedEventsManager {
 
     const currentMinutes = Math.floor(event.rawTime / 60);
 
-    // Populate edit form based on type
-    if (type === 'matchEvent') {
+    // Update modal title and show/hide fields based on type
+    const modalTitle = document.getElementById('editEventModalLabel');
+    const editEventTypeContainer = document.getElementById('editEventTypeContainer');
+    const editEventNotesContainer = document.getElementById('editEventNotesContainer');
+    
+    if (type === 'goal') {
+      if (modalTitle) modalTitle.textContent = 'Edit Goal Time';
+      if (editEventTypeContainer) editEventTypeContainer.style.display = 'none';
+      if (editEventNotesContainer) editEventNotesContainer.style.display = 'none';
+    } else {
+      if (modalTitle) modalTitle.textContent = 'Edit Event';
+      if (editEventTypeContainer) editEventTypeContainer.style.display = 'block';
+      if (editEventNotesContainer) editEventNotesContainer.style.display = 'block';
+      
+      // Populate event-specific fields
       const editEventType = document.getElementById('editEventType');
       const editEventNotes = document.getElementById('editEventNotes');
-      const editEventIndex = document.getElementById('editEventIndex');
-
-      if (editEventType) editEventType.value = event.type;
+      
+      if (editEventType) editEventType.value = event.type || '';
       if (editEventNotes) editEventNotes.value = event.notes || '';
-      if (editEventIndex) editEventIndex.value = index;
     }
 
+    // Set common fields
+    const editEventIndex = document.getElementById('editEventIndex');
     const editTimeInput = document.getElementById('editEventTime');
-    if (editTimeInput) {
-      editTimeInput.value = currentMinutes;
-    }
+    
+    if (editEventIndex) editEventIndex.value = index;
+    if (editTimeInput) editTimeInput.value = currentMinutes;
 
     showModal('editEventModal');
   }
@@ -158,45 +171,68 @@ class CombinedEventsManager {
   handleEditEventFormSubmission(e) {
     e.preventDefault();
 
-    const newMinutes = parseInt(document.getElementById('editEventTime')?.value, 10);
-    if (isNaN(newMinutes)) return;
+    try {
+      const newMinutes = parseInt(document.getElementById('editEventTime')?.value, 10);
+      if (isNaN(newMinutes) || newMinutes < 0) {
+        notificationManager.error('Please enter a valid time in minutes');
+        return;
+      }
 
-    const newRawTime = newMinutes * 60;
-    const newTimestamp = formatMatchTime(newRawTime);
+      const newRawTime = newMinutes * 60;
+      const newTimestamp = formatMatchTime(newRawTime);
 
-    // Handle different event types
-    if (gameState.editingEventType === 'goal') {
-      stateManager.updateGoal(gameState.editingEventIndex, {
-        rawTime: newRawTime,
-        timestamp: newTimestamp
-      });
-    } else if (gameState.editingEventType === 'matchEvent') {
-      const eventIndex = parseInt(document.getElementById('editEventIndex')?.value);
-      const newType = document.getElementById('editEventType')?.value;
-      const newNotes = document.getElementById('editEventNotes')?.value;
+      // Handle different event types
+      if (gameState.editingEventType === 'goal') {
+        stateManager.updateGoal(gameState.editingEventIndex, {
+          rawTime: newRawTime,
+          timestamp: newTimestamp
+        });
+      } else if (gameState.editingEventType === 'matchEvent') {
+        const eventIndexElement = document.getElementById('editEventIndex');
+        const eventTypeElement = document.getElementById('editEventType');
+        const eventNotesElement = document.getElementById('editEventNotes');
+        
+        if (!eventIndexElement) {
+          notificationManager.error('Error: Event index not found');
+          return;
+        }
+        
+        const eventIndex = parseInt(eventIndexElement.value, 10);
+        if (isNaN(eventIndex) || eventIndex < 0 || eventIndex >= gameState.matchEvents.length) {
+          notificationManager.error('Error: Invalid event index');
+          return;
+        }
+        
+        const newType = eventTypeElement?.value || gameState.matchEvents[eventIndex].type;
+        const newNotes = eventNotesElement?.value || '';
 
-      const updatedEvent = {
-        ...gameState.matchEvents[eventIndex],
-        type: newType,
-        notes: newNotes,
-        rawTime: newRawTime,
-        timestamp: newTimestamp
-      };
+        const updatedEvent = {
+          ...gameState.matchEvents[eventIndex],
+          type: newType,
+          notes: newNotes,
+          rawTime: newRawTime,
+          timestamp: newTimestamp
+        };
 
-      stateManager.updateMatchEvent(eventIndex, updatedEvent);
+        stateManager.updateMatchEvent(eventIndex, updatedEvent);
+      }
+
+      // Update displays
+      this.updateMatchLog();
+      this.updateEventStatistics();
+
+      // Save data
+      storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
+
+      // Clean up and close modal
+      stateManager.clearEditingEvent();
+      hideModal('editEventModal');
+      notificationManager.success('Event updated successfully');
+      
+    } catch (error) {
+      console.error('Error updating event:', error);
+      notificationManager.error('Error updating event. Please try again.');
     }
-
-    // Update displays
-    this.updateMatchLog();
-    this.updateEventStatistics();
-
-    // Save data
-    storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
-
-    // Clean up and close modal
-    stateManager.clearEditingEvent();
-    hideModal('editEventModal');
-    notificationManager.success('Event updated successfully');
   }
 
   // Update match log display

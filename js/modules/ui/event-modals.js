@@ -82,14 +82,32 @@ class EventModals {
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="editEventModalLabel">Edit Event Time</h5>
-              <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+              <h5 class="modal-title" id="editEventModalLabel">Edit Event</h5>
+              <button type="button" class="btn btn-danger btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-times" style="font-size: 14px;"></i>
+              </button>
             </div>
             <div class="modal-body">
               <form id="editEventForm">
+                <input type="hidden" id="editEventIndex" name="editEventIndex">
                 <div class="mb-3">
                   <label for="editEventTime" class="form-label">Event Time (in minutes)</label>
-                  <input type="number" class="form-control" id="editEventTime" required>
+                  <input type="number" class="form-control" id="editEventTime" required min="0" max="120">
+                </div>
+                <div class="mb-3" id="editEventTypeContainer" style="display: none;">
+                  <label for="editEventType" class="form-label">Event Type</label>
+                  <select class="form-select" id="editEventType">
+                    <option value="Yellow Card">Yellow Card</option>
+                    <option value="Red Card">Red Card</option>
+                    <option value="Sin Bin">Sin Bin</option>
+                    <option value="Foul">Foul</option>
+                    <option value="Penalty">Penalty</option>
+                    <option value="Incident">Incident</option>
+                  </select>
+                </div>
+                <div class="mb-3" id="editEventNotesContainer" style="display: none;">
+                  <label for="editEventNotes" class="form-label">Notes (Optional)</label>
+                  <textarea class="form-control" id="editEventNotes" rows="3"></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary">Save Changes</button>
               </form>

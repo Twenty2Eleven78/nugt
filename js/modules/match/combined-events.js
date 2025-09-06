@@ -492,19 +492,29 @@ export function updateMatchLog() {
   combinedEventsManager.updateMatchLog();
 }
 
+// Store pending deletion info
+let pendingDeletion = null;
+
 // Delete log entry function for global access
 export function deleteLogEntry(index, type) {
-  // Show confirmation dialog
+  // Store deletion info for confirmation
+  pendingDeletion = { index, type };
+  
   const itemType = type === 'goal' ? 'goal' : 'event';
   const itemName = type === 'goal' ? 
     (gameState.goals[index]?.goalScorerName || 'Unknown') : 
     (gameState.matchEvents[index]?.type || 'Unknown');
   
-  const confirmed = confirm(`Are you sure you want to delete this ${itemType}?\n\n${itemName}`);
+  // Show confirmation modal
+  showEventDeleteModal(itemType, itemName);
+}
+
+// Function to actually perform the deletion
+function performEventDeletion() {
+  if (!pendingDeletion) return;
   
-  if (!confirmed) {
-    return; // User cancelled
-  }
+  const { index, type } = pendingDeletion;
+  const itemType = type === 'goal' ? 'goal' : 'event';
 
   if (type === 'goal') {
     if (index < 0 || index >= gameState.goals.length) return;
@@ -521,4 +531,116 @@ export function deleteLogEntry(index, type) {
   
   storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
   notificationManager.success(`${itemType.charAt(0).toUpperCase() + itemType.slice(1)} deleted`);
+  
+  // Clear pending deletion
+  pendingDeletion = null;
+}
+
+// Function to show event delete confirmation modal
+function showEventDeleteModal(itemType, itemName) {
+  // Create modal if it doesn't exist
+  if (!document.getElementById('eventDeleteModal')) {
+    createEventDeleteModal();
+  }
+  
+  // Update modal content
+  const modalTitle = document.getElementById('eventDeleteModalTitle');
+  const modalBody = document.getElementById('eventDeleteModalBody');
+  
+  if (modalTitle) {
+    modalTitle.innerHTML = `<i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirm Deletion`;
+  }
+  
+  if (modalBody) {
+    modalBody.innerHTML = `
+      <p class="mb-3">Are you sure you want to delete this ${itemType}?</p>
+      <div class="alert alert-warning">
+        <strong>${itemType.charAt(0).toUpperCase() + itemType.slice(1)}:</strong> ${itemName}
+      </div>
+      <p class="text-muted small mb-0">This action cannot be undone.</p>
+    `;
+  }
+  
+  // Show modal
+  const modal = document.getElementById('eventDeleteModal');
+  if (modal) {
+    modal.style.display = 'block';
+    modal.classList.add('show');
+    document.body.classList.add('modal-open');
+  }
+}
+
+// Function to create event delete confirmation modal
+function createEventDeleteModal() {
+  const modalHTML = `
+    <div class="modal fade" id="eventDeleteModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="eventDeleteModalTitle">
+              <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
+            </h5>
+            <button type="button" class="btn btn-light btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-times text-danger" style="font-size: 14px;"></i>
+            </button>
+          </div>
+          <div class="modal-body" id="eventDeleteModalBody">
+            <!-- Content will be populated dynamically -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelEventDeleteBtn">
+              <i class="fas fa-times me-1"></i>Cancel
+            </button>
+            <button type="button" class="btn btn-danger" id="confirmEventDeleteBtn">
+              <i class="fas fa-trash me-1"></i>Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+  
+  // Add event listeners
+  const modal = document.getElementById('eventDeleteModal');
+  const cancelBtn = document.getElementById('cancelEventDeleteBtn');
+  const confirmBtn = document.getElementById('confirmEventDeleteBtn');
+  const closeBtn = modal.querySelector('[data-dismiss="modal"]');
+  
+  // Cancel button
+  cancelBtn?.addEventListener('click', () => {
+    hideEventDeleteModal();
+    pendingDeletion = null;
+  });
+  
+  // Close button
+  closeBtn?.addEventListener('click', () => {
+    hideEventDeleteModal();
+    pendingDeletion = null;
+  });
+  
+  // Confirm button
+  confirmBtn?.addEventListener('click', () => {
+    hideEventDeleteModal();
+    performEventDeletion();
+  });
+  
+  // Click outside to close
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      hideEventDeleteModal();
+      pendingDeletion = null;
+    }
+  });
+}
+
+// Function to hide event delete modal
+function hideEventDeleteModal() {
+  const modal = document.getElementById('eventDeleteModal');
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('show');
+    document.body.classList.remove('modal-open');
+  }
 }

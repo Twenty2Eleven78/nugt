@@ -404,7 +404,13 @@ class CombinedEventsManager {
           <i class="fas fa-${event.disallowed ? 'check' : 'ban'}"></i>
         </button>`;
 
-      return `${toggleButton}${editButton.replace('">', ' me-2">')}${deleteButton}`;
+      const goalEditButton = `
+        <button class="btn btn-sm btn-outline-primary me-2" 
+          onclick="window.EventsModule.openEditEventModal(${event.originalIndex}, '${event.updatetype}')">
+          <i class="fas fa-edit"></i>
+        </button>`;
+
+      return `${toggleButton}${goalEditButton}${deleteButton}`;
     }
 
     return `${editButton}${deleteButton}`;

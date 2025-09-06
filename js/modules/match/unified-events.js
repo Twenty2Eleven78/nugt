@@ -9,6 +9,7 @@
  * - Automatic cache invalidation on data changes
  * 
  * @version 1.1
+ * @updated Cache refresh fix for process.env issue
  */
 
 // Core dependencies
@@ -41,21 +42,22 @@ class EventManager {
         this.lastCacheUpdate = null;
         this.cacheKey = null;
         this._timelineVisible = true; // Initialize as visible by default
-        
+        this._statisticsVisible = true; // Initialize as visible by default
+
         // DOM element cache for frequently accessed elements
         this._domElementCache = new Map();
         this._cacheTimestamps = new Map();
         this._cacheTimeout = 10000; // 10 seconds
         this._animationFrameId = null;
         this._pendingUpdates = new Set();
-        
+
         // DOM element cache for timeline optimization
         this._timelineCache = {
             logElement: null,
             lastCacheTime: null,
             cacheTimeout: 5000 // 5 seconds
         };
-        
+
         this.cacheConfig = {
             maxAge: 30000, // 30 seconds
             enableLazyCalculation: true,
@@ -2445,13 +2447,6 @@ class EventManager {
           <p class="text-muted mb-3">
             Match events and goals will appear here as they happen.
           </p>
-          <div class="d-flex justify-content-center gap-2 flex-wrap">
-            <span >Goals</span>
-            <span >Cards</span>
-            <span >Fouls</span>
-            <span >Penalties</span>
-            <span >Incidents</span>
-          </div>
           <small class="text-muted d-block mt-2">
             Use the event recording buttons to add match events
           </small>

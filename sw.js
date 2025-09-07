@@ -22,7 +22,7 @@ const cacheFiles = [
   './js/modules/data/storage.js',
   './js/modules/data/default-roster.js',
   // Game modules
-  './js/modules/game/timer.js',
+  './js/modules/match/timer.js',
   // Match modules
   './js/modules/match/goals.js',
   './js/modules/match/combined-events.js',

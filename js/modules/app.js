@@ -17,7 +17,7 @@ import { ModuleErrorBoundary } from './shared/error-boundary.js';
 import { storageQuotaManager } from './shared/storage-manager.js';
 
 // Game modules
-import { timerController } from './game/timer.js';
+import { timerController } from './match/timer.js';
 
 // Match modules
 import { goalManager, toggleGoalDisallowed } from './match/goals.js';

@@ -3104,3 +3104,110 @@ nsure transfer match modal appears above admin modal */
     align-items: center;
     gap: 0.5rem;
 }
+
+/* ===== RELEASE NOTES STYLES ===== */
+.release-notes-content {
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.release-notes-content h1,
+.release-notes-content h2,
+.release-notes-content h3,
+.release-notes-content h4,
+.release-notes-content h5,
+.release-notes-content h6 {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+.release-notes-content h1 {
+    font-size: var(--font-size-xl);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: var(--spacing-sm);
+}
+
+.release-notes-content h2 {
+    font-size: var(--font-size-lg);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--spacing-xs);
+}
+
+.release-notes-content h3 {
+    font-size: var(--font-size-md);
+}
+
+.release-notes-content p {
+    margin-bottom: var(--spacing-lg);
+}
+
+.release-notes-content ul {
+    list-style: disc;
+    padding-left: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.release-notes-content li {
+    margin-bottom: var(--spacing-sm);
+}
+
+.release-notes-content a {
+    color: var(--theme-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.release-notes-content a:hover {
+    text-decoration: underline;
+    color: var(--theme-primary-dark);
+}
+
+.release-notes-content code {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    padding: 0.2em 0.4em;
+    border-radius: var(--border-radius-sm);
+    font-size: 85%;
+}
+
+.release-notes-content pre {
+    background-color: var(--bg-secondary);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+}
+
+.release-notes-content pre code {
+    background: none;
+    padding: 0;
+}
+
+.release-notes-content hr {
+    border: 0;
+    border-top: 1px solid var(--border-color);
+    margin: var(--spacing-xl) 0;
+}
+
+.release-notes-content blockquote {
+    border-left: 4px solid var(--theme-primary);
+    padding-left: var(--spacing-lg);
+    margin-left: 0;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.release-notes-content details {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.release-notes-content summary {
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--theme-primary);
+}

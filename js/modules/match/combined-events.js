@@ -1,6 +1,6 @@
 /**
  * Combined Events Management
- * Merges events.js and enhanced-events.js functionality
+ * Merges events.js functionality
  * @version 4.0
  */
 
@@ -315,16 +315,27 @@ class CombinedEventsManager {
 
     const stats = {
       goals: gameState.goals.filter(goal => !goal.disallowed).length,
-      cards: allEvents.filter(event => 
-        event.type && (event.type.toLowerCase().includes('card') || 
-                      event.type.toLowerCase().includes('yellow') || 
-                      event.type.toLowerCase().includes('red'))
-      ).length,
-      fouls: allEvents.filter(event => 
-        event.type && event.type.toLowerCase().includes('foul')
-      ).length,
+      cards: 0,
+      fouls: 0,
+      penalties: 0,
+      incidents: 0,
       total: allEvents.length
     };
+
+    // Count different event types
+    gameState.matchEvents.forEach(event => {
+      const eventType = event.type.toLowerCase();
+
+      if (eventType.includes('card')) {
+        stats.cards++;
+      } else if (eventType.includes('foul')) {
+        stats.fouls++;
+      } else if (eventType.includes('penalty')) {
+        stats.penalties++;
+      } else if (eventType.includes('incident')) {
+        stats.incidents++;
+      }
+    });
 
     return stats;
   }
@@ -527,7 +538,6 @@ export const {
 
 // Alias for backward compatibility
 export const eventsManager = combinedEventsManager;
-export const enhancedEventsManager = combinedEventsManager;
 
 // Update match log function for global access
 export function updateMatchLog() {

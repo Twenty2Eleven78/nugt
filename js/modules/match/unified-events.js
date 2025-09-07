@@ -1816,15 +1816,8 @@ class EventManager {
      * Called when events are added, updated, or deleted
      */
     _invalidateStatisticsCache() {
-        this.statisticsCache = null;
-        this.lastCacheUpdate = null;
-        this.cacheKey = null;
-
-        // Cancel any pending async calculations
-        if (this._pendingAsyncCalculation) {
-            clearTimeout(this._pendingAsyncCalculation);
-            this._pendingAsyncCalculation = null;
-        }
+        // Note: Cache invalidation simplified - no longer using complex caching
+        // This method is kept for compatibility but doesn't need to do anything
     }
 
     /**
@@ -1847,35 +1840,8 @@ class EventManager {
      * @param {Object} config - Cache configuration options
      */
     configureCaching(config = {}) {
-        try {
-            // Validate configuration
-            if (typeof config !== 'object') {
-                console.warn('Invalid cache configuration provided');
-                return;
-            }
-
-            // Update cache configuration with validation
-            if (typeof config.maxAge === 'number' && config.maxAge > 0) {
-                this.cacheConfig.maxAge = Math.min(config.maxAge, 300000); // Max 5 minutes
-            }
-
-            if (typeof config.enableLazyCalculation === 'boolean') {
-                this.cacheConfig.enableLazyCalculation = config.enableLazyCalculation;
-            }
-
-            if (typeof config.enableCacheKeyGeneration === 'boolean') {
-                this.cacheConfig.enableCacheKeyGeneration = config.enableCacheKeyGeneration;
-            }
-
-            // Invalidate cache if configuration changed significantly
-            if (config.maxAge !== undefined || config.enableCacheKeyGeneration === false) {
-                this._invalidateStatisticsCache();
-            }
-
-            console.log('Statistics cache configuration updated:', this.cacheConfig);
-        } catch (error) {
-            console.error('Error configuring statistics cache:', error);
-        }
+        // Note: Caching configuration removed - method kept for compatibility
+        console.log('Cache configuration is no longer used in simplified version');
     }
 
     /**
@@ -1883,28 +1849,13 @@ class EventManager {
      * @returns {Object} Cache performance data
      */
     getCacheMetrics() {
-        try {
-            const currentTime = Date.now();
-            const cacheAge = this.lastCacheUpdate ? currentTime - this.lastCacheUpdate : null;
-
-            return {
-                hasCachedData: !!this.statisticsCache,
-                cacheAge: cacheAge,
-                cacheKey: this.cacheKey,
-                isValid: this._isStatisticsCacheValid(),
-                config: { ...this.cacheConfig },
-                lastUpdated: this.lastCacheUpdate ? new Date(this.lastCacheUpdate).toISOString() : null
-            };
-        } catch (error) {
-            console.error('Error getting cache metrics:', error);
-            return {
-                hasCachedData: false,
-                cacheAge: null,
-                cacheKey: null,
-                isValid: false,
-                error: true
-            };
-        }
+        // Note: Cache metrics removed - method kept for compatibility
+        return {
+            hasCachedData: false,
+            cacheAge: null,
+            isValid: true,
+            simplified: true
+        };
     }
 
     // Note: Removed clearStatisticsCache method - no longer needed

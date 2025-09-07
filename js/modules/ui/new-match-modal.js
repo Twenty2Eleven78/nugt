@@ -11,7 +11,7 @@ import { GAME_CONFIG } from '../shared/constants.js';
 import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from './modals.js';
 import { rosterManager } from '../match/roster.js';
-import { timerController } from '../game/timer.js';
+import { timerController } from '../match/timer.js';
 import { teamManager } from '../match/teams.js';
 import { attendanceManager } from '../services/attendance.js';
 import { combinedEventsManager, updateMatchLog } from '../match/combined-events.js';

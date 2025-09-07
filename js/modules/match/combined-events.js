@@ -12,7 +12,7 @@ import { EVENT_TYPES } from '../shared/constants.js';
 import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from '../ui/modals.js';
 import { getEventIcon, getEventCardClass } from '../ui/components.js';
-import { timerController } from '../game/timer.js';
+import { timerController } from './timer.js';
 import { attendanceManager } from '../services/attendance.js';
 
 // Combined Events Manager Class

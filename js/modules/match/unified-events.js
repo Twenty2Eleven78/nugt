@@ -2,14 +2,15 @@
  * Unified Event Management System
  * Consolidates functionality from combined-events.js and enhanced-events.js
  * 
- * Enhanced Features:
- * - Advanced statistics caching with cache key generation
- * - Lazy calculation for expensive operations
- * - Configurable cache behavior and performance metrics
- * - Automatic cache invalidation on data changes
+ * Simplified Features:
+ * - Core event management (add, update, delete)
+ * - Timeline display and updates
+ * - Statistics calculation and display
+ * - Modal operations for editing events
+ * - HTML onclick handler integration
  * 
- * @version 1.1
- * @updated Cache refresh fix for process.env issue
+ * @version 2.0 - Simplified
+ * @updated Removed complex caching and validation for better maintainability
  */
 
 // Core dependencies
@@ -38,35 +39,10 @@ import { timerController } from '../game/timer.js';
 class EventManager {
     constructor() {
         this.isInitialized = false;
-        this.statisticsCache = null;
-        this.lastCacheUpdate = null;
-        this.cacheKey = null;
-        // Note: Removed _timelineVisible - timeline always updates when events are added
-        // Note: Removed _statisticsVisible - statistics always update when events are added
-
-        // DOM element cache for frequently accessed elements
-        this._domElementCache = new Map();
-        this._cacheTimestamps = new Map();
-        this._cacheTimeout = 10000; // 10 seconds
-        this._animationFrameId = null;
-        this._pendingUpdates = new Set();
-
-        // DOM element cache for timeline optimization
-        this._timelineCache = {
-            logElement: null,
-            lastCacheTime: null,
-            cacheTimeout: 5000 // 5 seconds
-        };
-
-        this.cacheConfig = {
-            maxAge: 30000, // 30 seconds
-            enableLazyCalculation: true,
-            enableCacheKeyGeneration: true
-        };
     }
 
     /**
-     * Initialize the event management system with performance optimizations
+     * Initialize the event management system
      */
     init() {
         if (this.isInitialized) return;
@@ -76,9 +52,6 @@ class EventManager {
 
         this._bindEvents();
         this._bindModalEvents();
-
-        // Setup performance optimizations
-        this._optimizeDOMOperations();
 
         // Initial statistics update
         this.updateEventStatistics();
@@ -111,12 +84,7 @@ class EventManager {
      */
     addMatchEvent(eventType, notes = '') {
         try {
-            // Validate operation permissions
-            const operationValidation = this._validateEventOperation('add');
-            if (!operationValidation.isValid) {
-                notificationManager.error(`Operation validation failed: ${operationValidation.errors.join(', ')}`);
-                return;
-            }
+            // Basic validation - ensure required parameters exist
 
             // Validate inputs
             if (!eventType || typeof eventType !== 'string') {
@@ -136,17 +104,14 @@ class EventManager {
             const team1Name = domCache.get('Team1NameElement')?.textContent;
             const team2Name = domCache.get('Team2NameElement')?.textContent;
 
-            // Validate team names
-            const teamValidation = this._validateTeamNames(team1Name, team2Name);
-            if (!teamValidation.isValid) {
-                notificationManager.error(`Team validation failed: ${teamValidation.errors.join(', ')}`);
+            // Simple validation
+            if (!team1Name || !team2Name) {
+                notificationManager.error('Team names are required');
                 return;
             }
 
-            // Validate time
-            const timeValidation = this._validateTime(currentSeconds);
-            if (!timeValidation.isValid) {
-                notificationManager.error(`Time validation failed: ${timeValidation.errors.join(', ')}`);
+            if (currentSeconds < 0) {
+                notificationManager.error('Invalid time');
                 return;
             }
 
@@ -166,10 +131,9 @@ class EventManager {
                 eventData.teamName = team2Name;
             }
 
-            // Validate complete event data
-            const eventValidation = this._validateEventData(eventData);
-            if (!eventValidation.isValid) {
-                notificationManager.error(`Event validation failed: ${eventValidation.errors.join(', ')}`);
+            // Basic event data validation
+            if (!eventData.type || !eventData.timestamp) {
+                notificationManager.error('Invalid event data');
                 return;
             }
 
@@ -854,37 +818,7 @@ class EventManager {
 
     // ===== MODAL FORM VALIDATION AND ERROR HANDLING =====
 
-    /**
-     * Validate record event form data
-     * @param {Object} formData - Form data to validate
-     * @returns {Object} Validation result with isValid and errors
-     */
-    _validateRecordEventForm(formData) {
-        const errors = [];
-
-        // Validate event type selection
-        if (!formData.eventType || typeof formData.eventType !== 'string') {
-            errors.push('Please select an event type');
-        } else if (!this._isValidEventType(formData.eventType)) {
-            errors.push('Selected event type is not valid');
-        }
-
-        // Validate notes (optional but if provided, must be valid)
-        if (formData.notes) {
-            if (typeof formData.notes !== 'string') {
-                errors.push('Notes must be text');
-            } else if (formData.notes.length > 500) {
-                errors.push('Notes cannot exceed 500 characters');
-            }
-        }
-
-        // Check if game is in valid state for adding events
-        if (!gameState) {
-            errors.push('Game not initialized');
-        }
-
-        return { isValid: errors.length === 0, errors };
-    }
+    // Note: Removed complex _validateRecordEventForm method
 
     /**
      * Validate edit event form data
@@ -1185,27 +1119,26 @@ class EventManager {
      */
     updateMatchLog() {
         try {
-            console.log('🔄 updateMatchLog called - timeline will always update');
+            // Timeline update - always executes when events are added
 
             // Note: Removed timeline visibility check to ensure updates always happen when events are added
 
-            // Use cached element for better performance
-            const logElement = this._getCachedDOMElement('log');
+            // Get DOM elements directly
+            const logElement = document.getElementById('log') || domCache.get('log');
             if (!logElement) {
-                console.warn('❌ Log element not found');
+                console.warn('Log element not found');
                 return;
             }
-            console.log('✅ Log element found:', logElement);
 
-            const currentTeam1Name = this._getCachedDOMElement('Team1NameElement')?.textContent;
-            const currentTeam2Name = this._getCachedDOMElement('Team2NameElement')?.textContent;
+            const currentTeam1Name = (document.getElementById('Team1NameElement') || domCache.get('Team1NameElement'))?.textContent;
+            const currentTeam2Name = (document.getElementById('Team2NameElement') || domCache.get('Team2NameElement'))?.textContent;
 
             // Validate team names
             if (!currentTeam1Name || !currentTeam2Name) {
                 console.warn('❌ Team names not found for timeline rendering', { currentTeam1Name, currentTeam2Name });
                 return;
             }
-            console.log('✅ Team names found:', { currentTeam1Name, currentTeam2Name });
+            // Team names found successfully
 
             // Combine and sort all events by time
             const allEvents = [
@@ -1221,16 +1154,11 @@ class EventManager {
                 }))
             ].sort((a, b) => a.rawTime - b.rawTime);
 
-            console.log('📊 Events to render:', {
-                goals: gameState.goals.length,
-                matchEvents: gameState.matchEvents.length,
-                totalEvents: allEvents.length,
-                events: allEvents
-            });
+            // Events combined and sorted for rendering
 
             // Handle empty state with enhanced UI
             if (allEvents.length === 0) {
-                console.log('📝 No events to display, rendering empty timeline');
+                // No events to display, showing empty state
                 this._batchDOMUpdate(() => {
                     this._renderEmptyTimeline(logElement);
                 }, 'timeline_empty');
@@ -1238,10 +1166,9 @@ class EventManager {
             }
 
             // Use optimized rendering with requestAnimationFrame for better performance
-            console.log('🎨 Starting timeline render with', allEvents.length, 'events');
+            // Render timeline with optimized performance
             this._batchDOMUpdate(() => {
                 this._optimizedTimelineRender(allEvents, logElement, currentTeam1Name, currentTeam2Name);
-                console.log('✅ Timeline render completed');
             }, 'timeline_update');
 
         } catch (error) {
@@ -1510,57 +1437,18 @@ class EventManager {
      * @param {boolean} forceRecalculation - Force recalculation even if cache is valid
      * @returns {Object} Statistics object with caching metadata
      */
-    calculateStatistics(forceRecalculation = false) {
+    calculateStatistics() {
         try {
-            // Check if cache is valid and not forcing recalculation
-            if (!forceRecalculation && this._isStatisticsCacheValid()) {
-                return {
-                    ...this.statisticsCache,
-                    fromCache: true,
-                    lastUpdated: this.lastCacheUpdate,
-                    cacheKey: this.cacheKey
-                };
-            }
-
-            // Generate new cache key
-            const newCacheKey = this._generateCacheKey();
-
-            // Lazy calculation check - if we have expensive operations, defer them
-            const shouldUseLazyCalculation = this.cacheConfig.enableLazyCalculation &&
-                this._shouldUseLazyCalculation();
-
-            let stats;
-            if (shouldUseLazyCalculation) {
-                stats = this._calculateStatisticsLazy();
-            } else {
-                stats = this._calculateEventStatistics();
-            }
-
-            // Update cache with new key
-            this.statisticsCache = { ...stats };
-            this.lastCacheUpdate = Date.now();
-            this.cacheKey = newCacheKey;
-
-            return {
-                ...stats,
-                fromCache: false,
-                lastUpdated: this.lastCacheUpdate,
-                cacheKey: this.cacheKey,
-                calculationMethod: shouldUseLazyCalculation ? 'lazy' : 'full'
-            };
+            return this._calculateEventStatistics();
         } catch (error) {
             console.error('Error calculating statistics:', error);
-            // Return default stats on error
             return {
                 goals: 0,
                 cards: 0,
                 fouls: 0,
                 penalties: 0,
                 incidents: 0,
-                total: 0,
-                fromCache: false,
-                lastUpdated: Date.now(),
-                error: true
+                total: 0
             };
         }
     }
@@ -1570,29 +1458,25 @@ class EventManager {
      */
     updateEventStatistics() {
         try {
-            console.log('📊 updateEventStatistics called - statistics will always update');
-            
+            // Statistics update - always executes when events are added
+
             // Note: Removed statistics visibility check to ensure updates always happen when events are added
 
             const stats = this.calculateStatistics();
-            console.log('📈 Calculated statistics:', stats);
-
-            // Batch all statistics updates for better performance
+            // Update all statistics elements
             this._batchDOMUpdate(() => {
-                console.log('🎯 Updating statistics elements...');
                 // Update statistics cards with error handling
                 this._updateStatisticsElement('goals-count', stats.goals);
                 this._updateStatisticsElement('cards-count', stats.cards);
                 this._updateStatisticsElement('fouls-count', stats.fouls);
                 this._updateStatisticsElement('total-events-count', stats.total);
 
-                // Update additional statistics if elements exist
-                this._updateStatisticsElement('penalties-count', stats.penalties);
-                this._updateStatisticsElement('incidents-count', stats.incidents);
+                // Update additional statistics if elements exist (optional)
+                this._updateStatisticsElement('penalties-count', stats.penalties, true);
+                this._updateStatisticsElement('incidents-count', stats.incidents, true);
 
                 // Add cache indicator for development/debugging
                 this._updateCacheIndicator(stats);
-                console.log('✅ Statistics update completed');
             }, 'statistics_update');
 
             // Log cache performance in development (browser-compatible check)
@@ -2023,25 +1907,7 @@ class EventManager {
         }
     }
 
-    /**
-     * Clear statistics cache manually
-     * @param {boolean} force - Force clear even if cache is valid
-     */
-    clearStatisticsCache(force = false) {
-        try {
-            if (force || !this._isStatisticsCacheValid()) {
-                this._invalidateStatisticsCache();
-                console.log('Statistics cache cleared');
-                return true;
-            }
-
-            console.log('Cache is valid, use force=true to clear anyway');
-            return false;
-        } catch (error) {
-            console.error('Error clearing statistics cache:', error);
-            return false;
-        }
-    }
+    // Note: Removed clearStatisticsCache method - no longer needed
 
     /**
      * Update a statistics element safely
@@ -2088,10 +1954,19 @@ class EventManager {
      */
     openEditEventModal(index, type = 'matchEvent') {
         try {
-            // Validate inputs
-            const indexValidation = this._validateEventIndex(index, type);
-            if (!indexValidation.isValid) {
-                notificationManager.error(`Invalid event index: ${indexValidation.errors.join(', ')}`);
+            // Basic input validation
+            if (typeof index !== 'number' || index < 0 || !Number.isInteger(index)) {
+                notificationManager.error('Invalid event index');
+                return;
+            }
+
+            if (type === 'goal' && index >= gameState.goals.length) {
+                notificationManager.error('Goal index out of range');
+                return;
+            }
+
+            if (type === 'matchEvent' && index >= gameState.matchEvents.length) {
+                notificationManager.error('Event index out of range');
                 return;
             }
 
@@ -2116,8 +1991,32 @@ class EventManager {
                 notes: event.notes || ''
             };
 
-            // Show the edit modal with populated data
-            this._showEditEventModal(eventData);
+            // Populate and show the edit modal
+            const modalTitle = document.getElementById('editEventModalLabel');
+            const editEventTypeContainer = document.getElementById('editEventTypeContainer');
+            const editEventNotesContainer = document.getElementById('editEventNotesContainer');
+            const editEventIndex = document.getElementById('editEventIndex');
+            const editTimeInput = document.getElementById('editEventTime');
+
+            if (type === 'goal') {
+                if (modalTitle) modalTitle.textContent = 'Edit Goal Time';
+                if (editEventTypeContainer) editEventTypeContainer.style.display = 'none';
+                if (editEventNotesContainer) editEventNotesContainer.style.display = 'none';
+            } else {
+                if (modalTitle) modalTitle.textContent = 'Edit Event';
+                if (editEventTypeContainer) editEventTypeContainer.style.display = 'block';
+                if (editEventNotesContainer) editEventNotesContainer.style.display = 'block';
+
+                const editEventType = document.getElementById('editEventType');
+                const editEventNotes = document.getElementById('editEventNotes');
+                if (editEventType) editEventType.value = event.type || '';
+                if (editEventNotes) editEventNotes.value = event.notes || '';
+            }
+
+            if (editEventIndex) editEventIndex.value = index;
+            if (editTimeInput) editTimeInput.value = currentMinutes;
+
+            showModal('editEventModal');
         } catch (error) {
             console.error('Error opening edit modal:', error);
             notificationManager.error('Error opening edit modal. Please try again.');
@@ -2197,10 +2096,9 @@ class EventManager {
             // Get form data using event modals helper
             const formData = eventModals.getRecordEventFormData();
 
-            // Comprehensive form validation
-            const formValidation = this._validateRecordEventForm(formData);
-            if (!formValidation.isValid) {
-                this._displayFormErrors('recordEventForm', formValidation.errors);
+            // Simple form validation
+            if (!formData.eventType || !this._isValidEventType(formData.eventType)) {
+                notificationManager.error('Please select a valid event type');
                 return;
             }
 
@@ -2247,10 +2145,8 @@ class EventManager {
 
             // Get and validate form data
             const formData = this._getEditEventFormData();
-            const formValidation = this._validateEditEventForm(formData);
-
-            if (!formValidation.isValid) {
-                this._displayFormErrors('editEventForm', formValidation.errors);
+            if (!formData || (formData.eventType && !this._isValidEventType(formData.eventType))) {
+                notificationManager.error('Invalid form data');
                 return;
             }
 
@@ -2541,77 +2437,12 @@ class EventManager {
             this._clearTimelineCache();
         }, this._timelineCache.cacheTimeout * 2);
 
-        // Setup intersection observer for visibility-based optimizations
-        this._setupIntersectionObserver();
+        // Note: Removed intersection observer - no longer needed
     }
 
-    /**
-     * Initialize DOM element cache with frequently accessed elements
-     */
-    _initializeDOMCache() {
-        const frequentElements = [
-            'log',
-            'Team1NameElement',
-            'Team2NameElement',
-            'firstScoreElement',
-            'secondScoreElement',
-            'goals-count',
-            'cards-count',
-            'fouls-count',
-            'total-events-count',
-            'penalties-count',
-            'incidents-count'
-        ];
+    // Note: Removed DOM caching - using direct DOM queries
 
-        frequentElements.forEach(elementId => {
-            this._getCachedDOMElement(elementId);
-        });
-    }
-
-    /**
-     * Get cached DOM element with automatic cache management
-     * @param {string} elementId - ID of element to cache
-     * @returns {HTMLElement|null} Cached or fetched element
-     */
-    _getCachedDOMElement(elementId) {
-        const now = Date.now();
-        const cacheKey = `element_${elementId}`;
-
-        // Check if cache is expired
-        const timestamp = this._cacheTimestamps.get(cacheKey);
-        if (timestamp && (now - timestamp) > this._cacheTimeout) {
-            this._domElementCache.delete(cacheKey);
-            this._cacheTimestamps.delete(cacheKey);
-        }
-
-        // Return cached element if available
-        if (this._domElementCache.has(cacheKey)) {
-            return this._domElementCache.get(cacheKey);
-        }
-
-        // Fetch and cache element
-        const element = document.getElementById(elementId) || domCache.get(elementId);
-        if (element) {
-            this._domElementCache.set(cacheKey, element);
-            this._cacheTimestamps.set(cacheKey, now);
-        }
-
-        return element;
-    }
-
-    /**
-     * Clear expired DOM cache entries
-     */
-    _clearExpiredDOMCache() {
-        const now = Date.now();
-
-        for (const [key, timestamp] of this._cacheTimestamps.entries()) {
-            if ((now - timestamp) > this._cacheTimeout) {
-                this._domElementCache.delete(key);
-                this._cacheTimestamps.delete(key);
-            }
-        }
-    }
+    // Note: Removed complex DOM caching system - using direct DOM queries
 
     /**
      * Setup global event delegation for better performance
@@ -2719,23 +2550,7 @@ class EventManager {
         }, 100);
     }
 
-    /**
-     * Setup intersection observer for visibility-based optimizations
-     */
-    _setupIntersectionObserver() {
-        if (!('IntersectionObserver' in window)) {
-            return; // Fallback for older browsers
-        }
-
-        this._intersectionObserver = new IntersectionObserver((entries) => {
-            // Note: Intersection observer no longer needed - both timeline and statistics always update
-        }, {
-            threshold: 0.1,
-            rootMargin: '50px'
-        });
-
-        // Note: No longer observing elements - both timeline and statistics always update when events are added
-    }
+    // Note: Removed intersection observer - no longer needed for performance optimization
 
     /**
      * Batch DOM updates using requestAnimationFrame for smooth performance
@@ -2743,70 +2558,31 @@ class EventManager {
      * @param {string} updateKey - Unique key for the update to prevent duplicates
      */
     _batchDOMUpdate(updateFunction, updateKey = 'default') {
-        // Prevent duplicate updates
-        if (this._pendingUpdates.has(updateKey)) {
-            return;
+        try {
+            updateFunction();
+        } catch (error) {
+            console.error('Error in DOM update:', error);
         }
-
-        this._pendingUpdates.add(updateKey);
-
-        // Cancel previous animation frame if exists
-        if (this._animationFrameId) {
-            cancelAnimationFrame(this._animationFrameId);
-        }
-
-        this._animationFrameId = requestAnimationFrame(() => {
-            try {
-                updateFunction();
-                this._pendingUpdates.delete(updateKey);
-            } catch (error) {
-                console.error('Error in batched DOM update:', error);
-                this._pendingUpdates.delete(updateKey);
-            }
-        });
     }
 
     /**
      * Update statistics element with caching and error handling
      * @param {string} elementId - ID of statistics element
      * @param {number} value - Value to display
+     * @param {boolean} optional - Whether this element is optional (suppresses warnings)
      */
-    _updateStatisticsElement(elementId, value) {
-        let element = this._getCachedDOMElement(elementId);
-        
-        // Fallback to direct DOM query if cached version fails
-        if (!element) {
-            console.log(`🔄 Cached element not found for ${elementId}, trying direct query...`);
-            element = document.getElementById(elementId);
-        }
-        
-        console.log(`🔍 Updating ${elementId}:`, { 
-            element: !!element, 
-            value, 
-            currentText: element?.textContent,
-            elementExists: !!document.getElementById(elementId)
-        });
-        
-        if (element && element.textContent !== value.toString()) {
-            console.log(`✏️ ${elementId} needs update: "${element.textContent}" → "${value}"`);
-            // Only update if value has changed
-            this._batchDOMUpdate(() => {
-                element.textContent = value;
+    _updateStatisticsElement(elementId, value, optional = false) {
+        const element = document.getElementById(elementId);
 
-                // Add visual feedback for updates
-                element.classList.add('stat-updated');
-                setTimeout(() => {
-                    element.classList.remove('stat-updated');
-                }, 300);
-                console.log(`✅ ${elementId} updated to: ${value}`);
-            }, `stats_${elementId}`);
-        } else if (!element) {
-            console.warn(`❌ Element not found: ${elementId} (even with direct query)`);
-            // List all elements with similar IDs for debugging
-            const allElements = Array.from(document.querySelectorAll('[id*="count"]'));
-            console.log('📋 Available count elements:', allElements.map(el => el.id));
-        } else {
-            console.log(`⏭️ ${elementId} already has correct value: ${value}`);
+        if (element && element.textContent !== value.toString()) {
+            element.textContent = value;
+            // Add visual feedback for updates
+            element.classList.add('stat-updated');
+            setTimeout(() => {
+                element.classList.remove('stat-updated');
+            }, 300);
+        } else if (!element && !optional) {
+            console.warn(`Statistics element not found: ${elementId}`);
         }
     }
 
@@ -3342,72 +3118,15 @@ export const openEditEventModal = (...args) => eventManager.openEditEventModal(.
 export const handleEditEventFormSubmission = (...args) => eventManager.handleEditEventFormSubmission(...args);
 export const updateEventStatistics = (...args) => eventManager.updateEventStatistics(...args);
 export const updateMatchLog = (...args) => eventManager.updateMatchLog(...args);
-export const renderTimeline = (...args) => eventManager.renderTimeline(...args);
 export const calculateStatistics = (...args) => eventManager.calculateStatistics(...args);
 export const onEventsUpdated = (...args) => eventManager.onEventsUpdated(...args);
-export const applyFilters = (...args) => eventManager.applyFilters(...args);
-export const clearFilters = (...args) => eventManager.clearFilters(...args);
-export const cleanup = (...args) => eventManager.cleanup(...args);
-export const getEventModals = (...args) => eventManager.getEventModals(...args);
-// Enhanced caching methods
-export const configureCaching = (...args) => eventManager.configureCaching(...args);
-export const getCacheMetrics = (...args) => eventManager.getCacheMetrics(...args);
-export const clearStatisticsCache = (...args) => eventManager.clearStatisticsCache(...args);
-
-// Additional method aliases for backward compatibility with combined-events.js
+// Note: Removed unused filter and utility methods
+// Essential methods only
 export const init = () => eventManager.init();
 export const destroy = () => eventManager.destroy();
-
-// Method aliases for enhanced-events.js compatibility
-export const _calculateEventStatistics = () => eventManager.calculateStatistics();
-
-// Expose internal methods that were previously available
-export const _getNotificationType = (eventType) => eventManager._getNotificationType(eventType);
-export const _handleHalfTimeEvent = (eventData, team1Name, team2Name) => eventManager._handleHalfTimeEvent(eventData, team1Name, team2Name);
-export const _handleFullTimeEvent = (eventData, team1Name, team2Name) => eventManager._handleFullTimeEvent(eventData, team1Name, team2Name);
-export const _addScoreData = (eventData, team1Name, team2Name) => eventManager._addScoreData(eventData, team1Name, team2Name);
-export const _recalculateScores = () => eventManager._recalculateScores();
-
-// Timeline and UI method aliases
-export const _createTimelineItem = (event, index, currentTeam1Name, currentTeam2Name) => eventManager._createTimelineItem(event, index, currentTeam1Name, currentTeam2Name);
-export const _createMatchEventHTML = (event, currentTeam1Name, currentTeam2Name) => eventManager._createMatchEventHTML(event, currentTeam1Name, currentTeam2Name);
-export const _createGoalEventHTML = (event, currentTeam1Name, currentTeam2Name) => eventManager._createGoalEventHTML(event, currentTeam1Name, currentTeam2Name);
-export const _createActionButtons = (event, type) => eventManager._createActionButtons(event, type);
-export const _createGoalDetails = (event, isOppositionGoal) => eventManager._createGoalDetails(event, isOppositionGoal);
-
-// Additional utility method aliases from combined-events.js
-export const _updateTeamNames = (text, oldTeam1Name, oldTeam2Name, newTeam1Name, newTeam2Name) => eventManager._updateTeamNames(text, oldTeam1Name, oldTeam2Name, newTeam1Name, newTeam2Name);
-export const _updateEventTeamNames = (eventData, newTeam1Name, newTeam2Name) => eventManager._updateEventTeamNames(eventData, newTeam1Name, newTeam2Name);
-
-// Internal method aliases that might be called externally
-export const _bindEvents = () => eventManager._bindEvents();
-export const _bindModalEvents = () => eventManager._bindModalEvents();
-export const _optimizeDOMOperations = () => eventManager._optimizeDOMOperations();
-export const _cleanupOptimizations = () => eventManager._cleanupOptimizations();
-
-// Enhanced-events.js specific method aliases
-export const _updateEmptyState = () => eventManager._updateEmptyState ? eventManager._updateEmptyState() : undefined;
-
-// Performance and caching method aliases
-export const _shouldRecalculateStatistics = () => eventManager._shouldRecalculateStatistics ? eventManager._shouldRecalculateStatistics() : true;
-export const _getCachedStatistics = () => eventManager._getCachedStatistics ? eventManager._getCachedStatistics() : null;
-
-// Modal-related method aliases for external access
-export const _showEventDeleteModal = (itemType, itemName) => eventManager._showEventDeleteModal(itemType, itemName);
-export const _createEventDeleteModal = () => eventManager._createEventDeleteModal();
-export const _hideEventDeleteModal = () => eventManager._hideEventDeleteModal();
-export const _performEventDeletion = () => eventManager._performEventDeletion();
-
-// Validation method aliases
-export const _validateEventData = (eventData) => eventManager._validateEventData(eventData);
-export const _validateGoalData = (goalData) => eventManager._validateGoalData(goalData);
-export const _isValidEventType = (eventType) => eventManager._isValidEventType(eventType);
 export const _sanitizeInput = (text) => eventManager._sanitizeInput(text);
 
-// Cache management aliases
-export const _invalidateStatisticsCache = () => eventManager._invalidateStatisticsCache();
-export const _generateCacheKey = () => eventManager._generateCacheKey();
-export const _isCacheValid = () => eventManager._isCacheValid();
+// Note: Removed cache management aliases - no longer needed
 
 // Aliases for backward compatibility
 export const combinedEventsManager = eventManager;
@@ -3479,7 +3198,19 @@ if (typeof window !== 'undefined') {
 
     // Modal operations - used by HTML onclick handlers in timeline buttons
     window.EventsModule.showRecordEventModal = () => eventManager.showRecordEventModal();
-    window.EventsModule.openEditEventModal = (index, type) => eventManager.openEditEventModal(index, type);
+    window.EventsModule.openEditEventModal = (index, type) => {
+        try {
+            if (!eventManager || typeof eventManager.openEditEventModal !== 'function') {
+                console.error('EventManager not properly initialized');
+                notificationManager.error('Event system not ready');
+                return;
+            }
+            return eventManager.openEditEventModal.call(eventManager, index, type);
+        } catch (error) {
+            console.error('Error in window.EventsModule.openEditEventModal:', error);
+            notificationManager.error('Error opening edit modal');
+        }
+    };
     window.EventsModule.handleEditEventFormSubmission = (event) => eventManager.handleEditEventFormSubmission(event);
 
     // Display updates - used by other modules and potentially HTML
@@ -3497,10 +3228,7 @@ if (typeof window !== 'undefined') {
     window.EventsModule.destroy = () => eventManager.destroy();
     window.EventsModule.cleanup = () => eventManager.cleanup();
 
-    // Enhanced functionality - for performance tuning
-    window.EventsModule.configureCaching = (config) => eventManager.configureCaching(config);
-    window.EventsModule.getCacheMetrics = () => eventManager.getCacheMetrics();
-    window.EventsModule.clearStatisticsCache = () => eventManager.clearStatisticsCache();
+    // Note: Removed cache-related methods - no longer needed
 
     // Event callbacks - for reactive programming
     window.EventsModule.onEventsUpdated = (callback) => eventManager.onEventsUpdated(callback);
@@ -3522,95 +3250,7 @@ if (typeof window !== 'undefined') {
         }
     });
 
-    // Integration testing method (for development and debugging)
-    window.EventsModule.testGlobalIntegration = () => {
-        console.log('🔍 Testing EventsModule global integration...');
-        console.log('📋 Available methods:', Object.keys(window.EventsModule));
-        console.log('🎯 Event manager instance:', eventManager);
-
-        // Test critical HTML onclick handler methods
-        const criticalMethods = [
-            'openEditEventModal',    // Used in timeline edit buttons
-            'deleteLogEntry',        // Used in timeline delete buttons  
-            'showRecordEventModal',  // Used in record event button
-            'addMatchEvent',         // Used for adding events
-            'updateMatchLog'         // Used for display updates
-        ];
-
-        const missingMethods = criticalMethods.filter(method =>
-            typeof window.EventsModule[method] !== 'function'
-        );
-
-        // Test method signatures by calling with safe parameters
-        const testResults = {};
-        criticalMethods.forEach(method => {
-            if (typeof window.EventsModule[method] === 'function') {
-                testResults[method] = '✅ Available';
-            } else {
-                testResults[method] = '❌ Missing';
-            }
-        });
-
-        console.table(testResults);
-
-        // Test GoalsModule integration
-        const goalsModuleStatus = window.GoalsModule &&
-            typeof window.GoalsModule.toggleGoalDisallowed === 'function'
-            ? '✅ Available' : '⚠️ Not available';
-
-        console.log('🥅 GoalsModule.toggleGoalDisallowed:', goalsModuleStatus);
-
-        // Test backward compatibility aliases
-        const aliases = ['eventsManager', 'combinedEventsManager', 'enhancedEventsManager'];
-        const aliasResults = {};
-        aliases.forEach(alias => {
-            aliasResults[alias] = window.EventsModule[alias] === eventManager ? '✅ Correct' : '❌ Incorrect';
-        });
-
-        console.log('🔄 Backward compatibility aliases:');
-        console.table(aliasResults);
-
-        const allTestsPassed = missingMethods.length === 0;
-
-        if (allTestsPassed) {
-            console.log('🎉 All critical HTML integration methods are available and properly configured!');
-        } else {
-            console.error('💥 Missing critical methods:', missingMethods);
-        }
-
-        return {
-            success: allTestsPassed,
-            missingMethods,
-            availableMethods: Object.keys(window.EventsModule),
-            goalsModuleAvailable: goalsModuleStatus.includes('✅'),
-            testResults
-        };
-    };
-
-    // Quick test method for HTML onclick handler simulation
-    window.EventsModule.testHtmlIntegration = () => {
-        console.log('🧪 Testing HTML onclick handler integration...');
-
-        try {
-            // Test that methods can be called (with safe parameters)
-            console.log('Testing openEditEventModal availability:',
-                typeof window.EventsModule.openEditEventModal === 'function' ? '✅' : '❌');
-            console.log('Testing deleteLogEntry availability:',
-                typeof window.EventsModule.deleteLogEntry === 'function' ? '✅' : '❌');
-            console.log('Testing showRecordEventModal availability:',
-                typeof window.EventsModule.showRecordEventModal === 'function' ? '✅' : '❌');
-
-            // Test GoalsModule integration
-            console.log('Testing GoalsModule.toggleGoalDisallowed availability:',
-                window.GoalsModule && typeof window.GoalsModule.toggleGoalDisallowed === 'function' ? '✅' : '❌');
-
-            console.log('🎯 HTML integration test completed successfully!');
-            return true;
-        } catch (error) {
-            console.error('💥 HTML integration test failed:', error);
-            return false;
-        }
-    };
+    // Note: Removed test integration methods - not needed in production
 }
 
 // Ensure GoalsModule integration for goal-specific operations referenced in HTML onclick handlers

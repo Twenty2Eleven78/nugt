@@ -3,11 +3,12 @@
  * @version 4.0
  */
 
+import { getConfig } from '../data/config.js';
 import { gameState, stateManager } from '../data/state.js';
 import { storage, storageHelpers } from '../data/storage.js';
 import { domCache } from '../shared/dom.js';
 import { formatTime, getCurrentSeconds } from '../shared/utils.js';
-import { GAME_CONFIG, EVENT_TYPES } from '../shared/constants.js';
+import { EVENT_TYPES } from '../shared/constants.js';
 import { notificationManager } from '../services/notifications.js';
 import { combinedEventsManager } from '../match/combined-events.js';
 
@@ -39,7 +40,7 @@ class TimerController {
       if (currentTime % 5 === 0) {
         storageHelpers.saveGameStateImmediate(gameState);
       }
-    }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
+    }, getConfig().game.timer_update_interval);
 
     const isNewGame = gameState.seconds === 0;
     const buttonText = isNewGame ? 'Game Started' : 'Game Resumed';
@@ -181,7 +182,7 @@ class TimerController {
 
       this.updateInterval = setInterval(() => {
         this.updateDisplay();
-      }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
+      }, getConfig().game.timer_update_interval);
 
       // Update button UI to reflect running state
       this._updateButtonUI('Game in Progress', 'btn-success', formatTime(currentSeconds));
@@ -209,7 +210,7 @@ class TimerController {
       }
       this.updateInterval = setInterval(() => {
         this.updateDisplay();
-      }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
+      }, getConfig().game.timer_update_interval);
     }
 
     this.updateDisplay();
@@ -284,7 +285,7 @@ class TimerController {
         if (currentTime % 5 === 0) {
           storageHelpers.saveGameStateImmediate(gameState);
         }
-      }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
+      }, getConfig().game.timer_update_interval);
 
       // Update UI
       this._updateButtonUI('Game in Progress', 'btn-success', formatTime(actualSeconds));

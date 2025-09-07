@@ -3,14 +3,15 @@
  * @version 4.0
  */
 
-import { STORAGE_KEYS, GAME_CONFIG } from '../shared/constants.js';
+import { getConfig } from './config.js';
+import { STORAGE_KEYS } from '../shared/constants.js';
 import { debounce } from '../shared/utils.js';
 
 // Enhanced storage manager with better error handling and performance
 class StorageManager {
   constructor() {
     this._saveQueue = new Map();
-    this._debouncedFlush = debounce(() => this._flushSaves(), GAME_CONFIG.STORAGE_DEBOUNCE_DELAY);
+    this._debouncedFlush = debounce(() => this._flushSaves(), () => getConfig().game.storage_debounce_delay);
   }
 
   // Save data with debouncing
@@ -180,16 +181,17 @@ export const storageHelpers = {
 
   // Load complete game state
   loadGameState() {
+    const config = getConfig();
     return {
       seconds: storage.load(STORAGE_KEYS.ELAPSED_TIME, 0),
       isRunning: storage.load(STORAGE_KEYS.IS_RUNNING, false),
       startTimestamp: storage.load(STORAGE_KEYS.START_TIMESTAMP, null),
-      gameTime: storage.load(STORAGE_KEYS.GAME_TIME, GAME_CONFIG.DEFAULT_GAME_TIME),
+      gameTime: storage.load(STORAGE_KEYS.GAME_TIME, config.game.default_game_time),
       isSecondHalf: storage.load(STORAGE_KEYS.IS_SECOND_HALF, false),
       goals: storage.load(STORAGE_KEYS.GOALS, []),
       matchEvents: storage.load(STORAGE_KEYS.MATCH_EVENTS, []),
-      team1History: storage.load(STORAGE_KEYS.TEAM1_HISTORY, [GAME_CONFIG.DEFAULT_TEAM1_NAME]),
-      team2History: storage.load(STORAGE_KEYS.TEAM2_HISTORY, [GAME_CONFIG.DEFAULT_TEAM2_NAME]),
+      team1History: storage.load(STORAGE_KEYS.TEAM1_HISTORY, [config.game.default_team1_name]),
+      team2History: storage.load(STORAGE_KEYS.TEAM2_HISTORY, [config.game.default_team2_name]),
       attendance: storage.load(STORAGE_KEYS.MATCH_ATTENDANCE, [])
     };
   }

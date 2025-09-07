@@ -3,8 +3,8 @@
  * Essential utility functions used throughout the application
  */
 
+import { getConfig } from '../data/config.js';
 import { gameState } from '../data/state.js';
-import { GAME_CONFIG } from './constants.js';
 
 // Cache for expensive operations
 const utilsCache = new Map();
@@ -86,8 +86,9 @@ export function formatMatchTime(seconds, options = {}) {
       return '0';
     }
 
-    const halfTime = (gameState.gameTime || GAME_CONFIG.DEFAULT_GAME_TIME) / 2;
-    const fullTime = gameState.gameTime || GAME_CONFIG.DEFAULT_GAME_TIME;
+    const config = getConfig();
+    const halfTime = (gameState.gameTime || config.game.default_game_time) / 2;
+    const fullTime = gameState.gameTime || config.game.default_game_time;
     
     let displayTime;
     let extraTime = 0;
@@ -165,7 +166,8 @@ export function debounce(func, wait, options = {}) {
     clearTimeout(timeout);
     clearTimeout(maxTimeout);
     
-    timeout = setTimeout(later, wait);
+    const waitValue = typeof wait === 'function' ? wait() : wait;
+    timeout = setTimeout(later, waitValue);
     
     // Handle maxWait
     if (maxWait && !maxTimeout) {

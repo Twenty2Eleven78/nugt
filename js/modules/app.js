@@ -4,7 +4,7 @@
  */
 
 // Import restructured modules
-import { gameState, stateManager } from './data/state.js';
+import { gameState, stateManager, initializeGameState } from './data/state.js';
 import { storage, storageHelpers } from './data/storage.js';
 import { domCache } from './shared/dom.js';
 import { formatTime } from './shared/utils.js';
@@ -170,9 +170,65 @@ function enhanceTouchTargets() {
   });
 }
 
+import { getConfig } from './data/config.js';
+
+function injectManifest(config) {
+  const manifest = {
+    "name": config.app.name,
+    "short_name": config.app.short_name,
+    "start_url": "./",
+    "theme_color": "#ffffff",
+    "background_color": "#fff",
+    "display": "standalone",
+    "description": config.app.description,
+    "icons": [
+        {
+            "src": "./nugt512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "id": "NUGT",
+    "lang": "en",
+    "orientation": "portrait-primary",
+    "categories": [
+        "sports",
+        "utilities"
+    ],
+    "display_override": [
+        "window-controls-overlay",
+        "standalone"
+    ],
+    "launch_handler": {
+        "client_mode": [
+            "focus-existing",
+            "auto"
+        ]
+    },
+    "handle_links": "preferred"
+  };
+
+  const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+  const manifestURL = URL.createObjectURL(blob);
+  const link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = manifestURL;
+  document.head.appendChild(link);
+}
+
 // Initialize application
 export function initializeApp() {
-  console.log('Initializing NUFC GameTime App v4.0 - Enhanced with Custom Framework');
+  const config = getConfig();
+  document.title = `${config.app.name} v${config.app.version}`;
+  const appTitle = domCache.get('app-title');
+  if (appTitle) {
+    appTitle.textContent = config.app.name;
+  }
+  console.log(`Initializing ${config.app.name} v${config.app.version} - Enhanced with Custom Framework`);
+
+  injectManifest(config);
+  initializeGameState();
 
   // Initialize custom modal system
   initializeCustomModals();

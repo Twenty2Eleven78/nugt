@@ -7,46 +7,49 @@
  * Enhanced modular architecture with attendance tracking, advanced events, and modern UI
  */
 
+import { fetchConfig } from './modules/data/config.js';
 import { initializeApp } from './modules/app.js';
 import { adminModal } from './modules/ui/admin-modal.js';
 import { authService } from './modules/services/auth.js';
 
 // Initialize the application when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  initializeApp();
+  fetchConfig().then(() => {
+    initializeApp();
 
-  const adminModalButton = document.getElementById('admin-modal-button');
-  if (adminModalButton) {
-    // Set up click handler once
-    adminModalButton.addEventListener('click', () => {
-      adminModal.show();
-    });
+    const adminModalButton = document.getElementById('admin-modal-button');
+    if (adminModalButton) {
+      // Set up click handler once
+      adminModalButton.addEventListener('click', () => {
+        adminModal.show();
+      });
 
-    // Update visibility based on auth state
-    const updateAdminButtonVisibility = async () => {
-      if (authService.isUserAuthenticated()) {
-        try {
-          const isAdmin = await authService.isAdmin();
-          if (isAdmin) {
-            adminModalButton.classList.remove('d-none');
-          } else {
+      // Update visibility based on auth state
+      const updateAdminButtonVisibility = async () => {
+        if (authService.isUserAuthenticated()) {
+          try {
+            const isAdmin = await authService.isAdmin();
+            if (isAdmin) {
+              adminModalButton.classList.remove('d-none');
+            } else {
+              adminModalButton.classList.add('d-none');
+            }
+          } catch (error) {
+            console.error('Error checking admin status:', error);
             adminModalButton.classList.add('d-none');
           }
-        } catch (error) {
-          console.error('Error checking admin status:', error);
+        } else {
           adminModalButton.classList.add('d-none');
         }
-      } else {
-        adminModalButton.classList.add('d-none');
-      }
-    };
+      };
 
-    // Listen for auth state changes
-    authService.onAuthStateChange(updateAdminButtonVisibility);
-    
-    // Initial check
-    updateAdminButtonVisibility();
-  }
+      // Listen for auth state changes
+      authService.onAuthStateChange(updateAdminButtonVisibility);
+
+      // Initial check
+      updateAdminButtonVisibility();
+    }
+  });
 });
 
 // Handle page visibility changes for timer accuracy

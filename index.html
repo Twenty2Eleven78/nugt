@@ -56,8 +56,7 @@
   <noscript>
     <link href="css/all.min.css" rel="stylesheet">
   </noscript>
-  <!-- PWA Manifest-->
-  <link rel="manifest" href="manifest.json">
+  <!-- PWA Manifest will be injected dynamically -->
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
   <!-- Module preload for better performance -->
   <link rel="modulepreload" href="js/main.js">
@@ -81,7 +80,7 @@
         <div class="row mb-2">
           <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
-              <h3 class="mb-0">&nbsp;&nbsp;&nbsp;NUFC GameTime</h3>
+              <h3 class="mb-0" id="app-title">&nbsp;&nbsp;&nbsp;</h3>
               <div id="header-profile-container"></div>
             </div>
           </div>

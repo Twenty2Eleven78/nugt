@@ -3,10 +3,11 @@
  * @version 4.0
  */
 
+import { getConfig } from '../data/config.js';
 import { gameState, stateManager } from '../data/state.js';
 import { storage } from '../data/storage.js';
 import { domCache } from '../shared/dom.js';
-import { STORAGE_KEYS, GAME_CONFIG } from '../shared/constants.js';
+import { STORAGE_KEYS } from '../shared/constants.js';
 import { notificationManager } from '../services/notifications.js';
 import { updateMatchLog } from './combined-events.js';
 
@@ -92,13 +93,14 @@ class TeamManager {
 
   // Initialize teams from storage
   initializeTeams() {
+    const config = getConfig();
     // Load team names from storage
-    const team1Name = storage.load(STORAGE_KEYS.TEAM1_NAME, GAME_CONFIG.DEFAULT_TEAM1_NAME);
-    const team2Name = storage.load(STORAGE_KEYS.TEAM2_NAME, GAME_CONFIG.DEFAULT_TEAM2_NAME);
+    const team1Name = storage.load(STORAGE_KEYS.TEAM1_NAME, config.game.default_team1_name);
+    const team2Name = storage.load(STORAGE_KEYS.TEAM2_NAME, config.game.default_team2_name);
 
     // Load team history
-    gameState.team1History = storage.load(STORAGE_KEYS.TEAM1_HISTORY, [GAME_CONFIG.DEFAULT_TEAM1_NAME]);
-    gameState.team2History = storage.load(STORAGE_KEYS.TEAM2_HISTORY, [GAME_CONFIG.DEFAULT_TEAM2_NAME]);
+    gameState.team1History = storage.load(STORAGE_KEYS.TEAM1_HISTORY, [config.game.default_team1_name]);
+    gameState.team2History = storage.load(STORAGE_KEYS.TEAM2_HISTORY, [config.game.default_team2_name]);
 
     // Update UI without saving to storage
     const team1Config = this._getTeamConfig(1);
@@ -109,9 +111,10 @@ class TeamManager {
 
   // Get current team names
   getCurrentTeamNames() {
+    const config = getConfig();
     return {
-      team1: domCache.get('Team1NameElement')?.textContent || GAME_CONFIG.DEFAULT_TEAM1_NAME,
-      team2: domCache.get('Team2NameElement')?.textContent || GAME_CONFIG.DEFAULT_TEAM2_NAME
+      team1: domCache.get('Team1NameElement')?.textContent || config.game.default_team1_name,
+      team2: domCache.get('Team2NameElement')?.textContent || config.game.default_team2_name
     };
   }
 
@@ -125,13 +128,14 @@ class TeamManager {
 
   // Reset teams to defaults
   resetTeams() {
+    const config = getConfig();
     stateManager.resetTeams();
 
     // Update UI and save to storage
     const team1Config = this._getTeamConfig(1);
     const team2Config = this._getTeamConfig(2);
-    this._updateTeamUI(GAME_CONFIG.DEFAULT_TEAM1_NAME, team1Config, true);
-    this._updateTeamUI(GAME_CONFIG.DEFAULT_TEAM2_NAME, team2Config, true);
+    this._updateTeamUI(config.game.default_team1_name, team1Config, true);
+    this._updateTeamUI(config.game.default_team2_name, team2Config, true);
   }
 }
 

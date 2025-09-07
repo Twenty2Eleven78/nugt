@@ -3,7 +3,7 @@
  * @version 4.0
  */
 
-import { GAME_CONFIG } from '../shared/constants.js';
+import { getConfig } from './config.js';
 
 // Centralized application state
 export const gameState = {
@@ -11,7 +11,7 @@ export const gameState = {
   seconds: 0,
   isRunning: false,
   startTimestamp: null,
-  gameTime: GAME_CONFIG.DEFAULT_GAME_TIME,
+  gameTime: 4200, // Default value, will be updated from config
   isSecondHalf: false,
 
   // Match data
@@ -20,13 +20,20 @@ export const gameState = {
   pendingGoalTimestamp: null,
 
   // Team data
-  team1History: [GAME_CONFIG.DEFAULT_TEAM1_NAME],
-  team2History: [GAME_CONFIG.DEFAULT_TEAM2_NAME],
+  team1History: ['Netherton'], // Default value, will be updated from config
+  team2History: ['Opposition'], // Default value, will be updated from config
 
   // UI state
   editingEventIndex: null,
   editingEventType: null
 };
+
+export function initializeGameState() {
+    const config = getConfig();
+    gameState.gameTime = config.game.default_game_time;
+    gameState.team1History = [config.game.default_team1_name];
+    gameState.team2History = [config.game.default_team2_name];
+}
 
 // State mutation methods with validation
 export const stateManager = {
@@ -130,15 +137,17 @@ export const stateManager = {
   },
 
   resetTeams() {
-    gameState.team1History = [GAME_CONFIG.DEFAULT_TEAM1_NAME];
-    gameState.team2History = [GAME_CONFIG.DEFAULT_TEAM2_NAME];
+    const config = getConfig();
+    gameState.team1History = [config.game.default_team1_name];
+    gameState.team2History = [config.game.default_team2_name];
   },
 
   resetAll() {
+    const config = getConfig();
     this.resetTimer();
     this.resetMatch();
     this.resetTeams();
-    gameState.gameTime = GAME_CONFIG.DEFAULT_GAME_TIME;
+    gameState.gameTime = config.game.default_game_time;
     this.clearEditingEvent();
   }
 };

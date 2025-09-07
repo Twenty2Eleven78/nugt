@@ -4,10 +4,10 @@
  * @version 1.0
  */
 
+import { getConfig } from '../data/config.js';
 import { gameState, stateManager } from '../data/state.js';
 import { storage, storageHelpers } from '../data/storage.js';
 import { domCache } from '../shared/dom.js';
-import { GAME_CONFIG } from '../shared/constants.js';
 import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from './modals.js';
 import { rosterManager } from '../match/roster.js';
@@ -286,14 +286,15 @@ class NewMatchModal {
     }
 
     setDefaultValues() {
+        const config = getConfig();
         const team1Input = document.getElementById('newMatchTeam1Name');
         const team2Input = document.getElementById('newMatchTeam2Name');
         
         if (team1Input) {
-            team1Input.value = GAME_CONFIG.DEFAULT_TEAM1_NAME;
+            team1Input.value = config.game.default_team1_name;
         }
         if (team2Input) {
-            team2Input.value = GAME_CONFIG.DEFAULT_TEAM2_NAME;
+            team2Input.value = config.game.default_team2_name;
         }
     }
 

@@ -3,14 +3,6 @@
  * Centralized configuration and constants for the NUFC GameTime application
  */
 
-// Application Configuration
-export const APP_CONFIG = {
-  NAME: 'NUFC GameTime',
-  VERSION: '4.0',
-  AUTHOR: 'NUFC GameTime Team',
-  DESCRIPTION: 'Football match tracking and statistics application'
-};
-
 // Storage Keys - Local Storage identifiers
 export const STORAGE_KEYS = {
   // Timer and Game State
@@ -38,34 +30,6 @@ export const STORAGE_KEYS = {
   // Player Management
   ROSTER: 'nugt_roster',
   PLAYER_STATS: 'nugt_playerStats'
-};
-
-// Game Configuration
-export const GAME_CONFIG = {
-  // Time Settings (in seconds)
-  DEFAULT_GAME_TIME: 4200, // 70 minutes
-  HALF_TIME_DURATION: 2100, // 35 minutes
-  FULL_TIME_DURATION: 4200, // 70 minutes
-  EXTRA_TIME_DURATION: 1800, // 30 minutes
-
-  // Timer Settings (in milliseconds)
-  TIMER_UPDATE_INTERVAL: 100,
-  STORAGE_DEBOUNCE_DELAY: 100,
-  AUTO_SAVE_INTERVAL: 5000, // 5 seconds
-
-  // Team Defaults
-  DEFAULT_TEAM1_NAME: 'Netherton',
-  DEFAULT_TEAM2_NAME: 'Opposition',
-
-  // Match Settings
-  MAX_PLAYERS_PER_TEAM: 22,
-  MIN_PLAYERS_PER_TEAM: 7,
-  MAX_SUBSTITUTIONS: 5,
-
-  // UI Settings
-  NOTIFICATION_DURATION: 3000, // 3 seconds
-  MODAL_ANIMATION_DURATION: 300, // 0.3 seconds
-  DEBOUNCE_DELAY: 300 // 0.3 seconds
 };
 
 // Match Event Types

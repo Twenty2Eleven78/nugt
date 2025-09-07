@@ -252,6 +252,7 @@ export function initializeApp() {
   updateMatchLog();
 
   console.log('App initialization complete');
+  console.log('Final gameState.goals after init:', gameState.goals);
 }
 
 // Load application state from storage
@@ -264,10 +265,12 @@ function loadAppState() {
   stateManager.setHalfState(savedState.isSecondHalf);
 
   // Load match data
+  console.log('Loading saved goals:', savedState.goals);
   gameState.goals = savedState.goals;
   gameState.matchEvents = savedState.matchEvents;
   gameState.team1History = savedState.team1History;
   gameState.team2History = savedState.team2History;
+  console.log('Goals loaded into gameState:', gameState.goals);
 
   // Load and display scores
   const firstScore = storage.load(STORAGE_KEYS.FIRST_SCORE, 0);

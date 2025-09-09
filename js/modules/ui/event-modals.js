@@ -30,7 +30,7 @@ class EventModals {
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="recordEventModalLabel">Record New Event</h5>
-              <button type="button" class="btn btn-danger btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+              <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
                 <i class="fas fa-times" style="font-size: 14px;"></i>
               </button>
             </div>

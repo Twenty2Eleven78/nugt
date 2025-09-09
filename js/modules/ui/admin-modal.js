@@ -73,7 +73,7 @@ const modalHtml = `
                 <h5 class="modal-title">
                     <i class="fas fa-trash"></i> Confirm Deletion
                 </h5>
-                <button type="button" class="btn btn-light btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-times text-danger" style="font-size: 14px;"></i>
                 </button>
             </div>

@@ -15,10 +15,12 @@ export const DEFAULT_ROSTER_CONFIG = {
 
     // Default players list
     players: [
-        { name: 'C.Alvarez', shirtNumber: null },
         { name: 'A-R.Obidi', shirtNumber: null },
+        { name: 'A.Osprey', shirtNumber: null },
         { name: 'A.Porada', shirtNumber: null },
         { name: 'A.Seaman', shirtNumber: null },
+        { name: 'C.Alvarez', shirtNumber: null },
+        { name: 'Ciana.player', shirtNumber: null },
         { name: 'D.Peacock', shirtNumber: null },
         { name: 'E.Doyle', shirtNumber: null },
         { name: 'E.Van-Kerro', shirtNumber: null },

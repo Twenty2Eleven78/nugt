@@ -42,7 +42,7 @@ class TeamModals {
                     <div>
                       <input type="text" id="team1Name" class="form-control" placeholder="Netherton">
                       <br>
-                      <button class="btn btn-danger btn-custom" id="updTeam1Btn">Update Team Name</button>
+                      <button class="btn btn-primary btn-custom" id="updTeam1Btn">Update Team Name</button>
                     </div>
                   </div>
                 </div>
@@ -85,7 +85,7 @@ class TeamModals {
                     <div>
                       <input type="text" id="team2Name" class="form-control" placeholder="Opposition Team">
                       <br>
-                      <button class="btn btn-danger btn-custom" id="updTeam2Btn">Update Team Name</button>
+                      <button class="btn btn-primary btn-custom" id="updTeam2Btn">Update Team Name</button>
                     </div>
                   </div>
                 </div>

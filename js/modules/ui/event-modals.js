@@ -83,7 +83,7 @@ class EventModals {
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="editEventModalLabel">Edit Event</h5>
-              <button type="button" class="btn btn-danger btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px;">
+              <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px;">
                 <i class="fas fa-times"></i>
               </button>
             </div>

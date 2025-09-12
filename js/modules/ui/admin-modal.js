@@ -10,7 +10,7 @@ const modalHtml = `
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="admin-modal-label">Admin Dashboard</h5>
-                <button type="button" class="btn btn-danger btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-times" style="font-size: 14px;"></i>
                 </button>
             </div>
@@ -38,7 +38,7 @@ const modalHtml = `
                             </button>
                         </div>
                         <div class="col-4">
-                            <button class="btn btn-success w-100" id="generate-stats-btn" title="Generate Statistics">
+                            <button class="btn btn-primary w-100" id="generate-stats-btn" title="Generate Statistics">
                                 <i class="fas fa-chart-bar me-1"></i>Stats
                             </button>
                         </div>
@@ -74,7 +74,7 @@ const modalHtml = `
                     <i class="fas fa-trash"></i> Confirm Deletion
                 </h5>
                 <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-times text-danger" style="font-size: 14px;"></i>
+                    <i class="fas fa-times" style="font-size: 14px;"></i>
                 </button>
             </div>
             <div class="modal-body">

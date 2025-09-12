@@ -56,7 +56,7 @@ class RosterModal {
                 <div class="input-group">
                   <input type="text" id="newPlayerName" class="form-control" placeholder="Name">&nbsp;
                   <input type="number" id="newPlayerShirtNumber" class="form-control" placeholder="Shirt #" min="0" max="99">&nbsp;
-                  <button class="btn btn-danger" id="addPlayerBtn" type="button">
+                  <button class="btn btn-primary" id="addPlayerBtn" type="button">
                     <i class="fas fa-plus me-2"></i>Add Player
                   </button>
                 </div>
@@ -68,7 +68,7 @@ class RosterModal {
               <div class="mb-3">
                 <label for="bulkPlayerNames" class="form-label">Paste names (comma or new-line separated):</label>
                 <textarea id="bulkPlayerNames" class="form-control mb-2" rows="3" placeholder="e.g. Player One, Player Two&#x0a;Player Three"></textarea>
-                <button id="addPlayersBulkBtn" class="btn btn-danger w-100" type="button">
+                <button id="addPlayersBulkBtn" class="btn btn-primary w-100" type="button">
                   <i class="fas fa-list-ul me-2"></i>Add Players from List
                 </button>
               </div>
@@ -90,7 +90,7 @@ class RosterModal {
               </div>
 
               <hr class="my-3">
-              <button id="clearRosterBtn" class="btn btn-danger w-100">
+              <button id="clearRosterBtn" class="btn btn-primary w-100">
                 <i class="fas fa-trash-alt me-2"></i>Clear All Players
               </button>
             </div>
@@ -105,7 +105,7 @@ class RosterModal {
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="editPlayerModalLabel"><i class="fas fa-user-edit me-2"></i>Edit Player</h5>
-              <button type="button" class="btn btn-danger btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+              <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
                 <i class="fas fa-times" style="font-size: 14px;"></i>
               </button>
             </div>
@@ -121,7 +121,7 @@ class RosterModal {
                   <input type="number" class="form-control" id="editPlayerShirtNumber" name="editPlayerShirtNumber" min="0" max="99">
                 </div>
                 <div class="d-flex justify-content-end gap-2 mt-3">
-                  <button type="submit" class="btn btn-danger">Save Changes</button>
+                  <button type="submit" class="btn btn-primary">Save Changes</button>
                 </div>
               </form>
             </div>

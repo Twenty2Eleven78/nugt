@@ -63,7 +63,7 @@ class AttendanceModal {
                   <i class="fas fa-user-times me-1"></i>All Absent
                 </button>
                 <button id="clearAttendanceBtnMain" class="btn btn-outline-secondary">
-                  <i class="fas fa-undo me-1"></i>Reset Attendance
+                  <i class="fas fa-undo me-1"></i>Reset
                 </button>
               </div>
 

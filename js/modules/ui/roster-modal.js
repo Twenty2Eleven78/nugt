@@ -76,7 +76,7 @@ class RosterModal {
               <hr>
 
               <h5>Current Roster</h5>
-              <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+              <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
                 <table class="table table-striped table-sm table-hover roster-table">
                   <thead>
                     <tr>

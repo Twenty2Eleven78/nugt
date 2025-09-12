@@ -56,13 +56,13 @@ class AttendanceModal {
 
               <!-- Attendance Controls -->
               <div class="attendance-controls mb-4">
-                <button id="markAllAttendingBtnMain" class=" w-100 btn btn-primary">
+                <button id="markAllAttendingBtnMain" class="w-33 btn btn-primary">
                   <i class="fas fa-user-check me-1"></i>All Present
                 </button>
-                <button id="markAllAbsentBtnMain" class=" w-100btn btn-warning">
+                <button id="markAllAbsentBtnMain" class=" w-33 btn btn-warning">
                   <i class="fas fa-user-times me-1"></i>All Absent
                 </button>
-                <button id="clearAttendanceBtnMain" class="w-100 btn btn-outline-secondary">
+                <button id="clearAttendanceBtnMain" class="w-33 btn btn-outline-secondary">
                   <i class="fas fa-undo me-1"></i>Reset
                 </button>
               </div>

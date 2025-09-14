@@ -55,26 +55,20 @@ class AttendanceModal {
               </div>
 
               <!-- Attendance Controls -->
-              <div class="attendance-controls row mb-4">
-                <div class="col-4">
-                <button id="markAllAttendingBtnMain" class="w-33 btn btn-primary">
+              <div class="attendance-controls d-flex gap-2 mb-4">
+                <button id="markAllAttendingBtnMain" class="flex-fill btn btn-primary">
                   <i class="fas fa-user-check me-1"></i>All Present
                 </button>
-                </div>
-                <div class="col-4">
-                <button id="markAllAbsentBtnMain" class=" w-33 btn btn-warning">
+                <button id="markAllAbsentBtnMain" class="flex-fill btn btn-warning">
                   <i class="fas fa-user-times me-1"></i>All Absent
                 </button>
-                </div>
-                <div class="col-4">
-                <button id="clearAttendanceBtnMain" class="w-33 btn btn-outline-secondary">
+                <button id="clearAttendanceBtnMain" class="flex-fill btn btn-outline-secondary">
                   <i class="fas fa-undo me-1"></i>Reset
                 </button>
-                </div>
               </div>
 
               <!-- Attendance List -->
-              <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+              <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
                 <table class="table table-striped table-hover">
                   <thead class="table-dark sticky-top">
                     <tr>

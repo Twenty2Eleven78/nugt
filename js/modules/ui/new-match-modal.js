@@ -7,7 +7,7 @@
 import { gameState, stateManager } from '../data/state.js';
 import { storage, storageHelpers } from '../data/storage.js';
 import { domCache } from '../shared/dom.js';
-import { GAME_CONFIG } from '../shared/constants.js';
+import { GAME_CONFIG, STORAGE_KEYS } from '../shared/constants.js';
 import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from './modals.js';
 import { rosterManager } from '../match/roster.js';
@@ -228,8 +228,11 @@ class NewMatchModal {
                         playerCard.setAttribute('data-selected', 'true');
                     }
                     
-                    this.updateSelectedCount();
-                    this.updateSummary();
+                    // Force update with setTimeout to ensure DOM is updated
+                    setTimeout(() => {
+                        this.updateSelectedCount();
+                        this.updateSummary();
+                    }, 10);
                     
                     // Reset processing flag after a short delay
                     setTimeout(() => {
@@ -270,8 +273,6 @@ class NewMatchModal {
 
     show() {
         this.init();
-        // Clear selections when showing modal fresh
-        this.selectedPlayers.clear();
         this.populatePlayersList();
         
         showModal('newMatchModal');
@@ -471,6 +472,9 @@ class NewMatchModal {
             // Get match title before reset
             const matchTitle = document.getElementById('matchTitle')?.value.trim();
 
+            // Capture selected players BEFORE reset clears them
+            const selectedPlayersCopy = new Set(this.selectedPlayers);
+
             // Reset current game state
             await this.resetGameState();
 
@@ -485,32 +489,29 @@ class NewMatchModal {
             if (matchTitle) {
                 gameState.matchTitle = matchTitle;
             }
-
-            // Set player attendance (silently to avoid notification spam)
-            if (this.selectedPlayers.size > 0) {
+            
+            // Set player attendance after reset
+            setTimeout(() => {
                 const roster = rosterManager.getRoster();
                 
-                // First, mark all players as absent (silently)
-                attendanceManager.markAllAbsent(true);
-                
-                // Then mark selected players as attending (silently)
-                Array.from(this.selectedPlayers).forEach(index => {
-                    const player = roster[index];
-                    if (player && player.name && typeof player.name === 'string') {
-                        attendanceManager.setPlayerAttendance(player.name, true, true);
-                    }
+                const attendanceData = roster.map((player, index) => {
+                    const attending = selectedPlayersCopy.size === 0 ? true : selectedPlayersCopy.has(index);
+                    return {
+                        playerName: player.name,
+                        attending: attending
+                    };
                 });
-            } else {
-                // If no players selected, mark all as attending (silently)
-                attendanceManager.markAllAttending(true);
-            }
+                
+                storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
+                attendanceManager.updateAttendanceList();
+            }, 200);
 
             // Update UI
             this.updateTeamNamesInUI(team1Name, team2Name);
             timerController.updateDisplay();
 
-            // Save state
-            storageHelpers.saveCompleteMatchData(gameState, Array.from(this.selectedPlayers));
+            // Save state immediately
+            storageHelpers.saveGameState(gameState);
 
             // Close modal and show success
             hideModal('newMatchModal');
@@ -518,9 +519,6 @@ class NewMatchModal {
 
             // Navigate to game tab
             this.navigateToGameTab();
-
-            // Clear selections for next time
-            this.selectedPlayers.clear();
 
         } catch (error) {
             console.error('Error starting new match:', error);

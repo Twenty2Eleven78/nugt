@@ -1,5 +1,6 @@
 
 import { CustomModal } from '../shared/custom-modal.js';
+import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
 
 // Match Summary Modal UI Component
 class MatchSummaryModal {
@@ -332,50 +333,39 @@ class MatchSummaryModal {
    * @private
    */
   _createModal() {
-    // Remove existing modal if it exists
-    const existingModal = document.getElementById('matchSummaryModal');
-    if (existingModal) {
-      existingModal.remove();
-    }
-
-    const modalHtml = `
-      <div class="modal fade" id="matchSummaryModal" tabindex="-1" aria-labelledby="matchSummaryModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="summaryModalTitle">Match Summary</h5>
-                <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-times" style="font-size: 14px;"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-              <div class="text-center mb-4">
-                <h2 id="summaryScore" class="summary-score-line"></h2>
-                <p>Game Time: <span id="summaryGameTime"></span></p>
-              </div>
-              <div class="mb-4">
-                <h5>Notes</h5>
-                <p id="summaryNotes"></p>
-              </div>
-              <div class="mb-4">
-                <h5>Goals</h5>
-                <div id="summaryGoals"></div>
-              </div>
-              <div>
-                <h5>Timeline</h5>
-                <div id="summaryTimeline" class="timeline"></div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" id="closeSummaryModalBtn">Close</button>
-            </div>
-          </div>
-        </div>
+    const bodyContent = `
+      <div class="text-center mb-4">
+        <h2 id="summaryScore" class="summary-score-line"></h2>
+        <p>Game Time: <span id="summaryGameTime"></span></p>
+      </div>
+      <div class="mb-4">
+        <h5>Notes</h5>
+        <p id="summaryNotes"></p>
+      </div>
+      <div class="mb-4">
+        <h5>Goals</h5>
+        <div id="summaryGoals"></div>
+      </div>
+      <div>
+        <h5>Timeline</h5>
+        <div id="summaryTimeline" class="timeline"></div>
       </div>
     `;
 
-    // Add modal to DOM
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const footerContent = `
+      <button type="button" class="btn btn-secondary" id="closeSummaryModalBtn">Close</button>
+    `;
+
+    createAndAppendModal(
+      'matchSummaryModal',
+      '<span id="summaryModalTitle">Match Summary</span>',
+      bodyContent,
+      {
+        ...MODAL_CONFIGS.LARGE,
+        size: 'modal-lg modal-dialog-scrollable',
+        footerContent: footerContent
+      }
+    );
 
     // Initialize custom modal
     this.modal = CustomModal.getOrCreateInstance('matchSummaryModal');

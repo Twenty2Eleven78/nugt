@@ -28,7 +28,6 @@ class ResetModal {
     const bodyContent = `
       <div class="text-center">
         <i class="fas fa-exclamation-triangle text-warning fa-3x mb-3"></i>
-        <h6 class="mb-3">Are you sure you want to reset the app?</h6>
         <p class="text-muted mb-0">
           This will clear all match data, scores, events, and return the app to its initial state.
           <strong>This action cannot be undone.</strong>

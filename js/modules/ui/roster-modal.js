@@ -4,6 +4,7 @@
  */
 
 import { CustomModal } from '../shared/custom-modal.js';
+import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
 import { rosterManager } from '../match/roster.js';
 
 class RosterModal {
@@ -28,111 +29,102 @@ class RosterModal {
    * Create roster modal and edit player modal
    */
   createModal() {
-    // Remove existing modals if they exist
-    const existingRosterModal = document.getElementById('rosterModal');
-    if (existingRosterModal) {
-      existingRosterModal.remove();
-    }
-    const existingEditModal = document.getElementById('editPlayerModal');
-    if (existingEditModal) {
-      existingEditModal.remove();
-    }
-
-    const rosterModalHTML = `
-      <div class="modal fade" id="rosterModal" tabindex="-1">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title modal-title-enhanced">
-                <i class="fas fa-users me-2"></i>Team Roster Management
-              </h4>
-              <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                <i class="fas fa-times" style="font-size: 14px;"></i>
-              </button>
+    // Create main roster modal using factory
+    const rosterBodyContent = `
+      <!-- Add New Player Section -->
+      <div class="roster-section mb-4">
+        <div class="section-header">
+          <h6><i class="fas fa-user-plus me-2"></i>Add New Player</h6>
+          <small class="text-muted">Add individual players to your roster</small>
+        </div>
+        <div class="add-player-form">
+          <div class="row g-2">
+            <div class="col-md-5">
+              <input type="text" id="newPlayerName" class="form-control" placeholder="Player Name" required>
             </div>
-            <div class="modal-body">
-              <h5>Add New Player</h5>
-              <div class="mb-3">
-                <div class="input-group">
-                  <input type="text" id="newPlayerName" class="form-control" placeholder="Name">&nbsp;
-                  <input type="number" id="newPlayerShirtNumber" class="form-control" placeholder="Shirt #" min="0" max="99">&nbsp;
-                  <button class="btn btn-primary" id="addPlayerBtn" type="button">
-                    <i class="fas fa-plus me-2"></i>Add Player
-                  </button>
-                </div>
-              </div>
-
-              <hr>
-
-              <h5>Bulk Add Players</h5>
-              <div class="mb-3">
-                <label for="bulkPlayerNames" class="form-label">Paste names (comma or new-line separated):</label>
-                <textarea id="bulkPlayerNames" class="form-control mb-2" rows="3" placeholder="e.g. Player One, Player Two&#x0a;Player Three"></textarea>
-                <button id="addPlayersBulkBtn" class="btn btn-primary w-100" type="button">
-                  <i class="fas fa-list-ul me-2"></i>Add Players from List
-                </button>
-              </div>
-
-              <hr>
-
-              <h5>Current Roster</h5>
-              <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
-                <table class="table table-striped table-sm table-hover roster-table">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Shirt #</th>
-                      <th class="text-end roster-actions-cell">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody id="rosterList"></tbody>
-                </table>
-              </div>
-
-              <hr class="my-3">
-              <button id="clearRosterBtn" class="btn btn-primary w-100">
-                <i class="fas fa-trash-alt me-2"></i>Clear All Players
+            <div class="col-md-3">
+              <input type="number" id="newPlayerShirtNumber" class="form-control" placeholder="Shirt #" min="0" max="99">
+            </div>
+            <div class="col-md-4">
+              <button class="btn btn-primary w-100" id="addPlayerBtn" type="button">
+                <i class="fas fa-plus me-1"></i>Add Player
               </button>
             </div>
           </div>
         </div>
       </div>
-    `;
 
-    const editPlayerModalHTML = `
-      <div class="modal fade" id="editPlayerModal" tabindex="-1" aria-labelledby="editPlayerModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="editPlayerModalLabel"><i class="fas fa-user-edit me-2"></i>Edit Player</h5>
-              <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                <i class="fas fa-times" style="font-size: 14px;"></i>
-              </button>
-            </div>
-            <div class="modal-body">
-              <form id="editPlayerForm">
-                <input type="hidden" id="editPlayerOldName" name="editPlayerOldName">
-                <div class="mb-3">
-                  <label for="editPlayerName" class="form-label">Player Name</label>
-                  <input type="text" class="form-control" id="editPlayerName" name="editPlayerName" required>
-                </div>
-                <div class="mb-3">
-                  <label for="editPlayerShirtNumber" class="form-label">Shirt Number (0-99, blank for none)</label>
-                  <input type="number" class="form-control" id="editPlayerShirtNumber" name="editPlayerShirtNumber" min="0" max="99">
-                </div>
-                <div class="d-flex justify-content-end gap-2 mt-3">
-                  <button type="submit" class="btn btn-primary">Save Changes</button>
-                </div>
-              </form>
-            </div>
-          </div>
+      <!-- Bulk Add Section -->
+      <div class="roster-section mb-4">
+        <div class="section-header">
+          <h6><i class="fas fa-list-ul me-2"></i>Bulk Add Players</h6>
+          <small class="text-muted">Add multiple players at once</small>
+        </div>
+        <div class="bulk-add-form">
+          <textarea id="bulkPlayerNames" class="form-control mb-2" rows="3" placeholder="Enter player names separated by commas or new lines:\ne.g. John Smith, Jane Doe\nMike Johnson"></textarea>
+          <button id="addPlayersBulkBtn" class="btn btn-primary w-100" type="button">
+            <i class="fas fa-users me-1"></i>Add All Players
+          </button>
+        </div>
+      </div>
+
+      <!-- Current Roster Section -->
+      <div class="roster-section">
+        <div class="section-header">
+          <h6><i class="fas fa-users me-2"></i>Current Roster</h6>
+          <small class="text-muted">Manage your team players</small>
+        </div>
+      <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+        <table class="table table-striped table-sm table-hover roster-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Shirt #</th>
+              <th class="text-end roster-actions-cell">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="rosterList"></tbody>
+        </table>
+      </div>
+
+        <div class="roster-actions mt-3">
+          <button id="clearRosterBtn" class="btn btn-outline-danger w-100">
+            <i class="fas fa-trash-alt me-1"></i>Clear All Players
+          </button>
         </div>
       </div>
     `;
 
-    // Add both modals to DOM
-    document.body.insertAdjacentHTML('beforeend', rosterModalHTML);
-    document.body.insertAdjacentHTML('beforeend', editPlayerModalHTML);
+    createAndAppendModal(
+      'rosterModal',
+      '<i class="fas fa-users me-2"></i>Team Roster Management',
+      rosterBodyContent
+    );
+
+    // Create edit player modal using factory
+    const editBodyContent = `
+      <form id="editPlayerForm">
+        <input type="hidden" id="editPlayerOldName" name="editPlayerOldName">
+        <div class="mb-3">
+          <label for="editPlayerName" class="form-label">Player Name</label>
+          <input type="text" class="form-control" id="editPlayerName" name="editPlayerName" required>
+        </div>
+        <div class="mb-3">
+          <label for="editPlayerShirtNumber" class="form-label">Shirt Number (0-99, blank for none)</label>
+          <input type="number" class="form-control" id="editPlayerShirtNumber" name="editPlayerShirtNumber" min="0" max="99">
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    `;
+
+    createAndAppendModal(
+      'editPlayerModal',
+      '<i class="fas fa-user-edit me-2"></i>Edit Player',
+      editBodyContent,
+      MODAL_CONFIGS.CENTERED
+    );
 
     // Initialize custom modals
     this.modal = CustomModal.getOrCreateInstance('rosterModal');

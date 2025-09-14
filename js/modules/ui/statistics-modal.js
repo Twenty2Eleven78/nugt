@@ -6,6 +6,7 @@
 import { authService } from '../services/auth.js';
 import { notificationManager } from '../services/notifications.js';
 import { CustomModal } from '../shared/custom-modal.js';
+import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
 
 class StatisticsModal {
     constructor() {
@@ -75,74 +76,65 @@ class StatisticsModal {
      * @private
      */
     _createModal() {
-        const modalHtml = `
-            <div class="modal fade" id="statistics-modal" tabindex="-1" aria-labelledby="statistics-modal-label" aria-hidden="true">
-                <div class="modal-dialog modal-fullscreen-sm-down modal-xl">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="statistics-modal-label">
-                                <i class="fas fa-chart-bar text-primary me-2"></i>
-                                Team Statistics
-                            </h5>
-                            <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-times" style="font-size: 14px;"></i>
-                            </button>
-                        </div>
-                        
-                        <div class="modal-body">
-                            <!-- Statistics Info -->
-                            <div id="statistics-info" class="mb-3">
-                                <!-- Will be populated dynamically -->
-                            </div>
-                            
-                            <!-- Navigation Tabs -->
-                            <div class="d-flex justify-content-center mb-3">
-                                <ul class="nav nav-tabs flex-nowrap" id="statsNavTabs" style="overflow-x: auto;">
-                                    <li class="nav-item me-1">
-                                        <button class="nav-link active px-1 px-sm-3 py-2 text-center" data-view="overview" style="min-width: 60px; font-size: 0.8rem;">
-                                            <i class="fas fa-tachometer-alt d-none d-sm-inline me-sm-1"></i>
-                                            <span>Over</span>
-                                        </button>
-                                    </li>
-                                    <li class="nav-item me-1">
-                                        <button class="nav-link px-1 px-sm-3 py-2 text-center" data-view="players" style="min-width: 60px; font-size: 0.8rem;">
-                                            <i class="fas fa-users d-none d-sm-inline me-sm-1"></i>
-                                            <span>Play</span>
-                                        </button>
-                                    </li>
-                                    <li class="nav-item me-1">
-                                        <button class="nav-link px-1 px-sm-3 py-2 text-center" data-view="teams" style="min-width: 60px; font-size: 0.8rem;">
-                                            <i class="fas fa-shield-alt d-none d-sm-inline me-sm-1"></i>
-                                            <span>Team</span>
-                                        </button>
-                                    </li>
-                                    <li class="nav-item">
-                                        <button class="nav-link px-1 px-sm-3 py-2 text-center" data-view="matches" style="min-width: 60px; font-size: 0.8rem;">
-                                            <i class="fas fa-calendar-alt d-none d-sm-inline me-sm-1"></i>
-                                            <span>Match</span>
-                                        </button>
-                                    </li>
-                                </ul>
-                            </div>
+        const bodyContent = `
+            <!-- Statistics Info -->
+            <div id="statistics-info" class="mb-3">
+                <!-- Will be populated dynamically -->
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <div class="d-flex justify-content-center mb-3">
+                <ul class="nav nav-tabs flex-nowrap" id="statsNavTabs" style="overflow-x: auto;">
+                    <li class="nav-item me-1">
+                        <button class="nav-link active px-1 px-sm-3 py-2 text-center" data-view="overview" style="min-width: 60px; font-size: 0.8rem;">
+                            <i class="fas fa-tachometer-alt d-none d-sm-inline me-sm-1"></i>
+                            <span>Over</span>
+                        </button>
+                    </li>
+                    <li class="nav-item me-1">
+                        <button class="nav-link px-1 px-sm-3 py-2 text-center" data-view="players" style="min-width: 60px; font-size: 0.8rem;">
+                            <i class="fas fa-users d-none d-sm-inline me-sm-1"></i>
+                            <span>Play</span>
+                        </button>
+                    </li>
+                    <li class="nav-item me-1">
+                        <button class="nav-link px-1 px-sm-3 py-2 text-center" data-view="teams" style="min-width: 60px; font-size: 0.8rem;">
+                            <i class="fas fa-shield-alt d-none d-sm-inline me-sm-1"></i>
+                            <span>Team</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link px-1 px-sm-3 py-2 text-center" data-view="matches" style="min-width: 60px; font-size: 0.8rem;">
+                            <i class="fas fa-calendar-alt d-none d-sm-inline me-sm-1"></i>
+                            <span>Match</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
 
-                            <!-- Content Area -->
-                            <div id="statistics-content">
-                                <!-- Will be populated dynamically -->
-                            </div>
-                        </div>
-                        
-                        <div class="modal-footer">
-                            <div id="refresh-btn-container">
-                                <!-- Refresh button will be added here if user is admin -->
-                            </div>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
+            <!-- Content Area -->
+            <div id="statistics-content">
+                <!-- Will be populated dynamically -->
             </div>
         `;
 
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        const footerContent = `
+            <div id="refresh-btn-container">
+                <!-- Refresh button will be added here if user is admin -->
+            </div>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        `;
+
+        createAndAppendModal(
+            'statistics-modal',
+            '<i class="fas fa-chart-bar text-primary me-2"></i>Team Statistics',
+            bodyContent,
+            {
+                ...MODAL_CONFIGS.EXTRA_LARGE,
+                size: 'modal-fullscreen-sm-down modal-xl',
+                footerContent: footerContent
+            }
+        );
 
         const modalElement = document.getElementById('statistics-modal');
         this.modalInstance = CustomModal.getOrCreateInstance(modalElement);

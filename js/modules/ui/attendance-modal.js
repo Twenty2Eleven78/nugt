@@ -38,16 +38,22 @@ class AttendanceModal {
       </div>
 
       <!-- Attendance Controls -->
-      <div class="attendance-controls d-flex gap-2 mb-4">
-        <button id="markAllAttendingBtnMain" class="flex-fill btn btn-primary">
-          <i class="fas fa-user-check me-1"></i>All Present
-        </button>
-        <button id="markAllAbsentBtnMain" class="flex-fill btn btn-warning">
-          <i class="fas fa-user-times me-1"></i>All Absent
-        </button>
-        <button id="clearAttendanceBtnMain" class="flex-fill btn btn-outline-secondary">
-          <i class="fas fa-undo me-1"></i>Reset
-        </button>
+      <div class="attendance-controls-header mb-4">
+        <div class="controls-info">
+          <h6 class="mb-1"><i class="fas fa-sliders-h me-2"></i>Quick Actions</h6>
+          <small class="text-muted">Manage attendance for all players at once</small>
+        </div>
+        <div class="controls-buttons">
+          <button id="markAllAttendingBtnMain" class="btn btn-success">
+            <i class="fas fa-user-check me-1"></i>All Present
+          </button>
+          <button id="markAllAbsentBtnMain" class="btn btn-warning">
+            <i class="fas fa-user-times me-1"></i>All Absent
+          </button>
+          <button id="clearAttendanceBtnMain" class="btn btn-outline-danger">
+            <i class="fas fa-undo me-1"></i>Reset
+          </button>
+        </div>
       </div>
 
       <!-- Attendance List -->

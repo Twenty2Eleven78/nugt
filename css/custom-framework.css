@@ -3080,3 +3080,263 @@ nsure transfer match modal appears above admin modal */
     align-items: center;
     gap: 0.5rem;
 }
+
+/* New Match Modal - Attendance Controls */
+.attendance-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm);
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+.attendance-info {
+    flex: 1;
+}
+
+.attendance-controls {
+    display: flex;
+    gap: var(--spacing-xs);
+    flex-shrink: 0;
+}
+
+.attendance-controls .btn {
+    font-weight: 500;
+    border-width: 2px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.attendance-controls .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.attendance-controls .btn i {
+    font-size: 0.8rem;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .attendance-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-sm);
+    }
+    
+    .attendance-controls {
+        justify-content: center;
+    }
+    
+    .attendance-controls .btn {
+        flex: 1;
+        max-width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .attendance-controls .btn {
+        font-size: 0.8rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+}
+
+/* Attendance Modal - Controls Header */
+.attendance-controls-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+.controls-info {
+    flex: 1;
+}
+
+.controls-info h6 {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin: 0;
+}
+
+.controls-buttons {
+    display: flex;
+    gap: var(--spacing-xs);
+    flex-shrink: 0;
+}
+
+.controls-buttons .btn {
+    font-weight: 500;
+    border-width: 2px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    min-width: 100px;
+}
+
+.controls-buttons .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.controls-buttons .btn i {
+    font-size: 0.9rem;
+}
+
+/* Mobile responsive adjustments for attendance modal */
+@media (max-width: 768px) {
+    .attendance-controls-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-sm);
+    }
+    
+    .controls-buttons {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .controls-buttons .btn {
+        flex: 1;
+        min-width: 90px;
+        max-width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .controls-buttons .btn {
+        font-size: 0.8rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
+        min-width: 80px;
+    }
+    
+    .controls-info h6 {
+        font-size: 0.9rem;
+    }
+}
+
+/* Roster Modal - Section Layout */
+.roster-section {
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+.section-header {
+    margin-bottom: var(--spacing-sm);
+}
+
+.section-header h6 {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin: 0 0 var(--spacing-xs) 0;
+}
+
+.section-header small {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+/* Add Player Form */
+.add-player-form .form-control {
+    border-width: 2px;
+    transition: all 0.2s ease;
+}
+
+.add-player-form .form-control:focus {
+    border-color: var(--theme-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--theme-primary-rgb), 0.25);
+}
+
+.add-player-form .btn {
+    font-weight: 500;
+    border-width: 2px;
+    transition: all 0.2s ease;
+}
+
+.add-player-form .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Bulk Add Form */
+.bulk-add-form textarea {
+    border-width: 2px;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.bulk-add-form textarea:focus {
+    border-color: var(--theme-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--theme-primary-rgb), 0.25);
+}
+
+.bulk-add-form .btn {
+    font-weight: 500;
+    border-width: 2px;
+    transition: all 0.2s ease;
+}
+
+.bulk-add-form .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Roster Actions */
+.roster-actions .btn {
+    font-weight: 500;
+    border-width: 2px;
+    transition: all 0.2s ease;
+}
+
+.roster-actions .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile responsive adjustments for roster modal */
+@media (max-width: 768px) {
+    .roster-section {
+        padding: var(--spacing-sm);
+    }
+    
+    .add-player-form .row {
+        margin: 0;
+    }
+    
+    .add-player-form .col-md-5,
+    .add-player-form .col-md-3,
+    .add-player-form .col-md-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .add-player-form .col-md-4:last-child {
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-header h6 {
+        font-size: 0.9rem;
+    }
+    
+    .section-header small {
+        font-size: 0.75rem;
+    }
+    
+    .add-player-form .btn,
+    .bulk-add-form .btn,
+    .roster-actions .btn {
+        font-size: 0.8rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+}

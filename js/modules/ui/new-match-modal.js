@@ -10,6 +10,7 @@ import { domCache } from '../shared/dom.js';
 import { GAME_CONFIG, STORAGE_KEYS } from '../shared/constants.js';
 import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from './modals.js';
+import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
 import { rosterManager } from '../match/roster.js';
 import { timerController } from '../match/timer.js';
 import { teamManager } from '../match/teams.js';
@@ -40,125 +41,119 @@ class NewMatchModal {
     }
 
     createModal() {
-        const modalHTML = `
-      <div class="modal fade" id="newMatchModal" tabindex="-1" aria-labelledby="newMatchModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="newMatchModalLabel">
-                <i class="fas fa-plus-circle me-2"></i>Start New Match
-              </h5>
-              <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                <i class="fas fa-times" style="font-size: 14px;"></i>
-              </button>
+        const bodyContent = `
+          <form id="newMatchForm">
+            <!-- Step 1: Match Details -->
+            <div class="step-section" id="step1">
+              <h6 class="text-primary mb-3">
+                <i class="fas fa-info-circle me-2"></i>Match Details
+              </h6>
+              
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="newMatchTeam1Name" class="form-label">Home Team</label>
+                  <input type="text" class="form-control" id="newMatchTeam1Name" value="Netherton" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="newMatchTeam2Name" class="form-label">Away Team</label>
+                  <input type="text" class="form-control" id="newMatchTeam2Name" value="Opposition" required>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="matchDuration" class="form-label">Match Duration</label>
+                  <select class="form-select" id="matchDuration">
+                    <option value="3600">60 minutes (30 min halves)</option>
+                    <option value="4200" selected>70 minutes (35 min halves)</option>
+                    <option value="5400">90 minutes (45 min halves)</option>
+                    <option value="custom">Custom duration...</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3" id="customDurationContainer" style="display: none;">
+                  <label for="customDuration" class="form-label">Custom Duration (minutes)</label>
+                  <input type="number" class="form-control" id="customDuration" 
+                         min="10" max="120" step="5" placeholder="e.g. 80">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="matchTitle" class="form-label">Match Title (Optional)</label>
+                <input type="text" class="form-control" id="matchTitle" 
+                       placeholder="e.g. League Cup Final, Friendly vs...">
+              </div>
             </div>
-            <div class="modal-body">
-              <form id="newMatchForm">
-                <!-- Step 1: Match Details -->
-                <div class="step-section" id="step1">
-                  <h6 class="text-primary mb-3">
-                    <i class="fas fa-info-circle me-2"></i>Match Details
-                  </h6>
-                  
+
+            <!-- Step 2: Player Attendance -->
+            <div class="step-section mt-4" id="step2">
+              <h6 class="text-primary mb-3">
+                <i class="fas fa-users me-2"></i>Player Attendance
+              </h6>
+              
+              <div class="attendance-header mb-3">
+                <div class="attendance-info">
+                  <span class="text-muted">Select players attending this match:</span>
+                  <small class="text-muted d-block mt-1">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Selected players: <span id="selectedCount">0</span>
+                  </small>
+                </div>
+                <div class="attendance-controls">
+                  <button type="button" class="btn btn-sm btn-outline-success" id="selectAllPlayers">
+                    <i class="fas fa-check-double me-1"></i>Select All
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-danger" id="clearAllPlayers">
+                    <i class="fas fa-times me-1"></i>Clear All
+                  </button>
+                </div>
+              </div>
+
+              <div id="playersGrid" class="row g-2">
+                <!-- Players will be populated here -->
+              </div>
+
+
+            </div>
+
+            <!-- Match Setup Summary -->
+            <div class="step-section mt-4" id="setupSummary">
+              <h6 class="text-success mb-3">
+                <i class="fas fa-check-circle me-2"></i>Match Setup Summary
+              </h6>
+              <div class="card bg-light">
+                <div class="card-body">
                   <div class="row">
-                    <div class="col-md-6 mb-3">
-                      <label for="newMatchTeam1Name" class="form-label">Home Team</label>
-                      <input type="text" class="form-control" id="newMatchTeam1Name" value="Netherton" required>
+                    <div class="col-md-6">
+                      <strong>Teams:</strong> <span id="summaryTeams">-</span><br>
+                      <strong>Duration:</strong> <span id="summaryDuration">-</span>
                     </div>
-                    <div class="col-md-6 mb-3">
-                      <label for="newMatchTeam2Name" class="form-label">Away Team</label>
-                      <input type="text" class="form-control" id="newMatchTeam2Name" value="Opposition" required>
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-md-6 mb-3">
-                      <label for="matchDuration" class="form-label">Match Duration</label>
-                      <select class="form-select" id="matchDuration">
-                        <option value="3600">60 minutes (30 min halves)</option>
-                        <option value="4200" selected>70 minutes (35 min halves)</option>
-                        <option value="5400">90 minutes (45 min halves)</option>
-                        <option value="custom">Custom duration...</option>
-                      </select>
-                    </div>
-                    <div class="col-md-6 mb-3" id="customDurationContainer" style="display: none;">
-                      <label for="customDuration" class="form-label">Custom Duration (minutes)</label>
-                      <input type="number" class="form-control" id="customDuration" 
-                             min="10" max="120" step="5" placeholder="e.g. 80">
-                    </div>
-                  </div>
-
-                  <div class="mb-3">
-                    <label for="matchTitle" class="form-label">Match Title (Optional)</label>
-                    <input type="text" class="form-control" id="matchTitle" 
-                           placeholder="e.g. League Cup Final, Friendly vs...">
-                  </div>
-                </div>
-
-                <!-- Step 2: Player Attendance -->
-                <div class="step-section mt-4" id="step2">
-                  <h6 class="text-primary mb-3">
-                    <i class="fas fa-users me-2"></i>Player Attendance
-                  </h6>
-                  
-                  <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="text-muted">Select players attending this match:</span>
-                    <div>
-                      <button type="button" class="btn btn-sm btn-outline-primary" id="selectAllPlayers">
-                        Select All
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary ms-2" id="clearAllPlayers">
-                        Clear All
-                      </button>
-                    </div>
-                  </div>
-
-                  <div id="playersGrid" class="row g-2">
-                    <!-- Players will be populated here -->
-                  </div>
-
-                  <div class="mt-3">
-                    <small class="text-muted">
-                      <i class="fas fa-info-circle me-1"></i>
-                      Selected players: <span id="selectedCount">0</span>
-                    </small>
-                  </div>
-                </div>
-
-                <!-- Match Setup Summary -->
-                <div class="step-section mt-4" id="setupSummary">
-                  <h6 class="text-success mb-3">
-                    <i class="fas fa-check-circle me-2"></i>Match Setup Summary
-                  </h6>
-                  <div class="card bg-light">
-                    <div class="card-body">
-                      <div class="row">
-                        <div class="col-md-6">
-                          <strong>Teams:</strong> <span id="summaryTeams">-</span><br>
-                          <strong>Duration:</strong> <span id="summaryDuration">-</span>
-                        </div>
-                        <div class="col-md-6">
-                          <strong>Players:</strong> <span id="summaryPlayers">-</span><br>
-                          <strong>Title:</strong> <span id="summaryTitle">-</span>
-                        </div>
-                      </div>
+                    <div class="col-md-6">
+                      <strong>Players:</strong> <span id="summaryPlayers">-</span><br>
+                      <strong>Title:</strong> <span id="summaryTitle">-</span>
                     </div>
                   </div>
                 </div>
-              </form>
+              </div>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-              <button type="button" class="btn btn-primary" id="startMatchBtn">
-                <i class="fas fa-play me-2"></i>Start Match
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
+          </form>
+        `;
 
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        const footerContent = `
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="startMatchBtn">
+            <i class="fas fa-play me-2"></i>Start Match
+          </button>
+        `;
+
+        createAndAppendModal(
+          'newMatchModal',
+          '<i class="fas fa-plus-circle me-2"></i>Start New Match',
+          bodyContent,
+          {
+            ...MODAL_CONFIGS.LARGE,
+            footerContent: footerContent
+          }
+        );
         
         // Set default values after modal is created - moved to show() method for better timing
     }

@@ -3,6 +3,7 @@
  */
 
 import { CustomModal } from '../shared/custom-modal.js';
+import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
 import { matchSummaryModal } from './match-summary-modal.js';
 import { rawDataModal } from './raw-data-modal.js';
 import { userMatchesApi } from '../services/user-matches-api.js';
@@ -206,74 +207,61 @@ class MatchLoadModal {
    * @private
    */
   _createModal() {
-    // Remove existing modal if it exists
-    const existingModal = document.getElementById('matchLoadModal');
-    if (existingModal) {
-      existingModal.remove();
-    }
-
-    const modalHtml = `
-      <div class="modal fade" id="matchLoadModal" tabindex="-1" aria-labelledby="matchLoadModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="matchLoadModalLabel">Load Match from Cloud</h5>
-                <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-times" style="font-size: 14px;"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-              <div class="mb-3">
-                <input type="text" class="form-control" id="matchSearchInput" 
-                       placeholder="Search matches...">
-              </div>
-              <div style="max-height: 400px; overflow-y: auto;">
-                <div id="matchLoadList">
-                  <!-- Match list will be populated here -->
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" id="cancelMatchLoadBtn">Cancel</button>
-            </div>
-          </div>
-        </div>
+    // Create main match load modal using factory
+    const bodyContent = `
+      <div class="mb-3">
+        <input type="text" class="form-control" id="matchSearchInput" 
+               placeholder="Search matches...">
       </div>
-
-      <!-- Delete Confirmation Modal -->
-      <div class="modal fade" id="matchLoadDeleteModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-              <h5 class="modal-title">
-                <i class="fas fa-trash"></i> Confirm Deletion
-              </h5>
-                <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-times" style="font-size: 14px;"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-              <p>Are you sure you want to delete this match?</p>
-              <div class="alert alert-warning">
-                <strong>Warning:</strong> This action cannot be undone.
-              </div>
-              <div id="matchLoadDeleteDetails">
-                <!-- Match details will be shown here -->
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" id="cancelMatchLoadDeleteBtn">Cancel</button>
-              <button type="button" class="btn btn-danger" id="confirmMatchLoadDeleteBtn">
-                <i class="fas fa-trash"></i> Delete Match
-              </button>
-            </div>
-          </div>
+      <div style="max-height: 400px; overflow-y: auto;">
+        <div id="matchLoadList">
+          <!-- Match list will be populated here -->
         </div>
       </div>
     `;
 
-    // Add modal to DOM
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const footerContent = `
+      <button type="button" class="btn btn-secondary" id="cancelMatchLoadBtn">Cancel</button>
+    `;
+
+    createAndAppendModal(
+      'matchLoadModal',
+      'Load Match from Cloud',
+      bodyContent,
+      {
+        ...MODAL_CONFIGS.LARGE,
+        footerContent: footerContent
+      }
+    );
+
+    // Create delete confirmation modal using factory
+    const deleteBodyContent = `
+      <p>Are you sure you want to delete this match?</p>
+      <div class="alert alert-warning">
+        <strong>Warning:</strong> This action cannot be undone.
+      </div>
+      <div id="matchLoadDeleteDetails">
+        <!-- Match details will be shown here -->
+      </div>
+    `;
+
+    const deleteFooterContent = `
+      <button type="button" class="btn btn-secondary" id="cancelMatchLoadDeleteBtn">Cancel</button>
+      <button type="button" class="btn btn-danger" id="confirmMatchLoadDeleteBtn">
+        <i class="fas fa-trash"></i> Delete Match
+      </button>
+    `;
+
+    createAndAppendModal(
+      'matchLoadDeleteModal',
+      '<i class="fas fa-trash"></i> Confirm Deletion',
+      deleteBodyContent,
+      {
+        ...MODAL_CONFIGS.CENTERED,
+        headerClass: 'bg-danger text-white',
+        footerContent: deleteFooterContent
+      }
+    );
 
     // Initialize custom modals
     this.modal = CustomModal.getOrCreateInstance('matchLoadModal');

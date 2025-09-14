@@ -3,6 +3,7 @@
  */
 
 import { CustomModal } from '../shared/custom-modal.js';
+import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
 
 class MatchSaveModal {
   constructor() {
@@ -52,45 +53,32 @@ class MatchSaveModal {
    * @private
    */
   _createModal() {
-    // Remove existing modal if it exists
-    const existingModal = document.getElementById('matchSaveModal');
-    if (existingModal) {
-      existingModal.remove();
-    }
-
-    const modalHtml = `
-      <div class="modal fade" id="matchSaveModal" tabindex="-1" aria-labelledby="matchSaveModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="matchSaveModalLabel">Save Match to Cloud</h5>
-                <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-times" style="font-size: 14px;"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-              <form id="matchSaveForm">
-                <div class="mb-3">
-                  <label for="matchTitleInput" class="form-label">Match Title</label>
-                  <input type="text" class="form-control" id="matchTitleInput" required>
-                </div>
-                <div class="mb-3">
-                  <label for="matchNotesInput" class="form-label">Notes (optional)</label>
-                  <textarea class="form-control" id="matchNotesInput" rows="3"></textarea>
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" id="cancelMatchSaveBtn">Cancel</button>
-              <button type="button" class="btn btn-primary" id="confirmMatchSaveBtn">Save Match</button>
-            </div>
-          </div>
+    const bodyContent = `
+      <form id="matchSaveForm">
+        <div class="mb-3">
+          <label for="matchTitleInput" class="form-label">Match Title</label>
+          <input type="text" class="form-control" id="matchTitleInput" required>
         </div>
-      </div>
+        <div class="mb-3">
+          <label for="matchNotesInput" class="form-label">Notes (optional)</label>
+          <textarea class="form-control" id="matchNotesInput" rows="3"></textarea>
+        </div>
+      </form>
     `;
 
-    // Add modal to DOM
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const footerContent = `
+      <button type="button" class="btn btn-secondary" id="cancelMatchSaveBtn">Cancel</button>
+      <button type="button" class="btn btn-primary" id="confirmMatchSaveBtn">Save Match</button>
+    `;
+
+    createAndAppendModal(
+      'matchSaveModal',
+      'Save Match to Cloud',
+      bodyContent,
+      {
+        footerContent: footerContent
+      }
+    );
 
     // Initialize custom modal
     this.modal = CustomModal.getOrCreateInstance('matchSaveModal');

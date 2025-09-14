@@ -489,11 +489,20 @@ class NewMatchModal {
             // Set player attendance after reset
             setTimeout(() => {
                 const roster = rosterManager.getRoster();
-                const attendanceData = roster.map((player, index) => ({
-                    playerName: player.name,
-                    attending: this.selectedPlayers.size === 0 ? true : this.selectedPlayers.has(index)
-                }));
+                console.log('Selected players:', Array.from(this.selectedPlayers));
+                console.log('Roster length:', roster.length);
                 
+                const attendanceData = roster.map((player, index) => {
+                    const isSelected = this.selectedPlayers.has(index);
+                    const attending = this.selectedPlayers.size === 0 ? true : isSelected;
+                    console.log(`Player ${player.name} (index ${index}): selected=${isSelected}, attending=${attending}`);
+                    return {
+                        playerName: player.name,
+                        attending: attending
+                    };
+                });
+                
+                console.log('Final attendance data:', attendanceData);
                 storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
                 attendanceManager.updateAttendanceList();
             }, 200);

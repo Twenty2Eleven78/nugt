@@ -15,25 +15,26 @@ export const DEFAULT_ROSTER_CONFIG = {
 
     // Default players list
     players: [
-        { name: 'A-R.Obidi', shirtNumber: null },
-        { name: 'A.Osprey', shirtNumber: null },
-        { name: 'A.Porada', shirtNumber: null },
-        { name: 'A.Seaman', shirtNumber: null },
-        { name: 'C.Alvarez', shirtNumber: null },
-        { name: 'Ciana.player', shirtNumber: null },
-        { name: 'D.Peacock', shirtNumber: null },
-        { name: 'E.Doyle', shirtNumber: null },
-        { name: 'E.Van-Kerro', shirtNumber: null },
-        { name: 'E.Mutiti', shirtNumber: null },
-        { name: 'F.Asadi', shirtNumber: null },
-        { name: 'F.Bone', shirtNumber: null },
-        { name: 'F.Kendall', shirtNumber: 1 },
-        { name: 'H.Strowthers', shirtNumber: null },
-        { name: 'M.Finch', shirtNumber: null },
-        { name: 'M.Stevens', shirtNumber: null },
-        { name: 'S.Smith', shirtNumber: null },
-        { name: 'T.Rushmer', shirtNumber: null },
-        { name: 'V.Aig-Imoru', shirtNumber: null }
+        { name: 'Rae.O', shirtNumber: null },
+        { name: 'Amelia.Osprey', shirtNumber: null },
+        { name: 'Amelia.Porada', shirtNumber: null },
+        { name: 'Aoife.Seaman', shirtNumber: null },
+        { name: 'Cimmy.A', shirtNumber: null },
+        { name: 'Ciana', shirtNumber: null },
+        { name: 'Daisy.P', shirtNumber: null },
+        { name: 'Ella.D', shirtNumber: null },
+        { name: 'Ella.VK', shirtNumber: null },
+        { name: 'Emily.M', shirtNumber: null },
+        { name: 'Farah.A', shirtNumber: null },
+        { name: 'Freya.B', shirtNumber: null },
+        { name: 'Freya.K', shirtNumber: 1 },
+        { name: 'Havana.S', shirtNumber: null },
+        { name: 'Megan.F', shirtNumber: null },
+        { name: 'Mia.S', shirtNumber: null },
+        { name: 'Miliana.L', shirtNumber: null },
+        { name: 'Sienna.S', shirtNumber: null },
+        { name: 'Tulula.R', shirtNumber: null },
+        { name: 'Veronica.AI', shirtNumber: null }
     ]
 };
 

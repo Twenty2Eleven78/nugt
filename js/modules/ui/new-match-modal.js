@@ -216,19 +216,16 @@ class NewMatchModal {
                     e.stopImmediatePropagation();
                     
                     const playerId = parseInt(playerCard.dataset.playerId);
-                    console.log('Player card clicked:', playerId, 'Current selections:', Array.from(this.selectedPlayers));
                     
                     // Toggle selection
                     if (this.selectedPlayers.has(playerId)) {
                         this.selectedPlayers.delete(playerId);
                         playerCard.classList.remove('selected');
                         playerCard.setAttribute('data-selected', 'false');
-                        console.log('Removed player', playerId, 'New selections:', Array.from(this.selectedPlayers));
                     } else {
                         this.selectedPlayers.add(playerId);
                         playerCard.classList.add('selected');
                         playerCard.setAttribute('data-selected', 'true');
-                        console.log('Added player', playerId, 'New selections:', Array.from(this.selectedPlayers));
                     }
                     
                     // Force update with setTimeout to ensure DOM is updated
@@ -369,7 +366,6 @@ class NewMatchModal {
         if (countElement) {
             countElement.textContent = this.selectedPlayers.size;
         }
-        console.log('Updated count to:', this.selectedPlayers.size, 'Selected players:', Array.from(this.selectedPlayers));
         
         // Sync UI with actual selected state
         this.syncUIWithSelectedState();
@@ -478,8 +474,6 @@ class NewMatchModal {
 
             // Capture selected players BEFORE reset clears them
             const selectedPlayersCopy = new Set(this.selectedPlayers);
-            console.log('Original selectedPlayers:', Array.from(this.selectedPlayers));
-            console.log('Copy selectedPlayersCopy:', Array.from(selectedPlayersCopy));
 
             // Reset current game state
             await this.resetGameState();
@@ -499,11 +493,9 @@ class NewMatchModal {
             // Set player attendance after reset
             setTimeout(() => {
                 const roster = rosterManager.getRoster();
-                console.log('In timeout - selectedPlayersCopy size:', selectedPlayersCopy.size);
                 
                 const attendanceData = roster.map((player, index) => {
                     const attending = selectedPlayersCopy.size === 0 ? true : selectedPlayersCopy.has(index);
-                    console.log(`Player ${player.name} (${index}): has=${selectedPlayersCopy.has(index)}, attending=${attending}`);
                     return {
                         playerName: player.name,
                         attending: attending

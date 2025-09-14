@@ -8,6 +8,7 @@
 @font-face {
     font-family: 'Font Awesome 6 Free';
     font-display: swap;
+    src: url('./webfonts/fa-solid-900.woff2') format('woff2');
 }
 
 /* Prevent layout shifts during font loading */
@@ -149,7 +150,6 @@
     contain: layout;
     overflow-y: auto;
     touch-action: pan-y;
-    -webkit-overflow-scrolling: touch;
 }
 
 /* Event statistics - prevent layout shifts */

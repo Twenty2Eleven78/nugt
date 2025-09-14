@@ -486,14 +486,22 @@ class NewMatchModal {
 
             // Capture selected players before clearing
             const selectedPlayersCopy = new Set(this.selectedPlayers);
+            console.log('Original selectedPlayers:', Array.from(this.selectedPlayers));
+            console.log('Copy selectedPlayersCopy:', Array.from(selectedPlayersCopy));
             
             // Set player attendance after reset
             setTimeout(() => {
                 const roster = rosterManager.getRoster();
-                const attendanceData = roster.map((player, index) => ({
-                    playerName: player.name,
-                    attending: selectedPlayersCopy.size === 0 ? true : selectedPlayersCopy.has(index)
-                }));
+                console.log('In timeout - selectedPlayersCopy size:', selectedPlayersCopy.size);
+                
+                const attendanceData = roster.map((player, index) => {
+                    const attending = selectedPlayersCopy.size === 0 ? true : selectedPlayersCopy.has(index);
+                    console.log(`Player ${player.name} (${index}): has=${selectedPlayersCopy.has(index)}, attending=${attending}`);
+                    return {
+                        playerName: player.name,
+                        attending: attending
+                    };
+                });
                 
                 storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
                 attendanceManager.updateAttendanceList();

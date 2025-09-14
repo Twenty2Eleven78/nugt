@@ -38,8 +38,6 @@ class CombinedEventsManager {
     const team1Name = domCache.get('Team1NameElement')?.textContent;
     const team2Name = domCache.get('Team2NameElement')?.textContent;
 
-
-
     const eventData = {
       timestamp: formatMatchTime(currentSeconds),
       type: eventType,
@@ -162,7 +160,11 @@ class CombinedEventsManager {
     const editTimeInput = document.getElementById('editEventTime');
     
     if (editEventIndex) editEventIndex.value = index;
-    if (editTimeInput) editTimeInput.value = currentMinutes;
+    if (editTimeInput) {
+      // Use the actual event time, not the calculated minutes
+      // This prevents the 35:00 bug when editing events after half-time
+      editTimeInput.value = currentMinutes;
+    }
 
     showModal('editEventModal');
   }
@@ -178,6 +180,7 @@ class CombinedEventsManager {
         return;
       }
 
+      // Convert minutes directly to seconds without half-time adjustment
       const newRawTime = newMinutes * 60;
       const newTimestamp = formatMatchTime(newRawTime);
 

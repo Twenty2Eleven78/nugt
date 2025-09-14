@@ -270,8 +270,6 @@ class NewMatchModal {
 
     show() {
         this.init();
-        // Clear selections when showing modal fresh
-        this.selectedPlayers.clear();
         this.populatePlayersList();
         
         showModal('newMatchModal');
@@ -499,6 +497,9 @@ class NewMatchModal {
                 
                 storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
                 attendanceManager.updateAttendanceList();
+                
+                // Clear selections after attendance is set
+                this.selectedPlayers.clear();
             }, 200);
 
             // Update UI
@@ -514,9 +515,6 @@ class NewMatchModal {
 
             // Navigate to game tab
             this.navigateToGameTab();
-
-            // Clear selections for next time
-            this.selectedPlayers.clear();
 
         } catch (error) {
             console.error('Error starting new match:', error);

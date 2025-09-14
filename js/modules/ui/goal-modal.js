@@ -4,6 +4,7 @@
  */
 
 import { CustomModal } from '../shared/custom-modal.js';
+import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
 import { rosterManager } from '../match/roster.js';
 
 class GoalModal {
@@ -23,58 +24,36 @@ class GoalModal {
    * Create goal modal
    */
   createModal() {
-    // Remove existing modal if it exists
-    const existingModal = document.getElementById('goalModal');
-    if (existingModal) {
-      existingModal.remove();
-    }
-
-    const modalHTML = `
-      <div class="modal fade" id="goalModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Goal Details:</h5>
-              <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                <i class="fas fa-times" style="font-size: 14px;"></i>
-              </button>
-            </div>
-            <div class="modal-body">
-              <div class="row">
-                <div class="col-12">
-                  <div class="input-group mb-3">
-                    <form id="goalForm" class="w-100">
-                      <div class="mb-3">
-                        <label for="goalScorer" class="form-label">Goal Scorer: <span class="text-danger">*</span></label>
-                        <select id="goalScorer" class="form-select" required>
-                          <option value="">Select goal scorer</option>
-                          <option value="Own Goal">Own Goal</option>
-                        </select>
-                      </div>
-                      <div class="mb-3">
-                        <label for="goalAssist" class="form-label">Goal Assist:</label>
-                        <select id="goalAssist" class="form-select">
-                          <option value="">Select goal assist</option>
-                          <option value="N/A" selected>N/A</option>
-                        </select>
-                      </div>
-                      <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary w-100" id="goalSubmitButton">
-                          <i class="fa-solid fa-futbol me-2"></i>Record Goal
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+    const bodyContent = `
+      <form id="goalForm" class="w-100">
+        <div class="mb-3">
+          <label for="goalScorer" class="form-label">Goal Scorer: <span class="text-danger">*</span></label>
+          <select id="goalScorer" class="form-select" required>
+            <option value="">Select goal scorer</option>
+            <option value="Own Goal">Own Goal</option>
+          </select>
         </div>
-      </div>
+        <div class="mb-3">
+          <label for="goalAssist" class="form-label">Goal Assist:</label>
+          <select id="goalAssist" class="form-select">
+            <option value="">Select goal assist</option>
+            <option value="N/A" selected>N/A</option>
+          </select>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary w-100" id="goalSubmitButton">
+            <i class="fa-solid fa-futbol me-2"></i>Record Goal
+          </button>
+        </div>
+      </form>
     `;
 
-    // Add modal to DOM
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    createAndAppendModal(
+      'goalModal',
+      '<i class="fas fa-futbol me-2"></i>Goal Details',
+      bodyContent,
+      MODAL_CONFIGS.CENTERED
+    );
 
     // Initialize custom modal
     this.modal = CustomModal.getOrCreateInstance('goalModal');

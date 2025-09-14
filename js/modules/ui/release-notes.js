@@ -6,6 +6,7 @@
  */
 
 import { CustomModal } from '../shared/custom-modal.js';
+import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
 
 // Release Notes Manager
 class ReleaseNotesManager {
@@ -25,30 +26,14 @@ class ReleaseNotesManager {
 
   // Create release notes modal
   createModal() {
-    // Remove existing modal if it exists
-    const existingModal = document.getElementById('releasenotesmodal');
-    if (existingModal) {
-      existingModal.remove();
-    }
+    const bodyContent = `<div id="readme" class="readme-content"></div>`;
 
-    const modalHTML = `
-      <div class="modal fade" id="releasenotesmodal" tabindex="-1" data-backdrop="static" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Release Notes</h5>
-                <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-times" style="font-size: 14px;"></i>
-                </button>
-            </div>
-            <div id="readme" class="modal-body readme-content"></div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Add modal to DOM
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    createAndAppendModal(
+      'releasenotesmodal',
+      '<i class="fas fa-clipboard-list me-2"></i>Release Notes',
+      bodyContent,
+      MODAL_CONFIGS.LARGE
+    );
 
     // Initialize custom modal
     this.modal = CustomModal.getOrCreateInstance('releasenotesmodal');

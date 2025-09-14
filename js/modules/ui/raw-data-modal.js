@@ -3,6 +3,7 @@
  */
 
 import { CustomModal } from '../shared/custom-modal.js';
+import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
 
 class RawDataModal {
   constructor() {
@@ -51,35 +52,18 @@ class RawDataModal {
    * @private
    */
   _createModal() {
-    // Remove existing modal if it exists
-    const existingModal = document.getElementById('rawDataModal');
-    if (existingModal) {
-      existingModal.remove();
-    }
+    const bodyContent = `<pre id="rawDataContent" class="raw-data-content"></pre>`;
+    const footerContent = `<button type="button" class="btn btn-secondary" id="closeRawDataBtn">Close</button>`;
 
-    const modalHtml = `
-      <div class="modal fade" id="rawDataModal" tabindex="-1" aria-labelledby="rawDataModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="rawDataModalLabel">Raw Match Data</h5>
-                <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-times" style="font-size: 14px;"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-              <pre id="rawDataContent"></pre>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" id="closeRawDataBtn">Close</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Add modal to DOM
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    createAndAppendModal(
+      'rawDataModal',
+      '<i class="fas fa-code me-2"></i>Raw Match Data',
+      bodyContent,
+      {
+        ...MODAL_CONFIGS.LARGE,
+        footerContent: footerContent
+      }
+    );
 
     // Initialize custom modal
     this.modal = CustomModal.getOrCreateInstance('rawDataModal');

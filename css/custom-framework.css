@@ -448,6 +448,7 @@ html {
     text-decoration: none;
     vertical-align: middle;
     cursor: pointer;
+    -webkit-user-select: none;
     user-select: none;
     border: 2px solid transparent;
     border-radius: var(--border-radius-sm);
@@ -660,9 +661,9 @@ html {
 }
 
 .form-select {
-    appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
+    appearance: none;
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right var(--spacing-md) center;
@@ -697,6 +698,7 @@ html {
     background-size: contain;
     border: 1px solid var(--border-color);
     appearance: none;
+    -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
     transition: var(--transition-fast);
 }
@@ -875,7 +877,6 @@ html {
         padding-bottom: 160px;
         /* More space for enlarged mobile nav */
         overscroll-behavior-y: none;
-        -webkit-overflow-scrolling: touch;
     }
 
     .container-fluid {

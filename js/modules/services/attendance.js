@@ -139,26 +139,15 @@ class AttendanceManager {
 
   // Update attendance list in modal
   updateAttendanceList() {
-    const attendanceList = this._getCachedElement('attendanceList');
-    const noPlayersMessage = this._getCachedElement('noPlayersMessage');
-    
-    if (!attendanceList) {
-      // Try to find elements without cache if not found
-      const list = document.getElementById('attendanceList');
-      const message = document.getElementById('noPlayersMessage');
-      if (!list) return;
-      
-      this.cachedElements['attendanceList'] = list;
-      this.cachedElements['noPlayersMessage'] = message;
-    }
-
-    const attendance = this.getMatchAttendance();
-    const listElement = this.cachedElements['attendanceList'] || document.getElementById('attendanceList');
-    const messageElement = this.cachedElements['noPlayersMessage'] || document.getElementById('noPlayersMessage');
+    const listElement = document.getElementById('attendanceList');
+    const messageElement = document.getElementById('noPlayersMessage');
     
     if (!listElement) return;
+
+    const savedAttendance = storage.load(STORAGE_KEYS.MATCH_ATTENDANCE, []);
+    const roster = rosterManager.getRoster();
     
-    if (attendance.length === 0) {
+    if (roster.length === 0) {
       listElement.innerHTML = '';
       if (messageElement) messageElement.style.display = 'block';
       return;
@@ -166,9 +155,16 @@ class AttendanceManager {
 
     if (messageElement) messageElement.style.display = 'none';
     
-    listElement.innerHTML = attendance
+    const attendanceMap = new Map();
+    savedAttendance.forEach(record => {
+      if (record && record.playerName) {
+        attendanceMap.set(record.playerName.toLowerCase(), record.attending);
+      }
+    });
+    
+    listElement.innerHTML = roster
       .map(player => {
-        const isAttending = player.attending;
+        const isAttending = attendanceMap.get(player.name.toLowerCase()) ?? true;
         const statusClass = isAttending ? 'text-success' : 'text-danger';
         const statusIcon = isAttending ? 'fa-check-circle' : 'fa-times-circle';
         const statusText = isAttending ? 'Present' : 'Absent';
@@ -179,7 +175,7 @@ class AttendanceManager {
         return `
           <tr class="${isAttending ? '' : 'table-secondary'}">
             <td>
-              <strong>${player.playerName}</strong>
+              <strong>${player.name}</strong>
             </td>
             <td>${player.shirtNumber !== null && player.shirtNumber !== undefined ? `#${player.shirtNumber}` : '-'}</td>
             <td>
@@ -189,7 +185,7 @@ class AttendanceManager {
             </td>
             <td class="text-center">
               <button class="btn btn-sm ${buttonClass} toggle-attendance-btn" 
-                      data-player-name="${player.playerName}" 
+                      data-player-name="${player.name}" 
                       title="${buttonTitle}">
                 <i class="fas ${buttonIcon}"></i>
               </button>

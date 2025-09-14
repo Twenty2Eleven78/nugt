@@ -8,7 +8,6 @@ import { gameState, stateManager } from '../data/state.js';
 import { storage, storageHelpers } from '../data/storage.js';
 import { domCache } from '../shared/dom.js';
 import { GAME_CONFIG, STORAGE_KEYS } from '../shared/constants.js';
-import { storage } from '../data/storage.js';
 import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from './modals.js';
 import { rosterManager } from '../match/roster.js';

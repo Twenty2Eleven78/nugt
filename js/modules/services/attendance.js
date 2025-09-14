@@ -49,7 +49,7 @@ class AttendanceManager {
     const attendance = roster.map(player => ({
       playerName: player.name,
       shirtNumber: player.shirtNumber,
-      attending: attendanceMap.get(player.name.toLowerCase()) ?? true
+      attending: attendanceMap.has(player.name.toLowerCase()) ? attendanceMap.get(player.name.toLowerCase()) : false
     }));
     
     return attendance;
@@ -164,7 +164,7 @@ class AttendanceManager {
     
     listElement.innerHTML = roster
       .map(player => {
-        const isAttending = attendanceMap.get(player.name.toLowerCase()) ?? true;
+        const isAttending = attendanceMap.has(player.name.toLowerCase()) ? attendanceMap.get(player.name.toLowerCase()) : false;
         const statusClass = isAttending ? 'text-success' : 'text-danger';
         const statusIcon = isAttending ? 'fa-check-circle' : 'fa-times-circle';
         const statusText = isAttending ? 'Present' : 'Absent';

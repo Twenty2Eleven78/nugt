@@ -319,8 +319,8 @@ function bindEventListeners() {
       defaultNotes: ''
     }, async ({ title, notes }) => {
       try {
-        // Gather match data with current attendance
-        const currentAttendance = attendanceManager.getMatchAttendance();
+        // Gather match data with saved attendance
+        const savedAttendance = storage.load(STORAGE_KEYS.MATCH_ATTENDANCE, []);
         const matchData = {
           title,
           notes,
@@ -334,7 +334,7 @@ function bindEventListeners() {
           team2Name,
           score1,
           score2,
-          attendance: currentAttendance,
+          attendance: savedAttendance,
           savedAt: Date.now()
         };
 

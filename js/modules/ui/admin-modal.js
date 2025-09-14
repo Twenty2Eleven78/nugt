@@ -2,68 +2,70 @@ import { userMatchesApi } from '../services/user-matches-api.js';
 import { notificationManager } from '../services/notifications.js';
 import { matchSummaryModal } from './match-summary-modal.js';
 import { CustomModal } from '../shared/custom-modal.js';
+import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
 import { authService } from '../services/auth.js';
 
-const modalHtml = `
-<div class="modal fade" id="admin-modal" tabindex="-1" aria-labelledby="admin-modal-label" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen-lg-down modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="admin-modal-label">Admin Dashboard</h5>
-                <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-times" style="font-size: 14px;"></i>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <!-- Admin Notification Container -->
-                <div id="admin-notification-container" style="display: none;"></div>
-                
-                <!-- Search and Controls -->
-                <div class="mb-3">
-                    <input type="text" class="form-control mb-2" id="admin-search" 
-                           placeholder="Search matches...">
-                    <div class="row g-2">
-                        <div class="col-4">
-                            <select class="form-select" id="filter-select">
-                                <option value="">All Matches</option>
-                                <option value="today">Today</option>
-                                <option value="week">This Week</option>
-                                <option value="month">This Month</option>
-                            </select>
-                        </div>
-                        <div class="col-4">
-                            <button class="btn btn-primary w-100" id="refresh-data-btn">
-                                <i class="fas fa-sync-alt me-1"></i>Refresh
-                            </button>
-                        </div>
-                        <div class="col-4">
-                            <button class="btn btn-primary w-100" id="generate-stats-btn" title="Generate Statistics">
-                                <i class="fas fa-chart-bar me-1"></i>Stats
-                            </button>
-                        </div>
-                    </div>
+const createMainAdminModal = () => {
+    const bodyContent = `
+        <!-- Admin Notification Container -->
+        <div id="admin-notification-container" style="display: none;"></div>
+        
+        <!-- Search and Controls -->
+        <div class="mb-3">
+            <input type="text" class="form-control mb-2" id="admin-search" 
+                   placeholder="Search matches...">
+            <div class="row g-2">
+                <div class="col-4">
+                    <select class="form-select" id="filter-select">
+                        <option value="">All Matches</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
                 </div>
-
-                <!-- Statistics -->
-                <div class="row g-2 mb-3" id="admin-stats-cards">
-                    <!-- Stats will be populated here -->
+                <div class="col-4">
+                    <button class="btn btn-primary w-100" id="refresh-data-btn">
+                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                    </button>
                 </div>
-
-                <!-- Matches List -->
-                <div style="max-height: 400px; overflow-y: auto;">
-                    <div id="matches-list">
-                        <!-- Match cards will be populated here -->
-                        <div class="text-center py-4">
-                            <div class="spinner-border text-primary mb-2" role="status"></div>
-                            <div class="text-muted small">Loading match data...</div>
-                        </div>
-                    </div>
+                <div class="col-4">
+                    <button class="btn btn-primary w-100" id="generate-stats-btn" title="Generate Statistics">
+                        <i class="fas fa-chart-bar me-1"></i>Stats
+                    </button>
                 </div>
             </div>
         </div>
-    </div>
-</div>
+
+        <!-- Statistics -->
+        <div class="row g-2 mb-3" id="admin-stats-cards">
+            <!-- Stats will be populated here -->
+        </div>
+
+        <!-- Matches List -->
+        <div style="max-height: 400px; overflow-y: auto;">
+            <div id="matches-list">
+                <!-- Match cards will be populated here -->
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary mb-2" role="status"></div>
+                    <div class="text-muted small">Loading match data...</div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Create main admin modal using factory
+    createAndAppendModal(
+        'admin-modal',
+        'Admin Dashboard',
+        bodyContent,
+        {
+            ...MODAL_CONFIGS.EXTRA_LARGE,
+            size: 'modal-fullscreen-lg-down modal-xl'
+        }
+    );
+};
+
+const modalHtml = `
 
 <!-- Confirmation Modal for Deletion -->
 <div class="modal fade" id="delete-confirm-modal" tabindex="-1" aria-hidden="true">
@@ -157,7 +159,12 @@ let currentDeleteMatch = null;
 let currentTransferMatch = null;
 
 const init = () => {
+    // Create main admin modal using factory
+    createMainAdminModal();
+    
+    // Add sub-modals using traditional HTML
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
     const modalElement = document.getElementById('admin-modal');
     const deleteModalElement = document.getElementById('delete-confirm-modal');
     const transferModalElement = document.getElementById('transfer-match-modal');

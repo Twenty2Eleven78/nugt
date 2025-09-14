@@ -4,6 +4,7 @@
  */
 
 import { CustomModal } from '../shared/custom-modal.js';
+import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
 
 class ResetModal {
   constructor() {
@@ -24,49 +25,38 @@ class ResetModal {
    * Create reset modal
    */
   createModal() {
-    const modalHTML = `
-      <div class="modal fade" id="resetConfirmModal" data-backdrop="static" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-              <h5 class="modal-title">
-                <i class="fas fa-exclamation-triangle me-2"></i>Confirm Reset
-              </h5>
-                <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-times" style="font-size: 14px;"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-              <div class="text-center">
-                <i class="fas fa-exclamation-triangle text-warning fa-3x mb-3"></i>
-                <h6 class="mb-3">Are you sure you want to reset the app?</h6>
-                <p class="text-muted mb-0">
-                  This will clear all match data, scores, events, and return the app to its initial state.
-                  <strong>This action cannot be undone.</strong>
-                </p>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                <i class="fas fa-times me-2"></i>Cancel
-              </button>
-              <button type="button" class="btn btn-danger" id="confirmResetBtn">
-                <i class="fas fa-arrows-rotate me-2"></i>Reset App
-              </button>
-            </div>
-          </div>
-        </div>
+    const bodyContent = `
+      <div class="text-center">
+        <i class="fas fa-exclamation-triangle text-warning fa-3x mb-3"></i>
+        <h6 class="mb-3">Are you sure you want to reset the app?</h6>
+        <p class="text-muted mb-0">
+          This will clear all match data, scores, events, and return the app to its initial state.
+          <strong>This action cannot be undone.</strong>
+        </p>
       </div>
     `;
 
-    // Remove existing modal if it exists
-    const existingModal = document.getElementById('resetConfirmModal');
-    if (existingModal) {
-      existingModal.remove();
-    }
+    const footerContent = `
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">
+        <i class="fas fa-times me-2"></i>Cancel
+      </button>
+      <button type="button" class="btn btn-danger" id="confirmResetBtn">
+        <i class="fas fa-arrows-rotate me-2"></i>Reset App
+      </button>
+    `;
 
-    // Add modal to DOM
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    // Create modal using factory
+    createAndAppendModal(
+      'resetConfirmModal',
+      '<i class="fas fa-exclamation-triangle me-2"></i>Confirm Reset',
+      bodyContent,
+      {
+        ...MODAL_CONFIGS.CENTERED,
+        backdrop: 'static',
+        headerClass: 'bg-danger text-white',
+        footerContent: footerContent
+      }
+    );
     
     // Initialize custom modal
     this.modal = CustomModal.getOrCreateInstance('resetConfirmModal');

@@ -4,6 +4,7 @@
  */
 
 import { CustomModal } from '../shared/custom-modal.js';
+import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
 import { attendanceManager } from '../services/attendance.js';
 
 class AttendanceModal {
@@ -27,80 +28,63 @@ class AttendanceModal {
    * Create attendance modal
    */
   createModal() {
-    // Remove existing modal if it exists
-    const existingModal = document.getElementById('attendanceModal');
-    if (existingModal) {
-      existingModal.remove();
-    }
-
-    const modalHTML = `
-      <div class="modal fade" id="attendanceModal" tabindex="-1" aria-labelledby="attendanceModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title" id="attendanceModalLabel">
-                <i class="fas fa-user-check me-2"></i>Match Attendance
-              </h4>
-              <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                <i class="fas fa-times" style="font-size: 14px;"></i>
-              </button>
-            </div>
-            <div class="modal-body">
-              <!-- Attendance Summary -->
-              <div class="attendance-summary mb-4">
-                <div id="attendanceSummaryMain" class="text-center">
-                  <i class="fas fa-users me-1"></i>
-                  <strong>Loading...</strong>
-                </div>
-              </div>
-
-              <!-- Attendance Controls -->
-              <div class="attendance-controls d-flex gap-2 mb-4">
-                <button id="markAllAttendingBtnMain" class="flex-fill btn btn-primary">
-                  <i class="fas fa-user-check me-1"></i>All Present
-                </button>
-                <button id="markAllAbsentBtnMain" class="flex-fill btn btn-warning">
-                  <i class="fas fa-user-times me-1"></i>All Absent
-                </button>
-                <button id="clearAttendanceBtnMain" class="flex-fill btn btn-outline-secondary">
-                  <i class="fas fa-undo me-1"></i>Reset
-                </button>
-              </div>
-
-              <!-- Attendance List -->
-              <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-                <table class="table table-striped table-hover">
-                  <thead class="table-dark sticky-top">
-                    <tr>
-                      <th>Player</th>
-                      <th>Shirt #</th>
-                      <th>Status</th>
-                      <th class="text-center">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody id="attendanceList">
-                    <!-- Attendance rows will be populated here -->
-                  </tbody>
-                </table>
-              </div>
-
-              <!-- No Players Message -->
-              <div id="noPlayersMessage" class="text-center text-muted py-4" style="display: none;">
-                <i class="fas fa-users fa-3x mb-3"></i>
-                <h5>No Players in Roster</h5>
-                <p>Add players to your roster first to track attendance.</p>
-                <button class="btn btn-primary" data-toggle="modal" data-target="#rosterModal" data-dismiss="modal">
-                  <i class="fas fa-users me-2"></i>Manage Roster
-                </button>
-              </div>
-            </div>
-          </div>
+    const bodyContent = `
+      <!-- Attendance Summary -->
+      <div class="attendance-summary mb-4">
+        <div id="attendanceSummaryMain" class="text-center">
+          <i class="fas fa-users me-1"></i>
+          <strong>Loading...</strong>
         </div>
+      </div>
+
+      <!-- Attendance Controls -->
+      <div class="attendance-controls d-flex gap-2 mb-4">
+        <button id="markAllAttendingBtnMain" class="flex-fill btn btn-primary">
+          <i class="fas fa-user-check me-1"></i>All Present
+        </button>
+        <button id="markAllAbsentBtnMain" class="flex-fill btn btn-warning">
+          <i class="fas fa-user-times me-1"></i>All Absent
+        </button>
+        <button id="clearAttendanceBtnMain" class="flex-fill btn btn-outline-secondary">
+          <i class="fas fa-undo me-1"></i>Reset
+        </button>
+      </div>
+
+      <!-- Attendance List -->
+      <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+        <table class="table table-striped table-hover">
+          <thead class="table-dark sticky-top">
+            <tr>
+              <th>Player</th>
+              <th>Shirt #</th>
+              <th>Status</th>
+              <th class="text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="attendanceList">
+            <!-- Attendance rows will be populated here -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No Players Message -->
+      <div id="noPlayersMessage" class="text-center text-muted py-4" style="display: none;">
+        <i class="fas fa-users fa-3x mb-3"></i>
+        <h5>No Players in Roster</h5>
+        <p>Add players to your roster first to track attendance.</p>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#rosterModal" data-dismiss="modal">
+          <i class="fas fa-users me-2"></i>Manage Roster
+        </button>
       </div>
     `;
 
-    // Add modal to DOM
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    // Create modal using factory
+    createAndAppendModal(
+      'attendanceModal',
+      '<i class="fas fa-user-check me-2"></i>Match Attendance',
+      bodyContent,
+      MODAL_CONFIGS.LARGE
+    );
 
     // Initialize custom modal
     this.modal = CustomModal.getOrCreateInstance('attendanceModal');

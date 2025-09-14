@@ -493,8 +493,11 @@ class NewMatchModal {
                 attending: this.selectedPlayers.size === 0 ? true : this.selectedPlayers.has(index)
             }));
             
-            // Save attendance data directly
-            storage.save(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
+            // Save attendance data and force update
+            storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
+            setTimeout(() => {
+                attendanceManager.updateAttendanceList();
+            }, 100);
 
             // Update UI
             this.updateTeamNamesInUI(team1Name, team2Name);

@@ -49,7 +49,7 @@ class AttendanceManager {
     const attendance = roster.map(player => ({
       playerName: player.name,
       shirtNumber: player.shirtNumber,
-      attending: attendanceMap.has(player.name.toLowerCase()) ? attendanceMap.get(player.name.toLowerCase()) : true
+      attending: attendanceMap.get(player.name.toLowerCase()) ?? true
     }));
     
     return attendance;

@@ -46,11 +46,18 @@ class AttendanceManager {
       }
     });
 
-    return roster.map(player => ({
+    const attendance = roster.map(player => ({
       playerName: player.name,
       shirtNumber: player.shirtNumber,
       attending: attendanceMap.get(player.name.toLowerCase()) ?? true // Default to attending
     }));
+    
+    // If no saved attendance exists and we have roster players, save the default attendance
+    if (savedAttendance.length === 0 && roster.length > 0) {
+      this._saveAttendance(attendance);
+    }
+    
+    return attendance;
   }
 
   // Helper method to save attendance and update UI
@@ -63,7 +70,7 @@ class AttendanceManager {
       if (!silent) {
         notificationManager.success(successMessage);
       }
-    }, 100);
+    }, 50);
   }
 
   // Helper method to find player by name (case-insensitive)
@@ -140,19 +147,31 @@ class AttendanceManager {
     const attendanceList = this._getCachedElement('attendanceList');
     const noPlayersMessage = this._getCachedElement('noPlayersMessage');
     
-    if (!attendanceList || !noPlayersMessage) return;
+    if (!attendanceList) {
+      // Try to find elements without cache if not found
+      const list = document.getElementById('attendanceList');
+      const message = document.getElementById('noPlayersMessage');
+      if (!list) return;
+      
+      this.cachedElements['attendanceList'] = list;
+      this.cachedElements['noPlayersMessage'] = message;
+    }
 
     const attendance = this.getMatchAttendance();
+    const listElement = this.cachedElements['attendanceList'] || document.getElementById('attendanceList');
+    const messageElement = this.cachedElements['noPlayersMessage'] || document.getElementById('noPlayersMessage');
+    
+    if (!listElement) return;
     
     if (attendance.length === 0) {
-      attendanceList.innerHTML = '';
-      noPlayersMessage.style.display = 'block';
+      listElement.innerHTML = '';
+      if (messageElement) messageElement.style.display = 'block';
       return;
     }
 
-    noPlayersMessage.style.display = 'none';
+    if (messageElement) messageElement.style.display = 'none';
     
-    attendanceList.innerHTML = attendance
+    listElement.innerHTML = attendance
       .map(player => {
         const isAttending = player.attending;
         const statusClass = isAttending ? 'text-success' : 'text-danger';
@@ -167,7 +186,7 @@ class AttendanceManager {
             <td>
               <strong>${player.playerName}</strong>
             </td>
-            <td>${player.shirtNumber !== null ? `#${player.shirtNumber}` : '-'}</td>
+            <td>${player.shirtNumber !== null && player.shirtNumber !== undefined ? `#${player.shirtNumber}` : '-'}</td>
             <td>
               <span class="${statusClass}">
                 <i class="fas ${statusIcon} me-1"></i>${statusText}

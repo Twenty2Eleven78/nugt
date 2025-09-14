@@ -203,6 +203,13 @@ export function initializeApp() {
   teamManager.initializeTeams();
   rosterManager.init();
   attendanceManager.init();
+  
+  // Ensure attendance is properly initialized after roster is loaded
+  setTimeout(() => {
+    if (attendanceManager.getMatchAttendance) {
+      attendanceManager.getMatchAttendance(); // This will initialize default attendance if needed
+    }
+  }, 200);
 
   // Initialize UI components
   bindEventListeners();
@@ -312,7 +319,8 @@ function bindEventListeners() {
       defaultNotes: ''
     }, async ({ title, notes }) => {
       try {
-        // Gather match data
+        // Gather match data with current attendance
+        const currentAttendance = attendanceManager.getMatchAttendance();
         const matchData = {
           title,
           notes,
@@ -326,7 +334,7 @@ function bindEventListeners() {
           team2Name,
           score1,
           score2,
-          attendance: attendanceManager.getMatchAttendance(),
+          attendance: currentAttendance,
           savedAt: Date.now()
         };
 

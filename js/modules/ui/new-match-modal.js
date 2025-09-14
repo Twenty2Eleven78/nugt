@@ -486,31 +486,41 @@ class NewMatchModal {
                 gameState.matchTitle = matchTitle;
             }
 
-            // Set player attendance (silently to avoid notification spam)
-            if (this.selectedPlayers.size > 0) {
-                const roster = rosterManager.getRoster();
+            // Set player attendance after state reset
+            setTimeout(() => {
+                if (this.selectedPlayers.size > 0) {
+                    const roster = rosterManager.getRoster();
+                    
+                    // First, mark all players as absent (silently)
+                    attendanceManager.markAllAbsent(true);
+                    
+                    // Then mark selected players as attending (silently)
+                    Array.from(this.selectedPlayers).forEach(index => {
+                        const player = roster[index];
+                        if (player && player.name && typeof player.name === 'string') {
+                            attendanceManager.setPlayerAttendance(player.name, true, true);
+                        }
+                    });
+                } else {
+                    // If no players selected, mark all as attending (silently)
+                    attendanceManager.markAllAttending(true);
+                }
                 
-                // First, mark all players as absent (silently)
-                attendanceManager.markAllAbsent(true);
-                
-                // Then mark selected players as attending (silently)
-                Array.from(this.selectedPlayers).forEach(index => {
-                    const player = roster[index];
-                    if (player && player.name && typeof player.name === 'string') {
-                        attendanceManager.setPlayerAttendance(player.name, true, true);
-                    }
-                });
-            } else {
-                // If no players selected, mark all as attending (silently)
-                attendanceManager.markAllAttending(true);
-            }
+                // Force update attendance display after setting attendance
+                if (attendanceManager.updateAttendanceList) {
+                    attendanceManager.updateAttendanceList();
+                }
+            }, 200);
 
             // Update UI
             this.updateTeamNamesInUI(team1Name, team2Name);
             timerController.updateDisplay();
 
-            // Save state
-            storageHelpers.saveCompleteMatchData(gameState, Array.from(this.selectedPlayers));
+            // Save state with attendance data
+            setTimeout(() => {
+                const attendanceData = attendanceManager.getMatchAttendance();
+                storageHelpers.saveMatchData(gameState, attendanceData);
+            }, 300);
 
             // Close modal and show success
             hideModal('newMatchModal');

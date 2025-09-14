@@ -216,20 +216,26 @@ class NewMatchModal {
                     e.stopImmediatePropagation();
                     
                     const playerId = parseInt(playerCard.dataset.playerId);
+                    console.log('Player card clicked:', playerId, 'Current selections:', Array.from(this.selectedPlayers));
                     
                     // Toggle selection
                     if (this.selectedPlayers.has(playerId)) {
                         this.selectedPlayers.delete(playerId);
                         playerCard.classList.remove('selected');
                         playerCard.setAttribute('data-selected', 'false');
+                        console.log('Removed player', playerId, 'New selections:', Array.from(this.selectedPlayers));
                     } else {
                         this.selectedPlayers.add(playerId);
                         playerCard.classList.add('selected');
                         playerCard.setAttribute('data-selected', 'true');
+                        console.log('Added player', playerId, 'New selections:', Array.from(this.selectedPlayers));
                     }
                     
-                    this.updateSelectedCount();
-                    this.updateSummary();
+                    // Force update with setTimeout to ensure DOM is updated
+                    setTimeout(() => {
+                        this.updateSelectedCount();
+                        this.updateSummary();
+                    }, 10);
                     
                     // Reset processing flag after a short delay
                     setTimeout(() => {
@@ -363,6 +369,7 @@ class NewMatchModal {
         if (countElement) {
             countElement.textContent = this.selectedPlayers.size;
         }
+        console.log('Updated count to:', this.selectedPlayers.size, 'Selected players:', Array.from(this.selectedPlayers));
         
         // Sync UI with actual selected state
         this.syncUIWithSelectedState();

@@ -1,7 +1,9 @@
 /**
  * Modal Factory
- * Reusable modal creation utility to reduce code duplication
+ * Reusable modal creation utility and management system
  */
+
+import { CustomModal } from './custom-modal.js';
 
 /**
  * Create a standardized modal HTML structure
@@ -85,3 +87,100 @@ export const MODAL_CONFIGS = {
   NO_KEYBOARD: { keyboard: false },
   NO_FADE: { fade: false }
 };
+
+/**
+ * Modal Management Utilities
+ */
+
+// Show modal by ID
+export function showModal(modalId) {
+  const modalElement = document.getElementById(modalId);
+  if (modalElement) {
+    const modal = CustomModal.getOrCreateInstance(modalElement);
+    modal.show();
+    return modal;
+  }
+  console.warn(`Modal with ID '${modalId}' not found`);
+  return null;
+}
+
+// Hide modal by ID
+export function hideModal(modalId) {
+  const modalElement = document.getElementById(modalId);
+  if (!modalElement) {
+    console.warn(`Modal with ID '${modalId}' not found`);
+    return;
+  }
+
+  try {
+    let modal = CustomModal.getInstance(modalElement);
+    if (!modal) {
+      modal = CustomModal.getOrCreateInstance(modalElement);
+    }
+    modal.hide();
+  } catch (error) {
+    console.warn('Modal hide failed, using fallback:', error);
+    modalElement.classList.remove('show');
+    modalElement.style.display = 'none';
+    document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+    document.body.classList.remove('modal-open');
+  }
+
+  setTimeout(() => {
+    const focusedElement = modalElement.querySelector(':focus');
+    if (focusedElement) focusedElement.blur();
+    
+    document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+    
+    modalElement.style.display = '';
+    modalElement.classList.remove('show');
+    modalElement.setAttribute('aria-hidden', 'true');
+    modalElement.removeAttribute('aria-modal');
+    modalElement.removeAttribute('role');
+  }, 300);
+}
+
+// Get modal instance
+export function getModalInstance(modalId) {
+  const modalElement = document.getElementById(modalId);
+  return modalElement ? CustomModal.getInstance(modalElement) : null;
+}
+
+// Cleanup modal overlays
+export function cleanupModalOverlays() {
+  document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+  
+  const openModals = document.querySelectorAll('.modal.show');
+  if (openModals.length === 0) {
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+  }
+}
+
+// Close all modals
+export function closeAllModals() {
+  document.querySelectorAll('.modal').forEach(modalElement => {
+    const modal = CustomModal.getInstance(modalElement);
+    if (modal) modal.hide();
+  });
+  
+  setTimeout(() => cleanupModalOverlays(), 350);
+}
+
+// Bind modal events
+export function bindModalEvents() {
+  document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('modal.hidden', () => cleanupModalOverlays());
+    modal.addEventListener('modal.hide', () => {
+      const focusedElement = modal.querySelector(':focus');
+      if (focusedElement) focusedElement.blur();
+    });
+    modal.addEventListener('modal.show', () => {
+      document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+    });
+  });
+}

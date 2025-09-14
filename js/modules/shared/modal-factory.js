@@ -29,7 +29,7 @@ export function createModal(id, title, bodyContent, options = {}) {
   const keyboardAttr = keyboard ? '' : ' data-keyboard="false"';
   
   const closeButtonHtml = closeButton ? 
-    '<button type="button" class="btn btn-danger btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-times" style="font-size: 14px;"></i></button>' : '';
+    '<button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-times" style="font-size: 14px;"></i></button>' : '';
   
   const footerHtml = footerContent ? 
     `<div class="modal-footer">${footerContent}</div>` : '';

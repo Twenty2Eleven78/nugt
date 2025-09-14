@@ -4,6 +4,7 @@
  */
 
 import { CustomModal } from '../shared/custom-modal.js';
+import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
 
 class TeamModals {
   constructor() {
@@ -25,42 +26,27 @@ class TeamModals {
    * Create Team 1 modal
    */
   createTeam1Modal() {
-    const modalHTML = `
-      <div class="modal fade" id="fixtureModalTeam1" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Our Team Name Management</h5>
-                <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-times" style="font-size: 14px;"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-              <div class="row">
-                <div class="col-12 col-md-8">
-                  <div class="input-group mb-3">
-                    <div>
-                      <input type="text" id="team1Name" class="form-control" placeholder="Netherton">
-                      <br>
-                      <button class="btn btn-primary btn-custom" id="updTeam1Btn">Update Team Name</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+    const bodyContent = `
+      <div class="row">
+        <div class="col-12 col-md-8">
+          <div class="input-group mb-3">
+            <div>
+              <input type="text" id="team1Name" class="form-control" placeholder="Netherton">
+              <br>
+              <button class="btn btn-primary btn-custom" id="updTeam1Btn">Update Team Name</button>
             </div>
           </div>
         </div>
       </div>
     `;
 
-    // Remove existing modal if it exists
-    const existingModal = document.getElementById('fixtureModalTeam1');
-    if (existingModal) {
-      existingModal.remove();
-    }
-
-    // Add modal to DOM
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    // Create modal using factory
+    createAndAppendModal(
+      'fixtureModalTeam1',
+      'Our Team Name Management',
+      bodyContent,
+      MODAL_CONFIGS.CENTERED
+    );
     
     // Initialize custom modal
     this.team1Modal = CustomModal.getOrCreateInstance('fixtureModalTeam1');
@@ -70,42 +56,27 @@ class TeamModals {
    * Create Team 2 modal
    */
   createTeam2Modal() {
-    const modalHTML = `
-      <div class="modal fade" id="fixtureModalTeam2" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Opposition Name Management</h5>
-                <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-times" style="font-size: 14px;"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-              <div class="row">
-                <div class="col-12 col-md-8">
-                  <div class="input-group mb-3">
-                    <div>
-                      <input type="text" id="team2Name" class="form-control" placeholder="Opposition Team">
-                      <br>
-                      <button class="btn btn-primary btn-custom" id="updTeam2Btn">Update Team Name</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+    const bodyContent = `
+      <div class="row">
+        <div class="col-12 col-md-8">
+          <div class="input-group mb-3">
+            <div>
+              <input type="text" id="team2Name" class="form-control" placeholder="Opposition Team">
+              <br>
+              <button class="btn btn-primary btn-custom" id="updTeam2Btn">Update Team Name</button>
             </div>
           </div>
         </div>
       </div>
     `;
 
-    // Remove existing modal if it exists
-    const existingModal = document.getElementById('fixtureModalTeam2');
-    if (existingModal) {
-      existingModal.remove();
-    }
-
-    // Add modal to DOM
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    // Create modal using factory
+    createAndAppendModal(
+      'fixtureModalTeam2',
+      'Opposition Name Management',
+      bodyContent,
+      MODAL_CONFIGS.CENTERED
+    );
     
     // Initialize custom modal
     this.team2Modal = CustomModal.getOrCreateInstance('fixtureModalTeam2');

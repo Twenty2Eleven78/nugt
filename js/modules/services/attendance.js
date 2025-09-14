@@ -49,13 +49,8 @@ class AttendanceManager {
     const attendance = roster.map(player => ({
       playerName: player.name,
       shirtNumber: player.shirtNumber,
-      attending: attendanceMap.get(player.name.toLowerCase()) ?? true // Default to attending
+      attending: attendanceMap.has(player.name.toLowerCase()) ? attendanceMap.get(player.name.toLowerCase()) : true
     }));
-    
-    // If no saved attendance exists and we have roster players, save the default attendance
-    if (savedAttendance.length === 0 && roster.length > 0) {
-      this._saveAttendance(attendance);
-    }
     
     return attendance;
   }

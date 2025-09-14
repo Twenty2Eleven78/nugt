@@ -490,7 +490,7 @@ class NewMatchModal {
             const roster = rosterManager.getRoster();
             const attendanceData = roster.map((player, index) => ({
                 playerName: player.name,
-                attending: this.selectedPlayers.has(index)
+                attending: this.selectedPlayers.size === 0 ? true : this.selectedPlayers.has(index)
             }));
             
             // Save attendance data directly

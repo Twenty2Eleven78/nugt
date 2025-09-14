@@ -1,5 +1,5 @@
 //Cache Name
-const CACHE_NAME = "nugt-cache-v159";
+const CACHE_NAME = "nugt-cache-v160";
 //Files to cache - Modular Architecture
 const cacheFiles = [
   './',

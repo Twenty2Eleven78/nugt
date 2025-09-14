@@ -476,6 +476,11 @@ class NewMatchModal {
             // Get match title before reset
             const matchTitle = document.getElementById('matchTitle')?.value.trim();
 
+            // Capture selected players BEFORE reset clears them
+            const selectedPlayersCopy = new Set(this.selectedPlayers);
+            console.log('Original selectedPlayers:', Array.from(this.selectedPlayers));
+            console.log('Copy selectedPlayersCopy:', Array.from(selectedPlayersCopy));
+
             // Reset current game state
             await this.resetGameState();
 
@@ -490,11 +495,6 @@ class NewMatchModal {
             if (matchTitle) {
                 gameState.matchTitle = matchTitle;
             }
-
-            // Capture selected players before clearing
-            const selectedPlayersCopy = new Set(this.selectedPlayers);
-            console.log('Original selectedPlayers:', Array.from(this.selectedPlayers));
-            console.log('Copy selectedPlayersCopy:', Array.from(selectedPlayersCopy));
             
             // Set player attendance after reset
             setTimeout(() => {
@@ -512,9 +512,6 @@ class NewMatchModal {
                 
                 storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
                 attendanceManager.updateAttendanceList();
-                
-                // Clear selections after attendance is set
-                this.selectedPlayers.clear();
             }, 200);
 
             // Update UI

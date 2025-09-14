@@ -486,18 +486,17 @@ class NewMatchModal {
                 gameState.matchTitle = matchTitle;
             }
 
-            // Set player attendance based on selection
-            const roster = rosterManager.getRoster();
-            const attendanceData = roster.map((player, index) => ({
-                playerName: player.name,
-                attending: this.selectedPlayers.size === 0 ? true : this.selectedPlayers.has(index)
-            }));
-            
-            // Save attendance data and force update
-            storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
+            // Set player attendance after reset
             setTimeout(() => {
+                const roster = rosterManager.getRoster();
+                const attendanceData = roster.map((player, index) => ({
+                    playerName: player.name,
+                    attending: this.selectedPlayers.size === 0 ? true : this.selectedPlayers.has(index)
+                }));
+                
+                storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
                 attendanceManager.updateAttendanceList();
-            }, 100);
+            }, 200);
 
             // Update UI
             this.updateTeamNamesInUI(team1Name, team2Name);

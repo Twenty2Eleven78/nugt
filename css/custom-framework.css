@@ -3231,6 +3231,25 @@ uth modal notification styling */
     padding: var(--spacing-lg);
 }
 
+/* Scrollable sections */
+.stats-section-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.stats-section-body::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 3px;
+}
+
+.stats-section-body::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.stats-section-body::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
 /* Enhanced Player Items */
 .stats-player-item {
     display: flex;

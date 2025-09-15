@@ -299,9 +299,9 @@ class StatisticsTab {
                     <div class="stats-section">
                         <div class="stats-section-header">
                             <i class="fas fa-trophy text-warning me-2"></i>
-                            <span>Player Performance Rankings</span>
+                            <span>Player Performance Rankings (${playerStats.filter(p => p.totalContributions > 0 || p.appearances > 0).length})</span>
                         </div>
-                        <div class="stats-section-body">
+                        <div class="stats-section-body" style="max-height: 400px; overflow-y: auto; -webkit-overflow-scrolling: touch;">
                             ${this._renderPlayerRankings(playerStats)}
                         </div>
                     </div>
@@ -511,9 +511,9 @@ class StatisticsTab {
                     <div class="stats-section">
                         <div class="stats-section-header">
                             <i class="fas fa-list text-primary me-2"></i>
-                            <span>Match Results</span>
+                            <span>Match Results (${matchStats.length})</span>
                         </div>
-                        <div class="stats-section-body">
+                        <div class="stats-section-body" style="max-height: 400px; overflow-y: auto; -webkit-overflow-scrolling: touch;">
                             <div class="d-sm-none">
                                 ${this._renderMatchCards(matchStats)}
                             </div>
@@ -670,8 +670,7 @@ class StatisticsTab {
                     return b.goals - a.goals;
                 }
                 return b.assists - a.assists;
-            })
-            .slice(0, 10);
+            });
 
         if (sortedPlayers.length === 0) {
             return '<div class="stats-empty"><i class="fas fa-users me-2"></i>No player contributions recorded yet</div>';
@@ -742,7 +741,7 @@ class StatisticsTab {
     _renderMatchCards(matchStats) {
         return matchStats.map((match, index) => {
             const date = match.date || match.matchDate || 'Unknown';
-            const opposition = match.opposition || match.opponent || 'Unknown';
+            const opposition = match.team2Name || match.opposition || match.opponent || 'Unknown';
             const ourGoals = match.ourGoals || match.goalsFor || 0;
             const theirGoals = match.theirGoals || match.goalsAgainst || 0;
             const attendance = match.attendance || 0;
@@ -797,7 +796,7 @@ class StatisticsTab {
     _renderMatchRows(matchStats) {
         return matchStats.map((match, index) => {
             const date = match.date || match.matchDate || 'Unknown';
-            const opposition = match.opposition || match.opponent || 'Unknown';
+            const opposition = match.team2Name || match.opposition || match.opponent || 'Unknown';
             const ourGoals = match.ourGoals || match.goalsFor || 0;
             const theirGoals = match.theirGoals || match.goalsAgainst || 0;
             const attendance = match.attendance || 0;

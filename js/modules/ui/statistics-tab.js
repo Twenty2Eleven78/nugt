@@ -523,13 +523,13 @@ class StatisticsTab {
                                     <table class="table table-hover table-sm mb-0">
                                         <thead class="table-light">
                                             <tr>
-                                                <th style="width: 90px;" class="small">Date</th>
+                                                <th style="width: 70px;" class="small">Date</th>
                                                 <th class="small">Opposition</th>
-                                                <th class="text-center small" style="width: 70px;">Result</th>
-                                                <th class="text-center small" style="width: 50px;">G</th>
-                                                <th class="text-center small" style="width: 50px;">A</th>
-                                                <th class="text-center small" style="width: 60px;">Att.</th>
-                                                <th class="small" style="width: 120px;">Top Scorer</th>
+                                                <th class="text-center small" style="width: 60px;">Result</th>
+                                                <th class="text-center small" style="width: 35px;">G</th>
+                                                <th class="text-center small" style="width: 35px;">A</th>
+                                                <th class="text-center small" style="width: 40px;">Att</th>
+                                                <th class="small" style="width: 100px;">Top Scorer</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -840,7 +840,7 @@ class StatisticsTab {
                     <td class="text-center py-2">${ourGoals}</td>
                     <td class="text-center py-2">${match.assists || 0}</td>
                     <td class="text-center py-2">${attendance}</td>
-                    <td class="text-muted small py-2">${this._escapeHtml(topScorer)}</td>
+                    <td class="text-muted small py-2">${this._escapeHtml(topScorer !== 'None' && !topScorer.toLowerCase().includes('n/a') ? topScorer : '-')}</td>
                 </tr>
             `;
         }).join('');

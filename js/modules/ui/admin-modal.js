@@ -1465,7 +1465,7 @@ const calculateStatisticsFromMatches = async (matches) => {
         }
         
         // Find top scorer for this match
-        const matchGoals = match.goals ? match.goals.filter(g => g.goalScorerName && g.goalScorerName !== 'Opposition') : [];
+        const matchGoals = match.goals ? match.goals.filter(g => g.goalScorerName && g.goalScorerName !== 'Opposition' && g.goalScorerName.toLowerCase() !== 'n/a') : [];
         const scorerCounts = {};
         matchGoals.forEach(goal => {
             const scorer = goal.goalScorerName;

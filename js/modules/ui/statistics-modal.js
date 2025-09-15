@@ -87,19 +87,19 @@ class StatisticsModal {
                 <div class="btn-group w-100" role="group" id="statsNavTabs" style="max-width: 400px;">
                     <button type="button" class="btn btn-outline-primary active flex-fill" data-view="overview" style="font-size: 0.75rem;">
                         <i class="fas fa-tachometer-alt d-none d-sm-inline me-sm-1"></i>
-                        <span>Over</span>
+                        <span> Over</span>
                     </button>
                     <button type="button" class="btn btn-outline-primary flex-fill" data-view="players" style="font-size: 0.75rem;">
                         <i class="fas fa-users d-none d-sm-inline me-sm-1"></i>
-                        <span>Play</span>
+                        <span> Play</span>
                     </button>
                     <button type="button" class="btn btn-outline-primary flex-fill" data-view="teams" style="font-size: 0.75rem;">
                         <i class="fas fa-shield-alt d-none d-sm-inline me-sm-1"></i>
-                        <span>Team</span>
+                        <span> Team</span>
                     </button>
                     <button type="button" class="btn btn-outline-primary flex-fill" data-view="matches" style="font-size: 0.75rem;">
                         <i class="fas fa-calendar-alt d-none d-sm-inline me-sm-1"></i>
-                        <span>Match</span>
+                        <span> Match</span>
                     </button>
                 </div>
             </div>

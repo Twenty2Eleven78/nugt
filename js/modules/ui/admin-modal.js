@@ -1327,7 +1327,7 @@ const calculateStatisticsFromMatches = async (matches) => {
             
             // Process scorer - use the correct property names from the actual data
             const scorer = goal.goalScorerName || goal.scorer || goal.player || goal.goalScorer;
-            if (scorer && scorer.trim() && scorer !== 'Opposition') {
+            if (scorer && scorer.trim() && scorer !== 'Opposition' && scorer.trim().toLowerCase() !== 'n/a') {
                 const playerKey = scorer.toLowerCase().trim();
                 
                 if (playerStatsMap.has(playerKey)) {
@@ -1352,7 +1352,7 @@ const calculateStatisticsFromMatches = async (matches) => {
 
             // Process assists - use the correct property names from the actual data
             const assistName = goal.goalAssistName || goal.assists || goal.assist || goal.assistedBy;
-            if (assistName && assistName.trim() && assistName !== 'Opposition') {
+            if (assistName && assistName.trim() && assistName !== 'Opposition' && assistName.trim().toLowerCase() !== 'n/a') {
                 totalAssistsFound++;
                 const playerKey = assistName.toLowerCase().trim();
                 

@@ -3407,3 +3407,108 @@ nsure transfer match modal appears above admin modal */
         padding: var(--spacing-xs) var(--spacing-sm);
     }
 }
+
+/* Upload JSON Modal Styling */
+#upload-json-modal {
+    z-index: 1070 !important;
+}
+
+#upload-json-modal .modal-backdrop {
+    z-index: 1065 !important;
+}
+
+#upload-json-modal .modal-content {
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow-modal);
+}
+
+#upload-json-modal .modal-header {
+    background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+    color: white;
+    border-bottom: none;
+}
+
+#upload-json-modal .modal-title {
+    font-weight: 600;
+}
+
+#upload-json-modal .form-control[type="file"] {
+    border: 2px dashed var(--border-color);
+    background: var(--bg-secondary);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-sm);
+    transition: all 0.2s ease;
+}
+
+#upload-json-modal .form-control[type="file"]:hover {
+    border-color: var(--success-color);
+    background: rgba(var(--success-color-rgb), 0.05);
+}
+
+#upload-json-modal .form-control[type="file"]:focus {
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 0.2rem rgba(var(--success-color-rgb), 0.25);
+}
+
+#upload-json-modal #upload-preview {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#upload-json-modal #upload-preview-content {
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+#upload-json-modal .alert-info {
+    background: rgba(var(--info-color-rgb), 0.1);
+    border: 1px solid rgba(var(--info-color-rgb), 0.3);
+    color: var(--info-color);
+    border-radius: var(--border-radius-sm);
+}
+
+/* Upload button styling */
+#upload-json-btn {
+    background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+    border-color: var(--success-color);
+    color: white;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+#upload-json-btn:hover {
+    background: linear-gradient(135deg, #1e7e34 0%, var(--success-color) 100%);
+    box-shadow: 0 4px 12px rgba(var(--success-color-rgb), 0.3);
+    transform: translateY(-1px);
+}
+
+/* Mobile responsive adjustments for upload modal */
+@media (max-width: 768px) {
+    #upload-json-modal .modal-dialog {
+        margin: var(--spacing-sm);
+    }
+    
+    #upload-json-modal .form-control[type="file"] {
+        padding: var(--spacing-sm);
+        font-size: 0.875rem;
+    }
+    
+    #upload-json-modal #upload-preview {
+        max-height: 150px;
+    }
+    
+    #upload-json-modal #upload-preview-content {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #upload-json-modal .modal-title {
+        font-size: 1rem;
+    }
+    
+    #upload-json-modal .btn {
+        font-size: 0.875rem;
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+}

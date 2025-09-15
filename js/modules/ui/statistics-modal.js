@@ -84,32 +84,24 @@ class StatisticsModal {
             
             <!-- Navigation Tabs -->
             <div class="d-flex justify-content-center mb-3">
-                <ul class="nav nav-tabs flex-nowrap" id="statsNavTabs" style="overflow-x: auto;">
-                    <li class="nav-item me-1">
-                        <button class="nav-link active px-1 px-sm-3 py-2 text-center" data-view="overview" style="min-width: 60px; font-size: 0.8rem;">
-                            <i class="fas fa-tachometer-alt d-none d-sm-inline me-sm-1"></i>
-                            <span>Over</span>
-                        </button>
-                    </li>
-                    <li class="nav-item me-1">
-                        <button class="nav-link px-1 px-sm-3 py-2 text-center" data-view="players" style="min-width: 60px; font-size: 0.8rem;">
-                            <i class="fas fa-users d-none d-sm-inline me-sm-1"></i>
-                            <span>Play</span>
-                        </button>
-                    </li>
-                    <li class="nav-item me-1">
-                        <button class="nav-link px-1 px-sm-3 py-2 text-center" data-view="teams" style="min-width: 60px; font-size: 0.8rem;">
-                            <i class="fas fa-shield-alt d-none d-sm-inline me-sm-1"></i>
-                            <span>Team</span>
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link px-1 px-sm-3 py-2 text-center" data-view="matches" style="min-width: 60px; font-size: 0.8rem;">
-                            <i class="fas fa-calendar-alt d-none d-sm-inline me-sm-1"></i>
-                            <span>Match</span>
-                        </button>
-                    </li>
-                </ul>
+                <div class="btn-group w-100" role="group" id="statsNavTabs" style="max-width: 400px;">
+                    <button type="button" class="btn btn-outline-primary active flex-fill" data-view="overview" style="font-size: 0.75rem;">
+                        <i class="fas fa-tachometer-alt d-none d-sm-inline me-sm-1"></i>
+                        <span>Over</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-primary flex-fill" data-view="players" style="font-size: 0.75rem;">
+                        <i class="fas fa-users d-none d-sm-inline me-sm-1"></i>
+                        <span>Play</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-primary flex-fill" data-view="teams" style="font-size: 0.75rem;">
+                        <i class="fas fa-shield-alt d-none d-sm-inline me-sm-1"></i>
+                        <span>Team</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-primary flex-fill" data-view="matches" style="font-size: 0.75rem;">
+                        <i class="fas fa-calendar-alt d-none d-sm-inline me-sm-1"></i>
+                        <span>Match</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Content Area -->
@@ -898,17 +890,29 @@ class StatisticsModal {
         const modalElement = document.getElementById('statistics-modal');
         if (modalElement) {
             modalElement.addEventListener('click', (e) => {
-                if (e.target.matches('#statsNavTabs .nav-link')) {
+                const button = e.target.closest('#statsNavTabs .btn');
+                if (button) {
                     e.preventDefault();
+                    e.stopPropagation();
 
-                    // Update active tab
-                    const tabButtons = modalElement.querySelectorAll('#statsNavTabs .nav-link');
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    e.target.classList.add('active');
+                    const view = button.getAttribute('data-view');
+                    if (view && view !== this.currentView) {
+                        // Update active button
+                        const tabButtons = modalElement.querySelectorAll('#statsNavTabs .btn');
+                        tabButtons.forEach(btn => {
+                            btn.classList.remove('active');
+                            btn.classList.add('btn-outline-primary');
+                            btn.classList.remove('btn-primary');
+                        });
+                        
+                        button.classList.add('active');
+                        button.classList.remove('btn-outline-primary');
+                        button.classList.add('btn-primary');
 
-                    // Update current view
-                    this.currentView = e.target.getAttribute('data-view');
-                    this._renderCurrentView();
+                        // Update current view
+                        this.currentView = view;
+                        this._renderCurrentView();
+                    }
                 }
             });
         }

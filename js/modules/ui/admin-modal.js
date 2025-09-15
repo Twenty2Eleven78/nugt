@@ -29,8 +29,15 @@ const createMainAdminModal = () => {
                     </button>
                 </div>
                 <div class="col-4">
+                    <button class="btn btn-success w-100" id="upload-json-btn" title="Upload Match Data">
+                        <i class="fas fa-upload me-1"></i>Upload
+                    </button>
+                </div>
+            </div>
+            <div class="row g-2 mt-1">
+                <div class="col-12">
                     <button class="btn btn-primary w-100" id="generate-stats-btn" title="Generate Statistics">
-                        <i class="fas fa-chart-bar me-1"></i>Stats
+                        <i class="fas fa-chart-bar me-1"></i>Generate Statistics
                     </button>
                 </div>
             </div>
@@ -98,6 +105,59 @@ const modalHtml = `
     </div>
 </div>
 
+<!-- Upload JSON Modal -->
+<div class="modal fade" id="upload-json-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-upload"></i> Upload Match Data
+                </h5>
+                <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-times" style="font-size: 14px;"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="json-file-input" class="form-label">
+                        <strong>Select JSON File:</strong>
+                    </label>
+                    <input type="file" class="form-control" id="json-file-input" accept=".json" multiple>
+                    <div class="form-text">
+                        Select one or more JSON files containing match data to upload.
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="target-user-email" class="form-label">
+                        <strong>Assign to User Email:</strong>
+                    </label>
+                    <input type="email" class="form-control" id="target-user-email" placeholder="user@example.com">
+                    <div class="form-text">
+                        Enter the email address to assign this match data to. If left empty, will use the email from the JSON data or create a new user.
+                    </div>
+                </div>
+                <div id="upload-preview" class="mb-3" style="display: none;">
+                    <h6>Preview:</h6>
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <div id="upload-preview-content"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-info">
+                    <strong>Note:</strong> The JSON files should contain valid match data. Each file will be imported as a separate match.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelUploadBtn">Cancel</button>
+                <button type="button" class="btn btn-success" id="confirm-upload-btn" disabled>
+                    <i class="fas fa-upload"></i> Upload Matches
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Transfer Match Modal -->
 <div class="modal fade" id="transfer-match-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -154,9 +214,11 @@ const modalHtml = `
 let modalInstance = null;
 let deleteModalInstance = null;
 let transferModalInstance = null;
+let uploadModalInstance = null;
 let allMatches = []; // Store all matches for search functionality
 let currentDeleteMatch = null;
 let currentTransferMatch = null;
+let selectedFiles = [];
 
 const init = () => {
     // Create main admin modal using factory
@@ -167,10 +229,12 @@ const init = () => {
     
     const modalElement = document.getElementById('admin-modal');
     const deleteModalElement = document.getElementById('delete-confirm-modal');
+    const uploadModalElement = document.getElementById('upload-json-modal');
     const transferModalElement = document.getElementById('transfer-match-modal');
 
     modalInstance = CustomModal.getOrCreateInstance(modalElement);
     deleteModalInstance = CustomModal.getOrCreateInstance(deleteModalElement);
+    uploadModalInstance = CustomModal.getOrCreateInstance(uploadModalElement);
     transferModalInstance = CustomModal.getOrCreateInstance(transferModalElement);
 
     // Initialize match summary modal
@@ -194,6 +258,12 @@ const init = () => {
     const generateStatsBtn = document.getElementById('generate-stats-btn');
     if (generateStatsBtn) {
         generateStatsBtn.addEventListener('click', generateStatistics);
+    }
+
+    // Add upload JSON button functionality
+    const uploadJsonBtn = document.getElementById('upload-json-btn');
+    if (uploadJsonBtn) {
+        uploadJsonBtn.addEventListener('click', showUploadModal);
     }
 
     // Add filter functionality
@@ -254,6 +324,25 @@ const init = () => {
 
     if (newUserEmail) {
         newUserEmail.addEventListener('input', validateTransferForm);
+    }
+
+    // Upload modal event listeners
+    const jsonFileInput = document.getElementById('json-file-input');
+    const confirmUploadBtn = document.getElementById('confirm-upload-btn');
+    const cancelUploadBtn = document.getElementById('cancelUploadBtn');
+
+    if (jsonFileInput) {
+        jsonFileInput.addEventListener('change', handleFileSelection);
+    }
+
+    if (confirmUploadBtn) {
+        confirmUploadBtn.addEventListener('click', handleUploadConfirm);
+    }
+
+    if (cancelUploadBtn) {
+        cancelUploadBtn.addEventListener('click', () => {
+            uploadModalInstance.hide();
+        });
     }
 
     modalElement.addEventListener('modal.show', async () => {
@@ -1438,6 +1527,156 @@ const saveGeneratedStatistics = async (statistics) => {
     
     // Could also save to cloud storage here
     // await userMatchesApi.saveStatistics(statistics);
+};
+
+const showUploadModal = () => {
+    // Reset form
+    const jsonFileInput = document.getElementById('json-file-input');
+    const targetUserEmail = document.getElementById('target-user-email');
+    const uploadPreview = document.getElementById('upload-preview');
+    const confirmUploadBtn = document.getElementById('confirm-upload-btn');
+
+    if (jsonFileInput) jsonFileInput.value = '';
+    if (targetUserEmail) targetUserEmail.value = '';
+    if (uploadPreview) uploadPreview.style.display = 'none';
+    if (confirmUploadBtn) confirmUploadBtn.disabled = true;
+
+    selectedFiles = [];
+    uploadModalInstance.show();
+};
+
+const handleFileSelection = async (event) => {
+    const files = Array.from(event.target.files);
+    const uploadPreview = document.getElementById('upload-preview');
+    const uploadPreviewContent = document.getElementById('upload-preview-content');
+    const confirmUploadBtn = document.getElementById('confirm-upload-btn');
+
+    selectedFiles = [];
+
+    if (files.length === 0) {
+        uploadPreview.style.display = 'none';
+        confirmUploadBtn.disabled = true;
+        return;
+    }
+
+    let validFiles = 0;
+    let previewHtml = '';
+
+    for (const file of files) {
+        try {
+            const text = await file.text();
+            const jsonData = JSON.parse(text);
+
+            // Basic validation
+            if (typeof jsonData === 'object' && jsonData !== null) {
+                selectedFiles.push({ file, data: jsonData });
+                validFiles++;
+
+                const matchTitle = jsonData.title || jsonData.matchTitle || file.name;
+                const userEmail = jsonData.userEmail || 'Not specified';
+                const savedAt = jsonData.savedAt ? new Date(jsonData.savedAt).toLocaleString() : 'Not specified';
+
+                previewHtml += `
+                    <div class="border-bottom pb-2 mb-2">
+                        <strong>File:</strong> ${escapeHtml(file.name)}<br>
+                        <strong>Match:</strong> ${escapeHtml(matchTitle)}<br>
+                        <strong>User:</strong> ${escapeHtml(userEmail)}<br>
+                        <strong>Date:</strong> ${savedAt}
+                    </div>
+                `;
+            }
+        } catch (error) {
+            previewHtml += `
+                <div class="border-bottom pb-2 mb-2 text-danger">
+                    <strong>File:</strong> ${escapeHtml(file.name)}<br>
+                    <strong>Error:</strong> Invalid JSON format
+                </div>
+            `;
+        }
+    }
+
+    if (uploadPreviewContent) {
+        uploadPreviewContent.innerHTML = previewHtml;
+    }
+
+    uploadPreview.style.display = 'block';
+    confirmUploadBtn.disabled = validFiles === 0;
+
+    if (validFiles > 0) {
+        notificationManager.info(`${validFiles} valid JSON file(s) selected for upload`);
+    } else {
+        notificationManager.error('No valid JSON files found');
+    }
+};
+
+const handleUploadConfirm = async () => {
+    if (selectedFiles.length === 0) return;
+
+    const confirmBtn = document.getElementById('confirm-upload-btn');
+    const targetUserEmail = document.getElementById('target-user-email');
+    const originalText = confirmBtn.innerHTML;
+
+    try {
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+
+        const targetEmail = targetUserEmail?.value?.trim();
+        let successCount = 0;
+        let errorCount = 0;
+
+        for (const { file, data } of selectedFiles) {
+            try {
+                // Prepare match data
+                const matchData = {
+                    ...data,
+                    uploadedAt: Date.now(),
+                    uploadedBy: (await authService.getCurrentUser())?.email || 'admin',
+                    originalFileName: file.name
+                };
+
+                // Override user email if specified
+                if (targetEmail) {
+                    matchData.userEmail = targetEmail;
+                    matchData.userId = generateUserIdFromEmail(targetEmail);
+                } else if (!matchData.userEmail) {
+                    // Generate default user if none specified
+                    matchData.userEmail = `imported_${Date.now()}@example.com`;
+                    matchData.userId = generateUserIdFromEmail(matchData.userEmail);
+                }
+
+                // Remove any admin-specific properties
+                delete matchData.blobKey;
+                delete matchData.matchIndex;
+                delete matchData.id;
+
+                // Save the match data
+                await userMatchesApi.saveMatchData(matchData);
+                successCount++;
+
+            } catch (error) {
+                console.error(`Failed to upload ${file.name}:`, error);
+                errorCount++;
+            }
+        }
+
+        // Refresh the data
+        await loadMatchesData();
+
+        uploadModalInstance.hide();
+
+        if (successCount > 0) {
+            notificationManager.success(`Successfully uploaded ${successCount} match(es)`);
+        }
+        if (errorCount > 0) {
+            notificationManager.error(`Failed to upload ${errorCount} match(es)`);
+        }
+
+    } catch (error) {
+        notificationManager.error(`Upload failed: ${error.message}`);
+    } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = originalText;
+    }
 };
 
 const refreshData = async () => {

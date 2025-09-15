@@ -14,7 +14,7 @@ class TouchGestures {
     this.maxVerticalDistance = 100;
     this.isEnabled = true;
     this.currentTabIndex = 0;
-    this.tabs = ['gametab', 'gamelogtab', 'optionstab','#statstab'];
+    this.tabs = ['gametab', 'gamelogtab', 'optionstab', 'statstab'];
     this.tabLinks = [];
 
     this.init();

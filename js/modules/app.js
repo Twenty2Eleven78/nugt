@@ -224,6 +224,7 @@ export function initializeApp() {
   rawDataModal.init();
 
   statisticsTab.init();
+  touchGestures.init();
 
   // Initialize modal modules
   teamModals.init();

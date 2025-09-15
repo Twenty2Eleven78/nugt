@@ -3409,6 +3409,14 @@ nsure transfer match modal appears above admin modal */
 }
 
 /* Upload JSON Modal Styling */
+#upload-json-modal {
+    z-index: 1070 !important;
+}
+
+#upload-json-modal .modal-backdrop {
+    z-index: 1065 !important;
+}
+
 #upload-json-modal .modal-content {
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow-modal);

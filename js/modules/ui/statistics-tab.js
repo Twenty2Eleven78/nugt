@@ -299,7 +299,7 @@ class StatisticsTab {
                     <div class="stats-section">
                         <div class="stats-section-header">
                             <i class="fas fa-trophy text-warning me-2"></i>
-                            <span>Player Performance Rankings (${playerStats.filter(p => p.totalContributions > 0 || p.appearances > 0).length})</span>
+                            <span>Player Performance Rankings (${playerStats.length})</span>
                         </div>
                         <div class="stats-section-body" style="max-height: 400px; overflow-y: auto; -webkit-overflow-scrolling: touch;">
                             ${this._renderPlayerRankings(playerStats)}
@@ -661,7 +661,6 @@ class StatisticsTab {
         }
 
         const sortedPlayers = playerStats
-            .filter(p => p.totalContributions > 0 || p.appearances > 0)
             .sort((a, b) => {
                 if (b.totalContributions !== a.totalContributions) {
                     return b.totalContributions - a.totalContributions;

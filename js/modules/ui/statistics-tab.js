@@ -44,27 +44,30 @@ class StatisticsTab {
         }
 
         container.innerHTML = `
-            <div class="d-flex justify-content-center mb-3">
-                <div class="btn-group w-100" role="group" style="max-width: 400px;">
-                    <button type="button" class="btn btn-outline-primary active flex-fill" data-view="overview" style="font-size: 0.75rem;">
-                        <i class="fas fa-tachometer-alt d-none d-sm-inline me-sm-1"></i>
-                        <span>Over</span>
+            <!-- Enhanced Navigation -->
+            <div class="stats-nav-container mb-3">
+                <div class="stats-nav-pills">
+                    <button type="button" class="stats-nav-pill active" data-view="overview">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Overview</span>
                     </button>
-                    <button type="button" class="btn btn-outline-primary flex-fill" data-view="players" style="font-size: 0.75rem;">
-                        <i class="fas fa-users d-none d-sm-inline me-sm-1"></i>
-                        <span>Play</span>
+                    <button type="button" class="stats-nav-pill" data-view="players">
+                        <i class="fas fa-users"></i>
+                        <span>Players</span>
                     </button>
-                    <button type="button" class="btn btn-outline-primary flex-fill" data-view="teams" style="font-size: 0.75rem;">
-                        <i class="fas fa-shield-alt d-none d-sm-inline me-sm-1"></i>
+                    <button type="button" class="stats-nav-pill" data-view="teams">
+                        <i class="fas fa-shield-alt"></i>
                         <span>Team</span>
                     </button>
-                    <button type="button" class="btn btn-outline-primary flex-fill" data-view="matches" style="font-size: 0.75rem;">
-                        <i class="fas fa-calendar-alt d-none d-sm-inline me-sm-1"></i>
-                        <span>Match</span>
+                    <button type="button" class="stats-nav-pill" data-view="matches">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Matches</span>
                     </button>
                 </div>
             </div>
-            <div id="stats-view-content">
+            
+            <!-- Content Area -->
+            <div id="stats-view-content" class="stats-content">
                 ${this._renderOverviewStats()}
             </div>
         `;
@@ -87,25 +90,28 @@ class StatisticsTab {
         if (!container) return;
 
         container.addEventListener('click', (e) => {
-            const button = e.target.closest('.btn-group .btn');
+            const button = e.target.closest('.stats-nav-pill');
             if (button) {
                 e.preventDefault();
                 e.stopPropagation();
 
                 const view = button.getAttribute('data-view');
                 if (view && view !== this.currentView) {
-                    // Update active button
-                    const buttons = container.querySelectorAll('.btn-group .btn');
-                    buttons.forEach(btn => {
-                        btn.classList.remove('active', 'btn-primary');
-                        btn.classList.add('btn-outline-primary');
-                    });
-                    
-                    button.classList.add('active', 'btn-primary');
-                    button.classList.remove('btn-outline-primary');
+                    // Update active button with smooth transition
+                    const buttons = container.querySelectorAll('.stats-nav-pill');
+                    buttons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
 
-                    this.currentView = view;
-                    this._renderCurrentView();
+                    // Add loading state
+                    const content = document.getElementById('stats-view-content');
+                    if (content) {
+                        content.style.opacity = '0.5';
+                        setTimeout(() => {
+                            this.currentView = view;
+                            this._renderCurrentView();
+                            content.style.opacity = '1';
+                        }, 150);
+                    }
                 }
             }
         });
@@ -138,63 +144,81 @@ class StatisticsTab {
         if (!this.statistics) return this._renderNoDataMessage();
 
         const stats = this.statistics;
+        const avgGoalsPerMatch = stats.totalMatches > 0 ? (stats.totalGoals / stats.totalMatches).toFixed(1) : '0.0';
+        const avgAssistsPerMatch = stats.totalMatches > 0 ? (stats.totalAssists / stats.totalMatches).toFixed(1) : '0.0';
+        
         return `
+            <!-- Mobile-Optimized Summary Cards -->
             <div class="row g-2 mb-3">
-                <div class="col-6 col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body py-2 py-md-3">
-                            <i class="fas fa-futbol text-primary mb-1 d-none d-sm-block"></i>
-                            <h5 class="card-title text-primary mb-0">${stats.totalMatches}</h5>
-                            <p class="card-text small text-muted mb-0">Matches</p>
+                <div class="col-6 col-lg-3">
+                    <div class="stats-card stats-card-primary">
+                        <div class="stats-icon">
+                            <i class="fas fa-futbol"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number">${stats.totalMatches}</div>
+                            <div class="stats-label">Matches</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body py-2 py-md-3">
-                            <i class="fas fa-bullseye text-success mb-1 d-none d-sm-block"></i>
-                            <h5 class="card-title text-success mb-0">${stats.totalGoals}</h5>
-                            <p class="card-text small text-muted mb-0">Goals</p>
+                <div class="col-6 col-lg-3">
+                    <div class="stats-card stats-card-success">
+                        <div class="stats-icon">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number">${stats.totalGoals}</div>
+                            <div class="stats-label">Goals</div>
+                            <div class="stats-sub">${avgGoalsPerMatch}/match</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body py-2 py-md-3">
-                            <i class="fas fa-hands-helping text-info mb-1 d-none d-sm-block"></i>
-                            <h5 class="card-title text-info mb-0">${stats.totalAssists}</h5>
-                            <p class="card-text small text-muted mb-0">Assists</p>
+                <div class="col-6 col-lg-3">
+                    <div class="stats-card stats-card-info">
+                        <div class="stats-icon">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number">${stats.totalAssists}</div>
+                            <div class="stats-label">Assists</div>
+                            <div class="stats-sub">${avgAssistsPerMatch}/match</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body py-2 py-md-3">
-                            <i class="fas fa-users text-warning mb-1 d-none d-sm-block"></i>
-                            <h5 class="card-title text-warning mb-0">${stats.playerStats.length}</h5>
-                            <p class="card-text small text-muted mb-0">Players</p>
+                <div class="col-6 col-lg-3">
+                    <div class="stats-card stats-card-warning">
+                        <div class="stats-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number">${stats.playerStats.length}</div>
+                            <div class="stats-label">Players</div>
+                            <div class="stats-sub">${stats.playerStats.filter(p => p.goals > 0).length} scorers</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h6 class="mb-0"><i class="fas fa-trophy me-2"></i>Top Goal Scorers</h6>
+            <!-- Top Performers Section -->
+            <div class="row g-2">
+                <div class="col-12 col-md-6">
+                    <div class="stats-section">
+                        <div class="stats-section-header">
+                            <i class="fas fa-trophy text-warning me-2"></i>
+                            <span>Top Goal Scorers</span>
                         </div>
-                        <div class="card-body">
+                        <div class="stats-section-body">
                             ${this._renderTopScorers(stats.playerStats)}
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h6 class="mb-0"><i class="fas fa-handshake me-2"></i>Top Assist Providers</h6>
+                <div class="col-12 col-md-6">
+                    <div class="stats-section">
+                        <div class="stats-section-header">
+                            <i class="fas fa-handshake text-info me-2"></i>
+                            <span>Top Assist Providers</span>
                         </div>
-                        <div class="card-body">
+                        <div class="stats-section-body">
                             ${this._renderTopAssists(stats.playerStats)}
                         </div>
                     </div>
@@ -517,7 +541,7 @@ class StatisticsTab {
 
     _renderTopScorers(playerStats) {
         if (!playerStats || !Array.isArray(playerStats)) {
-            return '<p class="text-muted">No player data available</p>';
+            return '<div class="stats-empty"><i class="fas fa-info-circle me-2"></i>No player data available</div>';
         }
 
         const topScorers = playerStats
@@ -526,23 +550,32 @@ class StatisticsTab {
             .slice(0, 5);
 
         if (topScorers.length === 0) {
-            return '<p class="text-muted">No goals recorded</p>';
+            return '<div class="stats-empty"><i class="fas fa-futbol me-2"></i>No goals recorded yet</div>';
         }
 
-        return topScorers.map((player, index) => `
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <div>
-                    <span class="text-muted me-2">${index + 1}.</span>
-                    <strong>${this._escapeHtml(player.name)}</strong>
+        return topScorers.map((player, index) => {
+            const position = index + 1;
+            const positionClass = position === 1 ? 'position-gold' : position === 2 ? 'position-silver' : position === 3 ? 'position-bronze' : 'position-other';
+            
+            return `
+                <div class="stats-player-item">
+                    <div class="player-position ${positionClass}">${position}</div>
+                    <div class="player-info">
+                        <div class="player-name">${this._escapeHtml(player.name)}</div>
+                        <div class="player-details">${player.appearances} apps • ${player.goalsPerMatch} goals/game</div>
+                    </div>
+                    <div class="player-stat">
+                        <div class="stat-value">${player.goals}</div>
+                        <div class="stat-label">goals</div>
+                    </div>
                 </div>
-                <span class="text-muted">${player.goals} goals</span>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     _renderTopAssists(playerStats) {
         if (!playerStats || !Array.isArray(playerStats)) {
-            return '<p class="text-muted">No player data available</p>';
+            return '<div class="stats-empty"><i class="fas fa-info-circle me-2"></i>No player data available</div>';
         }
 
         const topAssists = playerStats
@@ -551,37 +584,67 @@ class StatisticsTab {
             .slice(0, 5);
 
         if (topAssists.length === 0) {
-            return '<p class="text-muted">No assists recorded</p>';
+            return '<div class="stats-empty"><i class="fas fa-hands-helping me-2"></i>No assists recorded yet</div>';
         }
 
-        return topAssists.map((player, index) => `
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <div>
-                    <span class="text-muted me-2">${index + 1}.</span>
-                    <strong>${this._escapeHtml(player.name)}</strong>
+        return topAssists.map((player, index) => {
+            const position = index + 1;
+            const positionClass = position === 1 ? 'position-gold' : position === 2 ? 'position-silver' : position === 3 ? 'position-bronze' : 'position-other';
+            
+            return `
+                <div class="stats-player-item">
+                    <div class="player-position ${positionClass}">${position}</div>
+                    <div class="player-info">
+                        <div class="player-name">${this._escapeHtml(player.name)}</div>
+                        <div class="player-details">${player.appearances} apps • ${player.assistsPerMatch} assists/game</div>
+                    </div>
+                    <div class="player-stat">
+                        <div class="stat-value">${player.assists}</div>
+                        <div class="stat-label">assists</div>
+                    </div>
                 </div>
-                <span class="text-muted">${player.assists} assists</span>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     async _renderNoDataMessage() {
         const isAdmin = await authService.isAdmin();
         return `
-            <div class="text-center py-5">
-                <i class="fas fa-chart-bar fa-4x text-muted mb-4"></i>
-                <h4 class="text-muted mb-3">No Statistics Available</h4>
-                <p class="text-muted mb-4">
-                    Statistics need to be generated by an administrator from approved matches.
-                </p>
-                ${isAdmin ? `
-                    <div class="alert alert-info">
-                        <h6>Admin Instructions:</h6>
-                        <p class="mb-2">1. Go to Admin Dashboard</p>
-                        <p class="mb-2">2. Approve matches for statistics</p>
-                        <p class="mb-0">3. Click "Generate Stats" to create statistics</p>
-                    </div>
-                ` : ''}
+            <div class="stats-empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="empty-state-content">
+                    <h4>No Statistics Available</h4>
+                    <p>Statistics need to be generated by an administrator from approved matches.</p>
+                    ${isAdmin ? `
+                        <div class="admin-instructions">
+                            <div class="instruction-header">
+                                <i class="fas fa-user-shield me-2"></i>
+                                Admin Instructions
+                            </div>
+                            <div class="instruction-steps">
+                                <div class="instruction-step">
+                                    <span class="step-number">1</span>
+                                    <span>Go to Admin Dashboard</span>
+                                </div>
+                                <div class="instruction-step">
+                                    <span class="step-number">2</span>
+                                    <span>Approve matches for statistics</span>
+                                </div>
+                                <div class="instruction-step">
+                                    <span class="step-number">3</span>
+                                    <span>Click "Generate Stats" to create statistics</span>
+                                </div>
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="user-message">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Contact your administrator to generate team statistics
+                        </div>
+                    `}
+                </div>
             </div>
         `;
     }

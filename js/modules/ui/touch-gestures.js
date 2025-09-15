@@ -14,7 +14,7 @@ class TouchGestures {
     this.maxVerticalDistance = 100;
     this.isEnabled = true;
     this.currentTabIndex = 0;
-    this.tabs = ['gametab', 'gamelogtab', 'optionstab'];
+    this.tabs = ['gametab', 'gamelogtab', 'optionstab','statisticstab'];
     this.tabLinks = [];
 
     this.init();
@@ -25,7 +25,8 @@ class TouchGestures {
     this.tabLinks = [
       document.querySelector('a[href="#gametab"]'),
       document.querySelector('a[href="#gamelogtab"]'),
-      document.querySelector('a[href="#optionstab"]')
+      document.querySelector('a[href="#optionstab"]'),
+      document.querySelector('a[href="#statisticstab"]')
     ];
 
     // Find current active tab

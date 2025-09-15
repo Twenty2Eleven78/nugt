@@ -36,6 +36,7 @@ import { matchSummaryModal } from './ui/match-summary-modal.js';
 import { rawDataModal } from './ui/raw-data-modal.js';
 import { newMatchModal } from './ui/new-match-modal.js';
 import { statisticsModal } from './ui/statistics-modal.js';
+import { statisticsTab } from './ui/statistics-tab.js';
 import { touchGestures } from './ui/touch-gestures.js';
 import teamModals from './ui/team-modals.js';
 import goalModal from './ui/goal-modal.js';
@@ -222,6 +223,7 @@ export function initializeApp() {
   matchSummaryModal.init();
   rawDataModal.init();
   statisticsModal.init();
+  statisticsTab.init();
 
   // Initialize modal modules
   teamModals.init();

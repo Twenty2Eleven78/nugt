@@ -2999,7 +2999,31 @@ uth modal notification styling */
     transform: none;
     opacity: 1;
 }
-}/* Fi
+}
+
+/* Statistics Tab Styling */
+.statistics-container {
+    padding: var(--spacing-sm);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+#statisticsContent {
+    flex: 1;
+    min-height: 0;
+}
+
+/* Mobile responsive adjustments for statistics tab */
+@media (max-width: 768px) {
+    .statistics-container {
+        padding: var(--spacing-xs);
+    }
+}
+
+/* Fi
 x auth modal button layering and positioning */
 #authModal #loginButton,
 #authModal #registerButton {

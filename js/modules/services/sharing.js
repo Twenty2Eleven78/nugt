@@ -304,7 +304,8 @@ class SharingService {
       .map(event => {
         if (event.type) {
           const icon = getEventIcon(event.type);
-          return `${icon} ${event.timestamp}' - ${event.type}${event.score ? ` (${event.score})` : ''}`;
+          const notesText = event.notes ? ` - ${event.notes}` : '';
+          return `${icon} ${event.timestamp}' - ${event.type}${event.score ? ` (${event.score})` : ''}${notesText}`;
         } else {
           const isOppositionGoal = event.goalScorerName === stats.team2Name;
           const disallowedText = event.disallowed ? ` (DISALLOWED: ${event.disallowedReason})` : '';

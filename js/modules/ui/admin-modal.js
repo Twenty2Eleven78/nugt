@@ -1465,7 +1465,7 @@ const calculateStatisticsFromMatches = async (matches) => {
         }
         
         // Find top scorer for this match
-        const matchGoals = match.goals ? match.goals.filter(g => g.goalScorerName && g.goalScorerName !== 'Opposition') : [];
+        const matchGoals = match.goals ? match.goals.filter(g => g.goalScorerName && g.goalScorerName !== 'Opposition' && g.goalScorerName.toLowerCase() !== 'n/a') : [];
         const scorerCounts = {};
         matchGoals.forEach(goal => {
             const scorer = goal.goalScorerName;
@@ -1481,7 +1481,7 @@ const calculateStatisticsFromMatches = async (matches) => {
             }
         });
         
-        const opposition = match.team2name || match.opposition || match.opponent || 'Unknown';
+        const opposition = match.team2Name || match.opposition || match.opponent || 'Unknown';
         console.log(`Match ${index}: team2name="${match.team2name}", opposition="${match.opposition}", opponent="${match.opponent}", final="${opposition}"`);
         
         return {

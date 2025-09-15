@@ -35,7 +35,8 @@ import { matchLoadModal } from './ui/match-load-modal.js';
 import { matchSummaryModal } from './ui/match-summary-modal.js';
 import { rawDataModal } from './ui/raw-data-modal.js';
 import { newMatchModal } from './ui/new-match-modal.js';
-import { statisticsModal } from './ui/statistics-modal.js';
+
+import { statisticsTab } from './ui/statistics-tab.js';
 import { touchGestures } from './ui/touch-gestures.js';
 import teamModals from './ui/team-modals.js';
 import goalModal from './ui/goal-modal.js';
@@ -221,7 +222,9 @@ export function initializeApp() {
   matchLoadModal.init();
   matchSummaryModal.init();
   rawDataModal.init();
-  statisticsModal.init();
+
+  statisticsTab.init();
+  touchGestures.init();
 
   // Initialize modal modules
   teamModals.init();
@@ -415,13 +418,7 @@ function bindEventListeners() {
     saveMatchDataBtnCard.addEventListener('click', handleSaveMatch);
   }
 
-  // Statistics button
-  const statisticsBtn = document.getElementById('statisticsBtn');
-  if (statisticsBtn) {
-    statisticsBtn.addEventListener('click', () => {
-      statisticsModal.show();
-    });
-  }
+
 
   // Timer controls
   const startPauseButton = domCache.get('startPauseButton');

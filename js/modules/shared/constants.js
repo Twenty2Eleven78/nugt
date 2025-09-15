@@ -142,7 +142,6 @@ export const AUTH_CONFIG = {
   TOKEN_REFRESH_INTERVAL: 3600000, // 1 hour in milliseconds
   AUTH_REQUIRED: false,
   USAGE_TRACKING: true,
-  ADMIN_EMAIL: 'admin@nugt.app'
 };
 
 // API Configuration

@@ -221,14 +221,6 @@
             <!-- Options Tab Content -->
             <div class="tab-pane fade" id="optionstab">
               <div class="options-container">
-                <!-- New Match Button
-                <div class="row mb-3" style="margin-top: -0.5rem;">
-                  <div class="col-12">
-                    <button class="btn btn-primary btn-lg w-100" id="newMatchBtn">
-                      <i class="fas fa-plus-circle me-2"></i>Start New Match
-                    </button>
-                  </div>
-                </div> -->
 
                 <!-- Quick Actions Row -->
                 <div class="row mb-1">
@@ -322,9 +314,7 @@
                           <button class="btn btn-outline-info btn-sm" id="loadMatchDataBtn">
                             <i class="fas fa-cloud-arrow-down me-2"></i>Load from Cloud
                           </button>
-                          <button class="btn btn-outline-warning btn-sm" id="statisticsBtn">
-                            <i class="fas fa-chart-bar me-2"></i>Statistics
-                          </button>
+
                           <button id="admin-modal-button" class="btn btn-outline-secondary btn-sm d-none">
                             <i class="fas fa-user-shield me-2"></i>Admin Dashboard
                           </button>
@@ -399,14 +389,9 @@
             <!-- Statistics Tab Content -->
             <div class="tab-pane fade" id="statstab">
               <div class="statistics-container">
-                <div class="statistics-card">
-                  <h5 class="statistics-title">
-                    <i class="fas fa-chart-bar me-2"></i>Match Statistics
-                  </h5>
-                  <div id="statisticsContent">
-                    <p class="text-muted">Statistics Coming Soon...</p>
-                  </div> 
-                </div>
+                <div id="statisticsContent">
+                  <!-- Statistics content will be populated here -->
+                </div> 
               </div>
             </div>
             <!-- Statistics Tab Content --> 
@@ -440,11 +425,11 @@
             <i class="fa-solid fa-gears"></i> Options
           </a>
         </li>
-        <!--<li class="nav-item pill-3">
+        <li class="nav-item pill-4">
           <a class="nav-link" data-toggle="pill" href="#statstab">
-            <i class="fas fa-chart-bar"></i> Statistics
+            <i class="fas fa-chart-bar"></i> Stats
           </a>
-        </li>-->
+        </li>
       </ul>
     </div>
   </div>

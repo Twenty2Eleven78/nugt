@@ -232,83 +232,78 @@ class StatisticsTab {
         
         const playerStats = this.statistics.playerStats;
         if (!playerStats || !Array.isArray(playerStats)) {
-            return '<p class="text-muted">No player statistics available</p>';
+            return '<div class="stats-empty"><i class="fas fa-info-circle me-2"></i>No player statistics available</div>';
         }
 
         const rosterPlayers = playerStats.filter(p => p.isRosterPlayer);
         const nonRosterPlayers = playerStats.filter(p => !p.isRosterPlayer);
+        const totalGoals = playerStats.reduce((sum, p) => sum + p.goals, 0);
+        const totalAssists = playerStats.reduce((sum, p) => sum + p.assists, 0);
+        const avgGoalsPerPlayer = playerStats.length > 0 ? (totalGoals / playerStats.length).toFixed(1) : '0.0';
+        const avgAssistsPerPlayer = playerStats.length > 0 ? (totalAssists / playerStats.length).toFixed(1) : '0.0';
 
         return `
-            <div class="row g-3 mb-4">
-                <div class="col-6 col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body py-3">
-                            <i class="fas fa-users text-primary fa-2x mb-2"></i>
-                            <h5 class="card-title text-primary mb-1">${rosterPlayers.length}</h5>
-                            <p class="card-text small text-muted mb-0">Roster Players</p>
+            <div class="row g-2 mb-3">
+                <div class="col-6 col-lg-3">
+                    <div class="stats-card stats-card-primary">
+                        <div class="stats-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number">${rosterPlayers.length}</div>
+                            <div class="stats-label">Roster</div>
+                            <div class="stats-sub">${playerStats.filter(p => p.appearances > 0).length} active</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body py-3">
-                            <i class="fas fa-running text-success fa-2x mb-2"></i>
-                            <h5 class="card-title text-success mb-1">${playerStats.filter(p => p.appearances > 0).length}</h5>
-                            <p class="card-text small text-muted mb-0">Active Players</p>
+                <div class="col-6 col-lg-3">
+                    <div class="stats-card stats-card-success">
+                        <div class="stats-icon">
+                            <i class="fas fa-futbol"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number">${playerStats.filter(p => p.goals > 0).length}</div>
+                            <div class="stats-label">Scorers</div>
+                            <div class="stats-sub">${avgGoalsPerPlayer} avg/player</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body py-3">
-                            <i class="fas fa-futbol text-warning fa-2x mb-2"></i>
-                            <h5 class="card-title text-warning mb-1">${playerStats.filter(p => p.goals > 0).length}</h5>
-                            <p class="card-text small text-muted mb-0">Goal Scorers</p>
+                <div class="col-6 col-lg-3">
+                    <div class="stats-card stats-card-info">
+                        <div class="stats-icon">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number">${playerStats.filter(p => p.assists > 0).length}</div>
+                            <div class="stats-label">Assisters</div>
+                            <div class="stats-sub">${avgAssistsPerPlayer} avg/player</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body py-3">
-                            <i class="fas fa-hands-helping text-info fa-2x mb-2"></i>
-                            <h5 class="card-title text-info mb-1">${playerStats.filter(p => p.assists > 0).length}</h5>
-                            <p class="card-text small text-muted mb-0">Assist Providers</p>
+                <div class="col-6 col-lg-3">
+                    <div class="stats-card stats-card-warning">
+                        <div class="stats-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number">${nonRosterPlayers.length}</div>
+                            <div class="stats-label">Guests</div>
+                            <div class="stats-sub">${playerStats.filter(p => !p.isRosterPlayer && p.totalContributions > 0).length} contributed</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-table me-2"></i>Player Statistics</h6>
-                </div>
-                <div class="card-body p-1 p-sm-3">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-sm">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="small">Player</th>
-                                    <th class="text-center small d-none d-md-table-cell" style="width: 60px;">Shirt</th>
-                                    <th class="text-center small" style="width: 50px;">Apps</th>
-                                    <th class="text-center small" style="width: 50px;">G</th>
-                                    <th class="text-center small" style="width: 50px;">A</th>
-                                    <th class="text-center small" style="width: 50px;">G+A</th>
-                                    <th class="text-center small d-none d-lg-table-cell" style="width: 80px;">G/Game</th>
-                                    <th class="text-center small d-none d-lg-table-cell" style="width: 80px;">A/Game</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${this._renderPlayerRows(rosterPlayers, 'roster')}
-                                ${nonRosterPlayers.length > 0 ? `
-                                    <tr class="table-secondary">
-                                        <td colspan="8" class="text-center fw-bold py-2 small">
-                                            <i class="fas fa-user-plus me-1"></i>Non-Roster Players
-                                        </td>
-                                    </tr>
-                                    ${this._renderPlayerRows(nonRosterPlayers, 'non-roster')}
-                                ` : ''}
-                            </tbody>
-                        </table>
+            <div class="row g-2">
+                <div class="col-12">
+                    <div class="stats-section">
+                        <div class="stats-section-header">
+                            <i class="fas fa-trophy text-warning me-2"></i>
+                            <span>Player Performance Rankings</span>
+                        </div>
+                        <div class="stats-section-body">
+                            ${this._renderPlayerRankings(playerStats)}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -322,125 +317,110 @@ class StatisticsTab {
         const teamStats = stats.teamStats || {};
         const matchStats = stats.matchStats || [];
         const opponents = [...new Set(matchStats.map(match => match.opposition))].filter(opp => opp && opp !== 'Unknown');
+        const goalDifference = (teamStats.goalsFor || stats.totalGoals) - (teamStats.goalsAgainst || 0);
 
         return `
             <div class="row g-2 mb-3">
-                <div class="col-6 col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body py-2 py-md-3">
-                            <i class="fas fa-futbol text-primary mb-1 d-none d-sm-block"></i>
-                            <h5 class="card-title text-primary mb-0">${teamStats.totalMatches || stats.totalMatches}</h5>
-                            <p class="card-text small text-muted mb-0">Matches</p>
+                <div class="col-6 col-lg-3">
+                    <div class="stats-card stats-card-primary">
+                        <div class="stats-icon">
+                            <i class="fas fa-futbol"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number">${teamStats.totalMatches || stats.totalMatches}</div>
+                            <div class="stats-label">Matches</div>
+                            <div class="stats-sub">${teamStats.winPercentage || '0'}% win rate</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body py-2 py-md-3">
-                            <i class="fas fa-trophy text-success mb-1 d-none d-sm-block"></i>
-                            <h5 class="card-title text-success mb-0">${teamStats.wins || 0}</h5>
-                            <p class="card-text small text-muted mb-0">Wins</p>
+                <div class="col-6 col-lg-3">
+                    <div class="stats-card stats-card-success">
+                        <div class="stats-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number">${teamStats.wins || 0}</div>
+                            <div class="stats-label">Wins</div>
+                            <div class="stats-sub">${teamStats.avgGoalsFor || '0.0'} goals/game</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body py-2 py-md-3">
-                            <i class="fas fa-handshake text-warning mb-1 d-none d-sm-block"></i>
-                            <h5 class="card-title text-warning mb-0">${teamStats.draws || 0}</h5>
-                            <p class="card-text small text-muted mb-0">Draws</p>
+                <div class="col-6 col-lg-3">
+                    <div class="stats-card stats-card-warning">
+                        <div class="stats-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number">${teamStats.draws || 0}</div>
+                            <div class="stats-label">Draws</div>
+                            <div class="stats-sub">${teamStats.losses || 0} losses</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body py-2 py-md-3">
-                            <i class="fas fa-times text-danger mb-1 d-none d-sm-block"></i>
-                            <h5 class="card-title text-danger mb-0">${teamStats.losses || 0}</h5>
-                            <p class="card-text small text-muted mb-0">Losses</p>
+                <div class="col-6 col-lg-3">
+                    <div class="stats-card ${goalDifference >= 0 ? 'stats-card-success' : 'stats-card-info'}">
+                        <div class="stats-icon">
+                            <i class="fas fa-bullseye"></i>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h6 class="mb-0"><i class="fas fa-bullseye me-2"></i>Goals Summary</h6>
-                        </div>
-                        <div class="card-body p-2 p-sm-3">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-success fw-bold">${teamStats.goalsFor || stats.totalGoals} For</span>
-                                <span class="text-muted">vs</span>
-                                <span class="text-danger fw-bold">${teamStats.goalsAgainst || 0} Against</span>
-                            </div>
-                            <div class="text-center">
-                                <span class="badge ${(teamStats.goalsFor || stats.totalGoals) - (teamStats.goalsAgainst || 0) >= 0 ? 'bg-success' : 'bg-danger'} fs-6">
-                                    ${(teamStats.goalsFor || stats.totalGoals) - (teamStats.goalsAgainst || 0) >= 0 ? '+' : ''}${(teamStats.goalsFor || stats.totalGoals) - (teamStats.goalsAgainst || 0)} Goal Difference
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h6 class="mb-0"><i class="fas fa-percentage me-2"></i>Win Rate</h6>
-                        </div>
-                        <div class="card-body text-center p-2 p-sm-3">
-                            <h3 class="text-primary mb-1">${teamStats.winPercentage || '0'}%</h3>
-                            <p class="text-muted mb-0 small">
-                                ${teamStats.wins || 0} wins out of ${teamStats.totalMatches || stats.totalMatches} matches
-                            </p>
+                        <div class="stats-content">
+                            <div class="stats-number">${goalDifference >= 0 ? '+' : ''}${goalDifference}</div>
+                            <div class="stats-label">Goal Diff</div>
+                            <div class="stats-sub">${teamStats.goalsFor || stats.totalGoals} for, ${teamStats.goalsAgainst || 0} against</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            ${opponents.length > 0 ? `
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h6 class="mb-0"><i class="fas fa-users me-2"></i>Teams Played Against (${opponents.length})</h6>
+            <div class="row g-2">
+                ${opponents.length > 0 ? `
+                    <div class="col-12 col-md-6">
+                        <div class="stats-section">
+                            <div class="stats-section-header">
+                                <i class="fas fa-users text-info me-2"></i>
+                                <span>Opposition Teams (${opponents.length})</span>
+                            </div>
+                            <div class="stats-section-body">
+                                <div class="d-flex flex-wrap gap-1">
+                                    ${opponents.map(opponent => `
+                                        <span class="badge bg-secondary text-wrap">${this._escapeHtml(opponent)}</span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body p-2">
-                        <div class="d-flex flex-wrap gap-1">
-                            ${opponents.map(opponent => `
-                                <span class="badge bg-secondary text-wrap">${this._escapeHtml(opponent)}</span>
-                            `).join('')}
+                ` : ''}
+                <div class="col-12 ${opponents.length > 0 ? 'col-md-6' : ''}">
+                    <div class="stats-section">
+                        <div class="stats-section-header">
+                            <i class="fas fa-chart-line text-primary me-2"></i>
+                            <span>Performance Averages</span>
                         </div>
-                    </div>
-                </div>
-            ` : ''}
-
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-chart-line me-2"></i>Averages Per Match</h6>
-                </div>
-                <div class="card-body p-2">
-                    <div class="row text-center g-2">
-                        <div class="col-6 col-sm-3">
-                            <div class="p-2">
-                                <h6 class="text-success mb-0">${teamStats.avgGoalsFor || '0.0'}</h6>
-                                <small class="text-muted">Goals Scored</small>
-                            </div>
-                        </div>
-                        <div class="col-6 col-sm-3">
-                            <div class="p-2">
-                                <h6 class="text-danger mb-0">${teamStats.avgGoalsAgainst || '0.0'}</h6>
-                                <small class="text-muted">Goals Conceded</small>
-                            </div>
-                        </div>
-                        <div class="col-6 col-sm-3">
-                            <div class="p-2">
-                                <h6 class="text-info mb-0">${teamStats.avgAttendance || '0.0'}</h6>
-                                <small class="text-muted">Attendance</small>
-                            </div>
-                        </div>
-                        <div class="col-6 col-sm-3">
-                            <div class="p-2">
-                                <h6 class="text-warning mb-0">${teamStats.avgAssists || '0.0'}</h6>
-                                <small class="text-muted">Assists</small>
+                        <div class="stats-section-body">
+                            <div class="row g-2 text-center">
+                                <div class="col-6">
+                                    <div class="p-2">
+                                        <div class="stat-value text-success">${teamStats.avgGoalsFor || '0.0'}</div>
+                                        <div class="stat-label">Goals Scored</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-2">
+                                        <div class="stat-value text-danger">${teamStats.avgGoalsAgainst || '0.0'}</div>
+                                        <div class="stat-label">Goals Conceded</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-2">
+                                        <div class="stat-value text-info">${teamStats.avgAttendance || '0.0'}</div>
+                                        <div class="stat-label">Attendance</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-2">
+                                        <div class="stat-value text-warning">${teamStats.avgAssists || '0.0'}</div>
+                                        <div class="stat-label">Assists</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -457,81 +437,107 @@ class StatisticsTab {
 
         if (!matchStats || matchStats.length === 0) {
             return `
-                <div class="text-center py-5">
-                    <i class="fas fa-calendar-alt fa-4x text-muted mb-4"></i>
-                    <h4 class="text-muted mb-3">No Match Data Available</h4>
-                    <p class="text-muted">Individual match statistics are not available in the current data.</p>
+                <div class="stats-empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="empty-state-content">
+                        <h4>No Match Data Available</h4>
+                        <p>Individual match statistics are not available in the current data.</p>
+                    </div>
                 </div>
             `;
         }
 
+        const avgAttendance = Math.round(matchStats.reduce((sum, m) => sum + (m.attendance || 0), 0) / matchStats.length) || 0;
+        const wins = matchStats.filter(m => m.ourGoals > m.theirGoals).length;
+        const draws = matchStats.filter(m => m.ourGoals === m.theirGoals).length;
+        const losses = matchStats.filter(m => m.ourGoals < m.theirGoals).length;
+
         return `
-            <div class="row g-3 mb-4">
-                <div class="col-6 col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body py-2">
-                            <i class="fas fa-futbol text-primary fa-2x mb-2"></i>
-                            <h4 class="card-title text-primary mb-0">${matchStats.length}</h4>
-                            <p class="card-text small text-muted mb-0">Matches</p>
+            <div class="row g-2 mb-3">
+                <div class="col-6 col-lg-3">
+                    <div class="stats-card stats-card-primary">
+                        <div class="stats-icon">
+                            <i class="fas fa-futbol"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number">${matchStats.length}</div>
+                            <div class="stats-label">Matches</div>
+                            <div class="stats-sub">${wins}W ${draws}D ${losses}L</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body py-2">
-                            <i class="fas fa-bullseye text-success fa-2x mb-2"></i>
-                            <h4 class="card-title text-success mb-0">${stats.totalGoals}</h4>
-                            <p class="card-text small text-muted mb-0">Goals</p>
+                <div class="col-6 col-lg-3">
+                    <div class="stats-card stats-card-success">
+                        <div class="stats-icon">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number">${stats.totalGoals}</div>
+                            <div class="stats-label">Goals</div>
+                            <div class="stats-sub">${(stats.totalGoals / matchStats.length).toFixed(1)}/match</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body py-2">
-                            <i class="fas fa-users text-info fa-2x mb-2"></i>
-                            <h4 class="card-title text-info mb-0">${Math.round(matchStats.reduce((sum, m) => sum + (m.attendance || 0), 0) / matchStats.length) || 0}</h4>
-                            <p class="card-text small text-muted mb-0">Avg Att.</p>
+                <div class="col-6 col-lg-3">
+                    <div class="stats-card stats-card-info">
+                        <div class="stats-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number">${avgAttendance}</div>
+                            <div class="stats-label">Avg Attendance</div>
+                            <div class="stats-sub">${matchStats.reduce((sum, m) => sum + (m.attendance || 0), 0)} total</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body py-2">
-                            <i class="fas fa-chart-line text-warning fa-2x mb-2"></i>
-                            <h4 class="card-title text-warning mb-0">${(stats.totalGoals / matchStats.length).toFixed(1)}</h4>
-                            <p class="card-text small text-muted mb-0">G/Match</p>
+                <div class="col-6 col-lg-3">
+                    <div class="stats-card stats-card-warning">
+                        <div class="stats-icon">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number">${stats.totalAssists}</div>
+                            <div class="stats-label">Assists</div>
+                            <div class="stats-sub">${(stats.totalAssists / matchStats.length).toFixed(1)}/match</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-list me-2"></i>Match by Match Statistics</h6>
-                </div>
-                <div class="card-body p-1 p-sm-2">
-                    <div class="d-sm-none">
-                        ${this._renderMatchCards(matchStats)}
-                    </div>
-                    
-                    <div class="d-none d-sm-block">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-sm mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th style="width: 90px;" class="small">Date</th>
-                                        <th class="small">Opposition</th>
-                                        <th class="text-center small" style="width: 70px;">Result</th>
-                                        <th class="text-center small" style="width: 50px;">G</th>
-                                        <th class="text-center small" style="width: 50px;">A</th>
-                                        <th class="text-center small" style="width: 60px;">Att.</th>
-                                        <th class="small" style="width: 120px;">Top Scorer</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${this._renderMatchRows(matchStats)}
-                                </tbody>
-                            </table>
+            <div class="row g-2">
+                <div class="col-12">
+                    <div class="stats-section">
+                        <div class="stats-section-header">
+                            <i class="fas fa-list text-primary me-2"></i>
+                            <span>Match Results</span>
+                        </div>
+                        <div class="stats-section-body">
+                            <div class="d-sm-none">
+                                ${this._renderMatchCards(matchStats)}
+                            </div>
+                            
+                            <div class="d-none d-sm-block">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-sm mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th style="width: 90px;" class="small">Date</th>
+                                                <th class="small">Opposition</th>
+                                                <th class="text-center small" style="width: 70px;">Result</th>
+                                                <th class="text-center small" style="width: 50px;">G</th>
+                                                <th class="text-center small" style="width: 50px;">A</th>
+                                                <th class="text-center small" style="width: 60px;">Att.</th>
+                                                <th class="small" style="width: 120px;">Top Scorer</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${this._renderMatchRows(matchStats)}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -647,6 +653,60 @@ class StatisticsTab {
                 </div>
             </div>
         `;
+    }
+
+    _renderPlayerRankings(playerStats) {
+        if (!playerStats || !Array.isArray(playerStats)) {
+            return '<div class="stats-empty"><i class="fas fa-info-circle me-2"></i>No player data available</div>';
+        }
+
+        const sortedPlayers = playerStats
+            .filter(p => p.totalContributions > 0 || p.appearances > 0)
+            .sort((a, b) => {
+                if (b.totalContributions !== a.totalContributions) {
+                    return b.totalContributions - a.totalContributions;
+                }
+                if (b.goals !== a.goals) {
+                    return b.goals - a.goals;
+                }
+                return b.assists - a.assists;
+            })
+            .slice(0, 10);
+
+        if (sortedPlayers.length === 0) {
+            return '<div class="stats-empty"><i class="fas fa-users me-2"></i>No player contributions recorded yet</div>';
+        }
+
+        return sortedPlayers.map((player, index) => {
+            const position = index + 1;
+            const positionClass = position === 1 ? 'position-gold' : position === 2 ? 'position-silver' : position === 3 ? 'position-bronze' : 'position-other';
+            
+            return `
+                <div class="stats-player-item">
+                    <div class="player-position ${positionClass}">${position}</div>
+                    <div class="player-info">
+                        <div class="player-name">${this._escapeHtml(player.name)}</div>
+                        <div class="player-details">
+                            ${player.appearances} apps • ${player.goalsPerMatch} G/game • ${player.assistsPerMatch} A/game
+                            ${!player.isRosterPlayer ? ' • Guest' : ''}
+                            ${player.shirtNumber !== null ? ` • #${player.shirtNumber}` : ''}
+                        </div>
+                    </div>
+                    <div class="player-stat">
+                        <div class="stat-value">${player.totalContributions}</div>
+                        <div class="stat-label">G+A</div>
+                    </div>
+                    <div class="player-stat">
+                        <div class="stat-value">${player.goals}</div>
+                        <div class="stat-label">Goals</div>
+                    </div>
+                    <div class="player-stat">
+                        <div class="stat-value">${player.assists}</div>
+                        <div class="stat-label">Assists</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
     }
 
     _renderPlayerRows(players, type) {

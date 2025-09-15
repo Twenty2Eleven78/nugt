@@ -668,7 +668,10 @@ class StatisticsTab {
                 if (b.goals !== a.goals) {
                     return b.goals - a.goals;
                 }
-                return b.assists - a.assists;
+                if (b.assists !== a.assists) {
+                    return b.assists - a.assists;
+                }
+                return b.appearances - a.appearances;
             });
 
         if (sortedPlayers.length === 0) {

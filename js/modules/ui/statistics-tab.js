@@ -527,9 +527,8 @@ class StatisticsTab {
                                                 <th class="small">Opposition</th>
                                                 <th class="text-center small" style="width: 60px;">Result</th>
                                                 <th class="text-center small" style="width: 35px;">G</th>
-                                                <th class="text-center small" style="width: 35px;">A</th>
                                                 <th class="text-center small" style="width: 40px;">Att</th>
-                                                <th class="small" style="width: 100px;">Top Scorer</th>
+                                                <th class="small" style="width: 120px;">Top Scorer</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -783,7 +782,6 @@ class StatisticsTab {
                             <div class="col-4 text-end">
                                 <div class="small">
                                     <div><i class="fas fa-bullseye text-success me-1"></i>${ourGoals}</div>
-                                    <div><i class="fas fa-hands-helping text-info me-1"></i>${match.assists || 0}</div>
                                     <div><i class="fas fa-users text-warning me-1"></i>${attendance}</div>
                                 </div>
                             </div>
@@ -838,7 +836,6 @@ class StatisticsTab {
                     </td>
                     <td class="text-center ${resultClass} py-2 small">${resultText}</td>
                     <td class="text-center py-2">${ourGoals}</td>
-                    <td class="text-center py-2">${match.assists || 0}</td>
                     <td class="text-center py-2">${attendance}</td>
                     <td class="text-muted small py-2">${this._escapeHtml(topScorer !== 'None' && !topScorer.toLowerCase().includes('n/a') ? topScorer : '-')}</td>
                 </tr>

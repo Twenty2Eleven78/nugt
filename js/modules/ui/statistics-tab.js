@@ -74,9 +74,10 @@ class StatisticsTab {
 
     _bindEventListeners() {
         // Listen for tab activation
-        document.addEventListener('shown.bs.tab', (e) => {
-            if (e.target.getAttribute('href') === '#statstab') {
-                this.show();
+        document.addEventListener('click', (e) => {
+            const navLink = e.target.closest('.nav-link[href="#statstab"]');
+            if (navLink) {
+                setTimeout(() => this.show(), 100);
             }
         });
     }

@@ -741,7 +741,13 @@ class StatisticsTab {
     _renderMatchCards(matchStats) {
         return matchStats.map((match, index) => {
             const date = match.date || match.matchDate || 'Unknown';
-            const opposition = match.team2Name || match.opposition || match.opponent || 'Unknown';
+            const opposition = (match.team2Name && match.team2Name !== 'undefined' && match.team2Name !== 'Opposition Team') 
+                ? match.team2Name 
+                : (match.opposition && match.opposition !== 'undefined') 
+                    ? match.opposition 
+                    : (match.opponent && match.opponent !== 'undefined') 
+                        ? match.opponent 
+                        : 'Opposition Team';
             const ourGoals = match.ourGoals || match.goalsFor || 0;
             const theirGoals = match.theirGoals || match.goalsAgainst || 0;
             const attendance = match.attendance || 0;
@@ -796,7 +802,13 @@ class StatisticsTab {
     _renderMatchRows(matchStats) {
         return matchStats.map((match, index) => {
             const date = match.date || match.matchDate || 'Unknown';
-            const opposition = match.team2Name || match.opposition || match.opponent || 'Unknown';
+            const opposition = (match.team2Name && match.team2Name !== 'undefined' && match.team2Name !== 'Opposition Team') 
+                ? match.team2Name 
+                : (match.opposition && match.opposition !== 'undefined') 
+                    ? match.opposition 
+                    : (match.opponent && match.opponent !== 'undefined') 
+                        ? match.opponent 
+                        : 'Opposition Team';
             const ourGoals = match.ourGoals || match.goalsFor || 0;
             const theirGoals = match.theirGoals || match.goalsAgainst || 0;
             const attendance = match.attendance || 0;

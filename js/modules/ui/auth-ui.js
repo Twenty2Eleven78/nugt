@@ -7,6 +7,7 @@ import { authService } from '../services/auth.js';
 import { notificationManager } from '../services/notifications.js';
 import { hideModal } from './modals.js';
 import { CustomModal } from '../shared/custom-modal.js';
+import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
 
 class AuthUI {
   constructor() {
@@ -93,63 +94,54 @@ class AuthUI {
    * @private
    */
   _createAuthModal() {
-    const modalHtml = `
-      <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="authModalLabel">NUFC GameTime Authentication</h5>
-                <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-times" style="font-size: 14px;"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-              <!-- Auth modal notification container -->
-              <div id="auth-notification-container" class="mb-3" style="display: none;"></div>
-              
-              <div class="auth-container">
-                <div id="authMessage" class="mb-3">
-                  <p>Welcome to NUFC GameTime! Please sign in to track your usage.</p>
-                </div>
-                
-                <div id="registerForm" class="mb-3">
-                  <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="usernameInput" placeholder="name@example.com">
-                    <label for="usernameInput">Email Address</label>
-                  </div>
-                  <button type="button" id="registerButton" class="btn btn-primary w-100 mb-2">
-                    <i class="fas fa-user-plus me-2"></i>Register with Passkey
-                  </button>
-                  <small class="text-muted">First time? Create a passkey to securely access the app.</small>
-                </div>
-                
-                <div class="text-center my-3">
-                  <span>OR</span>
-                </div>
-                
-                <div id="loginForm">
-                  <button type="button" id="loginButton" class="btn btn-success w-100 mb-2">
-                    <i class="fas fa-key me-2"></i>Sign in with Passkey
-                  </button>
-                  <small class="text-muted">Already registered? Use your passkey to sign in.</small>
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <div id="skipAuthContainer" class="w-100 text-center">
-                <button type="button" id="skipAuthButton" class="btn btn-link">Continue without signing in</button>
-                <small class="d-block text-muted">Your data won't be saved between sessions</small>
-              </div>
-            </div>
+    const bodyContent = `
+      <div id="auth-notification-container" class="mb-3" style="display: none;"></div>
+      
+      <div class="auth-container">
+        <div id="authMessage" class="mb-3">
+          <p>Welcome to NUFC GameTime! Please sign in to track your usage.</p>
+        </div>
+        
+        <div id="registerForm" class="mb-3">
+          <div class="form-floating mb-3">
+            <input type="email" class="form-control" id="usernameInput" placeholder="name@example.com">
+            <label for="usernameInput">Email Address</label>
           </div>
+          <button type="button" id="registerButton" class="btn btn-primary w-100 mb-2">
+            <i class="fas fa-user-plus me-2"></i>Register with Passkey
+          </button>
+          <small class="text-muted">First time? Create a passkey to securely access the app.</small>
+        </div>
+        
+        <div class="text-center my-3">
+          <span>OR</span>
+        </div>
+        
+        <div id="loginForm">
+          <button type="button" id="loginButton" class="btn btn-success w-100 mb-2">
+            <i class="fas fa-key me-2"></i>Sign in with Passkey
+          </button>
+          <small class="text-muted">Already registered? Use your passkey to sign in.</small>
         </div>
       </div>
     `;
 
-    // Append modal to body
-    const modalContainer = document.createElement('div');
-    modalContainer.innerHTML = modalHtml;
-    document.body.appendChild(modalContainer.firstElementChild);
+    const footerContent = `
+      <div id="skipAuthContainer" class="w-100 text-center">
+        <button type="button" id="skipAuthButton" class="btn btn-link">Continue without signing in</button>
+        <small class="d-block text-muted">Your data won't be saved between sessions</small>
+      </div>
+    `;
+
+    createAndAppendModal(
+      'authModal',
+      '<i class="fas fa-shield-alt me-2"></i>NUFC GameTime Authentication',
+      bodyContent,
+      {
+        ...MODAL_CONFIGS.CENTERED,
+        footerContent: footerContent
+      }
+    );
 
     this.authModalInitialized = true;
 

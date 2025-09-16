@@ -140,6 +140,55 @@ class UserMatchesAPI {
     return response.data;
   }
 
+  async saveStatistics(statistics) {
+    if (!statistics || typeof statistics !== 'object') {
+      throw new Error('Invalid statistics data provided');
+    }
+
+    const token = await this._getAuthToken();
+    const enhancedStats = {
+      ...statistics,
+      savedBy: (await authService.getCurrentUser())?.email,
+      savedAt: Date.now()
+    };
+
+    const requestOptions = {
+      method: HTTP_METHODS.PUT,
+      headers: this._buildHeaders(token, true),
+      body: JSON.stringify({ statistics: enhancedStats, _statsUpdate: true })
+    };
+
+    const response = await this._makeRequest(API_ENDPOINTS.USER_MATCHES, requestOptions);
+    this._clearCache();
+    return response.data;
+  }
+
+  async loadStatistics() {
+    const cacheKey = 'loadStatistics';
+    const cachedData = this._getFromCache(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
+
+    const token = await this._getAuthToken();
+    const url = `${API_ENDPOINTS.USER_MATCHES}?statistics=true`;
+    const requestOptions = {
+      method: HTTP_METHODS.GET,
+      headers: this._buildHeaders(token)
+    };
+
+    try {
+      const response = await this._makeRequest(url, requestOptions);
+      this._setCache(cacheKey, response.data);
+      return response.data;
+    } catch (error) {
+      if (error.message.includes('404')) {
+        return null;
+      }
+      throw error;
+    }
+  }
+
   // Clear all cached data
   clearCache() {
     this._clearCache();

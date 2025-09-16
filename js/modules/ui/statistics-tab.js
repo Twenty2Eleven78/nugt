@@ -26,11 +26,29 @@ class StatisticsTab {
 
     async _loadGeneratedStatistics() {
         try {
+            // Try to load from cloud first
+            const cloudStats = await this._loadFromCloud();
+            if (cloudStats) {
+                this.statistics = cloudStats;
+                return;
+            }
+            
+            // Fallback to localStorage
             const stored = localStorage.getItem('generatedStatistics');
             this.statistics = stored ? JSON.parse(stored) : null;
         } catch (error) {
             console.error('Error loading statistics:', error);
             this.statistics = null;
+        }
+    }
+
+    async _loadFromCloud() {
+        try {
+            const { userMatchesApi } = await import('../services/user-matches-api.js');
+            return await userMatchesApi.loadStatistics();
+        } catch (error) {
+            console.warn('Failed to load statistics from cloud:', error);
+            return null;
         }
     }
 

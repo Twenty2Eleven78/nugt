@@ -1522,11 +1522,15 @@ const calculateStatisticsFromMatches = async (matches) => {
 };
 
 const saveGeneratedStatistics = async (statistics) => {
-    // Save to localStorage for now, could be extended to save to cloud
+    // Save to localStorage as fallback
     localStorage.setItem('generatedStatistics', JSON.stringify(statistics));
     
-    // Could also save to cloud storage here
-    // await userMatchesApi.saveStatistics(statistics);
+    // Save to cloud storage for sharing across users
+    try {
+        await userMatchesApi.saveStatistics(statistics);
+    } catch (error) {
+        console.warn('Failed to save statistics to cloud:', error);
+    }
 };
 
 const showUploadModal = () => {

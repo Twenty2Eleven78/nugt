@@ -1224,8 +1224,24 @@ const toggleMatchApproval = async (matchData, matchIndex) => {
     }
 };
 
+let isGeneratingStats = false;
+
 const generateStatistics = async () => {
+    if (isGeneratingStats) {
+        notificationManager.warning('Statistics generation already in progress');
+        return;
+    }
+    
+    const generateBtn = document.getElementById('generate-stats-btn');
+    const originalText = generateBtn?.innerHTML;
+    
     try {
+        isGeneratingStats = true;
+        if (generateBtn) {
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Generating...';
+        }
+        
         // Get all approved matches
         const approvedMatches = allMatches.filter(match => match.approvedForStats === true);
         
@@ -1245,6 +1261,12 @@ const generateStatistics = async () => {
     } catch (error) {
         console.error('Error generating statistics:', error);
         notificationManager.error('Failed to generate statistics');
+    } finally {
+        isGeneratingStats = false;
+        if (generateBtn) {
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = originalText || '<i class="fas fa-chart-bar me-1"></i>Generate Statistics';
+        }
     }
 };
 

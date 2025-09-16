@@ -271,7 +271,7 @@ class StatisticsTab {
         
         const playerStats = this.statistics.playerStats;
         if (!playerStats || !Array.isArray(playerStats)) {
-            return this._renderNoDataMessage();
+            return '<div class="stats-empty"><i class="fas fa-info-circle me-2"></i>No player statistics available</div>';
         }
 
         const rosterPlayers = playerStats.filter(p => p.isRosterPlayer);
@@ -475,7 +475,17 @@ class StatisticsTab {
         const matchStats = stats.matchStats || [];
 
         if (!matchStats || matchStats.length === 0) {
-            return this._renderNoDataMessage();
+            return `
+                <div class="stats-empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="empty-state-content">
+                        <h4>No Match Data Available</h4>
+                        <p>Individual match statistics are not available in the current data.</p>
+                    </div>
+                </div>
+            `;
         }
 
         const avgAttendance = Math.round(matchStats.reduce((sum, m) => sum + (m.attendance || 0), 0) / matchStats.length) || 0;

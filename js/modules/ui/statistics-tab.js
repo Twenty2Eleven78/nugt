@@ -32,6 +32,15 @@ class StatisticsTab {
             const cloudStats = await this._loadFromCloud();
             if (cloudStats) {
                 console.log('☁️ Statistics Tab: Loaded from cloud:', cloudStats);
+                // Extract statistics from the cloud response
+                if (Array.isArray(cloudStats)) {
+                    const statsEntry = cloudStats.find(item => item.title === 'Team Statistics' && item.statistics);
+                    if (statsEntry) {
+                        console.log('📊 Statistics Tab: Found statistics entry:', statsEntry.statistics);
+                        this.statistics = statsEntry.statistics;
+                        return;
+                    }
+                }
                 this.statistics = cloudStats;
                 return;
             }

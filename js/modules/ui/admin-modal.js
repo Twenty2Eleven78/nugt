@@ -1530,22 +1530,31 @@ const saveGeneratedStatistics = async (statistics) => {
     
     // Save to cloud storage for sharing across users
     try {
+        // Clear cache to ensure fresh data
+        userMatchesApi.clearCache();
+        
         // Check if statistics already exist and delete old ones first
         const existingData = await userMatchesApi.loadAllMatchData();
         if (existingData && Array.isArray(existingData)) {
-            const existingStatsEntries = existingData.filter(item => 
-                item.title === 'Team Statistics' && item.userId === 'system_statistics'
-            );
+            const existingStatsEntries = existingData
+                .map((item, index) => ({ ...item, arrayIndex: index }))
+                .filter(item => item.title === 'Team Statistics' && item.userId === 'system_statistics');
             
-            // Delete existing statistics entries
+            console.log(`🔍 Admin: Found ${existingStatsEntries.length} existing statistics entries to delete`);
+            
+            // Delete existing statistics entries using array index
             for (const entry of existingStatsEntries) {
                 try {
-                    await userMatchesApi.deleteMatchData('system_statistics', entry.matchIndex);
-                    console.log('🗑️ Admin: Deleted existing statistics entry');
+                    const indexToDelete = entry.matchIndex !== undefined ? entry.matchIndex : entry.arrayIndex;
+                    await userMatchesApi.deleteMatchData('system_statistics', indexToDelete);
+                    console.log(`🗑️ Admin: Deleted existing statistics entry at index ${indexToDelete}`);
                 } catch (deleteError) {
                     console.warn('⚠️ Admin: Failed to delete existing statistics:', deleteError);
                 }
             }
+            
+            // Clear cache again after deletions
+            userMatchesApi.clearCache();
         }
         
         await userMatchesApi.saveStatistics(statistics);

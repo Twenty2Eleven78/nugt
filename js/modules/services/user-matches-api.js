@@ -6,7 +6,8 @@
 import { authService } from './auth.js';
 
 const API_ENDPOINTS = {
-  USER_MATCHES: '/.netlify/functions/user-matches'
+  USER_MATCHES: '/.netlify/functions/user-matches',
+  STATISTICS: '/.netlify/functions/statistics'
 };
 
 const HTTP_METHODS = {
@@ -138,6 +139,75 @@ class UserMatchesAPI {
     const response = await this._makeRequest(API_ENDPOINTS.USER_MATCHES, requestOptions);
     this._clearCache(); // Clear all caches after update
     return response.data;
+  }
+
+  async saveStatistics(statistics) {
+    if (!statistics || typeof statistics !== 'object') {
+      throw new Error('Invalid statistics data provided');
+    }
+
+    const token = await this._getAuthToken();
+    const statsData = {
+      title: 'Team Statistics',
+      statistics: {
+        ...statistics,
+        savedBy: (await authService.getCurrentUser())?.email,
+        savedAt: Date.now()
+      },
+      userEmail: 'statistics@system.com',
+      userId: 'system_statistics',
+      savedAt: Date.now(),
+      _replaceExisting: true,  // Flag to replace existing statistics
+      _uniqueId: 'team_statistics_singleton'  // Unique identifier
+    };
+
+    const requestOptions = {
+      method: HTTP_METHODS.PUT,
+      headers: this._buildHeaders(token, true),
+      body: JSON.stringify({ ...statsData, _statsUpdate: true })
+    };
+
+    const response = await this._makeRequest(API_ENDPOINTS.USER_MATCHES, requestOptions);
+    this._clearCache();
+    return response.data;
+  }
+
+  async loadStatistics() {
+    console.log('🌐 API: Loading statistics from cloud...');
+    
+    const cacheKey = 'loadStatistics';
+    const cachedData = this._getFromCache(cacheKey);
+    if (cachedData) {
+      console.log('💾 API: Returning cached statistics:', cachedData);
+      return cachedData;
+    }
+
+    const token = await this._getAuthToken();
+    const url = `${API_ENDPOINTS.USER_MATCHES}?statistics=true`;
+    const requestOptions = {
+      method: HTTP_METHODS.GET,
+      headers: this._buildHeaders(token)
+    };
+
+    try {
+      console.log('🌐 API: Making request to:', url);
+      const response = await this._makeRequest(url, requestOptions);
+      console.log('🌐 API: Statistics response:', response);
+      
+      // Extract statistics from the response data
+      const statsData = response.data?.statistics || response.data;
+      console.log('📊 API: Extracted statistics data:', statsData);
+      
+      this._setCache(cacheKey, statsData);
+      return statsData;
+    } catch (error) {
+      console.log('❌ API: Statistics load error:', error);
+      if (error.message.includes('404')) {
+        console.log('🔄 API: No statistics found (404)');
+        return null;
+      }
+      throw error;
+    }
   }
 
   // Clear all cached data

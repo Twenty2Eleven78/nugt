@@ -1,5 +1,5 @@
 //Cache Name
-const CACHE_NAME = "nugt-cache-v204";
+const CACHE_NAME = "nugt-cache-v217";
 //Files to cache - Modular Architecture
 const cacheFiles = [
   './',
@@ -141,7 +141,6 @@ self.addEventListener('message', function (event) {
                     if (request.url.includes('/api/') ||
                       request.url.includes('user-matches') ||
                       request.url.includes('match')) {
-                      console.log('Clearing cached API request:', request.url);
                       return cache.delete(request);
                     }
                   })

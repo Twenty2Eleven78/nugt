@@ -1224,8 +1224,24 @@ const toggleMatchApproval = async (matchData, matchIndex) => {
     }
 };
 
+let isGeneratingStats = false;
+
 const generateStatistics = async () => {
+    if (isGeneratingStats) {
+        notificationManager.warning('Statistics generation already in progress');
+        return;
+    }
+    
+    const generateBtn = document.getElementById('generate-stats-btn');
+    const originalText = generateBtn?.innerHTML;
+    
     try {
+        isGeneratingStats = true;
+        if (generateBtn) {
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Generating...';
+        }
+        
         // Get all approved matches
         const approvedMatches = allMatches.filter(match => match.approvedForStats === true);
         
@@ -1245,6 +1261,12 @@ const generateStatistics = async () => {
     } catch (error) {
         console.error('Error generating statistics:', error);
         notificationManager.error('Failed to generate statistics');
+    } finally {
+        isGeneratingStats = false;
+        if (generateBtn) {
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = originalText || '<i class="fas fa-chart-bar me-1"></i>Generate Statistics';
+        }
     }
 };
 
@@ -1522,11 +1544,23 @@ const calculateStatisticsFromMatches = async (matches) => {
 };
 
 const saveGeneratedStatistics = async (statistics) => {
-    // Save to localStorage for now, could be extended to save to cloud
-    localStorage.setItem('generatedStatistics', JSON.stringify(statistics));
+    console.log('📊 Admin: Saving generated statistics:', statistics);
     
-    // Could also save to cloud storage here
-    // await userMatchesApi.saveStatistics(statistics);
+    // Save to localStorage as fallback
+    localStorage.setItem('generatedStatistics', JSON.stringify(statistics));
+    console.log('💾 Admin: Saved to localStorage');
+    
+    // Save to cloud storage for sharing across users
+    try {
+        // Clear cache to ensure fresh data
+        userMatchesApi.clearCache();
+        
+        // Save statistics - API will handle duplicate prevention
+        await userMatchesApi.saveStatistics(statistics);
+        console.log('☁️ Admin: Saved to cloud successfully');
+    } catch (error) {
+        console.warn('❌ Admin: Failed to save statistics to cloud:', error);
+    }
 };
 
 const showUploadModal = () => {

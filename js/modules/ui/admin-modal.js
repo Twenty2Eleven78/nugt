@@ -1530,6 +1530,24 @@ const saveGeneratedStatistics = async (statistics) => {
     
     // Save to cloud storage for sharing across users
     try {
+        // Check if statistics already exist and delete old ones first
+        const existingData = await userMatchesApi.loadAllMatchData();
+        if (existingData && Array.isArray(existingData)) {
+            const existingStatsEntries = existingData.filter(item => 
+                item.title === 'Team Statistics' && item.userId === 'system_statistics'
+            );
+            
+            // Delete existing statistics entries
+            for (const entry of existingStatsEntries) {
+                try {
+                    await userMatchesApi.deleteMatchData('system_statistics', entry.matchIndex);
+                    console.log('🗑️ Admin: Deleted existing statistics entry');
+                } catch (deleteError) {
+                    console.warn('⚠️ Admin: Failed to delete existing statistics:', deleteError);
+                }
+            }
+        }
+        
         await userMatchesApi.saveStatistics(statistics);
         console.log('☁️ Admin: Saved to cloud successfully');
     } catch (error) {

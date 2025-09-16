@@ -6,7 +6,8 @@
 import { authService } from './auth.js';
 
 const API_ENDPOINTS = {
-  USER_MATCHES: '/.netlify/functions/user-matches'
+  USER_MATCHES: '/.netlify/functions/user-matches',
+  STATISTICS: '/.netlify/functions/statistics'
 };
 
 const HTTP_METHODS = {
@@ -146,16 +147,22 @@ class UserMatchesAPI {
     }
 
     const token = await this._getAuthToken();
-    const enhancedStats = {
-      ...statistics,
-      savedBy: (await authService.getCurrentUser())?.email,
+    const statsData = {
+      title: 'Team Statistics',
+      statistics: {
+        ...statistics,
+        savedBy: (await authService.getCurrentUser())?.email,
+        savedAt: Date.now()
+      },
+      userEmail: 'statistics@system.com',
+      userId: 'system_statistics',
       savedAt: Date.now()
     };
 
     const requestOptions = {
       method: HTTP_METHODS.PUT,
       headers: this._buildHeaders(token, true),
-      body: JSON.stringify({ statistics: enhancedStats, _statsUpdate: true })
+      body: JSON.stringify({ ...statsData, _statsUpdate: true })
     };
 
     const response = await this._makeRequest(API_ENDPOINTS.USER_MATCHES, requestOptions);
@@ -184,8 +191,13 @@ class UserMatchesAPI {
       console.log('🌐 API: Making request to:', url);
       const response = await this._makeRequest(url, requestOptions);
       console.log('🌐 API: Statistics response:', response);
-      this._setCache(cacheKey, response.data);
-      return response.data;
+      
+      // Extract statistics from the response data
+      const statsData = response.data?.statistics || response.data;
+      console.log('📊 API: Extracted statistics data:', statsData);
+      
+      this._setCache(cacheKey, statsData);
+      return statsData;
     } catch (error) {
       console.log('❌ API: Statistics load error:', error);
       if (error.message.includes('404')) {

@@ -26,9 +26,12 @@ class StatisticsTab {
 
     async _loadGeneratedStatistics() {
         try {
+            console.log('📊 Statistics Tab: Loading statistics...');
+            
             // Try to load from cloud first
             const cloudStats = await this._loadFromCloud();
             if (cloudStats) {
+                console.log('☁️ Statistics Tab: Loaded from cloud:', cloudStats);
                 this.statistics = cloudStats;
                 return;
             }
@@ -36,18 +39,27 @@ class StatisticsTab {
             // Fallback to localStorage
             const stored = localStorage.getItem('generatedStatistics');
             this.statistics = stored ? JSON.parse(stored) : null;
+            
+            if (this.statistics) {
+                console.log('💾 Statistics Tab: Loaded from localStorage:', this.statistics);
+            } else {
+                console.log('❌ Statistics Tab: No statistics found in cloud or localStorage');
+            }
         } catch (error) {
-            console.error('Error loading statistics:', error);
+            console.error('❌ Statistics Tab: Error loading statistics:', error);
             this.statistics = null;
         }
     }
 
     async _loadFromCloud() {
         try {
+            console.log('☁️ Statistics Tab: Attempting to load from cloud...');
             const { userMatchesApi } = await import('../services/user-matches-api.js');
-            return await userMatchesApi.loadStatistics();
+            const result = await userMatchesApi.loadStatistics();
+            console.log('☁️ Statistics Tab: Cloud API response:', result);
+            return result;
         } catch (error) {
-            console.warn('Failed to load statistics from cloud:', error);
+            console.warn('❌ Statistics Tab: Failed to load statistics from cloud:', error);
             return null;
         }
     }

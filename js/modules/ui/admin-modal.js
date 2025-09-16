@@ -1522,14 +1522,18 @@ const calculateStatisticsFromMatches = async (matches) => {
 };
 
 const saveGeneratedStatistics = async (statistics) => {
+    console.log('📊 Admin: Saving generated statistics:', statistics);
+    
     // Save to localStorage as fallback
     localStorage.setItem('generatedStatistics', JSON.stringify(statistics));
+    console.log('💾 Admin: Saved to localStorage');
     
     // Save to cloud storage for sharing across users
     try {
         await userMatchesApi.saveStatistics(statistics);
+        console.log('☁️ Admin: Saved to cloud successfully');
     } catch (error) {
-        console.warn('Failed to save statistics to cloud:', error);
+        console.warn('❌ Admin: Failed to save statistics to cloud:', error);
     }
 };
 

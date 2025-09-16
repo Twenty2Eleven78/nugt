@@ -164,9 +164,12 @@ class UserMatchesAPI {
   }
 
   async loadStatistics() {
+    console.log('🌐 API: Loading statistics from cloud...');
+    
     const cacheKey = 'loadStatistics';
     const cachedData = this._getFromCache(cacheKey);
     if (cachedData) {
+      console.log('💾 API: Returning cached statistics:', cachedData);
       return cachedData;
     }
 
@@ -178,11 +181,15 @@ class UserMatchesAPI {
     };
 
     try {
+      console.log('🌐 API: Making request to:', url);
       const response = await this._makeRequest(url, requestOptions);
+      console.log('🌐 API: Statistics response:', response);
       this._setCache(cacheKey, response.data);
       return response.data;
     } catch (error) {
+      console.log('❌ API: Statistics load error:', error);
       if (error.message.includes('404')) {
+        console.log('🔄 API: No statistics found (404)');
         return null;
       }
       throw error;

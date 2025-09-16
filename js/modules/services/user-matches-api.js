@@ -156,7 +156,9 @@ class UserMatchesAPI {
       },
       userEmail: 'statistics@system.com',
       userId: 'system_statistics',
-      savedAt: Date.now()
+      savedAt: Date.now(),
+      _replaceExisting: true,  // Flag to replace existing statistics
+      _uniqueId: 'team_statistics_singleton'  // Unique identifier
     };
 
     const requestOptions = {

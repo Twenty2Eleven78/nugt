@@ -209,9 +209,9 @@ class StatisticsTab {
                             <i class="fas fa-users"></i>
                         </div>
                         <div class="stats-content">
-                            <div class="stats-number">${stats.playerStats.length}</div>
+                            <div class="stats-number">${stats.playerStats?.length || 0}</div>
                             <div class="stats-label">Players</div>
-                            <div class="stats-sub">${stats.playerStats.filter(p => p.goals > 0).length} scorers</div>
+                            <div class="stats-sub">${stats.playerStats?.filter(p => p.goals > 0).length || 0} scorers</div>
                         </div>
                     </div>
                 </div>
@@ -226,7 +226,7 @@ class StatisticsTab {
                             <span>Top Goal Scorers</span>
                         </div>
                         <div class="stats-section-body">
-                            ${this._renderTopScorers(stats.playerStats)}
+                            ${this._renderTopScorers(stats.playerStats || [])}
                         </div>
                     </div>
                 </div>
@@ -237,7 +237,7 @@ class StatisticsTab {
                             <span>Top Assist Providers</span>
                         </div>
                         <div class="stats-section-body">
-                            ${this._renderTopAssists(stats.playerStats)}
+                            ${this._renderTopAssists(stats.playerStats || [])}
                         </div>
                     </div>
                 </div>

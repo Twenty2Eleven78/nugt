@@ -10,10 +10,8 @@ const createMainAdminModal = () => {
         <!-- Admin Notification Container -->
         <div id="admin-notification-container" style="display: none;"></div>
         
-        <!-- Search and Controls -->
+        <!-- Controls -->
         <div class="mb-3">
-            <input type="text" class="form-control mb-2" id="admin-search" 
-                   placeholder="Search matches...">
             <div class="row g-2">
                 <div class="col-4">
                     <select class="form-select" id="filter-select">
@@ -232,13 +230,7 @@ const init = () => {
     // Initialize match summary modal
     matchSummaryModal.init();
 
-    // Add search functionality
-    const searchInput = document.getElementById('admin-search');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            filterMatches(e.target.value.toLowerCase());
-        });
-    }
+
 
     // Add refresh button functionality
     const refreshBtn = document.getElementById('refresh-data-btn');
@@ -936,31 +928,7 @@ const applyFilter = (filterValue) => {
     renderStats(filteredMatches, statsCardsContainer);
 };
 
-const filterMatches = (searchTerm) => {
-    if (!searchTerm.trim()) {
-        // Apply current filter if any
-        const filterSelect = document.getElementById('filter-select');
-        const currentFilter = filterSelect ? filterSelect.value : '';
-        applyFilter(currentFilter);
-        return;
-    }
 
-    const filtered = allMatches.filter(match => {
-        const email = (match.userEmail || '').toLowerCase();
-        const title = (match.title || match.matchTitle || '').toLowerCase();
-        const userId = (match.userId || '').toLowerCase();
-
-        return email.includes(searchTerm) ||
-            title.includes(searchTerm) ||
-            userId.includes(searchTerm);
-    });
-
-    renderCards(filtered);
-
-    // Update stats with filtered data
-    const statsCardsContainer = document.getElementById('admin-stats-cards');
-    renderStats(filtered, statsCardsContainer);
-};
 
 const showNoDataMessage = () => {
     const matchesList = document.getElementById('matches-list');

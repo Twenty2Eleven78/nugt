@@ -147,6 +147,7 @@ class UserMatchesAPI {
     }
 
     const token = await this._getAuthToken();
+    const currentUser = await authService.getCurrentUser();
     
     // First, delete existing statistics
     try {
@@ -156,7 +157,6 @@ class UserMatchesAPI {
       console.log('No existing statistics to delete:', error.message);
     }
 
-    const currentUser = await authService.getCurrentUser();
     const statsData = {
       title: 'Team Statistics',
       statistics: {
@@ -165,10 +165,10 @@ class UserMatchesAPI {
         savedAt: Date.now()
       },
       userEmail: 'statistics@system.com',
-      userId: 'system_statistics',
+      userId: currentUser?.id,
       savedAt: Date.now(),
-      _statsUpdate: true,
-      _forceUserId: 'system_statistics'
+      _isStatistics: true,
+      _statsUpdate: true
     };
 
     const requestOptions = {
@@ -184,11 +184,14 @@ class UserMatchesAPI {
 
   async deleteStatistics() {
     const token = await this._getAuthToken();
+    const currentUser = await authService.getCurrentUser();
     const params = this._buildQueryParams({ 
-      userId: 'system_statistics',
+      userId: currentUser?.id,
       statistics: true,
       title: 'Team Statistics',
-      userEmail: 'statistics@system.com'
+      userEmail: 'statistics@system.com',
+      _isStatistics: true,
+      _statsUpdate: true
     });
     const url = `${API_ENDPOINTS.USER_MATCHES}?${params}`;
 

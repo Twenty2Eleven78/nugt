@@ -147,6 +147,15 @@ class UserMatchesAPI {
     }
 
     const token = await this._getAuthToken();
+    
+    // First, delete existing statistics
+    try {
+      await this.deleteStatistics();
+    } catch (error) {
+      // Ignore if no existing statistics to delete
+      console.log('No existing statistics to delete:', error.message);
+    }
+
     const statsData = {
       title: 'Team Statistics',
       statistics: {
@@ -156,9 +165,7 @@ class UserMatchesAPI {
       },
       userEmail: 'statistics@system.com',
       userId: 'system_statistics',
-      savedAt: Date.now(),
-      _replaceExisting: true,  // Flag to replace existing statistics
-      _uniqueId: 'team_statistics_singleton'  // Unique identifier
+      savedAt: Date.now()
     };
 
     const requestOptions = {
@@ -170,6 +177,25 @@ class UserMatchesAPI {
     const response = await this._makeRequest(API_ENDPOINTS.USER_MATCHES, requestOptions);
     this._clearCache();
     return response.data;
+  }
+
+  async deleteStatistics() {
+    const token = await this._getAuthToken();
+    const params = this._buildQueryParams({ 
+      statistics: true,
+      title: 'Team Statistics',
+      userEmail: 'statistics@system.com'
+    });
+    const url = `${API_ENDPOINTS.USER_MATCHES}?${params}`;
+
+    const requestOptions = {
+      method: HTTP_METHODS.DELETE,
+      headers: this._buildHeaders(token)
+    };
+
+    const response = await this._makeRequest(url, requestOptions);
+    this._clearCache();
+    return response;
   }
 
   async loadStatistics() {

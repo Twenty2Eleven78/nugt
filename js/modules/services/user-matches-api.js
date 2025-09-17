@@ -146,8 +146,6 @@ class UserMatchesAPI {
       throw new Error('Invalid statistics data provided');
     }
 
-    const token = await this._getAuthToken();
-    
     // First, delete existing statistics
     try {
       await this.deleteStatistics();
@@ -164,20 +162,13 @@ class UserMatchesAPI {
         savedBy: currentUser?.email,
         savedAt: Date.now()
       },
-      userEmail: 'statistics@system.com',
+      userEmail: 'statistics@nugt.app',
       userId: 'system_statistics',
-      savedAt: Date.now()
+      savedAt: Date.now(),
+      _statsUpdate: true
     };
 
-    const requestOptions = {
-      method: HTTP_METHODS.PUT,
-      headers: this._buildHeaders(token, true),
-      body: JSON.stringify({ ...statsData, _statsUpdate: true })
-    };
-
-    const response = await this._makeRequest(API_ENDPOINTS.USER_MATCHES, requestOptions);
-    this._clearCache();
-    return response.data;
+    return await this.saveMatchData(statsData);
   }
 
   async deleteStatistics() {
@@ -254,6 +245,15 @@ class UserMatchesAPI {
 
   _enhanceMatchData(matchData) {
     const currentUser = authService.getCurrentUser();
+    
+    // Don't override system identifiers for statistics
+    if (matchData._statsUpdate || matchData.userId === 'system_statistics') {
+      return {
+        ...matchData,
+        timestamp: new Date().toISOString()
+      };
+    }
+    
     return {
       ...matchData,
       userEmail: currentUser?.email || 'unknown@example.com',

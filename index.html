@@ -222,161 +222,161 @@
             <div class="tab-pane fade" id="optionstab">
               <div class="options-container">
 
-                <!-- Quick Actions Row -->
-                <div class="row mb-1">
-                  <div class="col-12">
-                    <div class="row g-3">
-                      <div class="col-6 col-lg-3">
-                        <div class="quick-action-card" data-toggle="modal" data-target="#attendanceModal">
-                          <i class="fas fa-user-check fa-2x mb-2 text-primary"></i>
-                          <span>Attendance</span>
-                        </div>
-                      </div>
-                      <div class="col-6 col-lg-3">
-                        <div class="quick-action-card" id="shareButton">
-                          <i class="fas fa-share-alt fa-2x mb-2 text-success"></i>
-                          <span>Share Report</span>
-                        </div>
-                      </div>
-                      <div class="col-6 col-lg-3">
-                        <div class="quick-action-card" id="saveMatchDataBtn">
-                          <i class="fas fa-cloud-arrow-up fa-2x mb-2 text-info"></i>
-                          <span>Save to Cloud</span>
-                        </div>
-                      </div>
-                      <div class="col-6 col-lg-3">
-                        <div class="quick-action-card" onclick="pwaUpdater.triggerUpdate()">
-                          <i class="fas fa-sync fa-2x mb-2 text-secondary"></i>
-                          <span>Check Updates</span>
-                        </div>
-                      </div>
+                <!-- Quick Actions Grid -->
+                <div class="row g-2 mb-3">
+                  <div class="col-4">
+                    <div class="quick-action-card" id="saveMatchDataBtn" style="padding: 0.5rem; min-height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem;">
+                      <i class="fas fa-cloud-arrow-up text-info"></i>
+                      <span style="font-size: 0.75rem; text-align: center; line-height: 1;">Save Data</span>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <div class="quick-action-card" data-toggle="modal" data-target="#rosterModal" style="padding: 0.5rem; min-height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem;">
+                      <i class="fas fa-users text-primary"></i>
+                      <span style="font-size: 0.75rem; text-align: center; line-height: 1;">Roster</span>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <div class="quick-action-card" id="shareButton" style="padding: 0.5rem; min-height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem;">
+                      <i class="fas fa-share-alt text-success"></i>
+                      <span style="font-size: 0.75rem; text-align: center; line-height: 1;">Share Report</span>
                     </div>
                   </div>
                 </div>
 
-                <!-- Main Options Cards -->
+                <!-- Main Options -->
                 <div class="row g-3">
-                  <!-- Game Settings Card -->
+                  <!-- Match Settings -->
                   <div class="col-12">
                     <div class="option-card">
                       <div class="option-card-header">
-                        <i class="fas fa-cog me-2"></i>Game Settings
+                        <i class="fas fa-futbol me-2"></i>Match Settings
                       </div>
                       <div class="option-card-body">
-                        <label for="gameTimeSelect" class="form-label">Match Duration</label>
-                        <select id="gameTimeSelect" class="form-select mb-2">
-                          <option value="2400">40 minutes (7v7)</option>
-                          <option value="3000">50 minutes (7v7)</option>
-                          <option value="3600">60 minutes (U11/12 9v9)</option>
-                          <option value="4200" selected>70 minutes (U13/14 11v11)</option>
-                          <option value="4800">80 minutes (U15/16 11v11)</option>
-                          <option value="5400">90 minutes (11v11)</option>
-                        </select>
-                        <small class="text-muted">Each half will be 50% of total time</small>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Team Management Card -->
-                  <div class="col-12">
-                    <div class="option-card">
-                      <div class="option-card-header">
-                        <i class="fas fa-users me-2"></i>Team Management
-                      </div>
-                      <div class="option-card-body">
-                        <div class="d-grid gap-2">
-                          <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#rosterModal">
-                            <i class="fas fa-users me-2"></i>Manage Roster
-                          </button>
-                          <button class="btn btn-outline-primary btn-sm" data-toggle="modal"
-                            data-target="#attendanceModal">
-                            <i class="fas fa-user-check me-2"></i>Match Attendance
-                          </button>
+                        <div class="row g-3">
+                          <div class="col-12">
+                            <label for="gameTimeSelect" class="form-label">Match Duration</label>
+                            <select id="gameTimeSelect" class="form-select">
+                              <option value="2400">40 minutes (7v7)</option>
+                              <option value="3000">50 minutes (7v7)</option>
+                              <option value="3600">60 minutes (U11/12 9v9)</option>
+                              <option value="4200" selected>70 minutes (U13/14 11v11)</option>
+                              <option value="4800">80 minutes (U15/16 11v11)</option>
+                              <option value="5400">90 minutes (11v11)</option>
+                            </select>
+                            <small class="text-muted">Each half will be 50% of total time</small>
+                          </div>
+                          <div class="col-6">
+                            <button class="btn btn-outline-primary btn-sm w-100" data-toggle="modal" data-target="#rosterModal">
+                              <i class="fas fa-users me-2"></i>Manage Roster
+                            </button>
+                          </div>
+                          <div class="col-6">
+                            <button class="btn btn-outline-primary btn-sm w-100" data-toggle="modal" data-target="#attendanceModal">
+                              <i class="fas fa-user-check me-2"></i>Attendance
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <!-- Account & Data Card -->
+                  <!-- Cloud & Data -->
                   <div class="col-12">
                     <div class="option-card">
                       <div class="option-card-header">
-                        <i class="fas fa-cloud me-2"></i>Account & Data
+                        <i class="fas fa-cloud me-2"></i>Cloud & Data
                       </div>
                       <div class="option-card-body">
-                        <div class="d-grid gap-2">
-                          <button class="btn btn-outline-primary btn-sm" id="showAuthButtonCard">
-                            <i class="fas fa-user me-2"></i>Sign In / Register
-                          </button>
-                          <button class="btn btn-outline-success btn-sm" id="saveMatchDataBtnCard">
-                            <i class="fas fa-cloud-arrow-up me-2"></i>Save to Cloud
-                          </button>
-                          <button class="btn btn-outline-info btn-sm" id="loadMatchDataBtn">
-                            <i class="fas fa-cloud-arrow-down me-2"></i>Load from Cloud
-                          </button>
-
-                          <button id="admin-modal-button" class="btn btn-outline-secondary btn-sm d-none">
-                            <i class="fas fa-user-shield me-2"></i>Admin Dashboard
-                          </button>
+                        <div class="row g-2">
+                          <div class="col-12 mb-2">
+                            <button class="btn btn-outline-primary btn-sm w-100" id="showAuthButtonCard">
+                              <i class="fas fa-user me-2"></i>Sign In / Register
+                            </button>
+                          </div>
+                          <div class="col-6">
+                            <button class="btn btn-outline-success btn-sm w-100" id="saveMatchDataBtnCard">
+                              <i class="fas fa-cloud-arrow-up me-2"></i>Save
+                            </button>
+                          </div>
+                          <div class="col-6">
+                            <button class="btn btn-outline-info btn-sm w-100" id="loadMatchDataBtn">
+                              <i class="fas fa-cloud-arrow-down me-2"></i>Load
+                            </button>
+                          </div>
+                          <div class="col-12">
+                            <button id="admin-modal-button" class="btn btn-outline-secondary btn-sm w-100 d-none">
+                              <i class="fas fa-user-shield me-2"></i>Admin Dashboard
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <!-- Theme & Appearance Card -->
+                  <!-- Appearance -->
                   <div class="col-12">
                     <div class="option-card">
                       <div class="option-card-header">
-                        <i class="fas fa-palette me-2"></i>Theme & Appearance
+                        <i class="fas fa-palette me-2"></i>Appearance
                       </div>
                       <div class="option-card-body">
-                        <label for="themeSelect" class="form-label">Choose Color Theme</label>
-                        <select id="themeSelect" class="form-select mb-3">
-                          <option value="red" selected>Red (Default)</option>
-                          <option value="blue">Blue</option>
-                          <option value="green">Green</option>
-                          <option value="purple">Purple</option>
-                          <option value="orange">Orange</option>
-                          <option value="yellow">Yellow</option>
-                          <option value="cyan">Cyan</option>
-                          <option value="pink">Pink</option>
-                        </select>
-                        <div class="theme-preview d-flex gap-2 mb-3">
-                          <div class="theme-color-preview" id="themePreview"></div>
-                          <small class="text-muted align-self-center">Color preview</small>
-                        </div>
-
-                        <div class="form-check form-switch">
-                          <input class="form-check-input" type="checkbox" role="switch" id="darkModeToggle">
-                          <label class="form-check-label" for="darkModeToggle">
-                            <i class="fas fa-moon me-2"></i>Dark Mode
-                          </label>
+                        <div class="row g-3">
+                          <div class="col-12">
+                            <label for="themeSelect" class="form-label">Color Theme</label>
+                            <select id="themeSelect" class="form-select">
+                              <option value="red" selected>Red (Default)</option>
+                              <option value="blue">Blue</option>
+                              <option value="green">Green</option>
+                              <option value="purple">Purple</option>
+                              <option value="orange">Orange</option>
+                              <option value="yellow">Yellow</option>
+                              <option value="cyan">Cyan</option>
+                              <option value="pink">Pink</option>
+                            </select>
+                          </div>
+                          <div class="col-6">
+                            <div class="theme-preview d-flex align-items-center gap-2">
+                              <div class="theme-color-preview" id="themePreview"></div>
+                              <small class="text-muted">Preview</small>
+                            </div>
+                          </div>
+                          <div class="col-6">
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="darkModeToggle">
+                              <label class="form-check-label" for="darkModeToggle">
+                                <i class="fas fa-moon me-1"></i>Dark Mode
+                              </label>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <!-- App Management Card -->
+                  <!-- App Info & Updates -->
                   <div class="col-12">
                     <div class="option-card">
                       <div class="option-card-header">
-                        <i class="fas fa-tools me-2"></i>App Management
+                        <i class="fas fa-info-circle me-2"></i>App Info & Updates
                       </div>
                       <div class="option-card-body">
-                        <div class="d-grid gap-2">
-                          <button class="btn btn-outline-secondary btn-sm" data-toggle="modal"
-                            data-target="#releasenotesmodal">
-                            <i class="fas fa-list me-2"></i>Release Notes
-                          </button>
-                          <button class="btn btn-outline-info btn-sm" id="checkForUpdatesBtn"
-                            onclick="pwaUpdater.triggerUpdate()">
-                            <i class="fas fa-sync me-2"></i>Check Updates
-                          </button>
-
-                          <button class="btn btn-outline-danger btn-sm" data-toggle="modal"
-                            data-target="#resetConfirmModal">
-                            <i class="fas fa-arrows-rotate me-2"></i>Reset App
-                          </button>
+                        <div class="row g-2">
+                          <div class="col-6">
+                            <button class="btn btn-outline-secondary btn-sm w-100" data-toggle="modal" data-target="#releasenotesmodal">
+                              <i class="fas fa-list me-2"></i>Release Notes
+                            </button>
+                          </div>
+                          <div class="col-6">
+                            <button class="btn btn-outline-info btn-sm w-100" id="checkForUpdatesBtn" onclick="pwaUpdater.triggerUpdate()">
+                              <i class="fas fa-sync me-2"></i>Check Updates
+                            </button>
+                          </div>
+                          <div class="col-12">
+                            <button class="btn btn-outline-danger btn-sm w-100" data-toggle="modal" data-target="#resetConfirmModal">
+                              <i class="fas fa-arrows-rotate me-2"></i>Reset App Data
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>

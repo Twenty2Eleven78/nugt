@@ -148,14 +148,6 @@ class UserMatchesAPI {
 
     const token = await this._getAuthToken();
     const currentUser = await authService.getCurrentUser();
-    
-    // First, delete existing statistics
-    try {
-      await this.deleteStatistics();
-    } catch (error) {
-      // Ignore if no existing statistics to delete
-      console.log('No existing statistics to delete:', error.message);
-    }
 
     const statsData = {
       title: 'Team Statistics',
@@ -189,9 +181,7 @@ class UserMatchesAPI {
       userId: currentUser?.id,
       statistics: true,
       title: 'Team Statistics',
-      userEmail: 'statistics@system.com',
-      _isStatistics: true,
-      _statsUpdate: true
+      userEmail: 'statistics@nugt.app'
     });
     const url = `${API_ENDPOINTS.USER_MATCHES}?${params}`;
 

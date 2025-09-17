@@ -127,15 +127,7 @@ const modalHtml = `
                         Select one or more JSON files containing match data to upload.
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label for="target-user-email" class="form-label">
-                        <strong>Assign to User Email:</strong>
-                    </label>
-                    <input type="email" class="form-control" id="target-user-email" placeholder="user@example.com">
-                    <div class="form-text">
-                        Enter the email address to assign this match data to. If left empty, will use the email from the JSON data or create a new user.
-                    </div>
-                </div>
+
                 <div id="upload-preview" class="mb-3" style="display: none;">
                     <h6>Preview:</h6>
                     <div class="card bg-light">
@@ -1566,12 +1558,10 @@ const saveGeneratedStatistics = async (statistics) => {
 const showUploadModal = () => {
     // Reset form
     const jsonFileInput = document.getElementById('json-file-input');
-    const targetUserEmail = document.getElementById('target-user-email');
     const uploadPreview = document.getElementById('upload-preview');
     const confirmUploadBtn = document.getElementById('confirm-upload-btn');
 
     if (jsonFileInput) jsonFileInput.value = '';
-    if (targetUserEmail) targetUserEmail.value = '';
     if (uploadPreview) uploadPreview.style.display = 'none';
     if (confirmUploadBtn) confirmUploadBtn.disabled = true;
 
@@ -1647,36 +1637,27 @@ const handleUploadConfirm = async () => {
     if (selectedFiles.length === 0) return;
 
     const confirmBtn = document.getElementById('confirm-upload-btn');
-    const targetUserEmail = document.getElementById('target-user-email');
     const originalText = confirmBtn.innerHTML;
 
     try {
         confirmBtn.disabled = true;
         confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
 
-        const targetEmail = targetUserEmail?.value?.trim();
+        const currentUser = await authService.getCurrentUser();
         let successCount = 0;
         let errorCount = 0;
 
         for (const { file, data } of selectedFiles) {
             try {
-                // Prepare match data
+                // Prepare match data - assign to current admin user
                 const matchData = {
                     ...data,
                     uploadedAt: Date.now(),
-                    uploadedBy: (await authService.getCurrentUser())?.email || 'admin',
-                    originalFileName: file.name
+                    uploadedBy: currentUser?.email || 'admin',
+                    originalFileName: file.name,
+                    userEmail: currentUser?.email || 'admin@nugt.app',
+                    userId: currentUser?.id || 'admin_user'
                 };
-
-                // Override user email if specified
-                if (targetEmail) {
-                    matchData.userEmail = targetEmail;
-                    matchData.userId = generateUserIdFromEmail(targetEmail);
-                } else if (!matchData.userEmail) {
-                    // Generate default user if none specified
-                    matchData.userEmail = `imported_${Date.now()}@example.com`;
-                    matchData.userId = generateUserIdFromEmail(matchData.userEmail);
-                }
 
                 // Remove any admin-specific properties
                 delete matchData.blobKey;

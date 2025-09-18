@@ -322,8 +322,9 @@ function bindEventListeners() {
       defaultNotes: ''
     }, async ({ title, notes }) => {
       try {
-        // Gather match data with saved attendance
+        // Gather match data with saved attendance and lineup
         const savedAttendance = storage.load(STORAGE_KEYS.MATCH_ATTENDANCE, []);
+        const savedLineup = storage.load('MATCH_LINEUP', null);
         const matchData = {
           title,
           notes,
@@ -338,6 +339,7 @@ function bindEventListeners() {
           score1,
           score2,
           attendance: savedAttendance,
+          matchLineup: savedLineup || gameState.matchLineup,
           savedAt: Date.now()
         };
 
@@ -557,6 +559,9 @@ function resetTracker() {
 
   // Clear storage (except auth data)
   storage.clear();
+  
+  // Explicitly clear match lineup data
+  storage.remove('MATCH_LINEUP');
 
   // Show confirmation and redirect
   notificationManager.success('Game reset successfully');

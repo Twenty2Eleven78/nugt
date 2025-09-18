@@ -726,7 +726,7 @@ class StatisticsTab {
                     <div class="player-info">
                         <div class="player-name">${this._escapeHtml(player.name)}</div>
                         <div class="player-details">
-                            ${player.appearances} apps • ${player.goalsPerMatch} G/game • ${player.assistsPerMatch} A/game
+                            ${player.appearances} apps • ${player.starts || 0} starts • ${player.substitute || 0} subs
                             ${!player.isRosterPlayer ? ' • Guest' : ''}
                             ${player.shirtNumber !== null ? ` • #${player.shirtNumber}` : ''}
                         </div>

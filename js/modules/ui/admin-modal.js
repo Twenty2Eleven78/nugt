@@ -1246,6 +1246,8 @@ const calculateStatisticsFromMatches = async (matches) => {
             goals: 0,
             assists: 0,
             appearances: 0,
+            starts: 0,
+            substitute: 0,
             matchesWithGoals: new Set(),
             matchesWithAssists: new Set(),
             matchesPlayed: new Set(),
@@ -1258,6 +1260,67 @@ const calculateStatisticsFromMatches = async (matches) => {
 
     // Process each approved match
     matches.forEach((match, matchIndex) => {
+        // Process lineup data
+        if (match.matchLineup) {
+            // Process starting XI
+            if (match.matchLineup.startingXI && Array.isArray(match.matchLineup.startingXI)) {
+                match.matchLineup.startingXI.forEach(playerName => {
+                    if (playerName && playerName.trim()) {
+                        const playerKey = playerName.toLowerCase().trim();
+                        
+                        if (playerStatsMap.has(playerKey)) {
+                            const player = playerStatsMap.get(playerKey);
+                            player.starts++;
+                            player.matchesPlayed.add(matchIndex);
+                        } else {
+                            playerStatsMap.set(playerKey, {
+                                name: playerName.trim(),
+                                shirtNumber: null,
+                                goals: 0,
+                                assists: 0,
+                                appearances: 0,
+                                starts: 1,
+                                substitute: 0,
+                                matchesWithGoals: new Set(),
+                                matchesWithAssists: new Set(),
+                                matchesPlayed: new Set([matchIndex]),
+                                isRosterPlayer: false
+                            });
+                        }
+                    }
+                });
+            }
+            
+            // Process substitutes
+            if (match.matchLineup.substitutes && Array.isArray(match.matchLineup.substitutes)) {
+                match.matchLineup.substitutes.forEach(playerName => {
+                    if (playerName && playerName.trim()) {
+                        const playerKey = playerName.toLowerCase().trim();
+                        
+                        if (playerStatsMap.has(playerKey)) {
+                            const player = playerStatsMap.get(playerKey);
+                            player.substitute++;
+                            player.matchesPlayed.add(matchIndex);
+                        } else {
+                            playerStatsMap.set(playerKey, {
+                                name: playerName.trim(),
+                                shirtNumber: null,
+                                goals: 0,
+                                assists: 0,
+                                appearances: 0,
+                                starts: 0,
+                                substitute: 1,
+                                matchesWithGoals: new Set(),
+                                matchesWithAssists: new Set(),
+                                matchesPlayed: new Set([matchIndex]),
+                                isRosterPlayer: false
+                            });
+                        }
+                    }
+                });
+            }
+        }
+        
         // Process attendance
         if (match.attendance && Array.isArray(match.attendance)) {
             match.attendance.forEach(attendee => {
@@ -1284,6 +1347,8 @@ const calculateStatisticsFromMatches = async (matches) => {
                             goals: 0,
                             assists: 0,
                             appearances: 0,
+                            starts: 0,
+                            substitute: 0,
                             matchesWithGoals: new Set(),
                             matchesWithAssists: new Set(),
                             matchesPlayed: new Set([matchIndex]),
@@ -1324,6 +1389,8 @@ const calculateStatisticsFromMatches = async (matches) => {
                         goals: 1,
                         assists: 0,
                         appearances: 0,
+                        starts: 0,
+                        substitute: 0,
                         matchesWithGoals: new Set([matchIndex]),
                         matchesWithAssists: new Set(),
                         matchesPlayed: new Set([matchIndex]),
@@ -1350,6 +1417,8 @@ const calculateStatisticsFromMatches = async (matches) => {
                         goals: 0,
                         assists: 1,
                         appearances: 0,
+                        starts: 0,
+                        substitute: 0,
                         matchesWithGoals: new Set(),
                         matchesWithAssists: new Set([matchIndex]),
                         matchesPlayed: new Set([matchIndex]),

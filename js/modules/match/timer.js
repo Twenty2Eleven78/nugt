@@ -159,12 +159,9 @@ class TimerController {
     const button = domCache.get('startPauseButton');
     if (!button) return;
 
-    const oldStatusClass = newStatusClass === 'btn-success' ? 'btn-danger' : 'btn-success';
-    button.classList.remove(oldStatusClass);
-
-    if (button.classList.contains(newStatusClass)) {
-      button.classList.remove(newStatusClass);
-    }
+    // Remove all possible button state classes
+    button.classList.remove('btn-success', 'btn-danger', 'btn-warning');
+    // Add the new class
     button.classList.add(newStatusClass);
 
     // Update the button content while preserving the timer display structure

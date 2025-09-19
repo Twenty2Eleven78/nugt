@@ -42,7 +42,17 @@ class TimerController {
     }, GAME_CONFIG.TIMER_UPDATE_INTERVAL);
 
     const isNewGame = gameState.seconds === 0;
-    const buttonText = isNewGame ? 'Game Started' : 'Game Resumed';
+    const isSecondHalf = gameState.isSecondHalf;
+    let buttonText;
+    
+    if (isNewGame) {
+      buttonText = 'Game Started';
+    } else if (isSecondHalf) {
+      buttonText = 'Second Half Started';
+    } else {
+      buttonText = 'Game Resumed';
+    }
+    
     this._updateButtonUI('Game in Progress', 'btn-success', formatTime(gameState.seconds));
     notificationManager.success(buttonText + '!');
 

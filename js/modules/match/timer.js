@@ -118,16 +118,16 @@ class TimerController {
 
   // Handle half time
   handleHalfTime() {
-    const currentSeconds = getCurrentSeconds();
+    // Set timer to half-time position (half of total game time)
+    const halfTimeSeconds = Math.floor(gameState.gameTime / 2);
 
     this._stopTimer();
-    stateManager.setTimerState(currentSeconds, false, null);
-    // Don't set second half flag during half-time break
-    // stateManager.setHalfState(true);
+    stateManager.setTimerState(halfTimeSeconds, false, null);
+    stateManager.setHalfState(true);
 
-    this._updateButtonUI('Half Time Break', 'btn-danger', formatTime(currentSeconds));
+    this._updateButtonUI('Half Time Break', 'btn-warning', formatTime(halfTimeSeconds));
     this.updateDisplay();
-    notificationManager.info('Half Time - Game Paused');
+    notificationManager.info('Half Time - Timer set to ' + formatTime(halfTimeSeconds));
 
     storageHelpers.saveGameState(gameState);
   }

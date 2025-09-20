@@ -155,6 +155,8 @@ class MomentumTracker {
   // Initialize momentum tracking
   init() {
     this.createMomentumIndicator();
+    this.loadSettings();
+    this.bindToggle();
     this.calculateMomentum();
     
     // Update momentum every 30 seconds during active match
@@ -163,6 +165,34 @@ class MomentumTracker {
         this.calculateMomentum();
       }
     }, 30000);
+  }
+
+  // Load momentum settings
+  loadSettings() {
+    const enabled = localStorage.getItem('momentum-enabled') !== 'false';
+    const toggle = document.getElementById('momentumToggle');
+    if (toggle) toggle.checked = enabled;
+    this.toggleMomentum(enabled);
+  }
+
+  // Bind toggle event
+  bindToggle() {
+    const toggle = document.getElementById('momentumToggle');
+    if (toggle) {
+      toggle.addEventListener('change', (e) => {
+        const enabled = e.target.checked;
+        localStorage.setItem('momentum-enabled', enabled);
+        this.toggleMomentum(enabled);
+      });
+    }
+  }
+
+  // Toggle momentum display
+  toggleMomentum(enabled) {
+    const momentumCard = document.querySelector('.momentum-card');
+    if (momentumCard) {
+      momentumCard.style.display = enabled ? 'block' : 'none';
+    }
   }
 
   // Check if match is currently active
@@ -196,7 +226,10 @@ class MomentumTracker {
 
   // Update momentum when events change
   onEventUpdate() {
-    this.calculateMomentum();
+    const enabled = localStorage.getItem('momentum-enabled') !== 'false';
+    if (enabled) {
+      this.calculateMomentum();
+    }
   }
 }
 

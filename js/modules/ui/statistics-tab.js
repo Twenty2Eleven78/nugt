@@ -246,7 +246,7 @@ class StatisticsTab {
                             <i class="fas fa-trophy text-warning me-2"></i>
                             <span>Top Goal Scorers</span>
                         </div>
-                        <div class="stats-section-body" style="height: 300px; overflow-y: scroll;">
+                        <div class="stats-section-body" style="height: 200px; overflow-y: scroll;">
                             ${this._renderTopScorers(stats.playerStats || [])}
                         </div>
                     </div>

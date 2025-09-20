@@ -29,7 +29,7 @@ export const DEFAULT_ROSTER_CONFIG = {
         { name: 'Freya.B', shirtNumber: 4 },
         { name: 'Freya.K', shirtNumber: 1 },
         { name: 'Havana.S', shirtNumber: 18 },
-        { name: 'Megan.F', shirtNumber: null },
+        { name: 'Megan.F', shirtNumber: 9 },
         { name: 'Mia.S', shirtNumber: 19 },
         { name: 'Miliana.L', shirtNumber: null },
         { name: 'Sienna.S', shirtNumber: 7 },

@@ -1382,6 +1382,10 @@ const calculateStatisticsFromMatches = async (matches) => {
                     player.goals++;
                     player.matchesWithGoals.add(matchIndex);
                     player.matchesPlayed.add(matchIndex);
+                    // Update shirt number from match data if available
+                    if (goal.goalScorerShirtNumber && !player.shirtNumber) {
+                        player.shirtNumber = goal.goalScorerShirtNumber;
+                    }
                 } else {
                     playerStatsMap.set(playerKey, {
                         name: scorer.trim(),
@@ -1410,6 +1414,10 @@ const calculateStatisticsFromMatches = async (matches) => {
                     player.assists++;
                     player.matchesWithAssists.add(matchIndex);
                     player.matchesPlayed.add(matchIndex);
+                    // Update shirt number from match data if available
+                    if (goal.goalAssistShirtNumber && !player.shirtNumber) {
+                        player.shirtNumber = goal.goalAssistShirtNumber;
+                    }
                 } else {
                     playerStatsMap.set(playerKey, {
                         name: assistName.trim(),

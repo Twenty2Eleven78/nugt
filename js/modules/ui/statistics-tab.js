@@ -421,7 +421,7 @@ class StatisticsTab {
                             <div class="stats-section-body" style="max-height: 150px; overflow-y: auto;">
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem;">
                                     ${opponents.map(opponent => `
-                                        <span class="badge bg-secondary text-wrap" style="font-size: 0.75rem;">${this._escapeHtml(opponent)}</span>
+                                        <span class="text-wrap">${this._escapeHtml(opponent)}</span>
                                     `).join('')}
                                 </div>
                             </div>

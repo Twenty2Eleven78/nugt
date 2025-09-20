@@ -33,6 +33,7 @@ class MomentumTracker {
   calculateMomentum() {
     const currentTime = this.getCurrentMatchTime();
     const windowStart = Math.max(0, currentTime - this.windowSize);
+    const team2Name = domCache.get('Team2NameElement')?.textContent || 'Opposition';
     
     // Reset momentum
     this.momentumData.team1 = 0;
@@ -43,23 +44,27 @@ class MomentumTracker {
       if (goal.disallowed || goal.rawTime < windowStart || goal.rawTime > currentTime) return;
       
       const weight = this.eventWeights.goal;
-      if (goal.team === 1) {
-        this.momentumData.team1 += weight;
-      } else {
+      // Check if goal scorer is opposition team
+      if (goal.goalScorerName === team2Name || goal.team === 2) {
         this.momentumData.team2 += weight;
+      } else {
+        this.momentumData.team1 += weight;
       }
     });
     
     // Process match events
     gameState.matchEvents.forEach(event => {
       if (event.rawTime < windowStart || event.rawTime > currentTime) return;
+      if (event.isSystemEvent) return; // Skip system events like half-time
       
       const weight = this.getEventWeight(event.type);
       if (weight === 0) return;
       
-      if (event.team === 1) {
+      // Extract team from event type text
+      const eventTeam = this.getEventTeam(event.type, team2Name);
+      if (eventTeam === 1) {
         this.momentumData.team1 += weight;
-      } else if (event.team === 2) {
+      } else if (eventTeam === 2) {
         this.momentumData.team2 += weight;
       }
     });
@@ -76,6 +81,14 @@ class MomentumTracker {
       }
     }
     return 0;
+  }
+
+  // Get team from event type text
+  getEventTeam(eventType, team2Name) {
+    if (eventType.includes(team2Name)) {
+      return 2; // Opposition team
+    }
+    return 1; // Home team (default)
   }
 
   // Get current match time in seconds
@@ -112,16 +125,21 @@ class MomentumTracker {
       return;
     }
     
-    const team1Percentage = total > 0 ? (this.momentumData.team1 / total) * 50 + 50 : 50;
-    const team2Percentage = 100 - team1Percentage;
+    // Calculate momentum percentages
+    const netMomentum = this.momentumData.team1 - this.momentumData.team2;
+    let team1Percentage = 50;
+    
+    if (total > 0) {
+      team1Percentage = Math.max(10, Math.min(90, 50 + (netMomentum / total) * 40));
+    }
     
     let dominantTeam = 'neutral';
     let statusText = 'Match Balanced';
     
-    if (team1Percentage > 65) {
+    if (team1Percentage > 60) {
       dominantTeam = 'team1';
       statusText = `${team1Name} Momentum`;
-    } else if (team2Percentage > 65) {
+    } else if (team1Percentage < 40) {
       dominantTeam = 'team2';
       statusText = `${team2Name} Momentum`;
     }

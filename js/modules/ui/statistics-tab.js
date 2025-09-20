@@ -450,7 +450,16 @@ class StatisticsTab {
                                 </div>
                                 <div class="col-6">
                                     <div class="p-2">
-                                        <div class="stat-value text-info">${teamStats.avgAttendance || (matchStats.length > 0 ? (matchStats.reduce((sum, m) => sum + (m.attendance || 0), 0) / matchStats.length).toFixed(1) : '0.0')}</div>
+                                        <div class="stat-value text-info">${(() => {
+                                            if (teamStats.avgAttendance && teamStats.avgAttendance !== '0.0') {
+                                                return teamStats.avgAttendance;
+                                            }
+                                            if (matchStats.length > 0) {
+                                                const total = matchStats.reduce((sum, m) => sum + (m.attendance || 0), 0);
+                                                return (total / matchStats.length).toFixed(1);
+                                            }
+                                            return '0.0';
+                                        })()}</div>
                                         <div class="stat-label">Attendance</div>
                                     </div>
                                 </div>

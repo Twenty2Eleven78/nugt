@@ -5,6 +5,7 @@
 
 import { authService } from '../services/auth.js';
 import { notificationManager } from '../services/notifications.js';
+import { seasonCharts } from './season-charts.js';
 
 class StatisticsTab {
     constructor() {
@@ -102,6 +103,10 @@ class StatisticsTab {
                         <i class="fas fa-calendar-alt"></i>
                         <span>Matches</span>
                     </button>
+                    <button type="button" class="stats-nav-pill" data-view="charts">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Charts</span>
+                    </button>
                 </div>
             </div>
             
@@ -145,10 +150,17 @@ class StatisticsTab {
                     const content = document.getElementById('stats-view-content');
                     if (content) {
                         content.style.opacity = '0.5';
-                        setTimeout(() => {
+                        setTimeout(async () => {
                             this.currentView = view;
-                            this._renderCurrentView();
+                            await this._renderCurrentView();
                             content.style.opacity = '1';
+                            
+                            // Initialize charts if charts view
+                            if (view === 'charts') {
+                                setTimeout(() => {
+                                    seasonCharts.initializeCharts(this.statistics);
+                                }, 100);
+                            }
                         }, 150);
                     }
                 }
@@ -156,7 +168,7 @@ class StatisticsTab {
         });
     }
 
-    _renderCurrentView() {
+    async _renderCurrentView() {
         const content = document.getElementById('stats-view-content');
         if (!content) return;
 
@@ -174,9 +186,33 @@ class StatisticsTab {
             case 'matches':
                 html = this._renderPerMatchStats();
                 break;
+            case 'charts':
+                html = await this._renderChartsView();
+                break;
         }
 
         content.innerHTML = html;
+    }
+
+    async _renderChartsView() {
+        if (!this.statistics) return this._renderNoDataMessage();
+        
+        const matchStats = this.statistics.matchStats || [];
+        if (matchStats.length === 0) {
+            return `
+                <div class="stats-empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="empty-state-content">
+                        <h4>No Chart Data Available</h4>
+                        <p>Charts require match data to display trends and progression.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        return await seasonCharts.renderChartsSection(this.statistics);
     }
 
     _renderOverviewStats() {

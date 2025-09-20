@@ -450,7 +450,7 @@ class StatisticsTab {
                                 </div>
                                 <div class="col-6">
                                     <div class="p-2">
-                                        <div class="stat-value text-info">${teamStats.avgAttendance || '0.0'}</div>
+                                        <div class="stat-value text-info">${teamStats.avgAttendance || (matchStats.length > 0 ? (matchStats.reduce((sum, m) => sum + (m.attendance || 0), 0) / matchStats.length).toFixed(1) : '0.0')}</div>
                                         <div class="stat-label">Attendance</div>
                                     </div>
                                 </div>
@@ -591,7 +591,7 @@ class StatisticsTab {
         const topScorers = playerStats
             .filter(p => p.goals > 0)
             .sort((a, b) => b.goals - a.goals)
-            .slice(0, 5);
+            .slice(0, 10);
 
         if (topScorers.length === 0) {
             return '<div class="stats-empty"><i class="fas fa-futbol me-2"></i>No goals recorded yet</div>';
@@ -625,7 +625,7 @@ class StatisticsTab {
         const topAssists = playerStats
             .filter(p => p.assists > 0)
             .sort((a, b) => b.assists - a.assists)
-            .slice(0, 5);
+            .slice(0, 10);
 
         if (topAssists.length === 0) {
             return '<div class="stats-empty"><i class="fas fa-hands-helping me-2"></i>No assists recorded yet</div>';

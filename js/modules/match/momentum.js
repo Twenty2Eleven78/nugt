@@ -21,7 +21,7 @@ class MomentumTracker {
       'Yellow Card': -2,
       'Red Card': -3,
       'Sin Bin': -2,
-      'Foul': -1,
+      'Foul': 1,
       'Penalty': 2,
       'Offside': -0.5
     };

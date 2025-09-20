@@ -418,10 +418,10 @@ class StatisticsTab {
                                 <i class="fas fa-users text-info me-2"></i>
                                 <span>Opposition Teams (${opponents.length})</span>
                             </div>
-                            <div class="stats-section-body">
-                                <div class="d-flex flex-wrap gap-1">
+                            <div class="stats-section-body" style="max-height: 150px; overflow-y: auto;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem;">
                                     ${opponents.map(opponent => `
-                                        <span class="badge bg-secondary text-wrap">${this._escapeHtml(opponent)}</span>
+                                        <span class="badge bg-secondary text-wrap" style="font-size: 0.75rem;">${this._escapeHtml(opponent)}</span>
                                     `).join('')}
                                 </div>
                             </div>

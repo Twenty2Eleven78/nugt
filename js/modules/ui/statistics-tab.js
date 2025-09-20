@@ -239,25 +239,25 @@ class StatisticsTab {
             </div>
 
             <!-- Top Performers Section -->
-            <div class="row g-2">
-                <div class="col-12 col-md-6">
-                    <div class="stats-section">
+            <div class="row g-2" style="height: calc(100vh - 280px);">
+                <div class="col-12 col-md-6" style="height: 100%;">
+                    <div class="stats-section" style="height: 100%; display: flex; flex-direction: column;">
                         <div class="stats-section-header">
                             <i class="fas fa-trophy text-warning me-2"></i>
                             <span>Top Goal Scorers</span>
                         </div>
-                        <div class="stats-section-body" style="max-height: calc(100vh - 200px); overflow-y: scroll; padding-bottom: 80px;">
+                        <div class="stats-section-body" style="flex: 1; overflow-y: scroll; padding-bottom: 80px;">
                             ${this._renderTopScorers(stats.playerStats || [])}
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-md-6">
-                    <div class="stats-section">
+                <div class="col-12 col-md-6" style="height: 100%;">
+                    <div class="stats-section" style="height: 100%; display: flex; flex-direction: column;">
                         <div class="stats-section-header">
                             <i class="fas fa-handshake text-info me-2"></i>
                             <span>Top Assist Providers</span>
                         </div>
-                        <div class="stats-section-body" style="max-height: calc(100vh - 200px); overflow-y: scroll; padding-bottom: 80px;">
+                        <div class="stats-section-body" style="flex: 1; overflow-y: scroll; padding-bottom: 80px;">
                             ${this._renderTopAssists(stats.playerStats || [])}
                         </div>
                     </div>

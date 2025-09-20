@@ -14,6 +14,7 @@ import { showModal, hideModal } from '../ui/modals.js';
 import { getEventIcon, getEventCardClass } from '../ui/components.js';
 import { timerController } from './timer.js';
 import { attendanceManager } from '../services/attendance.js';
+import { momentumTracker } from './momentum.js';
 
 // Combined Events Manager Class
 class CombinedEventsManager {
@@ -27,6 +28,10 @@ class CombinedEventsManager {
     
     this._bindEvents();
     this.updateEventStatistics();
+    
+    // Initialize momentum tracker
+    momentumTracker.init();
+    
     this.isInitialized = true;
   }
 
@@ -69,6 +74,9 @@ class CombinedEventsManager {
     // Update displays
     this.updateMatchLog();
     this.updateEventStatistics(); // Enhanced functionality
+    
+    // Update momentum
+    momentumTracker.onEventUpdate();
 
     // Save data
     storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
@@ -223,6 +231,9 @@ class CombinedEventsManager {
       // Update displays
       this.updateMatchLog();
       this.updateEventStatistics();
+      
+      // Update momentum
+      momentumTracker.onEventUpdate();
 
       // Save data
       storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
@@ -583,6 +594,9 @@ function performEventDeletion() {
 
   combinedEventsManager.updateMatchLog();
   combinedEventsManager.updateEventStatistics();
+  
+  // Update momentum
+  momentumTracker.onEventUpdate();
   
   storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
   notificationManager.success(`${itemType.charAt(0).toUpperCase() + itemType.slice(1)} deleted`);

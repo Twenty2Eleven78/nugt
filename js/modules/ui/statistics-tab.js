@@ -106,7 +106,7 @@ class StatisticsTab {
             </div>
             
             <!-- Content Area -->
-            <div id="stats-view-content" class="stats-content" style="max-height: calc(100vh - 200px); overflow-y: auto;">
+            <div id="stats-view-content" class="stats-content">
                 ${this._renderOverviewStats()}
             </div>
         `;
@@ -605,8 +605,8 @@ class StatisticsTab {
                 <div class="stats-player-item">
                     <div class="player-position ${positionClass}">${position}</div>
                     <div class="player-info">
-                        <div class="player-name">${this._escapeHtml(player.name)}</div>
-                        <div class="player-details">${player.appearances} apps • ${player.goalsPerMatch} goals/game</div>
+                        <div class="player-name">${this._escapeHtml(player.name)} <small class="d-sm-none text-muted">${player.appearances} apps • ${player.goalsPerMatch} goals/game</small></div>
+                        <div class="player-details d-none d-sm-block">${player.appearances} apps • ${player.goalsPerMatch} goals/game</div>
                     </div>
                     <div class="player-stat">
                         <div class="stat-value">${player.goals}</div>
@@ -639,8 +639,8 @@ class StatisticsTab {
                 <div class="stats-player-item">
                     <div class="player-position ${positionClass}">${position}</div>
                     <div class="player-info">
-                        <div class="player-name">${this._escapeHtml(player.name)}</div>
-                        <div class="player-details">${player.appearances} apps • ${player.assistsPerMatch} assists/game</div>
+                        <div class="player-name">${this._escapeHtml(player.name)} <small class="d-sm-none text-muted">${player.appearances} apps • ${player.assistsPerMatch} assists/game</small></div>
+                        <div class="player-details d-none d-sm-block">${player.appearances} apps • ${player.assistsPerMatch} assists/game</div>
                     </div>
                     <div class="player-stat">
                         <div class="stat-value">${player.assists}</div>

@@ -1627,8 +1627,8 @@ body {
 }
 
 .momentum-fill.team1 {
-    background: linear-gradient(90deg, var(--theme-primary) 0%, var(--theme-primary-light) 100%);
-    box-shadow: 0 0 8px rgba(var(--theme-primary-rgb), 0.3);
+    background: linear-gradient(90deg, var(--success-color) 0%, #20c997 100%);
+    box-shadow: 0 0 8px rgba(40, 167, 69, 0.3);
 }
 
 .momentum-fill.team2 {

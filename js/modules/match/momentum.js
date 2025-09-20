@@ -29,19 +29,17 @@ class MomentumTracker {
     this.windowSize = 300; // 5 minutes in seconds
   }
 
-  // Calculate momentum based on recent events
+  // Calculate momentum based on entire match
   calculateMomentum() {
-    const currentTime = this.getCurrentMatchTime();
-    const windowStart = Math.max(0, currentTime - this.windowSize);
     const team2Name = domCache.get('Team2NameElement')?.textContent || 'Opposition';
     
     // Reset momentum
     this.momentumData.team1 = 0;
     this.momentumData.team2 = 0;
     
-    // Process goals
+    // Process all goals
     gameState.goals.forEach(goal => {
-      if (goal.disallowed || goal.rawTime < windowStart || goal.rawTime > currentTime) return;
+      if (goal.disallowed) return;
       
       const weight = this.eventWeights.goal;
       // Check if goal scorer is opposition team
@@ -52,9 +50,8 @@ class MomentumTracker {
       }
     });
     
-    // Process match events
+    // Process all match events
     gameState.matchEvents.forEach(event => {
-      if (event.rawTime < windowStart || event.rawTime > currentTime) return;
       if (event.isSystemEvent) return; // Skip system events like half-time
       
       const weight = this.getEventWeight(event.type);
@@ -69,7 +66,6 @@ class MomentumTracker {
       }
     });
     
-    this.momentumData.lastUpdate = currentTime;
     this.updateMomentumDisplay();
   }
 

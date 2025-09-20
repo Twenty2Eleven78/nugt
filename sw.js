@@ -1,5 +1,5 @@
 //Cache Name
-const CACHE_NAME = "nugt-cache-v258";
+const CACHE_NAME = "nugt-cache-v260";
 //Files to cache - Modular Architecture
 const cacheFiles = [
   './',
@@ -43,6 +43,7 @@ const cacheFiles = [
   './js/modules/ui/release-notes.js',
   './js/modules/ui/roster-modal.js',
   './js/modules/ui/statistics-tab.js',
+  './js/modules/ui/season-charts.js',
   // Services
   './js/modules/services/notifications.js',
   './js/modules/services/sharing.js',

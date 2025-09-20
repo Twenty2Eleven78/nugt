@@ -896,8 +896,22 @@ html {
 
     .scoreboard-card,
     .timer-card,
-    .game-actions-card {
+    .game-actions-card,
+    .momentum-card {
         padding: var(--spacing-xs);
+    }
+
+    .momentum-label {
+        min-width: 50px;
+        font-size: 0.65rem;
+    }
+
+    .momentum-bar {
+        height: 6px;
+    }
+
+    .momentum-status {
+        font-size: 0.65rem;
     }
 }
 
@@ -1558,6 +1572,79 @@ body {
     padding: var(--spacing-sm);
     box-shadow: var(--box-shadow-card);
     flex-shrink: 0;
+}
+
+/* Momentum Indicator */
+.momentum-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-sm);
+    box-shadow: var(--box-shadow-card);
+    flex-shrink: 0;
+}
+
+.momentum-title {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin: 0 0 var(--spacing-sm) 0;
+    text-align: center;
+    font-size: var(--font-size-sm);
+}
+
+.momentum-bar-container {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.momentum-label {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 60px;
+    text-align: center;
+}
+
+.momentum-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.momentum-fill {
+    height: 100%;
+    transition: all 0.5s ease;
+    border-radius: 3px;
+}
+
+.momentum-fill.neutral {
+    background: linear-gradient(90deg, var(--text-muted) 0%, var(--text-muted) 100%);
+}
+
+.momentum-fill.team1 {
+    background: linear-gradient(90deg, var(--success-color) 0%, #20c997 100%);
+    box-shadow: 0 0 8px rgba(40, 167, 69, 0.3);
+}
+
+.momentum-fill.team2 {
+    background: linear-gradient(90deg, var(--danger-color) 0%, #e74c3c 100%);
+    box-shadow: 0 0 8px rgba(220, 53, 69, 0.3);
+}
+
+.momentum-status {
+    text-align: center;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--text-primary);
+    padding: var(--spacing-xs);
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--border-color);
 }
 
 .timer-card {

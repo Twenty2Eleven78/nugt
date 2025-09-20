@@ -11,6 +11,7 @@ import { notificationManager } from '../services/notifications.js';
 import { showModal, hideModal } from '../ui/modals.js';
 import { updateMatchLog, combinedEventsManager } from './combined-events.js';
 import { attendanceManager } from '../services/attendance.js';
+import { momentumTracker } from './momentum.js';
 
 // Goal management class
 class GoalManager {
@@ -69,6 +70,9 @@ class GoalManager {
     // Show appropriate notification
     const notificationType = isOpposition ? 'error' : 'success';
     notificationManager[notificationType](`Goal scored by ${scorerName}!`);
+
+    // Update momentum
+    momentumTracker.onEventUpdate();
 
     // Save and cleanup
     storageHelpers.saveCompleteMatchData(gameState, attendanceManager.getMatchAttendance());
@@ -214,6 +218,9 @@ function updateGoalStatus(index) {
   // Recalculate and update scores using the manager instance
   goalManager._recalculateScores();
   updateMatchLog();
+
+  // Update momentum
+  momentumTracker.onEventUpdate();
 
   // Save updated goals data
   storageHelpers.saveMatchData(gameState);

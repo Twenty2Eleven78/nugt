@@ -1,5 +1,5 @@
 //Cache Name
-const CACHE_NAME = "nugt-cache-v251";
+const CACHE_NAME = "nugt-cache-v258";
 //Files to cache - Modular Architecture
 const cacheFiles = [
   './',
@@ -26,6 +26,7 @@ const cacheFiles = [
   // Match modules
   './js/modules/match/goals.js',
   './js/modules/match/combined-events.js',
+  './js/modules/match/momentum.js',
   './js/modules/match/teams.js',
   './js/modules/match/roster.js',
   // UI modules

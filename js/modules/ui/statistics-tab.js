@@ -246,7 +246,7 @@ class StatisticsTab {
                             <i class="fas fa-trophy text-warning me-2"></i>
                             <span>Top Goal Scorers</span>
                         </div>
-                        <div class="stats-section-body" style="max-height: 120px; overflow-y: auto;">
+                        <div class="stats-section-body" style="max-height: 120px; overflow-y: scroll;">
                             ${this._renderTopScorers(stats.playerStats || [])}
                         </div>
                     </div>
@@ -257,7 +257,7 @@ class StatisticsTab {
                             <i class="fas fa-handshake text-info me-2"></i>
                             <span>Top Assist Providers</span>
                         </div>
-                        <div class="stats-section-body" style="max-height: 120px; overflow-y: auto;">
+                        <div class="stats-section-body" style="max-height: 120px; overflow-y: scroll;">
                             ${this._renderTopAssists(stats.playerStats || [])}
                         </div>
                     </div>

@@ -340,7 +340,7 @@ class StatisticsTab {
                             <i class="fas fa-trophy text-warning me-2"></i>
                             <span>Player Performance Rankings (${playerStats.length})</span>
                         </div>
-                        <div class="stats-section-body" style="max-height: 400px; overflow-y: auto; -webkit-overflow-scrolling: touch;">
+                        <div class="stats-section-body" style="max-height: 425px; overflow-y: auto; -webkit-overflow-scrolling: touch;">
                             ${this._renderPlayerRankings(playerStats)}
                         </div>
                     </div>

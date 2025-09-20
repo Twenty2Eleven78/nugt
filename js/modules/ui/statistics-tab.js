@@ -212,7 +212,7 @@ class StatisticsTab {
             `;
         }
 
-        return await seasonCharts.renderChartsSection(this.statistics);
+        return `<div style="max-height: 70vh; overflow-y: auto; -webkit-overflow-scrolling: touch;">${await seasonCharts.renderChartsSection(this.statistics)}</div>`;
     }
 
     _renderOverviewStats() {

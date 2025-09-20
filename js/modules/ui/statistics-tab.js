@@ -257,7 +257,7 @@ class StatisticsTab {
                             <i class="fas fa-handshake text-info me-2"></i>
                             <span>Top Assist Providers</span>
                         </div>
-                        <div class="stats-section-body" style="height: 300px; overflow-y: scroll;">
+                        <div class="stats-section-body" style="height: 200px; overflow-y: scroll;">
                             ${this._renderTopAssists(stats.playerStats || [])}
                         </div>
                     </div>

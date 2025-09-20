@@ -106,7 +106,7 @@ class StatisticsTab {
             </div>
             
             <!-- Content Area -->
-            <div id="stats-view-content" class="stats-content">
+            <div id="stats-view-content" class="stats-content" style="max-height: calc(100vh - 200px); overflow-y: auto;">
                 ${this._renderOverviewStats()}
             </div>
         `;

@@ -54,6 +54,8 @@ import { pwaUpdater } from './services/pwa-updater.js';
 import { attendanceManager } from './services/attendance.js';
 import { authService } from './services/auth.js';
 import { userMatchesApi } from './services/user-matches-api.js';
+import { teamAccessService } from './services/team-access.js';
+import { teamSelectorModal } from './ui/team-selector-modal.js';
 
 // Initialize custom modal system
 function initializeCustomModals() {
@@ -187,12 +189,21 @@ export function initializeApp() {
     notificationManager.warning('Storage may not be working properly. Some features may be limited.');
   }
 
-  // Initialize authentication
-  authUI.init().then(isAuthenticated => {
+  // Initialize authentication and team access
+  authUI.init().then(async isAuthenticated => {
     if (isAuthenticated) {
       console.log('User authenticated successfully');
+      // Initialize team access
+      await teamAccessService.init();
       // Track app usage
       authService.trackUsage('app_start');
+      
+      // Hide app interface until team is selected
+      if (!teamAccessService.getCurrentTeam()) {
+        teamAccessService.showWelcomeScreen();
+      } else {
+        teamAccessService.showAppInterface();
+      }
     } else {
       console.log('User not authenticated');
     }
@@ -236,9 +247,37 @@ export function initializeApp() {
   rosterModal.init();
   attendanceModal.init();
   sharingModal.init();
+  teamSelectorModal.init();
 
   // Make modals available globally after initialization
   window.goalModal = goalModal;
+  
+  // Add team selector button to options if authenticated
+  if (authService.isUserAuthenticated()) {
+    setTimeout(() => {
+      const optionsContainer = document.getElementById('optionstab');
+      if (optionsContainer) {
+        const teamCard = document.createElement('div');
+        teamCard.className = 'col-md-6 mb-3';
+        teamCard.innerHTML = `
+          <div class="option-card h-100">
+            <div class="option-card-header">
+              <i class="fas fa-users me-2"></i>Team Management
+            </div>
+            <div class="option-card-body">
+              <button class="btn btn-primary w-100" onclick="teamSelectorModal.show()">
+                <i class="fas fa-users me-2"></i>Select Team
+              </button>
+            </div>
+          </div>
+        `;
+        const firstRow = optionsContainer.querySelector('.row');
+        if (firstRow) {
+          firstRow.appendChild(teamCard);
+        }
+      }
+    }, 500);
+  }
 
   // Initialize theme manager
   themeManager.init();

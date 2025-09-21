@@ -4,6 +4,7 @@
  */
 
 import { authService } from './auth.js';
+import { teamAccessService } from './team-access.js';
 
 const API_ENDPOINTS = {
   USER_MATCHES: '/.netlify/functions/user-matches',
@@ -28,6 +29,11 @@ class UserMatchesAPI {
   async saveMatchData(matchData) {
     if (!matchData || typeof matchData !== 'object') {
       throw new Error('Invalid match data provided');
+    }
+
+    const currentTeam = teamAccessService.getCurrentTeam();
+    if (!currentTeam) {
+      throw new Error('No team selected. Please select a team first.');
     }
 
     const token = await this._getAuthToken();
@@ -249,6 +255,7 @@ class UserMatchesAPI {
 
   _enhanceMatchData(matchData) {
     const currentUser = authService.getCurrentUser();
+    const currentTeam = teamAccessService.getCurrentTeam();
     
     // Don't override system identifiers for statistics
     if (matchData._statsUpdate || matchData.userId === 'system_statistics') {
@@ -262,6 +269,8 @@ class UserMatchesAPI {
       ...matchData,
       userEmail: currentUser?.email || 'unknown@example.com',
       userName: currentUser?.name || 'Unknown User',
+      teamId: currentTeam?.id,
+      teamName: currentTeam?.name,
       timestamp: new Date().toISOString()
     };
   }

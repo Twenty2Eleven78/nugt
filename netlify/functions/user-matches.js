@@ -46,7 +46,9 @@ exports.handler = async function(event, context) {
       };
     }
     
-    const key = `user-data/${userId}/matches.json`;
+    // Support team-scoped data
+    const teamId = event.queryStringParameters?.teamId;
+    const key = teamId ? `team-data/${teamId}/matches.json` : `user-data/${userId}/matches.json`;
 
     // Helper function to check if user is admin
     const isAdminUser = (userId, userEmail) => {
@@ -485,8 +487,9 @@ exports.handler = async function(event, context) {
           };
         }
 
-        // Build the key for the target user's matches
-        const targetKey = `user-data/${targetUserId}/matches.json`;
+        // Build the key for the target user's matches (support team scope)
+        const targetTeamId = queryParams.teamId;
+        const targetKey = targetTeamId ? `team-data/${targetTeamId}/matches.json` : `user-data/${targetUserId}/matches.json`;
         const url = `${NETLIFY_BLOBS_API}/${SITE_ID}/${targetKey}`;
         
         // Get existing matches

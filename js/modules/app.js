@@ -221,6 +221,7 @@ export async function initializeApp() {
   }
   
   // Initialize auth UI without showing modal
+  authUI._createProfileButton();
   authUI._updateAuthState(isAuthenticated);
 
   // Load saved state

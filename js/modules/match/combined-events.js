@@ -127,7 +127,7 @@ class CombinedEventsManager {
   _getNotificationType(eventType) {
     const warningEvents = [
       EVENT_TYPES.INCIDENT, EVENT_TYPES.PENALTY, EVENT_TYPES.YELLOW_CARD,
-      EVENT_TYPES.RED_CARD, EVENT_TYPES.SIN_BIN, EVENT_TYPES.FOUL
+      EVENT_TYPES.RED_CARD, EVENT_TYPES.SIN_BIN, EVENT_TYPES.FOUL, EVENT_TYPES.OFFSIDE
     ];
     return warningEvents.includes(eventType) ? 'warning' : 'info';
   }

@@ -37,21 +37,19 @@
     font-variant-numeric: tabular-nums;
 }
 
-/* Notification container - prevent layout shifts */
-#notification-container {
-    contain: layout style;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-sm);
-    z-index: 9999;
-    /* Very high z-index to ensure notifications appear above all modals */
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    pointer-events: none;
-    /* Allow clicks to pass through container */
+/* Global notification container - left positioned */
+#global-notification-container {
+    position: fixed !important;
+    top: 20px !important;
+    left: 20px !important;
+    z-index: 2147483647 !important;
+    pointer-events: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    max-width: 420px !important;
+    width: auto !important;
 }
 
 /* Modal backdrop - prevent layout shifts */
@@ -2055,21 +2053,20 @@ body {
 
 /* Mobile notification improvements */
 @media (max-width: 768px) {
-    #notification-container {
-        padding: var(--spacing-xs);
+    #global-notification-container {
+        top: 10px !important;
+        left: 10px !important;
+        right: 10px !important;
+        max-width: none !important;
+        align-items: stretch !important;
     }
 
-    .notification {
-        max-width: calc(100vw - 2rem);
-        padding: var(--spacing-sm) var(--spacing-md);
-        font-size: var(--font-size-xs);
+    .global-notification {
+        max-width: none !important;
+        padding: 10px 12px !important;
+        font-size: 13px !important;
     }
-
-    .notification::before {
-        width: 16px;
-        height: 16px;
-        font-size: 10px;
-    }
+}
 
     /* Mobile Options Tab Improvements */
 
@@ -3041,51 +3038,12 @@ body #notification-container {
 
 body .notification {
     z-index: 2147483647 !important; /* Maximum z-index value */
-}/* A
-uth modal notification styling */
-#auth-notification-container {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
 }
 
-#auth-notification-container .notification {
-    width: 100%;
-    max-width: none;
-    margin-bottom: 0;
-    position: relative;
-    transform: none;
-    opacity: 1;
-}
-
-#auth-notification-container .notification.show {
-    transform: none;
-    opacity: 1;
-}
-
-/* Admin modal notification styling */
+/* Legacy notification containers - now unused but kept for compatibility */
+#auth-notification-container,
 #admin-notification-container {
-    position: sticky;
-    top: 0;
-    z-index: 1060;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-#admin-notification-container .notification {
-    width: 100%;
-    max-width: none;
-    margin: 0;
-    position: relative;
-    z-index: 1061;
-}
-
-#admin-notification-container .notification.show {
-    transform: none;
-    opacity: 1;
-}
+    display: none !important;
 }
 
 /* Statistics Tab Styling */

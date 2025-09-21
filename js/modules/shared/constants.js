@@ -110,6 +110,7 @@ export const EVENT_ICONS = {
   [EVENT_TYPES.RED_CARD]: 'fas fa-square text-danger',
   [EVENT_TYPES.SIN_BIN]: 'fas fa-clock text-info',
   [EVENT_TYPES.FOUL]: 'fas fa-hand-paper text-warning',
+  [EVENT_TYPES.OFFSIDE]: 'fas fa-flag text-warning',
   [EVENT_TYPES.PENALTY]: 'fas fa-futbol text-danger',
   [EVENT_TYPES.FREE_KICK]: 'fas fa-running text-primary',
   [EVENT_TYPES.CORNER]: 'fas fa-flag text-info',

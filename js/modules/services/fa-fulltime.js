@@ -68,7 +68,6 @@ class FAFullTimeService {
 
       return leagueTable;
     } catch (error) {
-      console.error('FA Full-Time fetch error:', error);
       
       // Fallback: Show manual entry option
       throw new Error(`FA Full-Time uses dynamic loading. Please try copying the table data manually or use a different league table source.`);
@@ -144,10 +143,7 @@ class FAFullTimeService {
       
       if (cells.length < 4) continue;
       
-      // Debug: Log first few rows to see structure
-      if (i < 3) {
-        console.log(`Row ${i} (${cells.length} cells):`, Array.from(cells).map((cell, idx) => `${idx}: ${this.extractText(cell)}`));
-      }
+
       
       // Skip header row
       const firstCellText = this.extractText(cells[0]).toLowerCase();

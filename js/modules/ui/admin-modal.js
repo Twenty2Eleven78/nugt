@@ -7,9 +7,6 @@ import { authService } from '../services/auth.js';
 
 const createMainAdminModal = () => {
     const bodyContent = `
-        <!-- Admin Notification Container -->
-        <div id="admin-notification-container" style="display: none;"></div>
-        
         <!-- Controls -->
         <div class="mb-3">
             <div class="row g-2">

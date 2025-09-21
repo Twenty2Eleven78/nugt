@@ -95,8 +95,6 @@ class AuthUI {
    */
   _createAuthModal() {
     const bodyContent = `
-      <div id="auth-notification-container" class="mb-3" style="display: none;"></div>
-      
       <div class="auth-container">
         <div id="authMessage" class="mb-3">
           <p>Welcome to NUFC GameTime! Please sign in to track your usage.</p>

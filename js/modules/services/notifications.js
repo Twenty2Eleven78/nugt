@@ -12,61 +12,48 @@ class NotificationManager {
     this.container = null;
     this.notifications = new Set();
     this.timeouts = new Map();
-    this.cachedElements = {}; // Cache for frequently accessed DOM elements
     this._initializeContainer();
   }
 
   _initializeContainer() {
-    this.container = document.getElementById('notification-container');
-    if (!this.container) {
-      console.warn('Notification container not found');
-    }
-  }
-
-  _getCachedElement(id) {
-    if (!this.cachedElements[id]) {
-      this.cachedElements[id] = document.getElementById(id);
-    }
-    return this.cachedElements[id];
+    // Create global floating notification container
+    this.container = document.createElement('div');
+    this.container.id = 'global-notification-container';
+    this.container.style.cssText = `
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 2147483647;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      max-width: 420px;
+      width: auto;
+    `;
+    
+    // Append to body to ensure it's always on top
+    document.body.appendChild(this.container);
   }
 
   _getActiveContainer() {
-    // Check if admin modal is open and use its notification container
-    const adminModal = this._getCachedElement('admin-modal');
-    const adminNotificationContainer = this._getCachedElement('admin-notification-container');
-    
-    if (adminModal && adminNotificationContainer && 
-        (adminModal.classList.contains('show') || adminModal.style.display === 'block')) {
-      adminNotificationContainer.style.display = 'block';
-      return adminNotificationContainer;
-    }
-    
-    // Check if auth modal is open and use its notification container
-    const authModal = this._getCachedElement('authModal');
-    const authNotificationContainer = this._getCachedElement('auth-notification-container');
-    
-    if (authModal && authNotificationContainer && 
-        (authModal.classList.contains('show') || authModal.style.display === 'block')) {
-      authNotificationContainer.style.display = 'block';
-      return authNotificationContainer;
-    }
-    
+    // Always use the global floating container
     return this.container;
   }
 
   show(message, type = NOTIFICATION_TYPES.INFO, duration = DEFAULT_DURATION) {
     if (!this._validateInput(message, type)) return null;
     
-    const activeContainer = this._getActiveContainer();
-    if (!activeContainer) {
-      console.warn('Cannot show notification: no container available');
+    if (!this.container) {
+      console.warn('Global notification container not available');
       return null;
     }
 
     this._enforceMaxNotifications();
 
     const notification = this._createNotification(message, type);
-    this._addNotification(notification, activeContainer);
+    this._addNotification(notification);
 
     if (duration > 0) {
       this._scheduleRemoval(notification, duration);
@@ -77,8 +64,32 @@ class NotificationManager {
 
   _createNotification(message, type) {
     const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
+    notification.className = `global-notification ${type}`;
     notification.textContent = message;
+    
+    // Enhanced styling for global floating notifications
+    notification.style.cssText = `
+      pointer-events: auto;
+      cursor: pointer;
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 1.4;
+      max-width: 400px;
+      word-wrap: break-word;
+      transform: translateX(-100%);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      z-index: 2147483647;
+    `;
+    
+    // Set colors based on type
+    this._applyNotificationStyles(notification, type);
 
     // Add click to dismiss functionality
     notification.addEventListener('click', () => this.remove(notification));
@@ -92,19 +103,13 @@ class NotificationManager {
     // Clear any pending timeout
     this._clearTimeout(notification);
 
-    notification.classList.remove('show');
+    // Animate out
+    notification.style.transform = 'translateX(-100%)';
+    notification.style.opacity = '0';
 
     setTimeout(() => {
-      // Check all containers for the notification using cached elements
-      const authContainer = this._getCachedElement('auth-notification-container');
-      const adminContainer = this._getCachedElement('admin-notification-container');
-      
       if (this.container && this.container.contains(notification)) {
         this.container.removeChild(notification);
-      } else if (authContainer && authContainer.contains(notification)) {
-        authContainer.removeChild(notification);
-      } else if (adminContainer && adminContainer.contains(notification)) {
-        adminContainer.removeChild(notification);
       }
       this.notifications.delete(notification);
     }, ANIMATION_DURATION);
@@ -153,14 +158,49 @@ class NotificationManager {
     }
   }
 
-  _addNotification(notification, container = null) {
-    const targetContainer = container || this.container;
-    targetContainer.appendChild(notification);
+  _addNotification(notification) {
+    this.container.appendChild(notification);
     this.notifications.add(notification);
 
+    // Ensure initial state is set
+    notification.style.transform = 'translateX(-100%)';
+    notification.style.opacity = '0';
+
+    // Animate in with double requestAnimationFrame for proper timing
     requestAnimationFrame(() => {
-      notification.classList.add('show');
+      requestAnimationFrame(() => {
+        notification.style.transform = 'translateX(0)';
+        notification.style.opacity = '1';
+      });
     });
+  }
+
+  _applyNotificationStyles(notification, type) {
+    const styles = {
+      success: {
+        background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+        color: 'white',
+        borderLeft: '4px solid #20c997'
+      },
+      warning: {
+        background: 'linear-gradient(135deg, #ffc107 0%, #fd7e14 100%)',
+        color: '#000',
+        borderLeft: '4px solid #fd7e14'
+      },
+      danger: {
+        background: 'linear-gradient(135deg, #dc3545 0%, #e74c3c 100%)',
+        color: 'white',
+        borderLeft: '4px solid #e74c3c'
+      },
+      info: {
+        background: 'linear-gradient(135deg, #6c757d 0%, #495057 100%)',
+        color: 'white',
+        borderLeft: '4px solid #495057'
+      }
+    };
+    
+    const style = styles[type] || styles.info;
+    Object.assign(notification.style, style);
   }
 
   _scheduleRemoval(notification, duration) {

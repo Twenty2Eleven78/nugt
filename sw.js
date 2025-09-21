@@ -1,5 +1,5 @@
 //Cache Name
-const CACHE_NAME = "nugt-cache-v260";
+const CACHE_NAME = "nugt-cache-v285";
 //Files to cache - Modular Architecture
 const cacheFiles = [
   './',
@@ -44,6 +44,7 @@ const cacheFiles = [
   './js/modules/ui/roster-modal.js',
   './js/modules/ui/statistics-tab.js',
   './js/modules/ui/season-charts.js',
+  './js/modules/ui/league-table-modal.js',
   // Services
   './js/modules/services/notifications.js',
   './js/modules/services/sharing.js',
@@ -51,6 +52,7 @@ const cacheFiles = [
   './js/modules/services/attendance.js',
   './js/modules/services/auth.js',
   './js/modules/services/user-matches-api.js',
+  './js/modules/services/fa-fulltime.js',
   // Assets
   './webfonts/fa-regular-400.woff2',
   './webfonts/fa-solid-900.woff2',

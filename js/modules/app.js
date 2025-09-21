@@ -38,6 +38,7 @@ import { newMatchModal } from './ui/new-match-modal.js';
 
 import { statisticsTab } from './ui/statistics-tab.js';
 import { touchGestures } from './ui/touch-gestures.js';
+import { leagueTableModal } from './ui/league-table-modal.js';
 import teamModals from './ui/team-modals.js';
 import goalModal from './ui/goal-modal.js';
 import eventModals from './ui/event-modals.js';
@@ -225,6 +226,7 @@ export function initializeApp() {
 
   statisticsTab.init();
   touchGestures.init();
+  leagueTableModal.init();
 
   // Initialize modal modules
   teamModals.init();
@@ -515,6 +517,14 @@ function bindEventListeners() {
   if (shareButton) {
     shareButton.addEventListener('click', () => {
       sharingModal.show();
+    });
+  }
+
+  // League table button
+  const leagueTableBtn = document.getElementById('leagueTableBtn');
+  if (leagueTableBtn) {
+    leagueTableBtn.addEventListener('click', () => {
+      leagueTableModal.show();
     });
   }
 

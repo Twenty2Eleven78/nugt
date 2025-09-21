@@ -199,9 +199,14 @@ export function initializeApp() {
       authService.trackUsage('app_start');
       
       // Hide app interface until team is selected
-      if (!teamAccessService.getCurrentTeam()) {
+      const currentTeam = teamAccessService.getCurrentTeam();
+      console.log('App init: Current team check:', currentTeam);
+      
+      if (!currentTeam) {
+        console.log('App init: No team found, showing welcome screen');
         teamAccessService.showWelcomeScreen();
       } else {
+        console.log('App init: Team found, showing app interface');
         teamAccessService.showAppInterface();
       }
     } else {

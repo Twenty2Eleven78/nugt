@@ -22,14 +22,20 @@ class TeamAccessService {
   // Initialize team access for authenticated user
   async init() {
     if (!authService.isUserAuthenticated()) {
+      console.log('Team access: User not authenticated');
       return false;
     }
 
     this.userTeams = storage.load(TEAM_STORAGE_KEYS.USER_TEAMS, []);
     const savedTeamId = storage.load(TEAM_STORAGE_KEYS.CURRENT_TEAM, null);
     
+    console.log('Team access init:', { userTeams: this.userTeams, savedTeamId });
+    
     if (savedTeamId && this.userTeams.find(t => t.id === savedTeamId)) {
       this.currentTeam = this.userTeams.find(t => t.id === savedTeamId);
+      console.log('Team access: Current team set to', this.currentTeam);
+    } else {
+      console.log('Team access: No current team found');
     }
 
     return true;
@@ -130,10 +136,15 @@ class TeamAccessService {
 
   // Show welcome screen and hide app interface
   showWelcomeScreen() {
+    console.log('Team access: Showing welcome screen');
+    
     // Hide main app interface
     const mainContainer = document.querySelector('.main-container');
     if (mainContainer) {
       mainContainer.style.display = 'none';
+      console.log('Team access: Main container hidden');
+    } else {
+      console.log('Team access: Main container not found');
     }
 
     // Create welcome screen
@@ -149,7 +160,7 @@ class TeamAccessService {
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--text-primary);
+      color: #333;
       z-index: 10000;
     `;
     
@@ -159,7 +170,7 @@ class TeamAccessService {
         <h1 class="mb-3">Welcome to NUFC GameTime</h1>
         <p class="mb-4 fs-5">Professional football match tracking and statistics</p>
         <div class="mb-4">
-          <button class="btn btn-light btn-lg" onclick="teamSelectorModal.show()">
+          <button class="btn btn-primary btn-lg" onclick="teamSelectorModal.show()">
             <i class="fas fa-users me-2"></i>Select Team to Continue
           </button>
         </div>
@@ -168,6 +179,7 @@ class TeamAccessService {
     `;
     
     document.body.appendChild(welcomeScreen);
+    console.log('Team access: Welcome screen added to DOM');
   }
 
   // Show app interface and hide welcome screen

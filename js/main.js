@@ -92,12 +92,5 @@ import('./modules/services/auth.js').then(() => {
   // Auth service preloaded
 });
 
-import('./modules/ui/auth-ui.js').then(module => {
-  // Auth UI preloaded
-  // Create auth modal early
-  setTimeout(() => {
-    if (module.authUI && typeof module.authUI.init === 'function') {
-      module.authUI.init();
-    }
-  }, 1000);
-});
+// Auth UI preloaded but not initialized to prevent modal popup
+import('./modules/ui/auth-ui.js');

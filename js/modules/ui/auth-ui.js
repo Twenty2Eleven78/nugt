@@ -152,11 +152,6 @@ class AuthUI {
    * @private
    */
   _createProfileButton() {
-    // Check if profile button already exists
-    if (document.getElementById('userProfileButton')) {
-      return;
-    }
-
     // Find the header profile container with retry logic
     const headerProfileContainer = document.getElementById('header-profile-container');
     if (!headerProfileContainer) {
@@ -165,6 +160,12 @@ class AuthUI {
         this._createProfileButton();
       }, 100);
       return;
+    }
+
+    // Remove existing profile container if it exists
+    const existingContainer = document.querySelector('.user-profile-container');
+    if (existingContainer) {
+      existingContainer.remove();
     }
 
     // Create profile button container
@@ -227,6 +228,11 @@ class AuthUI {
    * @private
    */
   _setupDropdown(button, menu) {
+    // Remove existing click listeners
+    const newButton = button.cloneNode(true);
+    button.parentNode.replaceChild(newButton, button);
+    button = newButton;
+
     // Toggle dropdown on button click
     button.addEventListener('click', (e) => {
       e.preventDefault();
@@ -236,26 +242,28 @@ class AuthUI {
 
       // Close all other dropdowns
       document.querySelectorAll('.dropdown-menu.show').forEach(dropdown => {
-        dropdown.classList.remove('show');
+        if (dropdown !== menu) {
+          dropdown.classList.remove('show');
+          const btn = document.querySelector(`[aria-controls="${dropdown.id}"]`);
+          if (btn) btn.setAttribute('aria-expanded', 'false');
+        }
       });
 
       // Toggle this dropdown
-      if (!isOpen) {
-        menu.classList.add('show');
-        button.setAttribute('aria-expanded', 'true');
-      } else {
-        menu.classList.remove('show');
-        button.setAttribute('aria-expanded', 'false');
-      }
+      menu.classList.toggle('show');
+      button.setAttribute('aria-expanded', !isOpen);
     });
 
     // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
+    const closeDropdown = (e) => {
       if (!button.contains(e.target) && !menu.contains(e.target)) {
         menu.classList.remove('show');
         button.setAttribute('aria-expanded', 'false');
       }
-    });
+    };
+
+    document.removeEventListener('click', closeDropdown);
+    document.addEventListener('click', closeDropdown);
 
     // Close dropdown on escape key
     document.addEventListener('keydown', (e) => {
@@ -403,12 +411,17 @@ class AuthUI {
    * @private
    */
   _updateAuthState(isAuthenticated) {
-    // Create profile button if it doesn't exist
+    // Always recreate the profile button to ensure clean state
     this._createProfileButton();
 
     const profileButton = document.getElementById('userProfileButton');
     const profileUsername = document.getElementById('profileUsername');
     const dropdownMenu = document.getElementById('userProfileDropdown');
+
+    // Close dropdown if it's open
+    if (dropdownMenu && dropdownMenu.classList.contains('show')) {
+      dropdownMenu.classList.remove('show');
+    }
 
     if (isAuthenticated) {
       const user = authService.getCurrentUser();

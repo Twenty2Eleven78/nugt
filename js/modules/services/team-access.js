@@ -134,23 +134,20 @@ class TeamAccessService {
     return team;
   }
 
-  // Show welcome screen and hide app interface
-  showWelcomeScreen() {
-    console.log('Team access: Showing welcome screen');
-    
-    // Hide main app interface
+  // Hide app interface
+  hideAppInterface() {
     const mainContainer = document.querySelector('.main-container');
     if (mainContainer) {
       mainContainer.style.display = 'none';
-      console.log('Team access: Main container hidden');
-    } else {
-      console.log('Team access: Main container not found');
     }
+  }
 
-    // Create welcome screen
-    const welcomeScreen = document.createElement('div');
-    welcomeScreen.id = 'welcomeScreen';
-    welcomeScreen.style.cssText = `
+  // Show combined auth and team selection screen
+  showAuthScreen() {
+    this._clearScreens();
+    const authScreen = document.createElement('div');
+    authScreen.id = 'authScreen';
+    authScreen.style.cssText = `
       position: fixed;
       top: 0;
       left: 0;
@@ -164,22 +161,162 @@ class TeamAccessService {
       z-index: 10000;
     `;
     
-    welcomeScreen.innerHTML = `
-      <div class="text-center p-4">
-        <img src="./nugt512.png" alt="NUGT" style="width: 120px; height: 120px; margin-bottom: 2rem; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
-        <h1 class="mb-3">Welcome to NUFC GameTime</h1>
-        <p class="mb-4 fs-5">Professional football match tracking and statistics</p>
-        <div class="mb-4">
-          <button class="btn btn-primary btn-lg" onclick="teamSelectorModal.show()">
-            <i class="fas fa-users me-2"></i>Select Team to Continue
-          </button>
+    authScreen.innerHTML = `
+      <div class="text-center p-4" style="max-width: 500px;">
+        <img src="./nugt512.png" alt="NUGT" style="width: 100px; height: 100px; margin-bottom: 1.5rem; border-radius: 15px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">
+        <h1 class="mb-3">GameTime App</h1>
+        <p class="mb-4">Football match tracking and statistics</p>
+        
+        <div id="authSection">
+          <h4 class="mb-3">Sign In</h4>
+          <form id="authForm" class="mb-4">
+            <div class="mb-3">
+              <input type="email" class="form-control form-control-lg" id="authEmail" placeholder="Enter your email" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg w-100">
+              <i class="fas fa-sign-in-alt me-2"></i>Sign In / Register
+            </button>
+          </form>
         </div>
-        <small class="opacity-75">You need to join or create a team to access the application</small>
+        
+        <div id="teamSection" style="display: none;">
+          <h4 class="mb-3">Enter Team Code</h4>
+          <form id="teamForm">
+            <div class="mb-3">
+              <input type="text" class="form-control form-control-lg text-center" id="teamCodeInput" placeholder="Team Code" required style="letter-spacing: 2px; text-transform: uppercase;">
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg w-100">
+              <i class="fas fa-unlock me-2"></i>Access Team
+            </button>
+          </form>
+          <small class="text-muted mt-2 d-block">Contact your team administrator for the access code</small>
+        </div>
       </div>
     `;
     
-    document.body.appendChild(welcomeScreen);
-    console.log('Team access: Welcome screen added to DOM');
+    document.body.appendChild(authScreen);
+    this._bindAuthEvents();
+  }
+
+  // Bind authentication and team events
+  _bindAuthEvents() {
+    // Auth form submission
+    document.getElementById('authForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value.trim();
+      if (email) {
+        try {
+          const { authService } = await import('./auth.js');
+          await authService.register(email);
+          
+          // Check if user is admin
+          const currentUser = authService.getCurrentUser();
+          console.log('Current user:', currentUser);
+          console.log('User email:', currentUser?.email);
+          
+          const isAdmin = await authService.isAdmin();
+          console.log('Admin check result:', isAdmin);
+          
+          if (isAdmin) {
+            console.log('Admin detected - showing app interface');
+            this._clearScreens();
+            this.showAppInterface();
+          } else {
+            console.log('Regular user - showing team section');
+            console.log('Make sure admin email is configured in ADMIN_EMAILS environment variable');
+            this._showTeamSection();
+          }
+        } catch (error) {
+          notificationManager.error(error.message);
+        }
+      }
+    });
+    
+    // Team form submission
+    document.getElementById('teamForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const code = document.getElementById('teamCodeInput').value.trim().toUpperCase();
+      if (code) {
+        try {
+          await this.joinTeam(code);
+          this.showAppInterface();
+        } catch (error) {
+          notificationManager.error(error.message);
+        }
+      }
+    });
+  }
+
+  // Show team section after successful auth
+  _showTeamSection() {
+    document.getElementById('authSection').style.display = 'none';
+    document.getElementById('teamSection').style.display = 'block';
+  }
+
+  // Show team code entry screen (now uses combined screen)
+  showTeamCodeScreen() {
+    this.showAuthScreen();
+  }
+
+  // Clear all screens
+  _clearScreens() {
+    ['authScreen', 'teamScreen', 'welcomeScreen'].forEach(id => {
+      const screen = document.getElementById(id);
+      if (screen) screen.remove();
+    });
+  }
+
+  // Inline auth fallback
+  _showInlineAuth() {
+    const authModal = document.createElement('div');
+    authModal.id = 'inlineAuthModal';
+    authModal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20000;
+    `;
+    
+    authModal.innerHTML = `
+      <div class="bg-white p-4 rounded" style="max-width: 400px; width: 90%;">
+        <h3 class="mb-3">Sign In</h3>
+        <form id="inlineAuthForm">
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="authEmail" required>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary flex-fill">Register/Sign In</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('inlineAuthModal').remove()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    `;
+    
+    document.body.appendChild(authModal);
+    
+    // Handle form submission
+    document.getElementById('inlineAuthForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value.trim();
+      if (email) {
+        try {
+          // Import authService dynamically
+          const { authService } = await import('./auth.js');
+          await authService.register(email);
+          authModal.remove();
+          window.location.reload();
+        } catch (error) {
+          notificationManager.error(error.message);
+        }
+      }
+    });
   }
 
   // Show app interface and hide welcome screen

@@ -189,7 +189,10 @@ export function initializeApp() {
     notificationManager.warning('Storage may not be working properly. Some features may be limited.');
   }
 
-  // Initialize authentication and team access
+  // Show auth screen first, hide app interface
+  teamAccessService.hideAppInterface();
+  
+  // Initialize authentication
   authUI.init().then(async isAuthenticated => {
     if (isAuthenticated) {
       console.log('User authenticated successfully');
@@ -198,19 +201,19 @@ export function initializeApp() {
       // Track app usage
       authService.trackUsage('app_start');
       
-      // Hide app interface until team is selected
-      const currentTeam = teamAccessService.getCurrentTeam();
-      console.log('App init: Current team check:', currentTeam);
+      // Check if user is admin
+      const isAdmin = await authService.isAdmin();
       
-      if (!currentTeam) {
-        console.log('App init: No team found, showing welcome screen');
-        teamAccessService.showWelcomeScreen();
-      } else {
-        console.log('App init: Team found, showing app interface');
+      if (isAdmin) {
+        console.log('Admin user - direct app access');
         teamAccessService.showAppInterface();
+      } else {
+        console.log('Regular user - team selection required');
+        teamAccessService.showTeamCodeScreen();
       }
     } else {
-      console.log('User not authenticated');
+      console.log('User not authenticated - showing auth screen');
+      teamAccessService.showAuthScreen();
     }
   });
 
@@ -256,6 +259,7 @@ export function initializeApp() {
 
   // Make modals available globally after initialization
   window.goalModal = goalModal;
+  window.authUI = authUI;
   
   // Add team selector button to options if authenticated
   if (authService.isUserAuthenticated()) {

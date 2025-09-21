@@ -87,13 +87,6 @@ window.addEventListener('pagehide', () => {
   }
 });
 
-// Note: unload event is deprecated. Using pagehide above for cleanup.
-
-// Service Worker registration is handled by PWA updater in app.js
-// This ensures proper update management and avoids conflicts
-
-
-
 // Preload authentication modules for faster startup
 import('./modules/services/auth.js').then(() => {
   // Auth service preloaded

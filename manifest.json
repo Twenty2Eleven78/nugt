@@ -2,16 +2,34 @@
     "name": "Netherton United Game Time App",
     "short_name": "NUGT",
     "start_url": "./",
-    "theme_color": "#ffffff",
-    "background_color": "#fff",
+    "scope": "./",
+    "theme_color": "#dc3545",
+    "background_color": "#ffffff",
     "display": "standalone",
     "description": "Advanced football match tracker with attendance, statistics, and enhanced event management",
     "icons": [
         {
+            "src": "./favicon.ico",
+            "sizes": "16x16 32x32",
+            "type": "image/x-icon"
+        },
+        {
+            "src": "./nugt512.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
             "src": "./nugt512.png",
             "sizes": "512x512",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
+        },
+        {
+            "src": "./nugt512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
         }
     ],
     "id": "NUGT",
@@ -31,5 +49,24 @@
             "auto"
         ]
     },
-    "handle_links": "preferred"
+    "handle_links": "preferred",
+    "prefer_related_applications": false,
+    "edge_side_panel": {
+        "preferred_width": 400
+    },
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "New Match",
+            "short_name": "New Match",
+            "description": "Start a new football match",
+            "url": "./?action=new-match",
+            "icons": [
+                {
+                    "src": "./nugt512.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ]
 }

@@ -175,7 +175,7 @@ function enhanceTouchTargets() {
 }
 
 // Initialize application
-export function initializeApp() {
+export async function initializeApp() {
   console.log('Initializing NUFC GameTime App v4.0 - Enhanced with Custom Framework');
 
   // Initialize custom modal system

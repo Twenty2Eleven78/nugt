@@ -1,5 +1,5 @@
 //Cache Name
-const CACHE_NAME = "nugt-cache-v288";
+const CACHE_NAME = "nugt-cache-v289";
 //Files to cache - Modular Architecture
 const cacheFiles = [
   './',
@@ -67,18 +67,27 @@ self.addEventListener('install', function (event) {
   // Skip waiting to activate immediately
   self.skipWaiting();
 
-  // Perform install steps
+  // Perform install steps with individual file caching
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(function (cache) {
         console.log('Opened cache:', CACHE_NAME);
-        return cache.addAll(cacheFiles);
+        // Cache files individually to avoid single failure breaking everything
+        return Promise.allSettled(
+          cacheFiles.map(file => 
+            cache.add(file).catch(error => {
+              console.warn(`Failed to cache ${file}:`, error);
+              return null;
+            })
+          )
+        );
       })
-      .then(() => {
-        console.log('All files cached successfully');
+      .then((results) => {
+        const successful = results.filter(r => r.status === 'fulfilled').length;
+        console.log(`Cached ${successful}/${cacheFiles.length} files successfully`);
       })
       .catch(error => {
-        console.error('Failed to cache files:', error);
+        console.error('Failed to open cache:', error);
       })
   );
 });

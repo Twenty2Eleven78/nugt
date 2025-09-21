@@ -4,7 +4,7 @@
  */
 
 import { notificationManager } from '../services/notifications.js';
-import { ModuleErrorBoundary, ERROR_SEVERITY, ERROR_CATEGORIES } from './error-boundary.js';
+import { ModuleErrorBoundary } from './error-boundary.js';
 import { STORAGE_KEYS, ERROR_MESSAGES, SUCCESS_MESSAGES } from './constants.js';
 
 // Storage configuration constants
@@ -68,12 +68,7 @@ class StorageQuotaManager {
       this._notifyObservers('quotaUpdated', quotaInfo);
 
       return quotaInfo;
-    }, {
-      moduleName: 'StorageQuotaCheck',
-      severity: ERROR_SEVERITY.MEDIUM,
-      category: ERROR_CATEGORIES.STORAGE,
-      fallback: this.quotaInfo
-    })();
+    }, () => this.quotaInfo, 'StorageQuotaCheck')();
   }
 
   async _getStorageEstimate() {
@@ -133,7 +128,7 @@ class StorageQuotaManager {
         timestamp: Date.now()
       };
     } catch (error) {
-      ModuleErrorBoundary.logError(error, 'LocalStorageEstimation', ERROR_SEVERITY.LOW, ERROR_CATEGORIES.STORAGE);
+      console.error('LocalStorageEstimation error:', error);
       return this._getDefaultQuotaInfo();
     }
   }
@@ -208,12 +203,7 @@ class StorageQuotaManager {
       }
 
       return cleanupResults;
-    }, {
-      moduleName: 'RoutineCleanup',
-      severity: ERROR_SEVERITY.MEDIUM,
-      category: ERROR_CATEGORIES.STORAGE,
-      fallback: false
-    })().finally(() => {
+    }, () => false, 'RoutineCleanup')().finally(() => {
       this.cleanupInProgress = false;
     });
   }
@@ -246,12 +236,7 @@ class StorageQuotaManager {
       notificationManager.warning(`Critical storage cleanup freed ${this._formatBytes(totalCleaned)}`);
 
       return cleanupResults;
-    }, {
-      moduleName: 'AggressiveCleanup',
-      severity: ERROR_SEVERITY.HIGH,
-      category: ERROR_CATEGORIES.STORAGE,
-      fallback: false
-    })().finally(() => {
+    }, () => false, 'AggressiveCleanup')().finally(() => {
       this.cleanupInProgress = false;
     });
   }
@@ -280,7 +265,7 @@ class StorageQuotaManager {
       console.log(`🗑️ Error logs cleaned: ${errorLog.length} -> ${cleanedLog.length} entries`);
       return result;
     } catch (error) {
-      ModuleErrorBoundary.logError(error, 'ErrorLogCleanup', ERROR_SEVERITY.LOW, ERROR_CATEGORIES.STORAGE);
+      console.error('ErrorLogCleanup error:', error);
       return { cleaned: 0, bytesFreed: 0, error: true };
     }
   }
@@ -442,7 +427,7 @@ class StorageQuotaManager {
       console.log('✅ Storage Manager initialized successfully');
       return true;
     } catch (error) {
-      ModuleErrorBoundary.logError(error, 'StorageManagerInit', ERROR_SEVERITY.HIGH, ERROR_CATEGORIES.STORAGE);
+      console.error('StorageManagerInit error:', error);
       return false;
     }
   }
@@ -497,7 +482,7 @@ class StorageQuotaManager {
       console.log(`🗑️ Old matches cleaned: ${matchKeys.length} -> ${maxEntries} entries`);
       return result;
     } catch (error) {
-      ModuleErrorBoundary.logError(error, 'MatchCleanup', ERROR_SEVERITY.LOW, ERROR_CATEGORIES.STORAGE);
+      console.error('MatchCleanup error:', error);
       return { cleaned: 0, bytesFreed: 0, error: true };
     }
   }
@@ -523,7 +508,7 @@ class StorageQuotaManager {
 
       return result;
     } catch (error) {
-      ModuleErrorBoundary.logError(error, 'TempDataCleanup', ERROR_SEVERITY.LOW, ERROR_CATEGORIES.STORAGE);
+      console.error('TempDataCleanup error:', error);
       return { cleaned: 0, bytesFreed: 0, error: true };
     }
   }
@@ -549,7 +534,7 @@ class StorageQuotaManager {
 
       return result;
     } catch (error) {
-      ModuleErrorBoundary.logError(error, 'CacheCleanup', ERROR_SEVERITY.LOW, ERROR_CATEGORIES.STORAGE);
+      console.error('CacheCleanup error:', error);
       return { cleaned: 0, bytesFreed: 0, error: true };
     }
   }
@@ -575,7 +560,7 @@ class StorageQuotaManager {
 
       return result;
     } catch (error) {
-      ModuleErrorBoundary.logError(error, 'ExpiredDataCleanup', ERROR_SEVERITY.LOW, ERROR_CATEGORIES.STORAGE);
+      console.error('ExpiredDataCleanup error:', error);
       return { cleaned: 0, bytesFreed: 0, error: true };
     }
   }
@@ -601,7 +586,7 @@ class StorageQuotaManager {
 
       return result;
     } catch (error) {
-      ModuleErrorBoundary.logError(error, 'OrphanedDataCleanup', ERROR_SEVERITY.LOW, ERROR_CATEGORIES.STORAGE);
+      console.error('OrphanedDataCleanup error:', error);
       return { cleaned: 0, bytesFreed: 0, error: true };
     }
   }
@@ -643,7 +628,7 @@ class StorageQuotaManager {
 
       return result;
     } catch (error) {
-      ModuleErrorBoundary.logError(error, 'DataCompression', ERROR_SEVERITY.LOW, ERROR_CATEGORIES.STORAGE);
+      console.error('DataCompression error:', error);
       return { compressed: 0, bytesFreed: 0, error: true };
     }
   }

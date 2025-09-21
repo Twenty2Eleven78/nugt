@@ -118,6 +118,10 @@ class TeamAccessService {
     this.userTeams.push(team);
     this._saveUserTeams();
 
+    // Ensure UI is updated
+    const { authUI } = await import('../ui/auth-ui.js');
+    await authUI._updateAuthState(true);
+
     notificationManager.success(`Joined team "${team.name}"`);
     return team;
   }
@@ -233,6 +237,14 @@ class TeamAccessService {
             name: email.split('@')[0]
           };
           authService.authTimestamp = Date.now();
+          
+          // Save auth state first
+          storage.saveImmediate('nugt_is_authenticated', true);
+          storage.saveImmediate('nugt_auth_timestamp', Date.now());
+          
+          // Force a clean UI update
+          const { authUI } = await import('../ui/auth-ui.js');
+          await authUI._updateAuthState(true);
           
           // Notify auth state change
           authService.notifyAuthStateChange();

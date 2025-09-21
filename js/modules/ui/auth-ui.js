@@ -36,7 +36,11 @@ class AuthUI {
 
     // Set up auth state change listener
     authService.onAuthStateChange(isAuthenticated => {
-      this._updateAuthState(isAuthenticated);
+      console.log('AuthUI: Auth state changed -', isAuthenticated ? 'authenticated' : 'not authenticated');
+      // Force a complete UI update
+      setTimeout(() => {
+        this._updateAuthState(isAuthenticated);
+      }, 0);
     });
 
     // Update UI based on current auth state
@@ -155,9 +159,12 @@ class AuthUI {
    * @private
    */
   _createProfileButton() {
+    console.log('AuthUI: Creating profile button');
+
     // Find the header profile container with retry logic
     const headerProfileContainer = document.getElementById('header-profile-container');
     if (!headerProfileContainer) {
+      console.log('AuthUI: Header container not found, retrying...');
       // Retry after a short delay in case DOM isn't ready
       setTimeout(() => {
         this._createProfileButton();
@@ -168,6 +175,7 @@ class AuthUI {
     // Remove existing profile container if it exists
     const existingContainer = document.querySelector('.user-profile-container');
     if (existingContainer) {
+      console.log('AuthUI: Removing existing container');
       existingContainer.remove();
     }
 
@@ -414,12 +422,27 @@ class AuthUI {
    * @private
    */
   _updateAuthState(isAuthenticated) {
-    // Always recreate the profile button to ensure clean state
+    console.log('AuthUI: Updating auth state -', isAuthenticated ? 'authenticated' : 'not authenticated');
+
+    // Remove existing profile elements
+    const existingContainer = document.querySelector('.user-profile-container');
+    if (existingContainer) {
+      console.log('AuthUI: Removing existing profile container');
+      existingContainer.remove();
+    }
+
+    // Recreate profile button
     this._createProfileButton();
 
     const profileButton = document.getElementById('userProfileButton');
     const profileUsername = document.getElementById('profileUsername');
     const dropdownMenu = document.getElementById('userProfileDropdown');
+
+    console.log('AuthUI: Profile elements -', {
+      button: profileButton ? 'exists' : 'missing',
+      username: profileUsername ? 'exists' : 'missing',
+      dropdown: dropdownMenu ? 'exists' : 'missing'
+    });
 
     // Close dropdown if it's open
     if (dropdownMenu && dropdownMenu.classList.contains('show')) {

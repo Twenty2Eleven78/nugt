@@ -26,19 +26,22 @@ class AuthUI {
     // Bind event listeners
     this._bindEventListeners();
 
-    // Initialize auth service and check authentication status
-    const isAuthenticated = await authService.init();
+    // Check if already initialized by team access
+    const isAuthenticated = authService.isUserAuthenticated();
+    if (!isAuthenticated) {
+      // Initialize auth service only if not already authenticated
+      await authService.init();
+
+    }
 
     // Set up auth state change listener
     authService.onAuthStateChange(isAuthenticated => {
       this._updateAuthState(isAuthenticated);
     });
 
-    // Update UI based on initial auth state
-    if (isAuthenticated) {
-      this._updateAuthState(true);
-      return true;
-    }
+    // Update UI based on current auth state
+    this._updateAuthState(isAuthenticated);
+    return isAuthenticated;
 
     // Not authenticated - still create profile button for guest user
     this._updateAuthState(false);

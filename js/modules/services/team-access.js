@@ -21,6 +21,10 @@ class TeamAccessService {
 
   // Initialize team access for authenticated user
   async init() {
+    // Initialize auth UI first
+    const { authUI } = await import('../ui/auth-ui.js');
+    await authUI.init();
+    
     if (!authService.isUserAuthenticated()) {
       console.log('Team access: User not authenticated');
       return false;
@@ -143,8 +147,12 @@ class TeamAccessService {
   }
 
   // Show combined auth and team selection screen
-  showAuthScreen() {
+  async showAuthScreen() {
     this._clearScreens();
+    
+    // Initialize auth UI first
+    const { authUI } = await import('../ui/auth-ui.js');
+    await authUI.init();
     const authScreen = document.createElement('div');
     authScreen.id = 'authScreen';
     authScreen.style.cssText = `
@@ -217,7 +225,7 @@ class TeamAccessService {
             authTimestamp: Date.now()
           };
           
-          // Set authentication state directly
+          // Set authentication state
           authService.isAuthenticated = true;
           authService.currentUser = {
             id: userId,
@@ -225,6 +233,9 @@ class TeamAccessService {
             name: email.split('@')[0]
           };
           authService.authTimestamp = Date.now();
+          
+          // Notify auth state change
+          authService.notifyAuthStateChange();
           
           // Save to storage
           const { storage } = await import('../data/storage.js');

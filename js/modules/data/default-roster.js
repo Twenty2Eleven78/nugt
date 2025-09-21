@@ -15,26 +15,26 @@ export const DEFAULT_ROSTER_CONFIG = {
 
     // Default players list
     players: [
-        { name: 'Rae.O', shirtNumber: 3 },
-        { name: 'Amelia.O', shirtNumber: 6 },
-        { name: 'Amelia.P', shirtNumber: 17 },
-        { name: 'Aoife.S', shirtNumber: 2 },
-        { name: 'Cimmy.A', shirtNumber: 16 },
-        { name: 'Ciana.B', shirtNumber: 14 },
-        { name: 'Daisy.P', shirtNumber: 15 },
-        { name: 'Ella.D', shirtNumber: 8 },
-        { name: 'Ella.VK', shirtNumber: 12 },
-        { name: 'Emily.M', shirtNumber: 10 },
-        { name: 'Farah.A', shirtNumber: null },
-        { name: 'Freya.B', shirtNumber: 4 },
-        { name: 'Freya.K', shirtNumber: 1 },
-        { name: 'Havana.S', shirtNumber: 18 },
-        { name: 'Megan.F', shirtNumber: 9 },
-        { name: 'Mia.S', shirtNumber: 19 },
-        { name: 'Miliana.L', shirtNumber: null },
-        { name: 'Sienna.S', shirtNumber: 7 },
-        { name: 'Tulula.R', shirtNumber: 5 },
-        { name: 'Veronica.AI', shirtNumber: 11 }
+        { name: 'Rae', shirtNumber: 3 },
+        { name: 'Amelia O', shirtNumber: 6 },
+        { name: 'Amelia P', shirtNumber: 17 },
+        { name: 'Aoife', shirtNumber: 2 },
+        { name: 'Cimmy', shirtNumber: 16 },
+        { name: 'Ciana', shirtNumber: 14 },
+        { name: 'Daisy', shirtNumber: 15 },
+        { name: 'Ella D', shirtNumber: 8 },
+        { name: 'Ella VK', shirtNumber: 12 },
+        { name: 'Emily', shirtNumber: 10 },
+        { name: 'Farah', shirtNumber: null },
+        { name: 'Freya B', shirtNumber: 4 },
+        { name: 'Freya K', shirtNumber: 1 },
+        { name: 'Havana', shirtNumber: 18 },
+        { name: 'Megan', shirtNumber: 9 },
+        { name: 'Mia', shirtNumber: 19 },
+        { name: 'Miliana', shirtNumber: null },
+        { name: 'Sienna', shirtNumber: 7 },
+        { name: 'Tulula', shirtNumber: 5 },
+        { name: 'Veronica', shirtNumber: 11 }
     ]
 };
 

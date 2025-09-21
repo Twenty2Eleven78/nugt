@@ -207,13 +207,34 @@ class TeamAccessService {
       if (email) {
         try {
           const { authService } = await import('./auth.js');
-          await authService.register(email);
+          
+          // Directly set auth state without WebAuthn modal
+          const userId = `user_${email.split('@')[0]}_${email.split('@')[1].replace(/\./g, '_')}`;
+          const userData = {
+            userId,
+            email,
+            displayName: email.split('@')[0],
+            authTimestamp: Date.now()
+          };
+          
+          // Set authentication state directly
+          authService.isAuthenticated = true;
+          authService.currentUser = {
+            id: userId,
+            email: email,
+            name: email.split('@')[0]
+          };
+          authService.authTimestamp = Date.now();
+          
+          // Save to storage
+          const { storage } = await import('../data/storage.js');
+          storage.saveImmediate('nugt_user_id', userId);
+          storage.saveImmediate('nugt_email', email);
+          storage.saveImmediate('nugt_display_name', email.split('@')[0]);
+          storage.saveImmediate('nugt_is_authenticated', true);
+          storage.saveImmediate('nugt_auth_timestamp', Date.now());
           
           // Check if user is admin
-          const currentUser = authService.getCurrentUser();
-          console.log('Current user:', currentUser);
-          console.log('User email:', currentUser?.email);
-          
           const isAdmin = await authService.isAdmin();
           console.log('Admin check result:', isAdmin);
           
@@ -223,7 +244,6 @@ class TeamAccessService {
             this.showAppInterface();
           } else {
             console.log('Regular user - showing team section');
-            console.log('Make sure admin email is configured in ADMIN_EMAILS environment variable');
             this._showTeamSection();
           }
         } catch (error) {

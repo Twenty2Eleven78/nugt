@@ -192,30 +192,36 @@ export function initializeApp() {
   // Show auth screen first, hide app interface
   teamAccessService.hideAppInterface();
   
-  // Initialize authentication
-  authUI.init().then(async isAuthenticated => {
-    if (isAuthenticated) {
-      console.log('User authenticated successfully');
-      // Initialize team access
-      await teamAccessService.init();
-      // Track app usage
-      authService.trackUsage('app_start');
-      
-      // Check if user is admin
-      const isAdmin = await authService.isAdmin();
-      
-      if (isAdmin) {
-        console.log('Admin user - direct app access');
-        teamAccessService.showAppInterface();
-      } else {
-        console.log('Regular user - team selection required');
-        teamAccessService.showTeamCodeScreen();
-      }
+  // Initialize auth service without showing modal
+  await authService.init();
+  
+  // Check if user is already authenticated
+  const isAuthenticated = authService.isUserAuthenticated();
+  
+  if (isAuthenticated) {
+    console.log('User authenticated successfully');
+    // Initialize team access
+    await teamAccessService.init();
+    // Track app usage
+    authService.trackUsage('app_start');
+    
+    // Check if user is admin
+    const isAdmin = await authService.isAdmin();
+    
+    if (isAdmin) {
+      console.log('Admin user - direct app access');
+      teamAccessService.showAppInterface();
     } else {
-      console.log('User not authenticated - showing auth screen');
-      teamAccessService.showAuthScreen();
+      console.log('Regular user - team selection required');
+      teamAccessService.showTeamCodeScreen();
     }
-  });
+  } else {
+    console.log('User not authenticated - showing auth screen');
+    teamAccessService.showAuthScreen();
+  }
+  
+  // Initialize auth UI without showing modal
+  authUI._updateAuthState(isAuthenticated);
 
   // Load saved state
   loadAppState();

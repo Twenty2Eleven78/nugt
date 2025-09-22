@@ -18,6 +18,9 @@ class AuthUI {
    * Initialize the authentication UI
    */
   async init() {
+    // Ensure body doesn't have authenticated class initially
+    document.body.classList.remove('authenticated');
+    
     // Create auth modal if it doesn't exist
     if (!document.getElementById('authModal')) {
       this._createAuthModal();
@@ -134,7 +137,10 @@ class AuthUI {
     this.authModalInitialized = true;
 
     // Bind event listeners to the modal buttons
-    setTimeout(() => this._bindModalButtons(), 100);
+    setTimeout(() => {
+      this._bindModalButtons();
+      this._bindInputValidation();
+    }, 100);
   }
 
   /**
@@ -278,8 +284,20 @@ class AuthUI {
           button.setAttribute('aria-expanded', 'false');
         }
 
+        // Clear the email input
+        const emailInput = document.getElementById('usernameInput');
+        if (emailInput) {
+          emailInput.value = '';
+          emailInput.classList.remove('is-valid', 'is-invalid');
+        }
+
         // Trigger logout
         authService.logout();
+        
+        // Show the auth modal
+        requestAnimationFrame(() => {
+          this.showAuthModal();
+        });
       }
 
       if (e.target && e.target.id === 'loginButton' && e.target.classList.contains('dropdown-item')) {
@@ -330,18 +348,55 @@ class AuthUI {
   }
 
   /**
+   * Bind input validation
+   * @private
+   */
+  _bindInputValidation() {
+    const emailInput = document.getElementById('usernameInput');
+    const loginButton = document.getElementById('loginButton');
+    
+    if (emailInput && loginButton) {
+      emailInput.addEventListener('input', () => {
+        const email = emailInput.value.trim();
+        const isValid = email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        
+        loginButton.disabled = !isValid;
+        
+        // Update input validation state
+        if (email) {
+          if (isValid) {
+            emailInput.classList.remove('is-invalid');
+            emailInput.classList.add('is-valid');
+          } else {
+            emailInput.classList.remove('is-valid');
+            emailInput.classList.add('is-invalid');
+          }
+        } else {
+          emailInput.classList.remove('is-valid', 'is-invalid');
+        }
+      });
+
+      // Initial validation
+      emailInput.dispatchEvent(new Event('input'));
+    }
+  }
+
+  /**
    * Bind event listeners to modal buttons
    * @private
    */
   _bindModalButtons() {
-    // Register button
-    const registerButton = document.getElementById('registerButton');
-    if (registerButton) {
-      registerButton.onclick = async () => {
-        const email = document.getElementById('usernameInput').value.trim();
+    // Combined auth button
+    const loginButton = document.getElementById('loginButton');
+    if (loginButton) {
+      loginButton.onclick = async () => {
+        const button = loginButton;
+        const originalText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i>Processing...';
 
         try {
-          const success = await authService.register(email);
+          const success = await authService.authenticate();
           if (success) {
             // Clear the email input on success
             const emailInput = document.getElementById('usernameInput');
@@ -352,37 +407,11 @@ class AuthUI {
             this._updateAuthState(true);
           }
         } catch (error) {
-          // Let the auth service handle the error notification
-          // It has more context about the specific failure reason
+          // Error handling is done by auth service
+        } finally {
+          button.disabled = false;
+          button.innerHTML = originalText;
         }
-      };
-    } else {
-      console.warn('Register button not found');
-    }
-
-    // Login button
-    const loginButton = document.getElementById('loginButton');
-    if (loginButton) {
-      loginButton.onclick = async () => {
-        try {
-          const success = await authService.authenticate();
-          if (success) {
-            hideModal('authModal');
-            this._updateAuthState(true);
-          }
-        } catch (error) {
-          // Let the auth service handle the error notification
-          // It has more context about the specific error
-        }
-      };
-    }
-
-    // Skip auth button
-    const skipAuthButton = document.getElementById('skipAuthButton');
-    if (skipAuthButton) {
-      skipAuthButton.onclick = () => {
-        hideModal('authModal');
-        this._updateAuthState(false);
       };
     }
   }
@@ -393,6 +422,9 @@ class AuthUI {
    * @private
    */
   _updateAuthState(isAuthenticated) {
+    // Update body class for authentication state
+    document.body.classList.toggle('authenticated', isAuthenticated);
+    
     // Create profile button if it doesn't exist
     this._createProfileButton();
 
@@ -432,6 +464,17 @@ class AuthUI {
       if (profileButton) {
         profileButton.classList.remove('btn-outline-primary');
         profileButton.classList.add('btn-outline-secondary');
+      }
+      
+      if (profileUsername) {
+        profileUsername.textContent = 'Guest';
+      }
+
+      // Reset the login button to initial state if it exists
+      const loginButton = document.getElementById('loginButton');
+      if (loginButton) {
+        loginButton.disabled = false;
+        loginButton.innerHTML = '<i class="fas fa-shield-alt me-2"></i>Continue with Passkey';
       }
 
       if (profileUsername) {

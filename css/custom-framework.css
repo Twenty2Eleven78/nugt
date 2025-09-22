@@ -2149,7 +2149,7 @@ body {
 }
 
 /* Divider */
-.auth-container .text-center:before {
+.auth-container .text-center {
     position: relative;
 }
 
@@ -2160,7 +2160,7 @@ body {
     z-index: 1;
 }
 
-.auth-container .text-center {
+.auth-container .text-center:before {
     content: "";
     position: absolute;
     top: 50%;

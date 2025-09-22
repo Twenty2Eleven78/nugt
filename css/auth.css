@@ -4,8 +4,24 @@ body:not(.loaded) {
   transition: opacity 0.3s ease-in-out;
 }
 
-body.loaded:not(.authenticated) .app-content {
-  display: none;
+.app-content {
+  transition: filter 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+body:not(.authenticated) .app-content {
+  filter: blur(8px);
+  opacity: 0.5;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body.authenticated .app-content {
+  filter: none;
+  opacity: 1;
+  pointer-events: all;
+  -webkit-user-select: auto;
+  user-select: auto;
 }
 
 /* Welcome screen customizations */
@@ -19,16 +35,29 @@ body.loaded:not(.authenticated) .app-content {
   line-height: 2;
 }
 
+/* Modal customizations for auth screen */
 .modal-backdrop {
-  opacity: 0.85 !important;
+  opacity: 0.5 !important;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
 }
 
 #authModal {
-  -webkit-backdrop-filter: blur(5px);
-  backdrop-filter: blur(5px);
+  z-index: 1060;
 }
 
 #authModal .modal-content {
+  background: rgba(255, 255, 255, 0.95);
   border: none;
-  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border-radius: 1rem;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  #authModal .modal-content {
+    background: rgba(33, 37, 41, 0.95);
+  }
 }

@@ -2149,7 +2149,7 @@ body {
 }
 
 /* Divider */
-.auth-container .text-center {
+.auth-container .text-center:before {
     position: relative;
 }
 

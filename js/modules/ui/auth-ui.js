@@ -6,8 +6,7 @@
 import { authService } from '../services/auth.js';
 import { notificationManager } from '../services/notifications.js';
 import { hideModal } from './modals.js';
-import { CustomModal } from '../shared/custom-modal.js';
-import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
+import { createAndAppendModal } from '../shared/modal-factory.js';
 
 class AuthUI {
   constructor() {
@@ -18,6 +17,9 @@ class AuthUI {
    * Initialize the authentication UI
    */
   async init() {
+    // Ensure body doesn't have authenticated class initially
+    document.body.classList.remove('authenticated');
+    
     // Create auth modal if it doesn't exist
     if (!document.getElementById('authModal')) {
       this._createAuthModal();
@@ -40,7 +42,7 @@ class AuthUI {
       return true;
     }
 
-    // Not authenticated - still create profile button for guest user
+    // Not authenticated - update auth state and show modal
     this._updateAuthState(false);
     
     // Show the auth modal
@@ -63,29 +65,19 @@ class AuthUI {
           authMessage.innerHTML = `
             <div class="alert alert-warning">
               <i class="fas fa-exclamation-triangle me-2"></i>
-              <strong>Note:</strong> Your browser doesn't support passkeys. A simplified authentication will be used instead.
+              <strong>Note:</strong> Your browser doesn't support passkeys.
+              A simplified authentication will be used instead.
             </div>
-            <p>Welcome to NUFC GameTime! Please sign in to track your usage.</p>
+            <h3 class="h2 mb-2">Welcome to GameTime</h3>
+            <p class="lead text-muted">Please sign in to continue</p>
           `;
         }
       }
 
-      try {
-        // Use custom modal system
-        const modal = CustomModal.getOrCreateInstance(authModal);
-        modal.show();
-      } catch (error) {
-        console.error('Error showing modal:', error);
-        // Fallback modal display
-        authModal.classList.add('show');
-        authModal.style.display = 'block';
-        document.body.classList.add('modal-open');
-
-        // Create backdrop
-        const backdrop = document.createElement('div');
-        backdrop.className = 'modal-backdrop fade show';
-        document.body.appendChild(backdrop);
-      }
+      // Show the modal
+      authModal.classList.add('show');
+      authModal.style.display = 'block';
+      document.body.classList.add('modal-open');
     }
   }
 
@@ -95,56 +87,61 @@ class AuthUI {
    */
   _createAuthModal() {
     const bodyContent = `
-      <div class="auth-container">
-        <div id="authMessage" class="mb-3">
-          <p>Welcome to NUFC GameTime! Please sign in to track your usage.</p>
+      <div class="auth-container welcome-screen">
+        <div id="authMessage" class="text-center mb-4">
+          <h3 class="h2 mb-2">Welcome to GameTime</h3>
+          <p class="lead text-muted">Your Match Tracking Assistant</p>
         </div>
-        
-        <div id="registerForm" class="mb-3">
+        <div id="authForm" class="mb-4">
           <div class="form-floating mb-3">
-            <input type="email" class="form-control" id="usernameInput" placeholder="name@example.com">
+            <input type="email" class="form-control form-control-lg" id="usernameInput" placeholder="name@example.com">
             <label for="usernameInput">Email Address</label>
           </div>
-          <button type="button" id="registerButton" class="btn btn-primary w-100 mb-2">
-            <i class="fas fa-user-plus me-2"></i>Register with Passkey
+          <button type="button" id="loginButton" class="btn btn-primary btn-lg w-100 mb-3">
+            <i class="fas fa-shield-alt me-2"></i>Continue with Passkey
           </button>
-          <small class="text-muted">First time? Create a passkey to securely access the app.</small>
+          <small class="text-muted d-block">We'll create a new account if you're new, or sign you in if you're returning</small>
         </div>
-        
-        <div class="text-center my-3">
-          <span>OR</span>
+        <div class="welcome-features">
+          <div class="feature-list text-muted">
+            <div class="feature-item mb-2">
+              <i class="fas fa-check-circle me-2 text-success"></i>Track matches in real-time
+            </div>
+            <div class="feature-item mb-2">
+              <i class="fas fa-check-circle me-2 text-success"></i>Save and sync your data
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-check-circle me-2 text-success"></i>Access anywhere, anytime
+            </div>
+          </div>
         </div>
-        
-        <div id="loginForm">
-          <button type="button" id="loginButton" class="btn btn-success w-100 mb-2">
-            <i class="fas fa-key me-2"></i>Sign in with Passkey
-          </button>
-          <small class="text-muted">Already registered? Use your passkey to sign in.</small>
-        </div>
-      </div>
-    `;
-
-    const footerContent = `
-      <div id="skipAuthContainer" class="w-100 text-center">
-        <button type="button" id="skipAuthButton" class="btn btn-link">Continue without signing in</button>
-        <small class="d-block text-muted">Your data won't be saved between sessions</small>
       </div>
     `;
 
     createAndAppendModal(
       'authModal',
-      '<i class="fas fa-shield-alt me-2"></i>NUFC GameTime Authentication',
+      '<i class="fas fa-shield-alt"></i><span>GameTime App</span>',
       bodyContent,
       {
-        ...MODAL_CONFIGS.CENTERED,
-        footerContent: footerContent
+        size: 'modal-sm',
+        backdrop: 'static',
+        keyboard: false,
+        closeButton: false,
+        headerClass: 'border-0',
+        bodyClass: 'px-4 pb-4',
+        fade: true,
+        centered: true,
+        fullscreen: true
       }
     );
 
     this.authModalInitialized = true;
 
     // Bind event listeners to the modal buttons
-    setTimeout(() => this._bindModalButtons(), 100);
+    setTimeout(() => {
+      this._bindModalButtons();
+      this._bindInputValidation();
+    }, 100);
   }
 
   /**
@@ -288,8 +285,20 @@ class AuthUI {
           button.setAttribute('aria-expanded', 'false');
         }
 
+        // Clear the email input
+        const emailInput = document.getElementById('usernameInput');
+        if (emailInput) {
+          emailInput.value = '';
+          emailInput.classList.remove('is-valid', 'is-invalid');
+        }
+
         // Trigger logout
         authService.logout();
+        
+        // Show the auth modal
+        requestAnimationFrame(() => {
+          this.showAuthModal();
+        });
       }
 
       if (e.target && e.target.id === 'loginButton' && e.target.classList.contains('dropdown-item')) {
@@ -340,59 +349,84 @@ class AuthUI {
   }
 
   /**
+   * Bind input validation
+   * @private
+   */
+  _bindInputValidation() {
+    const emailInput = document.getElementById('usernameInput');
+    const loginButton = document.getElementById('loginButton');
+    
+    if (emailInput && loginButton) {
+      emailInput.addEventListener('input', () => {
+        const email = emailInput.value.trim();
+        const isValid = email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        
+        loginButton.disabled = !isValid;
+        
+        // Update input validation state
+        if (email) {
+          if (isValid) {
+            emailInput.classList.remove('is-invalid');
+            emailInput.classList.add('is-valid');
+          } else {
+            emailInput.classList.remove('is-valid');
+            emailInput.classList.add('is-invalid');
+          }
+        } else {
+          emailInput.classList.remove('is-valid', 'is-invalid');
+        }
+      });
+
+      // Initial validation
+      emailInput.dispatchEvent(new Event('input'));
+    }
+  }
+
+  /**
    * Bind event listeners to modal buttons
    * @private
    */
   _bindModalButtons() {
-    // Register button
-    const registerButton = document.getElementById('registerButton');
-    if (registerButton) {
-      registerButton.onclick = async () => {
-        const email = document.getElementById('usernameInput').value.trim();
+    // Combined auth button
+    const loginButton = document.getElementById('loginButton');
+    if (loginButton) {
+      loginButton.onclick = async () => {
+        const button = loginButton;
+        const originalText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i>Processing...';
 
         try {
-          const success = await authService.register(email);
+          const success = await authService.authenticate();
           if (success) {
             // Clear the email input on success
             const emailInput = document.getElementById('usernameInput');
             if (emailInput) {
               emailInput.value = '';
             }
-            hideModal('authModal');
+            
+            // Hide modal
+            const authModal = document.getElementById('authModal');
+            if (authModal) {
+              authModal.classList.remove('show');
+              authModal.style.display = 'none';
+              document.body.classList.remove('modal-open');
+              
+              // Remove backdrop
+              const backdrop = document.querySelector('.modal-backdrop');
+              if (backdrop) {
+                backdrop.remove();
+              }
+            }
+            
             this._updateAuthState(true);
           }
         } catch (error) {
-          // Let the auth service handle the error notification
-          // It has more context about the specific failure reason
+          // Error handling is done by auth service
+        } finally {
+          button.disabled = false;
+          button.innerHTML = originalText;
         }
-      };
-    } else {
-      console.warn('Register button not found');
-    }
-
-    // Login button
-    const loginButton = document.getElementById('loginButton');
-    if (loginButton) {
-      loginButton.onclick = async () => {
-        try {
-          const success = await authService.authenticate();
-          if (success) {
-            hideModal('authModal');
-            this._updateAuthState(true);
-          }
-        } catch (error) {
-          // Let the auth service handle the error notification
-          // It has more context about the specific error
-        }
-      };
-    }
-
-    // Skip auth button
-    const skipAuthButton = document.getElementById('skipAuthButton');
-    if (skipAuthButton) {
-      skipAuthButton.onclick = () => {
-        hideModal('authModal');
-        this._updateAuthState(false);
       };
     }
   }
@@ -403,6 +437,9 @@ class AuthUI {
    * @private
    */
   _updateAuthState(isAuthenticated) {
+    // Update body class for authentication state
+    document.body.classList.toggle('authenticated', isAuthenticated);
+    
     // Create profile button if it doesn't exist
     this._createProfileButton();
 
@@ -442,6 +479,17 @@ class AuthUI {
       if (profileButton) {
         profileButton.classList.remove('btn-outline-primary');
         profileButton.classList.add('btn-outline-secondary');
+      }
+      
+      if (profileUsername) {
+        profileUsername.textContent = 'Guest';
+      }
+
+      // Reset the login button to initial state if it exists
+      const loginButton = document.getElementById('loginButton');
+      if (loginButton) {
+        loginButton.disabled = false;
+        loginButton.innerHTML = '<i class="fas fa-shield-alt me-2"></i>Continue with Passkey';
       }
 
       if (profileUsername) {

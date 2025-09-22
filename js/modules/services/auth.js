@@ -115,11 +115,24 @@ class AuthService {
 
   async authenticate() {
     try {
-      const userData = this._loadUserData();
-      if (!userData.userId || !userData.email) {
-        throw new Error('No user found. Please register first.');
+      const email = document.getElementById('usernameInput')?.value?.trim();
+      if (!email) {
+        throw new Error('Please enter your email address');
+      }
+      
+      if (!this._validateEmail(email)) {
+        throw new Error('Please enter a valid email address');
       }
 
+      const userData = this._loadUserData();
+      const storedEmail = userData.email;
+
+      // If the email doesn't match stored one, or no stored credentials, register new user
+      if (!storedEmail || email.toLowerCase() !== storedEmail.toLowerCase()) {
+        return await this.register(email);
+      }
+
+      // Otherwise, attempt authentication with existing credentials
       await this._attemptWebAuthnAuthentication(userData.credentialId);
 
       const authTimestamp = Date.now();

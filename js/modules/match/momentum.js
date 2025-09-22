@@ -23,7 +23,7 @@ class MomentumTracker {
       'Sin Bin': -2,
       'Foul': 1,
       'Penalty': 2,
-      'Offside': -0.5
+      'Offside': 0.5
     };
     
     this.windowSize = 300; // 5 minutes in seconds

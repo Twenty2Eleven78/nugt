@@ -100,9 +100,9 @@ class AuthUI {
           <button type="button" id="loginButton" class="btn btn-primary btn-lg w-100 mb-3">
             <i class="fas fa-shield-alt me-2"></i>Continue with Passkey
           </button>
-          <small class="text-muted text-center d-block">We'll create a new account if you're new, or sign you in if you're returning</small>
+          <small class="text-muted d-block">We'll create a new account if you're new, or sign you in if you're returning</small>
         </div>
-        <div class="welcome-features text-center">
+        <div class="welcome-features">
           <div class="feature-list text-muted">
             <div class="feature-item mb-2">
               <i class="fas fa-check-circle me-2 text-success"></i>Track matches in real-time

@@ -40,7 +40,7 @@ class AuthUI {
       return true;
     }
 
-    // Not authenticated - still create profile button for guest user
+    // Not authenticated - update auth state and show modal
     this._updateAuthState(false);
     
     // Show the auth modal
@@ -95,49 +95,41 @@ class AuthUI {
    */
   _createAuthModal() {
     const bodyContent = `
-      <div class="auth-container">
-        <div id="authMessage" class="mb-3">
-          <p>Welcome to NUFC GameTime! Please sign in to track your usage.</p>
+      <div class="auth-container welcome-screen">
+        <div id="authMessage" class="text-center mb-4">
+          <h3>Welcome to NUFC GameTime</h3>
+          <p class="lead mb-4">Your Digital Match Tracking Assistant</p>
         </div>
         
-        <div id="registerForm" class="mb-3">
+        <div id="authForm" class="mb-4">
           <div class="form-floating mb-3">
             <input type="email" class="form-control" id="usernameInput" placeholder="name@example.com">
             <label for="usernameInput">Email Address</label>
           </div>
-          <button type="button" id="registerButton" class="btn btn-primary w-100 mb-2">
-            <i class="fas fa-user-plus me-2"></i>Register with Passkey
+          <button type="button" id="loginButton" class="btn btn-primary w-100 mb-2">
+            <i class="fas fa-shield-alt me-2"></i>Continue with Passkey
           </button>
-          <small class="text-muted">First time? Create a passkey to securely access the app.</small>
+          <small class="text-muted text-center d-block">We'll create a new account if you're new, or sign you in if you're returning</small>
         </div>
         
-        <div class="text-center my-3">
-          <span>OR</span>
+        <div class="welcome-features text-center">
+          <small class="text-muted">
+            <i class="fas fa-check-circle me-2"></i>Track matches in real-time<br>
+            <i class="fas fa-check-circle me-2"></i>Save and sync your data<br>
+            <i class="fas fa-check-circle me-2"></i>Access anywhere, anytime
+          </small>
         </div>
-        
-        <div id="loginForm">
-          <button type="button" id="loginButton" class="btn btn-success w-100 mb-2">
-            <i class="fas fa-key me-2"></i>Sign in with Passkey
-          </button>
-          <small class="text-muted">Already registered? Use your passkey to sign in.</small>
-        </div>
-      </div>
-    `;
-
-    const footerContent = `
-      <div id="skipAuthContainer" class="w-100 text-center">
-        <button type="button" id="skipAuthButton" class="btn btn-link">Continue without signing in</button>
-        <small class="d-block text-muted">Your data won't be saved between sessions</small>
       </div>
     `;
 
     createAndAppendModal(
       'authModal',
-      '<i class="fas fa-shield-alt me-2"></i>NUFC GameTime Authentication',
+      '<i class="fas fa-shield-alt me-2"></i>Welcome to NUFC GameTime',
       bodyContent,
       {
         ...MODAL_CONFIGS.CENTERED,
-        footerContent: footerContent
+        backdrop: 'static',  // Prevent closing by clicking outside
+        keyboard: false     // Prevent closing with keyboard
       }
     );
 

@@ -2160,7 +2160,7 @@ body {
     z-index: 1;
 }
 
-.auth-container .text-center:before {
+.auth-container .text-center {
     content: "";
     position: absolute;
     top: 50%;

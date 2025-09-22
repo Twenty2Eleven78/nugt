@@ -97,7 +97,7 @@ class AuthUI {
     const bodyContent = `
       <div class="auth-container welcome-screen">
         <div id="authMessage" class="text-center mb-4">
-          <h3>Welcome to NUFC GameTime</h3>
+          <h3>Welcome to GameTime App</h3>
           <p class="lead mb-4">Your Match Tracking Assistant</p>
         </div>
         <div id="authForm" class="mb-4">

@@ -1975,6 +1975,7 @@ body {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     pointer-events: auto;
@@ -2118,7 +2119,6 @@ body {
         font-size: var(--font-size-sm);
         padding-left: var(--spacing-sm);
     }
-}
 
 /* ===== MERGED FROM AUTH.CSS ===== */
 
@@ -2296,6 +2296,7 @@ body {
     border: 2px solid var(--border-color);
     background: var(--bg-primary);
     cursor: pointer;
+    -webkit-user-select: none;
     user-select: none;
     display: block;
     width: 100%;

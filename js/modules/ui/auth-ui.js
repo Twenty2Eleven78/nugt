@@ -6,8 +6,7 @@
 import { authService } from '../services/auth.js';
 import { notificationManager } from '../services/notifications.js';
 import { hideModal } from './modals.js';
-import { CustomModal } from '../shared/custom-modal.js';
-import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
+import { createAndAppendModal } from '../shared/modal-factory.js';
 
 class AuthUI {
   constructor() {
@@ -66,29 +65,19 @@ class AuthUI {
           authMessage.innerHTML = `
             <div class="alert alert-warning">
               <i class="fas fa-exclamation-triangle me-2"></i>
-              <strong>Note:</strong> Your browser doesn't support passkeys. A simplified authentication will be used instead.
+              <strong>Note:</strong> Your browser doesn't support passkeys.
+              A simplified authentication will be used instead.
             </div>
-            <p>Welcome to NUFC GameTime! Please sign in to track your usage.</p>
+            <h3 class="h2 mb-2">Welcome to GameTime</h3>
+            <p class="lead text-muted">Please sign in to continue</p>
           `;
         }
       }
 
-      try {
-        // Use custom modal system
-        const modal = CustomModal.getOrCreateInstance(authModal);
-        modal.show();
-      } catch (error) {
-        console.error('Error showing modal:', error);
-        // Fallback modal display
-        authModal.classList.add('show');
-        authModal.style.display = 'block';
-        document.body.classList.add('modal-open');
-
-        // Create backdrop
-        const backdrop = document.createElement('div');
-        backdrop.className = 'modal-backdrop fade show';
-        document.body.appendChild(backdrop);
-      }
+      // Show the modal
+      authModal.classList.add('show');
+      authModal.style.display = 'block';
+      document.body.classList.add('modal-open');
     }
   }
 
@@ -100,37 +89,49 @@ class AuthUI {
     const bodyContent = `
       <div class="auth-container welcome-screen">
         <div id="authMessage" class="text-center mb-4">
-          <h3>Welcome to GameTime App</h3>
-          <p class="lead mb-4">Your Match Tracking Assistant</p>
+          <h3 class="h2 mb-2">Welcome to GameTime</h3>
+          <p class="lead text-muted">Your Match Tracking Assistant</p>
         </div>
         <div id="authForm" class="mb-4">
           <div class="form-floating mb-3">
-            <input type="email" class="form-control" id="usernameInput" placeholder="name@example.com">
+            <input type="email" class="form-control form-control-lg" id="usernameInput" placeholder="name@example.com">
             <label for="usernameInput">Email Address</label>
           </div>
-          <button type="button" id="loginButton" class="btn btn-primary w-100 mb-2">
+          <button type="button" id="loginButton" class="btn btn-primary btn-lg w-100 mb-3">
             <i class="fas fa-shield-alt me-2"></i>Continue with Passkey
           </button>
           <small class="text-muted text-center d-block">We'll create a new account if you're new, or sign you in if you're returning</small>
         </div>
         <div class="welcome-features text-center">
-          <small class="text-muted">
-            <i class="fas fa-check-circle me-2"></i>Track matches in real-time<br>
-            <i class="fas fa-check-circle me-2"></i>Save and sync your data<br>
-            <i class="fas fa-check-circle me-2"></i>Access anywhere, anytime
-          </small>
+          <div class="feature-list text-muted">
+            <div class="feature-item mb-2">
+              <i class="fas fa-check-circle me-2 text-success"></i>Track matches in real-time
+            </div>
+            <div class="feature-item mb-2">
+              <i class="fas fa-check-circle me-2 text-success"></i>Save and sync your data
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-check-circle me-2 text-success"></i>Access anywhere, anytime
+            </div>
+          </div>
         </div>
       </div>
     `;
 
     createAndAppendModal(
       'authModal',
-      '<i class="fas fa-shield-alt me-2"></i>Welcome to NUFC GameTime',
+      '<i class="fas fa-shield-alt"></i><span>GameTime App</span>',
       bodyContent,
       {
-        ...MODAL_CONFIGS.CENTERED,
-        backdrop: 'static',  // Prevent closing by clicking outside
-        keyboard: false     // Prevent closing with keyboard
+        size: 'modal-sm',
+        backdrop: 'static',
+        keyboard: false,
+        closeButton: false,
+        headerClass: 'border-0',
+        bodyClass: 'px-4 pb-4',
+        fade: true,
+        centered: true,
+        fullscreen: true
       }
     );
 
@@ -403,7 +404,21 @@ class AuthUI {
             if (emailInput) {
               emailInput.value = '';
             }
-            hideModal('authModal');
+            
+            // Hide modal
+            const authModal = document.getElementById('authModal');
+            if (authModal) {
+              authModal.classList.remove('show');
+              authModal.style.display = 'none';
+              document.body.classList.remove('modal-open');
+              
+              // Remove backdrop
+              const backdrop = document.querySelector('.modal-backdrop');
+              if (backdrop) {
+                backdrop.remove();
+              }
+            }
+            
             this._updateAuthState(true);
           }
         } catch (error) {

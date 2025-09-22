@@ -98,9 +98,8 @@ class AuthUI {
       <div class="auth-container welcome-screen">
         <div id="authMessage" class="text-center mb-4">
           <h3>Welcome to NUFC GameTime</h3>
-          <p class="lead mb-4">Your Digital Match Tracking Assistant</p>
+          <p class="lead mb-4">Your Match Tracking Assistant</p>
         </div>
-        
         <div id="authForm" class="mb-4">
           <div class="form-floating mb-3">
             <input type="email" class="form-control" id="usernameInput" placeholder="name@example.com">
@@ -111,7 +110,6 @@ class AuthUI {
           </button>
           <small class="text-muted text-center d-block">We'll create a new account if you're new, or sign you in if you're returning</small>
         </div>
-        
         <div class="welcome-features text-center">
           <small class="text-muted">
             <i class="fas fa-check-circle me-2"></i>Track matches in real-time<br>

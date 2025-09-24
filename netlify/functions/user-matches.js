@@ -110,6 +110,31 @@ exports.handler = async function(event, context) {
         };
       }
 
+      const isStatsRequest = event.queryStringParameters?.statistics === 'true';
+      if (isStatsRequest) {
+        console.log('=== STATISTICS REQUEST STARTED ===');
+        try {
+          const statsKey = 'statistics/stats.json';
+          const url = `${NETLIFY_BLOBS_API}/${SITE_ID}/${statsKey}`;
+          const res = await fetch(url, { headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` } });
+
+          if (!res.ok) {
+            if (res.status === 404) {
+              return { statusCode: 200, body: JSON.stringify({ message: 'No statistics found', data: null }) };
+            }
+            return { statusCode: 500, body: JSON.stringify({ error: 'Failed to retrieve statistics' }) };
+          }
+
+          const data = await res.text();
+          const stats = data ? JSON.parse(data) : null;
+          console.log('=== STATISTICS REQUEST COMPLETED ===');
+          return { statusCode: 200, body: JSON.stringify({ message: 'Statistics retrieved successfully', data: stats }) };
+        } catch (error) {
+          console.error('=== STATISTICS ERROR ===:', error);
+          return { statusCode: 500, body: JSON.stringify({ error: 'Failed to retrieve statistics' }) };
+        }
+      }
+
       if (isAdmin) {
         // Verify admin permissions
         if (!isAdminUser(userId, userEmail)) {

@@ -75,11 +75,17 @@ exports.handler = async function(event, context) {
       }
       try {
         const statsData = JSON.parse(event.body);
-        await fetch(`${storeUrl}/${STATS_KEY}`, {
+        const res = await fetch(`${storeUrl}/${STATS_KEY}`, {
           method: 'PUT',
           headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
           body: JSON.stringify(statsData)
         });
+
+        if (!res.ok) {
+          const errorBody = await res.text();
+          throw new Error(`Failed to save statistics: ${res.statusText} - ${errorBody}`);
+        }
+
         return { statusCode: 200, body: JSON.stringify({ message: 'Statistics saved.' }) };
       } catch (error) {
         return { statusCode: 500, body: JSON.stringify({ error: error.message }) };

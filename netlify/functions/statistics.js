@@ -75,6 +75,7 @@ exports.handler = async function(event, context) {
       }
       try {
         const statsData = JSON.parse(event.body);
+
         const res = await fetch(`${storeUrl}/${STATS_KEY}`, {
           method: 'PUT',
           headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
@@ -93,6 +94,7 @@ exports.handler = async function(event, context) {
 
     case 'DELETE':
       if (!isAdmin) {
+
         return { statusCode: 403, body: JSON.stringify({ error: 'Permission denied.' }) };
       }
       try {

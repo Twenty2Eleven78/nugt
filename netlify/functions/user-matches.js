@@ -110,6 +110,7 @@ exports.handler = async function(event, context) {
         };
       }
 
+
       if (isAdmin) {
         // Verify admin permissions
         if (!isAdminUser(userId, userEmail)) {
@@ -400,38 +401,33 @@ exports.handler = async function(event, context) {
 
     if (event.httpMethod === 'PUT' || event.httpMethod === 'POST') {
       try {
-        // First, try to get existing matches
+        const payload = JSON.parse(event.body);
+
+        // Handle regular match data saving
         const url = `${NETLIFY_BLOBS_API}/${SITE_ID}/${key}`;
         const getRes = await fetch(url, {
           headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
         });
-        
-        // Initialize matches array
+
         let matches = [];
         if (getRes.ok) {
           const existingData = await getRes.text();
           try {
-            const parsed = JSON.parse(existingData);
-            matches = Array.isArray(parsed) ? parsed : [parsed];
-          } catch (parseError) {
-            console.warn('Could not parse existing matches:', parseError);
+            matches = JSON.parse(existingData);
+            if (!Array.isArray(matches)) matches = [matches];
+          } catch (e) {
+            console.warn('Could not parse existing matches:', e);
           }
         }
-        
-        // Add new match data
-        const newMatch = JSON.parse(event.body);
-        // Add timestamp if not present
-        if (!newMatch.savedAt) {
-          newMatch.savedAt = Date.now();
-        }
+
+        const newMatch = payload;
+        if (!newMatch.savedAt) newMatch.savedAt = Date.now();
         matches.push(newMatch);
-        
-        // Keep only the latest 50 matches
+
         if (matches.length > 50) {
           matches = matches.sort((a, b) => b.savedAt - a.savedAt).slice(0, 50);
         }
-        
-        // Save updated matches array
+
         const saveRes = await fetch(url, {
           method: 'PUT',
           headers: {
@@ -440,27 +436,18 @@ exports.handler = async function(event, context) {
           },
           body: JSON.stringify(matches)
         });
-        
+
         if (!saveRes.ok) {
-          return { 
-            statusCode: 500, 
-            body: JSON.stringify({ error: 'Failed to save match' }) 
-          };
+          return { statusCode: 500, body: JSON.stringify({ error: 'Failed to save match' }) };
         }
-        
-        return { 
-          statusCode: 200, 
-          body: JSON.stringify({ 
-            message: 'Match saved successfully',
-            data: newMatch 
-          })
+
+        return {
+          statusCode: 200,
+          body: JSON.stringify({ message: 'Match saved successfully', data: newMatch })
         };
       } catch (error) {
         console.error('Error saving data:', error);
-        return { 
-          statusCode: 500, 
-          body: JSON.stringify({ error: 'Failed to save data' }) 
-        };
+        return { statusCode: 500, body: JSON.stringify({ error: 'Failed to save data' }) };
       }
     }
 

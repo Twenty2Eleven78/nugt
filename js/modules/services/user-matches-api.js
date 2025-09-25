@@ -198,13 +198,6 @@ class UserMatchesAPI {
   async loadStatistics() {
     console.log('🌐 API: Loading statistics from cloud...');
     
-    const cacheKey = 'loadStatistics';
-    const cachedData = this._getFromCache(cacheKey);
-    if (cachedData) {
-      console.log('💾 API: Returning cached statistics:', cachedData);
-      return cachedData;
-    }
-
     const token = await this._getAuthToken();
     const url = `${API_ENDPOINTS.USER_MATCHES}?statistics=true`;
     const requestOptions = {
@@ -215,16 +208,15 @@ class UserMatchesAPI {
     try {
       console.log('🌐 API: Making request to:', url);
       const response = await this._makeRequest(url, requestOptions);
-      console.log('🌐 API: Statistics response:', response);
+      console.log('🌐 API: Statistics response received');
       
-      // Extract statistics from the response data
-      const statsData = response.data?.statistics || response.data;
-      console.log('📊 API: Extracted statistics data:', statsData);
+      // The server response has a `data` property containing the statistics object
+      const statsData = response.data;
+      console.log('📊 API: Extracted statistics data:', !!statsData);
       
-      this._setCache(cacheKey, statsData);
       return statsData;
     } catch (error) {
-      console.log('❌ API: Statistics load error:', error);
+      console.error('❌ API: Statistics load error:', error);
       if (error.message.includes('404')) {
         console.log('🔄 API: No statistics found (404)');
         return null;

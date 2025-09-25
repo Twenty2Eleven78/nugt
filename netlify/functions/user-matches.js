@@ -401,10 +401,10 @@ exports.handler = async function(event, context) {
 
     if (event.httpMethod === 'PUT' || event.httpMethod === 'POST') {
       try {
-        const payload = JSON.parse(event.body);
-
-        // Handle regular match data saving
+        const newMatch = JSON.parse(event.body);
         const url = `${NETLIFY_BLOBS_API}/${SITE_ID}/${key}`;
+
+        // First, try to get existing matches
         const getRes = await fetch(url, {
           headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
         });
@@ -413,21 +413,25 @@ exports.handler = async function(event, context) {
         if (getRes.ok) {
           const existingData = await getRes.text();
           try {
-            matches = JSON.parse(existingData);
-            if (!Array.isArray(matches)) matches = [matches];
-          } catch (e) {
-            console.warn('Could not parse existing matches:', e);
+            const parsed = JSON.parse(existingData);
+            matches = Array.isArray(parsed) ? parsed : [];
+          } catch (parseError) {
+            console.warn('Could not parse existing matches, starting fresh.');
           }
         }
 
-        const newMatch = payload;
-        if (!newMatch.savedAt) newMatch.savedAt = Date.now();
+        // Add new match data
+        if (!newMatch.savedAt) {
+          newMatch.savedAt = Date.now();
+        }
         matches.push(newMatch);
 
+        // Keep only the latest 50 matches
         if (matches.length > 50) {
           matches = matches.sort((a, b) => b.savedAt - a.savedAt).slice(0, 50);
         }
 
+        // Save updated matches array
         const saveRes = await fetch(url, {
           method: 'PUT',
           headers: {
@@ -438,16 +442,22 @@ exports.handler = async function(event, context) {
         });
 
         if (!saveRes.ok) {
-          return { statusCode: 500, body: JSON.stringify({ error: 'Failed to save match' }) };
+          throw new Error('Failed to save match data.');
         }
 
         return {
           statusCode: 200,
-          body: JSON.stringify({ message: 'Match saved successfully', data: newMatch })
+          body: JSON.stringify({
+            message: 'Match saved successfully',
+            data: newMatch
+          })
         };
       } catch (error) {
         console.error('Error saving data:', error);
-        return { statusCode: 500, body: JSON.stringify({ error: 'Failed to save data' }) };
+        return {
+          statusCode: 500,
+          body: JSON.stringify({ error: 'Failed to save data' })
+        };
       }
     }
 

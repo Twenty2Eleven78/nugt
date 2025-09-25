@@ -30,9 +30,14 @@ const createMainAdminModal = () => {
                 </div>
             </div>
             <div class="row g-2 mt-1">
-                <div class="col-12">
+                <div class="col-6">
                     <button class="btn btn-primary w-100" id="generate-stats-btn" title="Generate Statistics">
-                        <i class="fas fa-chart-bar me-1"></i>Generate Statistics
+                        <i class="fas fa-chart-bar me-1"></i>Generate Stats
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-danger w-100" id="clear-stats-btn" title="Clear Cloud Stats">
+                        <i class="fas fa-trash me-1"></i>Clear Stats
                     </button>
                 </div>
             </div>
@@ -196,12 +201,41 @@ const modalHtml = `
         </div>
     </div>
 </div>
+
+<!-- Confirmation Modal for Clearing Stats -->
+<div class="modal fade" id="clear-stats-confirm-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-trash"></i> Confirm Clear Statistics
+                </h5>
+                <button type="button" class="btn btn-primary btn-sm rounded-circle" data-dismiss="modal" aria-label="Close" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-times" style="font-size: 14px;"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete all generated statistics from the cloud?</p>
+                <div class="alert alert-danger">
+                    <strong>Warning:</strong> This will remove the shared statistics file for all users. This action cannot be undone.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-clear-stats-btn">
+                    <i class="fas fa-trash"></i> Clear Statistics
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 `;
 
 let modalInstance = null;
 let deleteModalInstance = null;
 let transferModalInstance = null;
 let uploadModalInstance = null;
+let clearStatsModalInstance = null;
 let allMatches = []; // Store all matches for search functionality
 let currentDeleteMatch = null;
 let currentTransferMatch = null;
@@ -218,11 +252,13 @@ const init = () => {
     const deleteModalElement = document.getElementById('delete-confirm-modal');
     const uploadModalElement = document.getElementById('upload-json-modal');
     const transferModalElement = document.getElementById('transfer-match-modal');
+    const clearStatsModalElement = document.getElementById('clear-stats-confirm-modal');
 
     modalInstance = CustomModal.getOrCreateInstance(modalElement);
     deleteModalInstance = CustomModal.getOrCreateInstance(deleteModalElement);
     uploadModalInstance = CustomModal.getOrCreateInstance(uploadModalElement);
     transferModalInstance = CustomModal.getOrCreateInstance(transferModalElement);
+    clearStatsModalInstance = CustomModal.getOrCreateInstance(clearStatsModalElement);
 
     // Initialize match summary modal
     matchSummaryModal.init();
@@ -239,6 +275,41 @@ const init = () => {
     const generateStatsBtn = document.getElementById('generate-stats-btn');
     if (generateStatsBtn) {
         generateStatsBtn.addEventListener('click', generateStatistics);
+    }
+
+    // Add clear statistics button functionality
+    const clearStatsBtn = document.getElementById('clear-stats-btn');
+    if (clearStatsBtn) {
+        clearStatsBtn.addEventListener('click', () => {
+            if (clearStatsModalInstance) {
+                clearStatsModalInstance.show();
+            }
+        });
+    }
+
+    // Handle z-index adjustment when the modal is shown
+    if (clearStatsModalElement) {
+        clearStatsModalElement.addEventListener('shown.bs.modal', () => {
+            const adminModal = document.getElementById('admin-modal');
+            if (adminModal) {
+                const adminModalZIndex = parseInt(window.getComputedStyle(adminModal).zIndex, 10);
+                clearStatsModalElement.style.zIndex = adminModalZIndex + 10;
+
+                // Adjust the backdrop as well
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                if (backdrops.length > 0) {
+                    const lastBackdrop = backdrops[backdrops.length - 1];
+                    if(lastBackdrop){
+                        lastBackdrop.style.zIndex = adminModalZIndex + 9;
+                    }
+                }
+            }
+        });
+    }
+
+    const confirmClearStatsBtn = document.getElementById('confirm-clear-stats-btn');
+    if (confirmClearStatsBtn) {
+        confirmClearStatsBtn.addEventListener('click', handleClearStatsConfirm);
     }
 
     // Add upload JSON button functionality
@@ -1178,6 +1249,45 @@ const toggleMatchApproval = async (matchData, matchIndex) => {
     } catch (error) {
         console.error('Error updating match approval:', error);
         notificationManager.error('Failed to update match approval status');
+    }
+};
+
+const handleClearStatsConfirm = async () => {
+    const confirmBtn = document.getElementById('confirm-clear-stats-btn');
+    const originalText = confirmBtn.innerHTML;
+
+    try {
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Clearing...';
+
+        // Call the API to delete the statistics from the cloud
+        await userMatchesApi.deleteStatistics();
+
+        // Clear the local cache
+        localStorage.removeItem('generatedStatistics');
+
+        // Hide the confirmation modal
+        clearStatsModalInstance.hide();
+
+        notificationManager.success('Cloud statistics have been cleared successfully.');
+
+        // Optionally, refresh the statistics tab if it's visible
+        const statsTab = document.querySelector('#statstab.active');
+        if (statsTab) {
+            import('./statistics-tab.js').then(({ statisticsTab }) => {
+                if (statisticsTab && statisticsTab.show) {
+                    statisticsTab.show();
+                }
+            });
+        }
+
+    } catch (error) {
+        notificationManager.error(`Failed to clear statistics: ${error.message}`);
+    } finally {
+        if(confirmBtn){
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = originalText;
+        }
     }
 };
 

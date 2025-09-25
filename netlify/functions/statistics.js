@@ -96,10 +96,17 @@ exports.handler = async function(event, context) {
         return { statusCode: 403, body: JSON.stringify({ error: 'Permission denied.' }) };
       }
       try {
-        await fetch(`${storeUrl}/${STATS_KEY}`, {
+        const res = await fetch(`${storeUrl}/${STATS_KEY}`, {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
         });
+
+        // A 404 is also a success for a DELETE operation
+        if (!res.ok && res.status !== 404) {
+          const errorBody = await res.text();
+          throw new Error(`Failed to delete statistics: ${res.statusText} - ${errorBody}`);
+        }
+
         return { statusCode: 200, body: JSON.stringify({ message: 'Statistics deleted.' }) };
       } catch (error) {
         return { statusCode: 500, body: JSON.stringify({ error: error.message }) };

@@ -281,7 +281,28 @@ const init = () => {
     const clearStatsBtn = document.getElementById('clear-stats-btn');
     if (clearStatsBtn) {
         clearStatsBtn.addEventListener('click', () => {
-            clearStatsModalInstance.show();
+            if (clearStatsModalInstance) {
+                clearStatsModalInstance.show();
+            }
+        });
+    }
+
+    // Handle z-index adjustment when the modal is shown
+    const clearStatsModalElement = document.getElementById('clear-stats-confirm-modal');
+    if (clearStatsModalElement) {
+        clearStatsModalElement.addEventListener('shown.bs.modal', () => {
+            const adminModal = document.getElementById('admin-modal');
+            if (adminModal) {
+                const adminModalZIndex = parseInt(window.getComputedStyle(adminModal).zIndex, 10);
+                clearStatsModalElement.style.zIndex = adminModalZIndex + 10;
+
+                // Adjust the backdrop as well
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                if (backdrops.length > 0) {
+                    const lastBackdrop = backdrops[backdrops.length - 1];
+                    lastBackdrop.style.zIndex = adminModalZIndex + 9;
+                }
+            }
         });
     }
 

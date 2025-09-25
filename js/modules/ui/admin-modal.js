@@ -288,7 +288,6 @@ const init = () => {
     }
 
     // Handle z-index adjustment when the modal is shown
-    const clearStatsModalElement = document.getElementById('clear-stats-confirm-modal');
     if (clearStatsModalElement) {
         clearStatsModalElement.addEventListener('shown.bs.modal', () => {
             const adminModal = document.getElementById('admin-modal');
@@ -300,7 +299,9 @@ const init = () => {
                 const backdrops = document.querySelectorAll('.modal-backdrop');
                 if (backdrops.length > 0) {
                     const lastBackdrop = backdrops[backdrops.length - 1];
-                    lastBackdrop.style.zIndex = adminModalZIndex + 9;
+                    if(lastBackdrop){
+                        lastBackdrop.style.zIndex = adminModalZIndex + 9;
+                    }
                 }
             }
         });

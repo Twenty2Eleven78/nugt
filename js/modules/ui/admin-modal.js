@@ -267,10 +267,21 @@ const init = () => {
     if (modalElement && deleteModalElement && uploadModalElement && transferModalElement && clearStatsModalElement) {
         const baseZIndex = 1050; // Bootstrap's default modal z-index
         modalElement.style.zIndex = baseZIndex;
-        deleteModalElement.style.zIndex = baseZIndex + 10;
-        uploadModalElement.style.zIndex = baseZIndex + 10;
-        transferModalElement.style.zIndex = baseZIndex + 10;
-        clearStatsModalElement.style.zIndex = baseZIndex + 10;
+        
+        // Set child modals to a much higher z-index to ensure they're always on top
+        const childModalZIndex = baseZIndex + 100; // Using a larger offset
+        deleteModalElement.style.zIndex = childModalZIndex;
+        uploadModalElement.style.zIndex = childModalZIndex;
+        transferModalElement.style.zIndex = childModalZIndex;
+        clearStatsModalElement.style.zIndex = childModalZIndex;
+
+        // Also update modal classes to ensure proper stacking
+        [deleteModalElement, uploadModalElement, transferModalElement, clearStatsModalElement].forEach(element => {
+            if (element) {
+                element.classList.add('modal-child');
+                element.setAttribute('data-child-modal', 'true');
+            }
+        });
     }
 
 
@@ -292,7 +303,21 @@ const init = () => {
     if (clearStatsBtn) {
         clearStatsBtn.addEventListener('click', () => {
             if (clearStatsModalInstance) {
+                // Ensure proper z-index stacking before showing
+                const baseZIndex = 1050;
+                const clearStatsModalElement = document.getElementById('clear-stats-confirm-modal');
+                if (clearStatsModalElement) {
+                    clearStatsModalElement.style.zIndex = baseZIndex + 100;
+                }
                 clearStatsModalInstance.show();
+                
+                // Force recalculate backdrop
+                setTimeout(() => {
+                    const backdrop = document.querySelector('.modal-backdrop:last-child');
+                    if (backdrop) {
+                        backdrop.style.zIndex = baseZIndex + 99;
+                    }
+                }, 0);
             }
         });
     }
@@ -1264,7 +1289,13 @@ const adjustModalBackdrop = (modalElement) => {
             const backdrop = backdrops[backdrops.length - 1];
             const modalZIndex = parseInt(window.getComputedStyle(modalElement).zIndex, 10);
             if (backdrop) {
-                backdrop.style.zIndex = modalZIndex - 1;
+                // For child modals, set backdrop higher than parent modal but lower than the child modal
+                if (modalElement.getAttribute('data-child-modal') === 'true') {
+                    backdrop.style.zIndex = modalZIndex - 1;
+                    backdrop.classList.add('modal-backdrop-child');
+                } else {
+                    backdrop.style.zIndex = modalZIndex - 1;
+                }
             }
         }
     }, 0);

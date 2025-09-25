@@ -149,71 +149,46 @@ class UserMatchesAPI {
     const token = await this._getAuthToken();
     const currentUser = await authService.getCurrentUser();
 
-    const statsData = {
-      title: 'Team Statistics',
-      statistics: {
-        ...statistics,
-        savedBy: currentUser?.email,
-        savedAt: Date.now()
-      },
-      userEmail: 'statistics@system.com',
-      userId: currentUser?.id,
-      savedAt: Date.now(),
-      _isStatistics: true,
-      _statsUpdate: true
+    const statsToSave = {
+      ...statistics,
+      savedBy: currentUser?.email,
+      savedAt: Date.now()
     };
 
     const requestOptions = {
       method: HTTP_METHODS.PUT,
       headers: this._buildHeaders(token, true),
-      body: JSON.stringify(statsData)
+      body: JSON.stringify(statsToSave)
     };
 
-    const response = await this._makeRequest(API_ENDPOINTS.USER_MATCHES, requestOptions);
+    const response = await this._makeRequest(API_ENDPOINTS.STATISTICS, requestOptions);
     this._clearCache();
-    return response.data;
+    return response;
   }
 
   async deleteStatistics() {
     const token = await this._getAuthToken();
-    const currentUser = await authService.getCurrentUser();
-    const params = this._buildQueryParams({ 
-      userId: currentUser?.id,
-      statistics: true,
-      title: 'Team Statistics',
-      userEmail: 'statistics@nugt.app'
-    });
-    const url = `${API_ENDPOINTS.USER_MATCHES}?${params}`;
-
     const requestOptions = {
       method: HTTP_METHODS.DELETE,
       headers: this._buildHeaders(token)
     };
 
-    const response = await this._makeRequest(url, requestOptions);
+    const response = await this._makeRequest(API_ENDPOINTS.STATISTICS, requestOptions);
     this._clearCache();
     return response;
   }
 
   async loadStatistics() {
-    console.log('🌐 API: Loading statistics from cloud...');
-    
+    console.log('🌐 API: Loading statistics from cloud via new endpoint...');
     const token = await this._getAuthToken();
-    const url = `${API_ENDPOINTS.USER_MATCHES}?statistics=true`;
     const requestOptions = {
       method: HTTP_METHODS.GET,
       headers: this._buildHeaders(token)
     };
 
     try {
-      console.log('🌐 API: Making request to:', url);
-      const response = await this._makeRequest(url, requestOptions);
-      console.log('🌐 API: Statistics response received');
-      
-      // The server response has a `data` property containing the statistics object
-      const statsData = response.data;
+      const statsData = await this._makeRequest(API_ENDPOINTS.STATISTICS, requestOptions);
       console.log('📊 API: Extracted statistics data:', !!statsData);
-      
       return statsData;
     } catch (error) {
       console.error('❌ API: Statistics load error:', error);

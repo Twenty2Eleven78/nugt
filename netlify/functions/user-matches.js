@@ -110,30 +110,6 @@ exports.handler = async function(event, context) {
         };
       }
 
-      const isStatsRequest = event.queryStringParameters?.statistics === 'true';
-      if (isStatsRequest) {
-        console.log('=== STATISTICS REQUEST STARTED ===');
-        try {
-          const statsKey = 'statistics/stats.json';
-          const url = `${NETLIFY_BLOBS_API}/${SITE_ID}/${statsKey}`;
-          const res = await fetch(url, { headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` } });
-
-          if (!res.ok) {
-            if (res.status === 404) {
-              return { statusCode: 200, body: JSON.stringify({ message: 'No statistics found', data: null }) };
-            }
-            return { statusCode: 500, body: JSON.stringify({ error: 'Failed to retrieve statistics' }) };
-          }
-
-          const data = await res.text();
-          const stats = data ? JSON.parse(data) : null;
-          console.log('=== STATISTICS REQUEST COMPLETED ===');
-          return { statusCode: 200, body: JSON.stringify({ message: 'Statistics retrieved successfully', data: stats }) };
-        } catch (error) {
-          console.error('=== STATISTICS ERROR ===:', error);
-          return { statusCode: 500, body: JSON.stringify({ error: 'Failed to retrieve statistics' }) };
-        }
-      }
 
       if (isAdmin) {
         // Verify admin permissions
@@ -426,84 +402,49 @@ exports.handler = async function(event, context) {
     if (event.httpMethod === 'PUT' || event.httpMethod === 'POST') {
       try {
         const payload = JSON.parse(event.body);
-        
-        // Check if this is a statistics update
-        if (payload._isStatistics) {
-          console.log('=== SAVING STATISTICS ===');
-          // Ensure user is an admin
-          if (!isAdminUser(userId, userEmail)) {
-            return {
-              statusCode: 403,
-              body: JSON.stringify({ error: 'Insufficient permissions to save statistics' })
-            };
+
+        // Handle regular match data saving
+        const url = `${NETLIFY_BLOBS_API}/${SITE_ID}/${key}`;
+        const getRes = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
+        });
+
+        let matches = [];
+        if (getRes.ok) {
+          const existingData = await getRes.text();
+          try {
+            matches = JSON.parse(existingData);
+            if (!Array.isArray(matches)) matches = [matches];
+          } catch (e) {
+            console.warn('Could not parse existing matches:', e);
           }
-
-          const statsKey = 'statistics/stats.json';
-          const url = `${NETLIFY_BLOBS_API}/${SITE_ID}/${statsKey}`;
-          const dataToSave = payload.statistics;
-
-          const saveRes = await fetch(url, {
-            method: 'PUT',
-            headers: {
-              'Authorization': `Bearer ${ACCESS_TOKEN}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dataToSave)
-          });
-
-          if (!saveRes.ok) {
-            return { statusCode: 500, body: JSON.stringify({ error: 'Failed to save statistics' }) };
-          }
-
-          console.log('=== STATISTICS SAVED SUCCESSFULLY ===');
-          return {
-            statusCode: 200,
-            body: JSON.stringify({ message: 'Statistics saved successfully', data: dataToSave })
-          };
-        } else {
-          // Handle regular match data saving
-          const url = `${NETLIFY_BLOBS_API}/${SITE_ID}/${key}`;
-          const getRes = await fetch(url, {
-            headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
-          });
-
-          let matches = [];
-          if (getRes.ok) {
-            const existingData = await getRes.text();
-            try {
-              matches = JSON.parse(existingData);
-              if (!Array.isArray(matches)) matches = [matches];
-            } catch (e) {
-              console.warn('Could not parse existing matches:', e);
-            }
-          }
-
-          const newMatch = payload;
-          if (!newMatch.savedAt) newMatch.savedAt = Date.now();
-          matches.push(newMatch);
-
-          if (matches.length > 50) {
-            matches = matches.sort((a, b) => b.savedAt - a.savedAt).slice(0, 50);
-          }
-
-          const saveRes = await fetch(url, {
-            method: 'PUT',
-            headers: {
-              'Authorization': `Bearer ${ACCESS_TOKEN}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(matches)
-          });
-
-          if (!saveRes.ok) {
-            return { statusCode: 500, body: JSON.stringify({ error: 'Failed to save match' }) };
-          }
-
-          return {
-            statusCode: 200,
-            body: JSON.stringify({ message: 'Match saved successfully', data: newMatch })
-          };
         }
+
+        const newMatch = payload;
+        if (!newMatch.savedAt) newMatch.savedAt = Date.now();
+        matches.push(newMatch);
+
+        if (matches.length > 50) {
+          matches = matches.sort((a, b) => b.savedAt - a.savedAt).slice(0, 50);
+        }
+
+        const saveRes = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${ACCESS_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(matches)
+        });
+
+        if (!saveRes.ok) {
+          return { statusCode: 500, body: JSON.stringify({ error: 'Failed to save match' }) };
+        }
+
+        return {
+          statusCode: 200,
+          body: JSON.stringify({ message: 'Match saved successfully', data: newMatch })
+        };
       } catch (error) {
         console.error('Error saving data:', error);
         return { statusCode: 500, body: JSON.stringify({ error: 'Failed to save data' }) };

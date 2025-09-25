@@ -263,6 +263,16 @@ const init = () => {
     // Initialize match summary modal
     matchSummaryModal.init();
 
+    // Set proper z-index for modal stacking
+    if (modalElement && deleteModalElement && uploadModalElement && transferModalElement && clearStatsModalElement) {
+        const baseZIndex = 1050; // Bootstrap's default modal z-index
+        modalElement.style.zIndex = baseZIndex;
+        deleteModalElement.style.zIndex = baseZIndex + 10;
+        uploadModalElement.style.zIndex = baseZIndex + 10;
+        transferModalElement.style.zIndex = baseZIndex + 10;
+        clearStatsModalElement.style.zIndex = baseZIndex + 10;
+    }
+
 
 
     // Add refresh button functionality
@@ -287,24 +297,18 @@ const init = () => {
         });
     }
 
-    // Handle z-index adjustment when the modal is shown
+    // Add modal show event listeners for backdrop adjustment
+    if (deleteModalElement) {
+        deleteModalElement.addEventListener('shown.bs.modal', () => adjustModalBackdrop(deleteModalElement));
+    }
+    if (uploadModalElement) {
+        uploadModalElement.addEventListener('shown.bs.modal', () => adjustModalBackdrop(uploadModalElement));
+    }
+    if (transferModalElement) {
+        transferModalElement.addEventListener('shown.bs.modal', () => adjustModalBackdrop(transferModalElement));
+    }
     if (clearStatsModalElement) {
-        clearStatsModalElement.addEventListener('shown.bs.modal', () => {
-            const adminModal = document.getElementById('admin-modal');
-            if (adminModal) {
-                const adminModalZIndex = parseInt(window.getComputedStyle(adminModal).zIndex, 10);
-                clearStatsModalElement.style.zIndex = adminModalZIndex + 10;
-
-                // Adjust the backdrop as well
-                const backdrops = document.querySelectorAll('.modal-backdrop');
-                if (backdrops.length > 0) {
-                    const lastBackdrop = backdrops[backdrops.length - 1];
-                    if(lastBackdrop){
-                        lastBackdrop.style.zIndex = adminModalZIndex + 9;
-                    }
-                }
-            }
-        });
+        clearStatsModalElement.addEventListener('shown.bs.modal', () => adjustModalBackdrop(clearStatsModalElement));
     }
 
     const confirmClearStatsBtn = document.getElementById('confirm-clear-stats-btn');
@@ -1250,6 +1254,20 @@ const toggleMatchApproval = async (matchData, matchIndex) => {
         console.error('Error updating match approval:', error);
         notificationManager.error('Failed to update match approval status');
     }
+};
+
+// Function to handle modal backdrop z-index
+const adjustModalBackdrop = (modalElement) => {
+    setTimeout(() => {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        if (backdrops.length > 0) {
+            const backdrop = backdrops[backdrops.length - 1];
+            const modalZIndex = parseInt(window.getComputedStyle(modalElement).zIndex, 10);
+            if (backdrop) {
+                backdrop.style.zIndex = modalZIndex - 1;
+            }
+        }
+    }, 0);
 };
 
 const handleClearStatsConfirm = async () => {

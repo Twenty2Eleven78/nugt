@@ -52,12 +52,12 @@ exports.handler = async function(event, context) {
     const isAdminUser = (userId, userEmail) => {
   
       // Get admin identifiers from environment variables
-      const adminEmails = process.env.ADMIN_EMAILS ? 
-        process.env.ADMIN_EMAILS.split(',').map(email => email.trim().toLowerCase()) : 
+      const adminEmails = process.env.ADMIN_EMAILS ?
+        process.env.ADMIN_EMAILS.split(',').map(email => email.trim().toLowerCase()).filter(Boolean) :
         [];
-      
-      const adminUserIds = process.env.ADMIN_USER_IDS ? 
-        process.env.ADMIN_USER_IDS.split(',').map(id => id.trim()) : 
+
+      const adminUserIds = process.env.ADMIN_USER_IDS ?
+        process.env.ADMIN_USER_IDS.split(',').map(id => id.trim()).filter(Boolean) :
         [];
       
       // SECURITY: If no admin emails/IDs are configured, deny access

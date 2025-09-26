@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update visibility based on auth state
     const updateAdminButtonVisibility = async () => {
-      if (authService.isUserAuthenticated()) {
+      const user = authService.getCurrentUser();
+      if (authService.isUserAuthenticated() && user && user.email) {
         try {
           const isAdmin = await authService.isAdmin();
           if (isAdmin) {

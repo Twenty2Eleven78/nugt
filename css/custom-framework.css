@@ -3651,6 +3651,15 @@ x auth modal button layering and positioning */
     z-index: 1065 !important;
 }
 
+/* Ensure clear stats confirmation modal appears above admin modal */
+#clear-stats-confirm-modal {
+    z-index: 1070 !important;
+}
+
+#clear-stats-confirm-modal .modal-backdrop {
+    z-index: 1065 !important;
+}
+
 /* Admin modal should be lower */
 #admin-modal {
     z-index: 1055 !important;

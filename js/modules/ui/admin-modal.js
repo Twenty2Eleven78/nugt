@@ -303,21 +303,7 @@ const init = () => {
     if (clearStatsBtn) {
         clearStatsBtn.addEventListener('click', () => {
             if (clearStatsModalInstance) {
-                // Ensure proper z-index stacking before showing
-                const baseZIndex = 1050;
-                const clearStatsModalElement = document.getElementById('clear-stats-confirm-modal');
-                if (clearStatsModalElement) {
-                    clearStatsModalElement.style.zIndex = baseZIndex + 100;
-                }
                 clearStatsModalInstance.show();
-                
-                // Force recalculate backdrop
-                setTimeout(() => {
-                    const backdrop = document.querySelector('.modal-backdrop:last-child');
-                    if (backdrop) {
-                        backdrop.style.zIndex = baseZIndex + 99;
-                    }
-                }, 0);
             }
         });
     }

@@ -22,31 +22,21 @@ document.addEventListener('DOMContentLoaded', () => {
       adminModal.show();
     });
 
-    // Update visibility and state based on auth
+    // Update visibility based on auth state
     const updateAdminButtonVisibility = async () => {
       if (authService.isUserAuthenticated()) {
-        // Show button for all authenticated users, but disable it initially
-        adminModalButton.classList.remove('d-none');
-        adminModalButton.disabled = true;
-        adminModalButton.setAttribute('title', 'Verifying admin status...');
-
         try {
           const isAdmin = await authService.isAdmin();
           if (isAdmin) {
-            // Enable button for admins
-            adminModalButton.disabled = false;
-            adminModalButton.removeAttribute('title');
+            adminModalButton.classList.remove('d-none');
           } else {
-            // Keep button disabled for non-admins and set informative title
-            adminModalButton.setAttribute('title', 'Admin access required');
+            adminModalButton.classList.add('d-none');
           }
         } catch (error) {
           console.error('Error checking admin status:', error);
-          // Hide button on error
           adminModalButton.classList.add('d-none');
         }
       } else {
-        // Hide button for non-authenticated users
         adminModalButton.classList.add('d-none');
       }
     };

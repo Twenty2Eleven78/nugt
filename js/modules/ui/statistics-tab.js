@@ -29,34 +29,21 @@ class StatisticsTab {
         try {
             console.log('📊 Statistics Tab: Loading statistics...');
 
-            // First, fetch from the cloud to get the latest version
+            // Clear local stats to force fresh cloud data
+            localStorage.removeItem('generatedStatistics');
+
+            // Fetch fresh statistics from the cloud
             const cloudStats = await this._loadFromCloud();
             if (cloudStats) {
-                console.log('☁️ Statistics Tab: Loaded from cloud, updating local cache.');
+                console.log('☁️ Statistics Tab: Loaded fresh from cloud.');
                 this.statistics = cloudStats;
-                // Save to localStorage for future offline access
-                localStorage.setItem('generatedStatistics', JSON.stringify(cloudStats));
             } else {
-                // If cloud is empty, try to load from localStorage as fallback
-                const stored = localStorage.getItem('generatedStatistics');
-                if (stored) {
-                    this.statistics = JSON.parse(stored);
-                    console.log('💾 Statistics Tab: Loaded from localStorage (cloud unavailable):', this.statistics);
-                } else {
-                    console.log('❌ Statistics Tab: No statistics found in cloud or localStorage.');
-                    this.statistics = null;
-                }
+                console.log('❌ Statistics Tab: No statistics found in cloud.');
+                this.statistics = null;
             }
         } catch (error) {
             console.error('❌ Statistics Tab: Error loading statistics:', error);
-            // Fallback to localStorage if cloud fails
-            const stored = localStorage.getItem('generatedStatistics');
-            if (stored) {
-                this.statistics = JSON.parse(stored);
-                console.log('💾 Statistics Tab: Loaded from localStorage (cloud error):', this.statistics);
-            } else {
-                this.statistics = null;
-            }
+            this.statistics = null;
         }
     }
 

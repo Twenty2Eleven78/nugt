@@ -15,7 +15,7 @@ export const DEFAULT_ROSTER_CONFIG = {
 
     // Default players list
     players: [
-        { name: 'Rae', shirtNumber: 3 },
+        { name: 'Rae ', shirtNumber: 3 },
         { name: 'Amelia O', shirtNumber: 6 },
         { name: 'Amelia P', shirtNumber: 17 },
         { name: 'Aoife', shirtNumber: 2 },

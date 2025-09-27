@@ -29,29 +29,32 @@ class StatisticsTab {
         try {
             console.log('📊 Statistics Tab: Loading statistics...');
 
-            // First, try to load from localStorage for a quick display
-            const stored = localStorage.getItem('generatedStatistics');
-            if (stored) {
-                this.statistics = JSON.parse(stored);
-                console.log('💾 Statistics Tab: Loaded from localStorage:', this.statistics);
-            }
-
-            // Then, fetch from the cloud to get the latest version
+            // First, fetch from the cloud to get the latest version
             const cloudStats = await this._loadFromCloud();
             if (cloudStats) {
                 console.log('☁️ Statistics Tab: Loaded from cloud, updating local cache.');
                 this.statistics = cloudStats;
                 // Save to localStorage for future offline access
                 localStorage.setItem('generatedStatistics', JSON.stringify(cloudStats));
-            } else if (!this.statistics) {
-                // If cloud is empty and we didn't have stored stats, then there are no stats
-                console.log('❌ Statistics Tab: No statistics found in cloud or localStorage.');
-                this.statistics = null;
+            } else {
+                // If cloud is empty, try to load from localStorage as fallback
+                const stored = localStorage.getItem('generatedStatistics');
+                if (stored) {
+                    this.statistics = JSON.parse(stored);
+                    console.log('💾 Statistics Tab: Loaded from localStorage (cloud unavailable):', this.statistics);
+                } else {
+                    console.log('❌ Statistics Tab: No statistics found in cloud or localStorage.');
+                    this.statistics = null;
+                }
             }
         } catch (error) {
             console.error('❌ Statistics Tab: Error loading statistics:', error);
             // Fallback to localStorage if cloud fails
-            if (!this.statistics) {
+            const stored = localStorage.getItem('generatedStatistics');
+            if (stored) {
+                this.statistics = JSON.parse(stored);
+                console.log('💾 Statistics Tab: Loaded from localStorage (cloud error):', this.statistics);
+            } else {
                 this.statistics = null;
             }
         }

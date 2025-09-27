@@ -383,7 +383,7 @@ class StatisticsTab {
 
         return `
             <div class="row g-2 mb-3">
-                <div class="col-6 col-lg-3">
+                <div class="col-6">
                     <div class="stats-card stats-card-primary">
                         <div class="stats-icon">
                             <i class="fas fa-futbol"></i>
@@ -395,7 +395,21 @@ class StatisticsTab {
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-lg-3">
+                <div class="col-6">
+                    <div class="stats-card ${goalDifference >= 0 ? 'stats-card-success' : 'stats-card-info'}">
+                        <div class="stats-icon">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number">${goalDifference >= 0 ? '+' : ''}${goalDifference}</div>
+                            <div class="stats-label">Goal Diff</div>
+                            <div class="stats-sub">${teamStats.goalsFor || stats.totalGoals} for, ${teamStats.goalsAgainst || 0} against</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-2 mb-3">
+                <div class="col-4">
                     <div class="stats-card stats-card-success">
                         <div class="stats-icon">
                             <i class="fas fa-trophy"></i>
@@ -407,7 +421,19 @@ class StatisticsTab {
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-lg-3">
+                <div class="col-4">
+                    <div class="stats-card stats-card-danger">
+                        <div class="stats-icon">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number">${teamStats.losses || 0}</div>
+                            <div class="stats-label">Losses</div>
+                            <div class="stats-sub">${teamStats.avgGoalsAgainst || '0.0'} goals/game</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
                     <div class="stats-card stats-card-warning">
                         <div class="stats-icon">
                             <i class="fas fa-handshake"></i>
@@ -415,19 +441,7 @@ class StatisticsTab {
                         <div class="stats-content">
                             <div class="stats-number">${teamStats.draws || 0}</div>
                             <div class="stats-label">Draws</div>
-                            <div class="stats-sub">${teamStats.losses || 0} losses</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <div class="stats-card ${goalDifference >= 0 ? 'stats-card-success' : 'stats-card-info'}">
-                        <div class="stats-icon">
-                            <i class="fas fa-bullseye"></i>
-                        </div>
-                        <div class="stats-content">
-                            <div class="stats-number">${goalDifference >= 0 ? '+' : ''}${goalDifference}</div>
-                            <div class="stats-label">Goal Diff</div>
-                            <div class="stats-sub">${teamStats.goalsFor || stats.totalGoals} for, ${teamStats.goalsAgainst || 0} against</div>
+                            <div class="stats-sub">${teamStats.totalMatches ? ((teamStats.draws || 0) / teamStats.totalMatches * 100).toFixed(1) : '0.0'}% of matches</div>
                         </div>
                     </div>
                 </div>

@@ -13,8 +13,8 @@ export const APP_CONFIG = {
 
 // Cache Configuration
 export const CACHE_CONFIG = {
-  NAME: 'nugt-cache-v308',
-  VERSION: 'v308'
+  NAME: 'nugt-cache-v309',
+  VERSION: 'v309'
 };
 
 // Storage Keys - Local Storage identifiers

@@ -51,9 +51,6 @@ class ReleaseNotesManager {
       const response = await fetch('README.md');
       const text = await response.text();
 
-      console.log('README content length:', text.length);
-      console.log('README first 200 chars:', text.substring(0, 200));
-
       if (!text || text.trim().length === 0) {
         container.innerHTML = '<div class="alert alert-warning">README.md is empty or not found</div>';
         return;
@@ -64,7 +61,6 @@ class ReleaseNotesManager {
       const fullText = cacheInfo + text;
 
       const parsed = this._parseMarkdown(fullText);
-      console.log('Parsed HTML length:', parsed.length);
       container.innerHTML = parsed;
     } catch (error) {
       console.error('Error loading README:', error);

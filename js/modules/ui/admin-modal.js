@@ -1500,6 +1500,11 @@ const calculateStatisticsFromMatches = async (matches) => {
         }
 
         goals.forEach(goal => {
+            // Skip disallowed goals entirely
+            if (goal.disallowed === true || goal.isDisallowed === true) {
+                return;
+            }
+
             // Process scorer - use the correct property names from the actual data
             const scorer = goal.goalScorerName || goal.scorer || goal.player || goal.goalScorer;
             if (scorer && scorer.trim() && scorer !== 'Opposition' && scorer.trim().toLowerCase() !== 'n/a') {
@@ -1574,8 +1579,13 @@ const calculateStatisticsFromMatches = async (matches) => {
 
     matches.forEach(match => {
         // Count goals for and against - goals by team 1 players are goalsFor, others are goalsAgainst
+        // Exclude disallowed goals
         if (match.goals && Array.isArray(match.goals)) {
             match.goals.forEach(goal => {
+                // Skip disallowed goals
+                if (goal.disallowed === true || goal.isDisallowed === true) {
+                    return;
+                }
                 const scorer = goal.goalScorerName || goal.scorer || goal.player || goal.goalScorer;
                 if (scorer && scorer.trim() && scorer.trim().toLowerCase() !== 'n/a') {
                     const playerKey = scorer.toLowerCase().trim();
@@ -1597,14 +1607,18 @@ const calculateStatisticsFromMatches = async (matches) => {
             totalAttendance += attendedCount;
         }
 
-        // Determine match result based on goals for vs against
+        // Determine match result based on goals for vs against (excluding disallowed goals)
         const matchGoalsFor = match.goals ? match.goals.filter(g => {
+            // Skip disallowed goals
+            if (g.disallowed === true || g.isDisallowed === true) return false;
             const scorer = g.goalScorerName || g.scorer || g.player || g.goalScorer;
             if (!scorer || !scorer.trim() || scorer.trim().toLowerCase() === 'n/a') return false;
             const playerKey = scorer.toLowerCase().trim();
             return playerStatsMap.has(playerKey);
         }).length : 0;
         const matchGoalsAgainst = match.goals ? match.goals.filter(g => {
+            // Skip disallowed goals
+            if (g.disallowed === true || g.isDisallowed === true) return false;
             const scorer = g.goalScorerName || g.scorer || g.player || g.goalScorer;
             if (!scorer || !scorer.trim() || scorer.trim().toLowerCase() === 'n/a') return false;
             const playerKey = scorer.toLowerCase().trim();
@@ -1630,18 +1644,24 @@ const calculateStatisticsFromMatches = async (matches) => {
     // Generate per-match statistics
     const matchStats = matches.map((match, index) => {
         const matchGoalsFor = match.goals ? match.goals.filter(g => {
+            // Skip disallowed goals
+            if (g.disallowed === true || g.isDisallowed === true) return false;
             const scorer = g.goalScorerName || g.scorer || g.player || g.goalScorer;
             if (!scorer || !scorer.trim() || scorer.trim().toLowerCase() === 'n/a') return false;
             const playerKey = scorer.toLowerCase().trim();
             return playerStatsMap.has(playerKey);
         }).length : 0;
         const matchGoalsAgainst = match.goals ? match.goals.filter(g => {
+            // Skip disallowed goals
+            if (g.disallowed === true || g.isDisallowed === true) return false;
             const scorer = g.goalScorerName || g.scorer || g.player || g.goalScorer;
             if (!scorer || !scorer.trim() || scorer.trim().toLowerCase() === 'n/a') return false;
             const playerKey = scorer.toLowerCase().trim();
             return !playerStatsMap.has(playerKey);
         }).length : 0;
         const matchAssists = match.goals ? match.goals.filter(g => {
+            // Skip disallowed goals for assists
+            if (g.disallowed === true || g.isDisallowed === true) return false;
             const assistName = g.goalAssistName || g.assists || g.assist || g.assistedBy;
             if (!assistName || !assistName.trim() || assistName.trim().toLowerCase() === 'n/a') return false;
             const playerKey = assistName.toLowerCase().trim();
@@ -1657,8 +1677,10 @@ const calculateStatisticsFromMatches = async (matches) => {
             }).length;
         }
 
-        // Find top scorer for this match (only team 1 players)
+        // Find top scorer for this match (only team 1 players, excluding disallowed goals)
         const matchGoals = match.goals ? match.goals.filter(g => {
+            // Skip disallowed goals
+            if (g.disallowed === true || g.isDisallowed === true) return false;
             const scorer = g.goalScorerName || g.scorer || g.player || g.goalScorer;
             if (!scorer || !scorer.trim() || scorer.trim().toLowerCase() === 'n/a') return false;
             const playerKey = scorer.toLowerCase().trim();
@@ -1666,7 +1688,7 @@ const calculateStatisticsFromMatches = async (matches) => {
         }) : [];
         const scorerCounts = {};
         matchGoals.forEach(goal => {
-            const scorer = goal.goalScorerName || goal.scorer || goal.player || goal.goalScorer;
+            const scorer = goal.goalScorerName || goal.scorer || g.player || g.goalScorer;
             scorerCounts[scorer] = (scorerCounts[scorer] || 0) + 1;
         });
 

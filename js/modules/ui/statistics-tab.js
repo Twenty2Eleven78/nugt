@@ -144,9 +144,12 @@ class StatisticsTab {
                             
                             // Initialize charts if charts view
                             if (view === 'charts') {
-                                setTimeout(() => {
-                                    seasonCharts.initializeCharts(this.statistics);
-                                }, 100);
+                                // Use multiple animation frames to ensure DOM is ready
+                                requestAnimationFrame(() => {
+                                    requestAnimationFrame(() => {
+                                        seasonCharts.initializeCharts(this.statistics);
+                                    });
+                                });
                             }
                         }, 150);
                     }

@@ -34,6 +34,8 @@ class SeasonCharts {
     if (!matchStats || matchStats.length === 0) return null;
 
     const ctx = document.createElement('canvas');
+    ctx.style.width = '100%';
+    ctx.style.height = '100%';
     container.appendChild(ctx);
 
     const labels = matchStats.map((match, index) => `Match ${index + 1}`);
@@ -84,6 +86,8 @@ class SeasonCharts {
     if (!matchStats || matchStats.length === 0) return null;
 
     const ctx = document.createElement('canvas');
+    ctx.style.width = '100%';
+    ctx.style.height = '100%';
     container.appendChild(ctx);
 
     let wins = 0, draws = 0, losses = 0;
@@ -146,6 +150,8 @@ class SeasonCharts {
     if (!playerStats || playerStats.length === 0) return null;
 
     const ctx = document.createElement('canvas');
+    ctx.style.width = '100%';
+    ctx.style.height = '100%';
     container.appendChild(ctx);
 
     const topPlayers = playerStats
@@ -201,6 +207,8 @@ class SeasonCharts {
     if (!matchStats || matchStats.length === 0) return null;
 
     const ctx = document.createElement('canvas');
+    ctx.style.width = '100%';
+    ctx.style.height = '100%';
     container.appendChild(ctx);
 
     const attendanceData = matchStats.map(match => match.attendance || 0);
@@ -308,7 +316,10 @@ class SeasonCharts {
 
   // Initialize charts after rendering
   async initializeCharts(statistics) {
-    if (!statistics || !window.Chart) return;
+    if (!statistics || !window.Chart) {
+      console.warn('Charts initialization skipped: missing statistics or Chart.js not loaded');
+      return;
+    }
 
     // Clear existing charts
     Object.values(this.charts).forEach(chart => chart.destroy());
@@ -317,26 +328,52 @@ class SeasonCharts {
     const matchStats = statistics.matchStats || [];
     const playerStats = statistics.playerStats || [];
 
-    // Create charts
-    const goalsContainer = document.getElementById('goals-trend-chart');
-    if (goalsContainer && matchStats.length > 0) {
-      this.charts.goals = this.createGoalsPerMatchChart(goalsContainer, matchStats);
-    }
+    // Stagger chart creation to avoid performance issues
+    const createChartWithDelay = (containerId, createFn, data, delay = 0) => {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          try {
+            const container = document.getElementById(containerId);
+            if (!container) {
+              console.warn(`Chart container ${containerId} not found`);
+              resolve(null);
+              return;
+            }
 
-    const winlossContainer = document.getElementById('winloss-chart');
-    if (winlossContainer && matchStats.length > 0) {
-      this.charts.winloss = this.createWinLossChart(winlossContainer, matchStats);
-    }
+            // Check if container is visible
+            if (container.offsetWidth === 0 || container.offsetHeight === 0) {
+              console.warn(`Chart container ${containerId} is not visible`);
+              resolve(null);
+              return;
+            }
 
-    const playerContainer = document.getElementById('player-performance-chart');
-    if (playerContainer && playerStats.length > 0) {
-      this.charts.player = this.createPlayerPerformanceChart(playerContainer, playerStats);
-    }
+            const chart = createFn(container, data);
+            resolve(chart);
+          } catch (error) {
+            console.error(`Failed to create chart ${containerId}:`, error);
+            resolve(null);
+          }
+        }, delay);
+      });
+    };
 
-    const attendanceContainer = document.getElementById('attendance-chart');
-    if (attendanceContainer && matchStats.length > 0) {
-      this.charts.attendance = this.createAttendanceChart(attendanceContainer, matchStats);
-    }
+    // Create charts with staggered timing
+    const chartPromises = [
+      createChartWithDelay('goals-trend-chart', this.createGoalsPerMatchChart.bind(this), matchStats, 0),
+      createChartWithDelay('winloss-chart', this.createWinLossChart.bind(this), matchStats, 50),
+      createChartWithDelay('player-performance-chart', this.createPlayerPerformanceChart.bind(this), playerStats, 100),
+      createChartWithDelay('attendance-chart', this.createAttendanceChart.bind(this), matchStats, 150)
+    ];
+
+    const charts = await Promise.all(chartPromises);
+
+    // Store successful charts
+    if (charts[0]) this.charts.goals = charts[0];
+    if (charts[1]) this.charts.winloss = charts[1];
+    if (charts[2]) this.charts.player = charts[2];
+    if (charts[3]) this.charts.attendance = charts[3];
+
+    console.log(`Charts initialized: ${Object.keys(this.charts).length} charts created`);
   }
 
   // Destroy all charts

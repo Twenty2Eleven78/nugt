@@ -11,6 +11,12 @@ export const APP_CONFIG = {
   DESCRIPTION: 'Football match tracking and statistics application'
 };
 
+// Cache Configuration
+export const CACHE_CONFIG = {
+  NAME: 'nugt-cache-v308',
+  VERSION: 'v308'
+};
+
 // Storage Keys - Local Storage identifiers
 export const STORAGE_KEYS = {
   // Timer and Game State

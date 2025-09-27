@@ -5,6 +5,7 @@
 
 import { CustomModal } from '../shared/custom-modal.js';
 import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
+import { CACHE_CONFIG } from '../shared/constants.js';
 
 class ReleaseNotesManager {
   constructor() {
@@ -46,19 +47,23 @@ class ReleaseNotesManager {
 
     try {
       container.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary mb-3"></div><p class="text-muted">Loading...</p></div>';
-      
+
       const response = await fetch('README.md');
       const text = await response.text();
-      
+
       console.log('README content length:', text.length);
       console.log('README first 200 chars:', text.substring(0, 200));
-      
+
       if (!text || text.trim().length === 0) {
         container.innerHTML = '<div class="alert alert-warning">README.md is empty or not found</div>';
         return;
       }
-      
-      const parsed = this._parseMarkdown(text);
+
+      // Add cache version to the first row
+      const cacheInfo = `Cache Version: ${CACHE_CONFIG.VERSION} (${CACHE_CONFIG.NAME})\n\n`;
+      const fullText = cacheInfo + text;
+
+      const parsed = this._parseMarkdown(fullText);
       console.log('Parsed HTML length:', parsed.length);
       container.innerHTML = parsed;
     } catch (error) {

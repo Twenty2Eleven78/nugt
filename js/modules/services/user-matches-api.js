@@ -262,8 +262,18 @@ class UserMatchesAPI {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
+      // Add cache-busting headers for GET requests to ensure fresh data
+      const requestOptions = { ...options };
+      if (options.method === 'GET' || !options.method) {
+        requestOptions.headers = {
+          ...requestOptions.headers,
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        };
+      }
+
       const response = await fetch(url, {
-        ...options,
+        ...requestOptions,
         signal: controller.signal
       });
 

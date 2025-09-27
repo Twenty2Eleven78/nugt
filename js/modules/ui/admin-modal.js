@@ -1500,8 +1500,6 @@ const calculateStatisticsFromMatches = async (matches) => {
         }
 
         goals.forEach(goal => {
-            totalGoalsFound++;
-
             // Process scorer - use the correct property names from the actual data
             const scorer = goal.goalScorerName || goal.scorer || goal.player || goal.goalScorer;
             if (scorer && scorer.trim() && scorer !== 'Opposition' && scorer.trim().toLowerCase() !== 'n/a') {
@@ -1509,6 +1507,7 @@ const calculateStatisticsFromMatches = async (matches) => {
 
                 // Only count goals for players who are already in the lineup (team 1 players)
                 if (playerStatsMap.has(playerKey)) {
+                    totalGoalsFound++; // Only increment for team 1 goals
                     const player = playerStatsMap.get(playerKey);
                     player.goals++;
                     player.matchesWithGoals.add(matchIndex);
@@ -1518,17 +1517,17 @@ const calculateStatisticsFromMatches = async (matches) => {
                         player.shirtNumber = goal.goalScorerShirtNumber;
                     }
                 }
-                // Note: Opposition goals are not counted in player stats, only in team goalsAgainst
+                // Note: Opposition goals are not counted in team totals or player stats
             }
 
             // Process assists - use the correct property names from the actual data
             const assistName = goal.goalAssistName || goal.assists || goal.assist || goal.assistedBy;
             if (assistName && assistName.trim() && assistName !== 'Opposition' && assistName.trim().toLowerCase() !== 'n/a') {
-                totalAssistsFound++;
                 const playerKey = assistName.toLowerCase().trim();
 
                 // Only count assists for players who are already in the lineup (team 1 players)
                 if (playerStatsMap.has(playerKey)) {
+                    totalAssistsFound++; // Only increment for team 1 assists
                     const player = playerStatsMap.get(playerKey);
                     player.assists++;
                     player.matchesWithAssists.add(matchIndex);
@@ -1538,7 +1537,7 @@ const calculateStatisticsFromMatches = async (matches) => {
                         player.shirtNumber = goal.goalAssistShirtNumber;
                     }
                 }
-                // Note: Opposition assists are not counted in player stats
+                // Note: Opposition assists are not counted in team totals
             }
         });
     });

@@ -1572,32 +1572,46 @@ const calculateStatisticsFromMatches = async (matches) => {
     // Calculate team statistics
     let wins = 0, draws = 0, losses = 0, goalsFor = 0, goalsAgainst = 0;
     let totalAttendance = 0;
-    
+
     matches.forEach(match => {
-        // Count goals for and against
+        // Count goals for and against - goals by team 1 players are goalsFor, others are goalsAgainst
         if (match.goals && Array.isArray(match.goals)) {
             match.goals.forEach(goal => {
-                if (goal.goalScorerName && goal.goalScorerName !== 'Opposition') {
-                    goalsFor++;
-                } else if (goal.goalScorerName === 'Opposition') {
-                    goalsAgainst++;
+                const scorer = goal.goalScorerName || goal.scorer || goal.player || goal.goalScorer;
+                if (scorer && scorer.trim() && scorer.trim().toLowerCase() !== 'n/a') {
+                    const playerKey = scorer.toLowerCase().trim();
+                    if (playerStatsMap.has(playerKey)) {
+                        goalsFor++;
+                    } else {
+                        goalsAgainst++;
+                    }
                 }
             });
         }
-        
+
         // Count attendance
         if (match.attendance && Array.isArray(match.attendance)) {
             const attendedCount = match.attendance.filter(attendee => {
                 if (typeof attendee === 'string') return true;
-                return attendee && (attendee.attendance === true || attendee.present === true || attendee.attended === true);
+                return attendee && (attendee.attendance === true || attendee.present === true || attendee.attended === true || attendee.attending === true);
             }).length;
             totalAttendance += attendedCount;
         }
-        
-        // Determine match result (simplified - you might want to enhance this)
-        const matchGoalsFor = match.goals ? match.goals.filter(g => g.goalScorerName !== 'Opposition').length : 0;
-        const matchGoalsAgainst = match.goals ? match.goals.filter(g => g.goalScorerName === 'Opposition').length : 0;
-        
+
+        // Determine match result based on goals for vs against
+        const matchGoalsFor = match.goals ? match.goals.filter(g => {
+            const scorer = g.goalScorerName || g.scorer || g.player || g.goalScorer;
+            if (!scorer || !scorer.trim() || scorer.trim().toLowerCase() === 'n/a') return false;
+            const playerKey = scorer.toLowerCase().trim();
+            return playerStatsMap.has(playerKey);
+        }).length : 0;
+        const matchGoalsAgainst = match.goals ? match.goals.filter(g => {
+            const scorer = g.goalScorerName || g.scorer || g.player || g.goalScorer;
+            if (!scorer || !scorer.trim() || scorer.trim().toLowerCase() === 'n/a') return false;
+            const playerKey = scorer.toLowerCase().trim();
+            return !playerStatsMap.has(playerKey);
+        }).length : 0;
+
         if (matchGoalsFor > matchGoalsAgainst) {
             wins++;
         } else if (matchGoalsFor === matchGoalsAgainst) {
@@ -1616,10 +1630,25 @@ const calculateStatisticsFromMatches = async (matches) => {
 
     // Generate per-match statistics
     const matchStats = matches.map((match, index) => {
-        const matchGoalsFor = match.goals ? match.goals.filter(g => g.goalScorerName && g.goalScorerName !== 'Opposition').length : 0;
-        const matchGoalsAgainst = match.goals ? match.goals.filter(g => g.goalScorerName === 'Opposition').length : 0;
-        const matchAssists = match.goals ? match.goals.filter(g => g.goalAssistName && g.goalAssistName !== 'Opposition').length : 0;
-        
+        const matchGoalsFor = match.goals ? match.goals.filter(g => {
+            const scorer = g.goalScorerName || g.scorer || g.player || g.goalScorer;
+            if (!scorer || !scorer.trim() || scorer.trim().toLowerCase() === 'n/a') return false;
+            const playerKey = scorer.toLowerCase().trim();
+            return playerStatsMap.has(playerKey);
+        }).length : 0;
+        const matchGoalsAgainst = match.goals ? match.goals.filter(g => {
+            const scorer = g.goalScorerName || g.scorer || g.player || g.goalScorer;
+            if (!scorer || !scorer.trim() || scorer.trim().toLowerCase() === 'n/a') return false;
+            const playerKey = scorer.toLowerCase().trim();
+            return !playerStatsMap.has(playerKey);
+        }).length : 0;
+        const matchAssists = match.goals ? match.goals.filter(g => {
+            const assistName = g.goalAssistName || g.assists || g.assist || g.assistedBy;
+            if (!assistName || !assistName.trim() || assistName.trim().toLowerCase() === 'n/a') return false;
+            const playerKey = assistName.toLowerCase().trim();
+            return playerStatsMap.has(playerKey);
+        }).length : 0;
+
         // Count attendance for this match
         let matchAttendance = 0;
         if (match.attendance && Array.isArray(match.attendance)) {
@@ -1628,15 +1657,20 @@ const calculateStatisticsFromMatches = async (matches) => {
                 return attendee && (attendee.attendance === true || attendee.present === true || attendee.attended === true || attendee.attending === true);
             }).length;
         }
-        
-        // Find top scorer for this match
-        const matchGoals = match.goals ? match.goals.filter(g => g.goalScorerName && g.goalScorerName !== 'Opposition' && g.goalScorerName.toLowerCase() !== 'n/a') : [];
+
+        // Find top scorer for this match (only team 1 players)
+        const matchGoals = match.goals ? match.goals.filter(g => {
+            const scorer = g.goalScorerName || g.scorer || g.player || g.goalScorer;
+            if (!scorer || !scorer.trim() || scorer.trim().toLowerCase() === 'n/a') return false;
+            const playerKey = scorer.toLowerCase().trim();
+            return playerStatsMap.has(playerKey);
+        }) : [];
         const scorerCounts = {};
         matchGoals.forEach(goal => {
-            const scorer = goal.goalScorerName;
+            const scorer = goal.goalScorerName || goal.scorer || goal.player || goal.goalScorer;
             scorerCounts[scorer] = (scorerCounts[scorer] || 0) + 1;
         });
-        
+
         let topScorer = 'None';
         let maxGoals = 0;
         Object.entries(scorerCounts).forEach(([scorer, goals]) => {
@@ -1645,10 +1679,10 @@ const calculateStatisticsFromMatches = async (matches) => {
                 topScorer = `${scorer} (${goals})`;
             }
         });
-        
+
         const opposition = match.team2Name || match.opposition || match.opponent || 'Unknown';
         console.log(`Match ${index}: team2name="${match.team2name}", opposition="${match.opposition}", opponent="${match.opponent}", final="${opposition}"`);
-        
+
         return {
             date: match.date || match.matchDate || match.savedAt,
             opposition: opposition,

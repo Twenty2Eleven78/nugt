@@ -1463,11 +1463,11 @@ const calculateStatisticsFromMatches = async (matches) => {
             }
         }
         
-        // Process attendance
+        // Process attendance - only count for players already in lineup (team 1 players)
         if (match.attendance && Array.isArray(match.attendance)) {
             match.attendance.forEach(attendee => {
                 let name, isPresent;
-                
+
                 if (typeof attendee === 'string' && attendee.trim()) {
                     name = attendee.trim();
                     isPresent = true;
@@ -1479,24 +1479,12 @@ const calculateStatisticsFromMatches = async (matches) => {
 
                 if (name && isPresent) {
                     const playerKey = name.toLowerCase().trim();
-                    
+
+                    // Only count attendance for players who are already in the lineup (team 1 players)
                     if (playerStatsMap.has(playerKey)) {
                         playerStatsMap.get(playerKey).matchesPlayed.add(matchIndex);
-                    } else {
-                        playerStatsMap.set(playerKey, {
-                            name: name.trim(),
-                            shirtNumber: null,
-                            goals: 0,
-                            assists: 0,
-                            appearances: 0,
-                            starts: 0,
-                            substitute: 0,
-                            matchesWithGoals: new Set(),
-                            matchesWithAssists: new Set(),
-                            matchesPlayed: new Set([matchIndex]),
-                            isRosterPlayer: false
-                        });
                     }
+                    // Note: Do not create new player entries for attendees not in lineup
                 }
             });
         }
@@ -1513,12 +1501,13 @@ const calculateStatisticsFromMatches = async (matches) => {
 
         goals.forEach(goal => {
             totalGoalsFound++;
-            
+
             // Process scorer - use the correct property names from the actual data
             const scorer = goal.goalScorerName || goal.scorer || goal.player || goal.goalScorer;
             if (scorer && scorer.trim() && scorer !== 'Opposition' && scorer.trim().toLowerCase() !== 'n/a') {
                 const playerKey = scorer.toLowerCase().trim();
-                
+
+                // Only count goals for players who are already in the lineup (team 1 players)
                 if (playerStatsMap.has(playerKey)) {
                     const player = playerStatsMap.get(playerKey);
                     player.goals++;
@@ -1528,21 +1517,8 @@ const calculateStatisticsFromMatches = async (matches) => {
                     if (goal.goalScorerShirtNumber && !player.shirtNumber) {
                         player.shirtNumber = goal.goalScorerShirtNumber;
                     }
-                } else {
-                    playerStatsMap.set(playerKey, {
-                        name: scorer.trim(),
-                        shirtNumber: goal.goalScorerShirtNumber || null,
-                        goals: 1,
-                        assists: 0,
-                        appearances: 0,
-                        starts: 0,
-                        substitute: 0,
-                        matchesWithGoals: new Set([matchIndex]),
-                        matchesWithAssists: new Set(),
-                        matchesPlayed: new Set([matchIndex]),
-                        isRosterPlayer: false
-                    });
                 }
+                // Note: Opposition goals are not counted in player stats, only in team goalsAgainst
             }
 
             // Process assists - use the correct property names from the actual data
@@ -1550,7 +1526,8 @@ const calculateStatisticsFromMatches = async (matches) => {
             if (assistName && assistName.trim() && assistName !== 'Opposition' && assistName.trim().toLowerCase() !== 'n/a') {
                 totalAssistsFound++;
                 const playerKey = assistName.toLowerCase().trim();
-                
+
+                // Only count assists for players who are already in the lineup (team 1 players)
                 if (playerStatsMap.has(playerKey)) {
                     const player = playerStatsMap.get(playerKey);
                     player.assists++;
@@ -1560,21 +1537,8 @@ const calculateStatisticsFromMatches = async (matches) => {
                     if (goal.goalAssistShirtNumber && !player.shirtNumber) {
                         player.shirtNumber = goal.goalAssistShirtNumber;
                     }
-                } else {
-                    playerStatsMap.set(playerKey, {
-                        name: assistName.trim(),
-                        shirtNumber: goal.goalAssistShirtNumber || null,
-                        goals: 0,
-                        assists: 1,
-                        appearances: 0,
-                        starts: 0,
-                        substitute: 0,
-                        matchesWithGoals: new Set(),
-                        matchesWithAssists: new Set([matchIndex]),
-                        matchesPlayed: new Set([matchIndex]),
-                        isRosterPlayer: false
-                    });
                 }
+                // Note: Opposition assists are not counted in player stats
             }
         });
     });

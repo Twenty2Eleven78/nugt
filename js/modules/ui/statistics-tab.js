@@ -343,14 +343,14 @@ class StatisticsTab {
                     </div>
                 </div>
                 <div class="col-6 col-lg-3">
-                    <div class="stats-card stats-card-warning">
+                    <div class="stats-card stats-card-info">
                         <div class="stats-icon">
-                            <i class="fas fa-star"></i>
+                            <i class="fas fa-plus-circle"></i>
                         </div>
                         <div class="stats-content">
-                            <div class="stats-number">${nonRosterPlayers.length}</div>
-                            <div class="stats-label">Guests</div>
-                            <div class="stats-sub">${playerStats.filter(p => !p.isRosterPlayer && p.totalContributions > 0).length} contributed</div>
+                            <div class="stats-number">${totalGoals + totalAssists}</div>
+                            <div class="stats-label">Contributions</div>
+                            <div class="stats-sub">${(totalGoals + totalAssists) / playerStats.length > 0 ? ((totalGoals + totalAssists) / playerStats.length).toFixed(1) : '0.0'} per player</div>
                         </div>
                     </div>
                 </div>

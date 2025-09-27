@@ -1745,8 +1745,8 @@ const saveGeneratedStatistics = async (statistics) => {
     console.log('📊 Admin: Saving generated statistics:', statistics);
     
     // Save to localStorage as fallback
-    localStorage.setItem('generatedStatistics', JSON.stringify(statistics));
-    console.log('💾 Admin: Saved to localStorage');
+    //localStorage.setItem('generatedStatistics', JSON.stringify(statistics));
+    //console.log('💾 Admin: Saved to localStorage');
     
     // Save to cloud storage for sharing across users
     try {

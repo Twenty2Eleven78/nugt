@@ -72,31 +72,31 @@ class StatisticsTab {
 
         container.innerHTML = `
             <!-- Enhanced Navigation -->
-            <div class="stats-nav-container mb-3">
-                <div class="stats-nav-pills">
-                    <button type="button" class="stats-nav-pill active" data-view="overview">
-                        <i class="fas fa-chart-pie"></i>
+            <div class="mb-3">
+                <div class="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+                    <button type="button" class="stats-nav-pill active flex-1 py-2 px-3 rounded-md text-sm font-medium bg-white text-gray-900 shadow-sm" data-view="overview">
+                        <i class="fas fa-chart-pie mr-1"></i>
                         <span>Overview</span>
                     </button>
-                    <button type="button" class="stats-nav-pill" data-view="players">
-                        <i class="fas fa-users"></i>
+                    <button type="button" class="stats-nav-pill flex-1 py-2 px-3 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900" data-view="players">
+                        <i class="fas fa-users mr-1"></i>
                         <span>Players</span>
                     </button>
-                    <button type="button" class="stats-nav-pill" data-view="teams">
-                        <i class="fas fa-shield-alt"></i>
+                    <button type="button" class="stats-nav-pill flex-1 py-2 px-3 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900" data-view="teams">
+                        <i class="fas fa-shield-alt mr-1"></i>
                         <span>Team</span>
                     </button>
-                    <button type="button" class="stats-nav-pill" data-view="matches">
-                        <i class="fas fa-calendar-alt"></i>
+                    <button type="button" class="stats-nav-pill flex-1 py-2 px-3 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900" data-view="matches">
+                        <i class="fas fa-calendar-alt mr-1"></i>
                         <span>Matches</span>
                     </button>
-                    <button type="button" class="stats-nav-pill" data-view="charts">
-                        <i class="fas fa-chart-line"></i>
+                    <button type="button" class="stats-nav-pill flex-1 py-2 px-3 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900" data-view="charts">
+                        <i class="fas fa-chart-line mr-1"></i>
                         <span>Charts</span>
                     </button>
                 </div>
             </div>
-            
+
             <!-- Content Area -->
             <div id="stats-view-content" class="stats-content">
                 ${this._renderOverviewStats()}
@@ -130,8 +130,12 @@ class StatisticsTab {
                 if (view && view !== this.currentView) {
                     // Update active button with smooth transition
                     const buttons = container.querySelectorAll('.stats-nav-pill');
-                    buttons.forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
+                    buttons.forEach(btn => {
+                        btn.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
+                        btn.classList.add('text-gray-600', 'hover:text-gray-900');
+                    });
+                    button.classList.remove('text-gray-600', 'hover:text-gray-900');
+                    button.classList.add('bg-white', 'text-gray-900', 'shadow-sm');
 
                     // Add loading state
                     const content = document.getElementById('stats-view-content');
@@ -212,78 +216,66 @@ class StatisticsTab {
         
         return `
             <!-- Mobile-Optimized Summary Cards -->
-            <div class="row g-2 mb-3">
-                <div class="col-6 col-lg-3">
-                    <div class="stats-card stats-card-primary">
-                        <div class="stats-icon">
-                            <i class="fas fa-futbol"></i>
-                        </div>
-                        <div class="stats-content">
-                            <div class="stats-number">${stats.totalMatches}</div>
-                            <div class="stats-label">Matches</div>
-                        </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-3">
+                <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                    <div class="flex items-center justify-center mb-2">
+                        <i class="fas fa-futbol text-2xl text-blue-600"></i>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-600">${stats.totalMatches}</div>
+                        <div class="text-sm text-gray-600">Matches</div>
                     </div>
                 </div>
-                <div class="col-6 col-lg-3">
-                    <div class="stats-card stats-card-success">
-                        <div class="stats-icon">
-                            <i class="fas fa-bullseye"></i>
-                        </div>
-                        <div class="stats-content">
-                            <div class="stats-number">${stats.totalGoals}</div>
-                            <div class="stats-label">Goals</div>
-                            <div class="stats-sub">${avgGoalsPerMatch}/match</div>
-                        </div>
+                <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+                    <div class="flex items-center justify-center mb-2">
+                        <i class="fas fa-bullseye text-2xl text-green-600"></i>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-green-600">${stats.totalGoals}</div>
+                        <div class="text-sm text-gray-600">Goals</div>
+                        <div class="text-xs text-gray-500">${avgGoalsPerMatch}/match</div>
                     </div>
                 </div>
-                <div class="col-6 col-lg-3">
-                    <div class="stats-card stats-card-info">
-                        <div class="stats-icon">
-                            <i class="fas fa-hands-helping"></i>
-                        </div>
-                        <div class="stats-content">
-                            <div class="stats-number">${stats.totalAssists}</div>
-                            <div class="stats-label">Assists</div>
-                            <div class="stats-sub">${avgAssistsPerMatch}/match</div>
-                        </div>
+                <div class="bg-cyan-50 rounded-lg p-4 border border-cyan-200">
+                    <div class="flex items-center justify-center mb-2">
+                        <i class="fas fa-hands-helping text-2xl text-cyan-600"></i>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-cyan-600">${stats.totalAssists}</div>
+                        <div class="text-sm text-gray-600">Assists</div>
+                        <div class="text-xs text-gray-500">${avgAssistsPerMatch}/match</div>
                     </div>
                 </div>
-                <div class="col-6 col-lg-3">
-                    <div class="stats-card stats-card-warning">
-                        <div class="stats-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stats-content">
-                            <div class="stats-number">${stats.playerStats?.length || 0}</div>
-                            <div class="stats-label">Players</div>
-                            <div class="stats-sub">${stats.playerStats?.filter(p => p.goals > 0).length || 0} scorers</div>
-                        </div>
+                <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                    <div class="flex items-center justify-center mb-2">
+                        <i class="fas fa-users text-2xl text-yellow-600"></i>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-yellow-600">${stats.playerStats?.length || 0}</div>
+                        <div class="text-sm text-gray-600">Players</div>
+                        <div class="text-xs text-gray-500">${stats.playerStats?.filter(p => p.goals > 0).length || 0} scorers</div>
                     </div>
                 </div>
             </div>
 
             <!-- Top Performers Section -->
-            <div class="row g-2">
-                <div class="col-12 col-md-6">
-                    <div class="stats-section">
-                        <div class="stats-section-header">
-                            <i class="fas fa-trophy text-warning me-2"></i>
-                            <span>Top Goal Scorers</span>
-                        </div>
-                        <div class="stats-section-body" style="height: 200px; overflow-y: scroll;">
-                            ${this._renderTopScorers(stats.playerStats || [])}
-                        </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center">
+                        <i class="fas fa-trophy text-yellow-500 mr-2"></i>
+                        <span class="font-semibold">Top Goal Scorers</span>
+                    </div>
+                    <div class="p-4 h-48 overflow-y-auto">
+                        ${this._renderTopScorers(stats.playerStats || [])}
                     </div>
                 </div>
-                <div class="col-12 col-md-6">
-                    <div class="stats-section">
-                        <div class="stats-section-header">
-                            <i class="fas fa-handshake text-info me-2"></i>
-                            <span>Top Assist Providers</span>
-                        </div>
-                        <div class="stats-section-body" style="height: 200px; overflow-y: scroll;">
-                            ${this._renderTopAssists(stats.playerStats || [])}
-                        </div>
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center">
+                        <i class="fas fa-handshake text-blue-500 mr-2"></i>
+                        <span class="font-semibold">Top Assist Providers</span>
+                    </div>
+                    <div class="p-4 h-48 overflow-y-auto">
+                        ${this._renderTopAssists(stats.playerStats || [])}
                     </div>
                 </div>
             </div>
@@ -646,18 +638,21 @@ class StatisticsTab {
 
         return topScorers.map((player, index) => {
             const position = index + 1;
-            const positionClass = position === 1 ? 'position-gold' : position === 2 ? 'position-silver' : position === 3 ? 'position-bronze' : 'position-other';
-            
+            const positionClass = position === 1 ? 'bg-yellow-400 text-yellow-900' : position === 2 ? 'bg-gray-300 text-gray-900' : position === 3 ? 'bg-orange-400 text-orange-900' : 'bg-gray-100 text-gray-900';
+
             return `
-                <div class="stats-player-item">
-                    <div class="player-position ${positionClass}">${position}</div>
-                    <div class="player-info">
-                        <div class="player-name">${this._escapeHtml(player.name)} <small class="d-sm-none text-muted">${player.appearances} apps • ${player.goalsPerMatch} goals/game</small></div>
-                        <div class="player-details d-none d-sm-block">${player.appearances} apps • ${player.goalsPerMatch} goals/game</div>
+                <div class="flex justify-between items-center p-2 border-b border-gray-100 last:border-b-0">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-full ${positionClass} flex items-center justify-center font-bold text-sm">${position}</div>
+                        <div>
+                            <div class="font-semibold">${this._escapeHtml(player.name)}</div>
+                            <div class="text-sm text-gray-600 md:hidden">${player.appearances} apps • ${player.goalsPerMatch} goals/game</div>
+                            <div class="text-sm text-gray-600 hidden md:block">${player.appearances} apps • ${player.goalsPerMatch} goals/game</div>
+                        </div>
                     </div>
-                    <div class="player-stat">
-                        <div class="stat-value">${player.goals}</div>
-                        <div class="stat-label">goals</div>
+                    <div class="text-right">
+                        <div class="text-xl font-bold text-green-600">${player.goals}</div>
+                        <div class="text-sm text-gray-500">goals</div>
                     </div>
                 </div>
             `;
@@ -680,18 +675,21 @@ class StatisticsTab {
 
         return topAssists.map((player, index) => {
             const position = index + 1;
-            const positionClass = position === 1 ? 'position-gold' : position === 2 ? 'position-silver' : position === 3 ? 'position-bronze' : 'position-other';
-            
+            const positionClass = position === 1 ? 'bg-yellow-400 text-yellow-900' : position === 2 ? 'bg-gray-300 text-gray-900' : position === 3 ? 'bg-orange-400 text-orange-900' : 'bg-gray-100 text-gray-900';
+
             return `
-                <div class="stats-player-item">
-                    <div class="player-position ${positionClass}">${position}</div>
-                    <div class="player-info">
-                        <div class="player-name">${this._escapeHtml(player.name)} <small class="d-sm-none text-muted">${player.appearances} apps • ${player.assistsPerMatch} assists/game</small></div>
-                        <div class="player-details d-none d-sm-block">${player.appearances} apps • ${player.assistsPerMatch} assists/game</div>
+                <div class="flex justify-between items-center p-2 border-b border-gray-100 last:border-b-0">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-full ${positionClass} flex items-center justify-center font-bold text-sm">${position}</div>
+                        <div>
+                            <div class="font-semibold">${this._escapeHtml(player.name)}</div>
+                            <div class="text-sm text-gray-600 md:hidden">${player.appearances} apps • ${player.assistsPerMatch} assists/game</div>
+                            <div class="text-sm text-gray-600 hidden md:block">${player.appearances} apps • ${player.assistsPerMatch} assists/game</div>
+                        </div>
                     </div>
-                    <div class="player-stat">
-                        <div class="stat-value">${player.assists}</div>
-                        <div class="stat-label">assists</div>
+                    <div class="text-right">
+                        <div class="text-xl font-bold text-blue-600">${player.assists}</div>
+                        <div class="text-sm text-gray-500">assists</div>
                     </div>
                 </div>
             `;

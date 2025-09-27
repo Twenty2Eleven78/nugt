@@ -49,6 +49,8 @@
   <link rel="preload" href="webfonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
 
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <!-- Custom Framework CSS - All styles merged -->
   <link href="css/custom-framework.css" rel="stylesheet">
   <link href="css/auth.css" rel="stylesheet">
@@ -83,17 +85,13 @@
     <!-- Global notification container is now created dynamically by the notification service -->
 
     <!-- Main Content Container-->
-    <div class="container-fluid px-4 py-3">
-      <div class="content-width">
+    <div class="w-full px-4 py-3">
+      <div class="max-w-7xl mx-auto">
         <!-- Header -->
-        <div class="row mb-2">
-          <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-              <!--<h3 class="mb-0">&nbsp;&nbsp;&nbsp;NUFC GameTime</h3>-->
-              <img src="nugtlogo.png" width="175" alt="NUGT gametime App logo">
-              <div id="header-profile-container"></div>
-            </div>
-          </div>
+        <div class="flex justify-between items-center mb-2">
+          <!--<h3 class="mb-0">&nbsp;&nbsp;&nbsp;NUFC GameTime</h3>-->
+          <img src="nugtlogo.png" class="w-44 h-auto" alt="NUGT gametime App logo">
+          <div id="header-profile-container"></div>
         </div>
         <!-- END Header -->
 
@@ -106,74 +104,74 @@
               <div class="game-container">
 
                 <!-- Compact Score Board -->
-                <div class="scoreboard-card">
-                  <div class="scoreboard-compact" id="scoreboard">
-                    <div class="team-score-section">
-                      <button id="first-team-name" class="team-name-btn" data-toggle="modal"
+                <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+                  <div class="flex justify-center items-center space-x-4" id="scoreboard">
+                    <div class="flex flex-col items-center">
+                      <button id="first-team-name" class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors" data-toggle="modal"
                         data-target="#fixtureModalTeam1">
                         Netherton
                       </button>
-                      <div class="score-display" id="first-score" style="min-width: 2ch;">0</div>
+                      <div class="text-3xl font-bold text-red-600 mt-2 min-w-[2ch] text-center" id="first-score">0</div>
                     </div>
-                    <div class="score-separator">-</div>
-                    <div class="team-score-section">
-                      <button id="second-team-name" class="team-name-btn" data-toggle="modal"
+                    <div class="text-2xl font-bold text-gray-500">-</div>
+                    <div class="flex flex-col items-center">
+                      <button id="second-team-name" class="bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-700 transition-colors" data-toggle="modal"
                         data-target="#fixtureModalTeam2">
                         Opposition Team
                       </button>
-                      <div class="score-display" id="second-score" style="min-width: 2ch;">0</div>
+                      <div class="text-3xl font-bold text-gray-600 mt-2 min-w-[2ch] text-center" id="second-score">0</div>
                     </div>
                   </div>
                 </div>
                 <!--END Compact Score Board-->
 
                 <!-- Game Actions -->
-                <div class="game-actions-card">
-                  <h6 class="actions-title">
-                    <i class="fa-regular fa-futbol me-2"></i>Game Actions
+                <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+                  <h6 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fa-regular fa-futbol mr-2 text-green-600"></i>Game Actions
                   </h6>
 
                   <!-- Goals Row -->
-                  <div class="action-row">
-                    <button id="goalButton" class="action-btn btn-success">
-                      <i class="fa-solid fa-futbol"></i>
-                      <span class="btn-text">Team1 Goal</span>
+                  <div class="flex gap-2 mb-3">
+                    <button id="goalButton" class="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center">
+                      <i class="fa-solid fa-futbol mr-2"></i>
+                      <span>Team1 Goal</span>
                     </button>
-                    <button id="opgoalButton" class="action-btn btn-danger" type="button">
-                      <i class="fa-solid fa-futbol"></i>
-                      <span class="btn-text">Team2 Goal</span>
+                    <button id="opgoalButton" class="flex-1 bg-red-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors flex items-center justify-center" type="button">
+                      <i class="fa-solid fa-futbol mr-2"></i>
+                      <span>Team2 Goal</span>
                     </button>
                   </div>
 
                   <!-- Time Markers Row -->
-                  <div class="action-row">
-                    <button id="HalfTimeButton" class="action-btn btn-secondary" type="button">
-                      <i class="fa-solid fa-stopwatch"></i>
-                      <span class="btn-text">Half Time</span>
+                  <div class="flex gap-2 mb-3">
+                    <button id="HalfTimeButton" class="flex-1 bg-gray-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-gray-700 transition-colors flex items-center justify-center" type="button">
+                      <i class="fa-solid fa-stopwatch mr-2"></i>
+                      <span>Half Time</span>
                     </button>
-                    <button id="FullTimeButton" class="action-btn btn-secondary" type="button">
-                      <i class="fa-solid fa-stopwatch"></i>
-                      <span class="btn-text">Full Time</span>
+                    <button id="FullTimeButton" class="flex-1 bg-gray-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-gray-700 transition-colors flex items-center justify-center" type="button">
+                      <i class="fa-solid fa-stopwatch mr-2"></i>
+                      <span>Full Time</span>
                     </button>
                   </div>
 
                   <!-- Record Event Row -->
-                  <div class="action-row">
-                    <button id="recordEventButton" class="action-btn btn-warning full-width" type="button"
+                  <div class="mb-3">
+                    <button id="recordEventButton" class="w-full bg-yellow-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-yellow-600 transition-colors flex items-center justify-center" type="button"
                       data-toggle="modal" data-target="#recordEventModal">
-                      <i class="fa-solid fa-hand"></i>
-                      <span class="btn-text">Record Event</span>
+                      <i class="fa-solid fa-hand mr-2"></i>
+                      <span>Record Event</span>
                     </button>
                   </div>
                 </div>
 
                 <!-- Game Timer Section -->
-                <div class="timer-card">
-                  <div class="timer-section">
-                    <button class="btn btn-danger timer-btn-compact" id="startPauseButton">
-                      <i class="fa-regular fa-clock me-2"></i>
+                <div class="bg-white rounded-lg shadow-md p-4">
+                  <div class="flex justify-center">
+                    <button class="bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors flex items-center space-x-2" id="startPauseButton">
+                      <i class="fa-regular fa-clock"></i>
                       <span class="timer-text">Start Game</span>
-                      <span id="stopwatch" role="timer" class="timer-display" style="min-width: 4ch;">00:00</span>
+                      <span id="stopwatch" role="timer" class="font-mono text-lg min-w-[4ch]">00:00</span>
                     </button>
                   </div>
                 </div>
@@ -428,27 +426,27 @@
   <!-- END MAIN CONTAINER -->
 
   <!-- Fixed Bottom Navigation -->
-  <div class="bottom-nav">
-    <div class="content-width">
-      <ul class="nav nav-pills nav-fill" role="tablist">
-        <li class="nav-item pill-1">
-          <a class="nav-link active" data-toggle="pill" href="#gametab">
-            <i class="fa-regular fa-futbol"></i> Game
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4">
+      <ul class="flex w-full" role="tablist">
+        <li class="flex-1">
+          <a class="nav-link active flex flex-col items-center py-2 px-1 text-xs font-medium text-gray-600 hover:text-blue-600" data-toggle="pill" href="#gametab">
+            <i class="fa-regular fa-futbol mb-1"></i> Game
           </a>
         </li>
-        <li class="nav-item pill-2">
-          <a class="nav-link" data-toggle="pill" href="#gamelogtab">
-            <i class="fa-solid fa-list"></i> Events
+        <li class="flex-1">
+          <a class="nav-link flex flex-col items-center py-2 px-1 text-xs font-medium text-gray-600 hover:text-blue-600" data-toggle="pill" href="#gamelogtab">
+            <i class="fa-solid fa-list mb-1"></i> Events
           </a>
         </li>
-        <li class="nav-item pill-3">
-          <a class="nav-link" data-toggle="pill" href="#optionstab">
-            <i class="fa-solid fa-gears"></i> Options
+        <li class="flex-1">
+          <a class="nav-link flex flex-col items-center py-2 px-1 text-xs font-medium text-gray-600 hover:text-blue-600" data-toggle="pill" href="#optionstab">
+            <i class="fa-solid fa-gears mb-1"></i> Options
           </a>
         </li>
-        <li class="nav-item pill-4">
-          <a class="nav-link" data-toggle="pill" href="#statstab">
-            <i class="fas fa-chart-bar"></i> Stats
+        <li class="flex-1">
+          <a class="nav-link flex flex-col items-center py-2 px-1 text-xs font-medium text-gray-600 hover:text-blue-600" data-toggle="pill" href="#statstab">
+            <i class="fas fa-chart-bar mb-1"></i> Stats
           </a>
         </li>
       </ul>

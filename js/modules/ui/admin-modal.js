@@ -9,42 +9,42 @@ const createMainAdminModal = () => {
     const bodyContent = `
         <!-- Controls -->
         <div class="mb-3">
-            <div class="row g-2">
-                <div class="col-4">
-                    <select class="form-select" id="filter-select">
+            <div class="grid grid-cols-3 gap-2">
+                <div>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md" id="filter-select">
                         <option value="">All Matches</option>
                         <option value="today">Today</option>
                         <option value="week">This Week</option>
                         <option value="month">This Month</option>
                     </select>
                 </div>
-                <div class="col-4">
-                    <button class="btn btn-primary w-100" id="refresh-data-btn">
-                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                <div>
+                    <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center" id="refresh-data-btn">
+                        <i class="fas fa-sync-alt mr-1"></i>Refresh
                     </button>
                 </div>
-                <div class="col-4">
-                    <button class="btn btn-success w-100" id="upload-json-btn" title="Upload Match Data">
-                        <i class="fas fa-upload me-1"></i>Upload
+                <div>
+                    <button class="w-full bg-green-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-green-700 transition-colors flex items-center justify-center" id="upload-json-btn" title="Upload Match Data">
+                        <i class="fas fa-upload mr-1"></i>Upload
                     </button>
                 </div>
             </div>
-            <div class="row g-2 mt-1">
-                <div class="col-6">
-                    <button class="btn btn-primary w-100" id="generate-stats-btn" title="Generate Statistics">
-                        <i class="fas fa-chart-bar me-1"></i>Generate Stats
+            <div class="grid grid-cols-2 gap-2 mt-1">
+                <div>
+                    <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center" id="generate-stats-btn" title="Generate Statistics">
+                        <i class="fas fa-chart-bar mr-1"></i>Generate Stats
                     </button>
                 </div>
-                <div class="col-6">
-                    <button class="btn btn-danger w-100" id="clear-stats-btn" title="Clear Cloud Stats">
-                        <i class="fas fa-trash me-1"></i>Clear Stats
+                <div>
+                    <button class="w-full bg-red-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-red-700 transition-colors flex items-center justify-center" id="clear-stats-btn" title="Clear Cloud Stats">
+                        <i class="fas fa-trash mr-1"></i>Clear Stats
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Statistics -->
-        <div class="row g-2 mb-3" id="admin-stats-cards">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3" id="admin-stats-cards">
             <!-- Stats will be populated here -->
         </div>
 
@@ -931,48 +931,40 @@ const renderStats = (matches, statsContainer) => {
     }).length;
 
     statsCardsContainer.innerHTML = `
-        <div class="col-6 col-md-3">
-            <div class="card shadow-sm" style="border-radius: 8px; border: 1px solid #e0e0e0;">
-                <div class="card-body text-center p-2">
-                    <div class="text-primary mb-1">
-                        <i class="fas fa-futbol"></i>
-                    </div>
-                    <div class="fw-bold text-primary">${totalMatches}</div>
-                    <div class="small text-muted">Total</div>
-                </div>
+        <div class="bg-white rounded-lg shadow-md p-4 border border-gray-200">
+            <div class="flex items-center justify-center mb-2">
+                <i class="fas fa-futbol text-2xl text-blue-600"></i>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-blue-600">${totalMatches}</div>
+                <div class="text-sm text-gray-600">Total</div>
             </div>
         </div>
-        <div class="col-6 col-md-3">
-            <div class="card shadow-sm" style="border-radius: 8px; border: 1px solid #e0e0e0;">
-                <div class="card-body text-center p-2">
-                    <div class="text-success mb-1">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="fw-bold text-success">${uniqueUsers}</div>
-                    <div class="small text-muted">Users</div>
-                </div>
+        <div class="bg-white rounded-lg shadow-md p-4 border border-gray-200">
+            <div class="flex items-center justify-center mb-2">
+                <i class="fas fa-users text-2xl text-green-600"></i>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-green-600">${uniqueUsers}</div>
+                <div class="text-sm text-gray-600">Users</div>
             </div>
         </div>
-        <div class="col-6 col-md-3">
-            <div class="card shadow-sm" style="border-radius: 8px; border: 1px solid #e0e0e0;">
-                <div class="card-body text-center p-2">
-                    <div class="text-info mb-1">
-                        <i class="fas fa-calendar-week"></i>
-                    </div>
-                    <div class="fw-bold text-info">${recentMatches}</div>
-                    <div class="small text-muted">Week</div>
-                </div>
+        <div class="bg-white rounded-lg shadow-md p-4 border border-gray-200">
+            <div class="flex items-center justify-center mb-2">
+                <i class="fas fa-calendar-week text-2xl text-cyan-600"></i>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-cyan-600">${recentMatches}</div>
+                <div class="text-sm text-gray-600">Week</div>
             </div>
         </div>
-        <div class="col-6 col-md-3">
-            <div class="card shadow-sm" style="border-radius: 8px; border: 1px solid #e0e0e0;">
-                <div class="card-body text-center p-2">
-                    <div class="text-warning mb-1">
-                        <i class="fas fa-calendar-day"></i>
-                    </div>
-                    <div class="fw-bold text-warning">${todayMatches}</div>
-                    <div class="small text-muted">Today</div>
-                </div>
+        <div class="bg-white rounded-lg shadow-md p-4 border border-gray-200">
+            <div class="flex items-center justify-center mb-2">
+                <i class="fas fa-calendar-day text-2xl text-yellow-600"></i>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-yellow-600">${todayMatches}</div>
+                <div class="text-sm text-gray-600">Today</div>
             </div>
         </div>
     `;

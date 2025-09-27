@@ -609,12 +609,12 @@ class StatisticsTab {
                                     <table class="table table-hover table-sm mb-0">
                                         <thead class="table-light">
                                             <tr>
-                                                <th style="width: 70px;" class="small">Date</th>
+                                                <th style="width: 55px;" class="small">Date</th>
                                                 <th class="small">Opposition</th>
-                                                <th class="text-center small" style="width: 60px;">Result</th>
-                                                <th class="text-center small" style="width: 35px;">G</th>
-                                                <th class="text-center small" style="width: 40px;">Att</th>
-                                                <th class="small" style="width: 120px;">Top Scorer</th>
+                                                <th class="text-center small" style="width: 50px;">Result</th>
+                                                <th class="text-center small" style="width: 30px;">G</th>
+                                                <th class="text-center small" style="width: 35px;">Att</th>
+                                                <th class="small" style="width: 90px;">Top Scorer</th>
                                             </tr>
                                         </thead>
                                         <tbody>

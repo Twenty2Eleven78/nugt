@@ -153,7 +153,9 @@ self.addEventListener('message', function (event) {
                     // Clear any API-related requests
                     if (request.url.includes('/api/') ||
                       request.url.includes('user-matches') ||
-                      request.url.includes('match')) {
+                      request.url.includes('match') ||
+                      request.url.includes('statistics') ||
+                      request.url.includes('.netlify/functions/')) {
                       return cache.delete(request);
                     }
                   })

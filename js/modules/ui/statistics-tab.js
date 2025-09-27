@@ -32,6 +32,9 @@ class StatisticsTab {
             // Clear local stats to force fresh cloud data
             localStorage.removeItem('generatedStatistics');
 
+            // Clear service worker cache for API requests
+            await this._clearServiceWorkerCache();
+
             // Fetch fresh statistics from the cloud
             const cloudStats = await this._loadFromCloud();
             if (cloudStats) {
@@ -928,6 +931,29 @@ class StatisticsTab {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    _clearServiceWorkerCache() {
+        return new Promise((resolve) => {
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                const messageChannel = new MessageChannel();
+
+                messageChannel.port1.onmessage = (event) => {
+                    console.log('Service worker cache clear response:', event.data);
+                    resolve(event.data.success);
+                };
+
+                navigator.serviceWorker.controller.postMessage(
+                    { type: 'CLEAR_API_CACHE' },
+                    [messageChannel.port2]
+                );
+
+                // Timeout after 2 seconds
+                setTimeout(() => resolve(false), 2000);
+            } else {
+                resolve(false);
+            }
+        });
     }
 }
 

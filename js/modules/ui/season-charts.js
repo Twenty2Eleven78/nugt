@@ -340,12 +340,8 @@ class SeasonCharts {
               return;
             }
 
-            // Check if container is visible
-            if (container.offsetWidth === 0 || container.offsetHeight === 0) {
-              console.warn(`Chart container ${containerId} is not visible`);
-              resolve(null);
-              return;
-            }
+            // Note: Removed visibility check to allow chart creation even if container not yet visible
+            // Chart.js can handle rendering when the element becomes visible
 
             const chart = createFn(container, data);
             resolve(chart);

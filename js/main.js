@@ -28,16 +28,16 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
           const isAdmin = await authService.isAdmin();
           if (isAdmin) {
-            adminModalButton.classList.remove('d-none');
+            adminModalButton.style.display = 'block';
           } else {
-            adminModalButton.classList.add('d-none');
+            adminModalButton.style.display = 'none';
           }
         } catch (error) {
           console.error('Error checking admin status:', error);
-          adminModalButton.classList.add('d-none');
+          adminModalButton.style.display = 'none';
         }
       } else {
-        adminModalButton.classList.add('d-none');
+        adminModalButton.style.display = 'none';
       }
     };
 

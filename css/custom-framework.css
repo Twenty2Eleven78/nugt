@@ -3,6 +3,14 @@
  * Lightweight, theme-aware components
  */
 
+:root {
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.25rem;
+    --font-size-xl: 1.5rem;
+}
+
 /* ===== CLS PREVENTION & PERFORMANCE ===== */
 /* Font loading optimization */
 @font-face {
@@ -154,9 +162,10 @@ html {
 
 /* Main container with bottom padding for fixed navigation */
 .main-container {
-    padding-bottom: 80px;
-    /* Space for fixed bottom navigation */
+    padding-bottom: calc(60px + var(--spacing-xs) * 2); /* Base height of nav + padding */
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Header styling */
@@ -875,6 +884,10 @@ html {
         max-width: calc(100% - 2rem);
         margin: 0 auto;
     }
+    
+    .main-container {
+        padding-bottom: calc(50px + var(--spacing-sm) * 2);
+    }
 
     .bottom-nav .nav-link {
         padding: var(--spacing-lg) var(--spacing-md);
@@ -904,6 +917,10 @@ html {
     .bottom-nav {
         padding: var(--spacing-xs) var(--spacing-sm);
     }
+
+    .main-container {
+        padding-bottom: calc(50px + var(--spacing-xs) * 2);
+    }
     
     .bottom-nav .nav-link {
         padding: var(--spacing-sm) var(--spacing-xs);
@@ -922,6 +939,10 @@ html {
 @media (max-width: 360px) {
     .bottom-nav .nav-link span:not(.icon) {
         display: none;
+    }
+
+    .main-container {
+        padding-bottom: calc(40px + var(--spacing-xs) * 2);
     }
     
     .bottom-nav .nav-link {
@@ -955,28 +976,163 @@ html {
         padding: var(--spacing-xs);
     }
 
+.action-btn {
+    min-height: 60px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    width: 100%;
+}
+
+.action-btn i {
+    font-size: var(--font-size-lg);
+    transition: font-size 0.2s ease;
+}
+
+.action-btn .btn-text {
+    font-size: var(--font-size-base);
+    transition: font-size 0.2s ease;
+}
+
+/* Width-based responsive adjustments */
+@media (max-width: 400px) {
     .action-btn {
-        min-height: 50px;
-        padding: var(--spacing-sm);
-        font-size: var(--font-size-sm);
+        min-height: 55px;
+        padding: var(--spacing-sm) var(--spacing-xs);
     }
 
     .action-btn i {
-        font-size: 1.3rem;
+        font-size: var(--font-size-base);
     }
 
-    .btn-text {
-        font-size: 0.9rem;
+    .action-btn .btn-text {
+        font-size: var(--font-size-sm);
+    }
+}
+
+@media (max-width: 360px) {
+    .action-btn {
+        min-height: 50px;
+        padding: var(--spacing-xs);
+        gap: calc(var(--spacing-xs) / 2);
     }
 
-    .scoreboard-card,
-    .timer-card,
-    .game-actions-card,
-    .momentum-card {
+    .action-btn i {
+        font-size: var(--font-size-sm);
+    }
+
+    .action-btn .btn-text {
+        font-size: var(--font-size-xs);
+    }
+}
+
+/* Height-based responsive adjustments */
+@media screen and (max-height: 740px) {
+    .action-btn {
+        min-height: 50px;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    .action-btn i {
+        font-size: var(--font-size-base);
+    }
+
+    .action-btn .btn-text {
+        font-size: var(--font-size-sm);
+    }
+}
+
+@media screen and (max-height: 667px) {
+    .action-btn {
+        min-height: 45px;
         padding: var(--spacing-xs);
     }
 
-    .momentum-label {
+    .action-btn i {
+        font-size: var(--font-size-sm);
+    }
+
+    .action-btn .btn-text {
+        font-size: var(--font-size-xs);
+    }
+}
+
+/* Combined width and height constraints */
+@media screen and (max-width: 400px) and (max-height: 667px) {
+    .action-btn {
+        min-height: 40px;
+        padding: calc(var(--spacing-xs) / 2);
+        gap: calc(var(--spacing-xs) / 2);
+    }
+
+    .action-btn i {
+        font-size: var(--font-size-xs);
+    }
+
+    .action-btn .btn-text {
+        font-size: var(--font-size-xs);
+    }
+}
+}.scoreboard-card,
+.timer-card,
+.game-actions-card,
+.momentum-card {
+    padding: var(--spacing-xs);
+}
+
+/* Height-based responsive adjustments for game elements */
+@media screen and (max-height: 740px) {
+    .scoreboard-card,
+    .timer-card,
+    .game-actions-card {
+        padding: calc(var(--spacing-xs) / 1.5);
+    }
+
+    .timer-btn-compact {
+        padding: var(--spacing-xs);
+        min-height: 45px;
+    }
+
+    .timer-text {
+        font-size: 0.85rem;
+    }
+
+    .timer-display {
+        font-size: 1.1rem;
+    }
+}
+
+@media screen and (max-height: 667px) {
+    .scoreboard-card,
+    .timer-card,
+    .game-actions-card {
+        padding: calc(var(--spacing-xs) / 2);
+    }
+
+    .timer-btn-compact {
+        padding: calc(var(--spacing-xs) / 2);
+        min-height: 40px;
+    }
+
+    .timer-text {
+        font-size: 0.75rem;
+    }
+
+    .timer-display {
+        font-size: 1rem;
+    }
+
+    .team-name-btn {
+        padding: calc(var(--spacing-xs) / 2);
+        font-size: var(--font-size-xs);
+    }
+
+    .score-display {
+        font-size: 1.1rem;
+    }
+}    .momentum-label {
         min-width: 50px;
         font-size: 0.65rem;
     }
@@ -1553,6 +1709,13 @@ body {
     min-height: 0;
     display: flex;
     flex-direction: column;
+    margin: 0 -0.5rem;
+}
+
+@media (max-width: 400px) {
+    .content-wrapper {
+        margin: 0 -0.25rem;
+    }
 }
 
 /* Tab content structure - works with slide animations */
@@ -1567,6 +1730,9 @@ body {
 #gametab {
     flex: 1;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
 }
 
 #gamelogtab {
@@ -1576,6 +1742,55 @@ body {
 #optionstab {
     overflow-y: auto;
     padding: var(--spacing-sm);
+}
+
+/* Responsive tab adjustments */
+@media (max-width: 400px) {
+    #gametab,
+    #gamelogtab,
+    #optionstab,
+    #statstab {
+        padding: var(--spacing-xs);
+    }
+
+    .game-container {
+        gap: var(--spacing-xs);
+    }
+
+    .scoreboard-card,
+    .timer-card,
+    .game-actions-card {
+        padding: var(--spacing-xs);
+    }
+
+    .team-name-btn {
+        font-size: var(--font-size-sm);
+        padding: var(--spacing-xs);
+    }
+
+    .score-display {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .game-container {
+        gap: 0.35rem;
+    }
+
+    .scoreboard-card,
+    .timer-card,
+    .game-actions-card {
+        padding: 0.35rem;
+    }
+
+    .team-name-btn {
+        font-size: var(--font-size-xs);
+    }
+
+    .score-display {
+        font-size: 1.25rem;
+    }
 }
 
 /* Ensure all tabs are properly displayed with animations */
@@ -1630,13 +1845,229 @@ body {
     touch-action: pan-x pan-y;
 }
 
+/* Responsive timer and game controls */
+.timer-btn-compact {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-height: 60px;
+    font-size: var(--font-size-base);
+}
+
+.timer-btn-compact i {
+    font-size: var(--font-size-lg);
+    margin-bottom: 0;
+}
+
+.timer-text {
+    font-size: var(--font-size-base);
+    margin: 0;
+}
+
+.timer-display {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-left: auto;
+}
+
+/* Width-based responsive adjustments */
+@media (max-width: 400px) {
+    .timer-btn-compact {
+        padding: var(--spacing-sm) var(--spacing-xs);
+        min-height: 55px;
+        font-size: var(--font-size-sm);
+    }
+
+    .timer-btn-compact i {
+        font-size: var(--font-size-base);
+    }
+
+    .timer-text {
+        font-size: var(--font-size-sm);
+    }
+
+    .timer-display {
+        font-size: var(--font-size-base);
+    }
+}
+
+@media (max-width: 360px) {
+    .timer-btn-compact {
+        padding: var(--spacing-xs);
+        min-height: 50px;
+        gap: var(--spacing-xs);
+    }
+
+    .timer-btn-compact i {
+        font-size: var(--font-size-sm);
+    }
+
+    .timer-text {
+        font-size: var(--font-size-xs);
+    }
+
+    .timer-display {
+        font-size: var(--font-size-sm);
+    }
+}
+
+/* Height-based responsive adjustments */
+@media screen and (max-height: 740px) {
+    .timer-btn-compact {
+        min-height: 50px;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    .timer-btn-compact i {
+        font-size: var(--font-size-base);
+    }
+
+    .timer-text {
+        font-size: var(--font-size-sm);
+    }
+
+    .timer-display {
+        font-size: var(--font-size-base);
+    }
+}
+
+@media screen and (max-height: 667px) {
+    .timer-btn-compact {
+        min-height: 45px;
+        padding: var(--spacing-xs);
+    }
+
+    .timer-btn-compact i {
+        font-size: var(--font-size-sm);
+    }
+
+    .timer-text {
+        font-size: var(--font-size-xs);
+    }
+
+    .timer-display {
+        font-size: var(--font-size-sm);
+    }
+}
+
+/* Combined width and height constraints */
+@media screen and (max-width: 400px) and (max-height: 667px) {
+    .timer-btn-compact {
+        min-height: 40px;
+        padding: calc(var(--spacing-xs) / 2);
+    }
+
+    .timer-btn-compact i {
+        font-size: var(--font-size-xs);
+    }
+
+    .timer-text {
+        font-size: 0.7rem;
+    }
+
+    .timer-display {
+        font-size: var(--font-size-xs);
+    }
+}
+
 .scoreboard-card {
     background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+}
+
+.team-name-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-base);
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+}
+
+.score-display {
+    font-size: 1.75rem;
+    font-weight: 600;
+    padding: var(--spacing-xs);
+    min-width: 2.5ch;
+    text-align: center;
+}
+
+@media (max-width: 400px) {
+    .team-name-btn {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: var(--font-size-sm);
+        min-height: 45px;
+    }
+
+    .score-display {
+        font-size: 1.5rem;
+        padding: calc(var(--spacing-xs) / 2);
+    }
+}
+
+@media (max-width: 360px) {
+    .team-name-btn {
+        padding: calc(var(--spacing-xs) / 2);
+        font-size: var(--font-size-xs);
+        min-height: 40px;
+    }
+
+    .score-display {
+        font-size: 1.25rem;
+        padding: calc(var(--spacing-xs) / 2);
+    }
+}
+
+@media screen and (max-height: 740px) {
+    .team-name-btn {
+        min-height: 45px;
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: var(--font-size-sm);
+    }
+
+    .score-display {
+        font-size: 1.5rem;
+        padding: calc(var(--spacing-xs) / 2);
+    }
+}
+
+@media screen and (max-height: 667px) {
+    .team-name-btn {
+        min-height: 40px;
+        padding: calc(var(--spacing-xs) / 2);
+        font-size: var(--font-size-xs);
+    }
+
+    .score-display {
+        font-size: 1.25rem;
+        padding: calc(var(--spacing-xs) / 2);
+    }
+}
+
+@media screen and (max-width: 400px) and (max-height: 667px) {
+    .team-name-btn {
+        min-height: 35px;
+        padding: calc(var(--spacing-xs) / 2);
+        font-size: 0.7rem;
+    }
+
+    .score-display {
+        font-size: 1.1rem;
+        padding: calc(var(--spacing-xs) / 3);
+    }
+}
+
+.scoreboard-card {
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     padding: var(--spacing-sm);
     box-shadow: var(--box-shadow-card);
     flex-shrink: 0;
+    margin-bottom: var(--spacing-xs);
 }
 
 /* Momentum Indicator */
@@ -1647,6 +2078,7 @@ body {
     padding: var(--spacing-sm);
     box-shadow: var(--box-shadow-card);
     flex-shrink: 0;
+    margin-bottom: var(--spacing-xs);
 }
 
 .momentum-title {
@@ -1783,42 +2215,129 @@ body {
 }
 
 /* Game Actions */
+.game-actions-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: space-evenly;
+    min-height: 0;
+}
+
 .game-actions-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     padding: var(--spacing-sm);
     box-shadow: var(--box-shadow-card);
-    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: var(--spacing-sm);
+    flex: 1;
     min-height: 0;
 }
 
 .actions-title {
     color: var(--text-primary);
     font-weight: 600;
-    margin-top: 0;
-    margin-bottom: var(--spacing-sm);
-    text-align: center;
+    margin: 0;
+    padding-bottom: var(--spacing-sm);
     border-bottom: 1px solid var(--border-color);
-    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-sm);
-    flex-shrink: 0;
-    font-size: var(--font-size-base);
-    line-height: 1;
-}
-
-.action-row {
     display: flex;
-    gap: var(--spacing-xs);
-    margin-bottom: var(--spacing-xs);
-    flex: 1;
     align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    font-size: var(--font-size-base);
+    line-height: 1.2;
+    width: 100%;
+    text-align: center;
 }
 
-.action-row:last-child {
-    margin-bottom: 0;
+.action-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-sm);
+    width: 100%;
+}
+
+.action-group-full {
+    grid-template-columns: 1fr;
+}
+
+@media (max-width: 400px) {
+    .action-group {
+        gap: var(--spacing-xs);
+    }
+}
+
+@media (max-width: 360px) {
+    .action-group {
+        gap: calc(var(--spacing-xs) / 2);
+    }
+}
+
+@media screen and (max-height: 740px) {
+    .action-group {
+        gap: var(--spacing-xs);
+    }
+}
+
+@media screen and (max-height: 667px) {
+    .action-group {
+        gap: calc(var(--spacing-xs) / 2);
+    }
+}
+
+/* Responsive adjustments for game actions */
+@media (max-width: 400px) {
+    .game-actions-card {
+        padding: var(--spacing-sm);
+        gap: var(--spacing-xs);
+    }
+
+    .action-row {
+        gap: var(--spacing-xs);
+    }
+
+    .actions-title {
+        font-size: var(--font-size-sm);
+        padding-bottom: var(--spacing-xs);
+    }
+}
+
+@media (max-width: 360px) {
+    .game-actions-card {
+        padding: var(--spacing-xs);
+        gap: calc(var(--spacing-xs) / 2);
+    }
+
+    .action-row {
+        gap: calc(var(--spacing-xs) / 2);
+    }
+
+    .actions-title {
+        font-size: var(--font-size-xs);
+        padding-bottom: calc(var(--spacing-xs) / 2);
+    }
+}
+
+@media screen and (max-height: 740px) {
+    .game-actions-card {
+        padding: var(--spacing-sm);
+        gap: var(--spacing-xs);
+    }
+}
+
+@media screen and (max-height: 667px) {
+    .game-actions-card {
+        padding: var(--spacing-xs);
+        gap: calc(var(--spacing-xs) / 2);
+    }
+}
+
+@media screen and (max-width: 400px) and (max-height: 667px) {
+    .game-actions-card {
+        padding: calc(var(--spacing-xs) / 2);
+    }
 }
 
 .action-btn {
@@ -1833,8 +2352,98 @@ body {
     font-weight: 600;
     transition: var(--transition);
     border: 2px solid transparent;
-    min-height: 70px;
+    min-height: 60px;
     color: var(--text-light);
+    width: 100%;
+}
+
+.action-btn i {
+    font-size: var(--font-size-lg);
+    transition: font-size 0.2s ease;
+}
+
+.btn-text {
+    font-size: var(--font-size-base);
+    transition: font-size 0.2s ease;
+    text-align: center;
+    line-height: 1.2;
+}
+
+@media (max-width: 400px) {
+    .action-btn {
+        min-height: 55px;
+        padding: var(--spacing-sm) var(--spacing-xs);
+    }
+
+    .action-btn i {
+        font-size: var(--font-size-base);
+    }
+
+    .btn-text {
+        font-size: var(--font-size-sm);
+    }
+}
+
+@media (max-width: 360px) {
+    .action-btn {
+        min-height: 50px;
+        padding: var(--spacing-xs);
+        gap: calc(var(--spacing-xs) / 2);
+    }
+
+    .action-btn i {
+        font-size: var(--font-size-sm);
+    }
+
+    .btn-text {
+        font-size: var(--font-size-xs);
+    }
+}
+
+@media screen and (max-height: 740px) {
+    .action-btn {
+        min-height: 50px;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    .action-btn i {
+        font-size: var(--font-size-base);
+    }
+
+    .btn-text {
+        font-size: var(--font-size-sm);
+    }
+}
+
+@media screen and (max-height: 667px) {
+    .action-btn {
+        min-height: 45px;
+        padding: var(--spacing-xs);
+    }
+
+    .action-btn i {
+        font-size: var(--font-size-sm);
+    }
+
+    .btn-text {
+        font-size: var(--font-size-xs);
+    }
+}
+
+@media screen and (max-width: 400px) and (max-height: 667px) {
+    .action-btn {
+        min-height: 40px;
+        padding: calc(var(--spacing-xs) / 2);
+        gap: calc(var(--spacing-xs) / 2);
+    }
+
+    .action-btn i {
+        font-size: var(--font-size-xs);
+    }
+
+    .btn-text {
+        font-size: 0.7rem;
+    }
 }
 
 .action-btn.full-width {
@@ -1848,18 +2457,27 @@ body {
 }
 
 .action-btn i {
-    font-size: 1.5rem;
+    font-size: var(--font-size-xl);
 }
 
 .btn-text {
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     text-align: center;
     line-height: 1.2;
+    transition: font-size 0.2s ease;
 }
 
 /* Timer Components */
 .timer-section {
     text-align: center;
+    margin-top: calc(var(--spacing-xs) * -1);
+}
+
+.timer-card {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .timer-btn-compact {
@@ -1867,7 +2485,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: var(--spacing-sm);
-    padding: var(--spacing-md) var(--spacing-xl);
+    padding: var(--spacing-sm) var(--spacing-xl);
     font-weight: 600;
     border-radius: var(--border-radius-sm);
     transition: var(--transition);
@@ -1954,6 +2572,35 @@ body {
     padding: var(--spacing-lg);
 }
 
+@media (max-width: 400px) {
+    .options-container {
+        padding: var(--spacing-sm);
+    }
+
+    .quick-action-card {
+        padding: var(--spacing-xs);
+        min-height: 55px;
+    }
+
+    .quick-action-card i {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .options-container {
+        padding: var(--spacing-xs);
+    }
+
+    .quick-action-card {
+        min-height: 50px;
+    }
+
+    .quick-action-card i {
+        font-size: 1.1rem;
+    }
+}
+
 .quick-action-card {
     background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
     border: 1px solid var(--border-color);
@@ -1965,6 +2612,38 @@ body {
     height: var(--card-min-height);
     display: flex;
     flex-direction: column;
+}
+
+/* Height-based responsive adjustments for cards */
+@media screen and (max-height: 740px) {
+    .quick-action-card {
+        padding: var(--spacing-sm);
+        min-height: 60px;
+    }
+
+    .quick-action-card i {
+        font-size: 1.2rem;
+    }
+
+    .quick-action-card span {
+        font-size: 0.8rem;
+    }
+}
+
+@media screen and (max-height: 667px) {
+    .quick-action-card {
+        padding: var(--spacing-xs);
+        min-height: 50px;
+    }
+
+    .quick-action-card i {
+        font-size: 1.1rem;
+    }
+
+    .quick-action-card span {
+        font-size: 0.7rem;
+    }
+}
     justify-content: center;
     align-items: center;
 }
@@ -3122,6 +3801,49 @@ body .notification {
     overflow-y: auto;
 }
 
+@media (max-width: 400px) {
+    .statistics-container {
+        padding: var(--spacing-xs);
+    }
+
+    .stats-nav-pill {
+        padding: var(--spacing-xs);
+        min-height: 45px;
+        font-size: 0.7rem;
+    }
+
+    .stats-card {
+        padding: var(--spacing-xs);
+    }
+
+    .stats-number {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .statistics-container {
+        padding: 0.35rem;
+    }
+
+    .stats-nav-pill {
+        min-height: 40px;
+        font-size: 0.65rem;
+    }
+
+    .stats-nav-pill i {
+        font-size: 0.9rem;
+    }
+
+    .stats-card {
+        padding: 0.35rem;
+    }
+
+    .stats-number {
+        font-size: 1.25rem;
+    }
+}
+
 #statisticsContent {
     flex: 1;
     min-height: 0;
@@ -3205,6 +3927,54 @@ body .notification {
     padding: var(--spacing-sm);
     display: flex;
     align-items: center;
+}
+
+/* Height-based responsive adjustments for statistics */
+@media screen and (max-height: 740px) {
+    .stats-card {
+        padding: var(--spacing-xs);
+    }
+
+    .stats-number {
+        font-size: 1.4rem;
+    }
+
+    .stats-label {
+        font-size: 0.8rem;
+    }
+
+    .stats-nav-pill {
+        min-height: 45px;
+        padding: var(--spacing-xs);
+    }
+}
+
+@media screen and (max-height: 667px) {
+    .stats-card {
+        padding: calc(var(--spacing-xs) / 2);
+    }
+
+    .stats-number {
+        font-size: 1.2rem;
+    }
+
+    .stats-label {
+        font-size: 0.7rem;
+    }
+
+    .stats-nav-pill {
+        min-height: 40px;
+        padding: calc(var(--spacing-xs) / 2);
+    }
+
+    .stats-nav-pill i {
+        font-size: 0.9rem;
+    }
+
+    .stats-nav-pill span {
+        font-size: 0.7rem;
+    }
+}
     gap: var(--spacing-sm);
     transition: all 0.3s ease;
     cursor: pointer;

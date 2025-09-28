@@ -125,14 +125,16 @@
                 </div>
                 <!--END Compact Score Board-->
 
-                <!-- Game Actions -->
-                <div class="game-actions-card">
+                <!-- Game Actions and Timer Container -->
+                <div class="game-actions-container">
+                  <!-- Game Actions -->
+                  <div class="game-actions-card">
                   <h6 class="actions-title">
                     <i class="fa-regular fa-futbol me-2"></i>Game Actions
                   </h6>
 
-                  <!-- Goals Row -->
-                  <div class="action-row">
+                    <!-- Goals Actions -->
+                  <div class="action-group">
                     <button id="goalButton" class="action-btn btn-success">
                       <i class="fa-solid fa-futbol"></i>
                       <span class="btn-text">Team1 Goal</span>
@@ -143,8 +145,8 @@
                     </button>
                   </div>
 
-                  <!-- Time Markers Row -->
-                  <div class="action-row">
+                  <!-- Time Markers Actions -->
+                  <div class="action-group">
                     <button id="HalfTimeButton" class="action-btn btn-secondary" type="button">
                       <i class="fa-solid fa-stopwatch"></i>
                       <span class="btn-text">Half Time</span>
@@ -155,8 +157,8 @@
                     </button>
                   </div>
 
-                  <!-- Record Event Row -->
-                  <div class="action-row">
+                  <!-- Record Event Action -->
+                  <div class="action-group action-group-full">
                     <button id="recordEventButton" class="action-btn btn-warning full-width" type="button"
                       data-toggle="modal" data-target="#recordEventModal">
                       <i class="fa-solid fa-hand"></i>
@@ -175,6 +177,7 @@
                     </button>
                   </div>
                 </div>
+                </div><!-- End game-actions-container -->
               </div>
             </div>
             <!--END Game Tab Content-->

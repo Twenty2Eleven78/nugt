@@ -13,8 +13,8 @@ export const APP_CONFIG = {
 
 // Cache Configuration
 export const CACHE_CONFIG = {
-  NAME: 'nugt-cache-v315',
-  VERSION: 'v315'
+  NAME: 'nugt-cache-v316',
+  VERSION: 'v316'
 };
 
 // Storage Keys - Local Storage identifiers
@@ -177,18 +177,7 @@ export const UI_CONFIG = {
 export const MATCH_RESULTS = {
   WIN: 'WIN',
   LOSS: 'LOSS',
-  DRAW: 'DRAW',
-  PENDING: 'PENDING',
-  CANCELLED: 'CANCELLED'
-};
-
-// Player Positions
-export const PLAYER_POSITIONS = {
-  GOALKEEPER: 'GK',
-  DEFENDER: 'DEF',
-  MIDFIELDER: 'MID',
-  FORWARD: 'FWD',
-  SUBSTITUTE: 'SUB'
+  DRAW: 'DRAW'
 };
 
 // Sharing Platforms

@@ -1075,7 +1075,7 @@ html {
         font-size: var(--font-size-xs);
     }
 }
-}.scoreboard-card,
+.scoreboard-card,
 .timer-card,
 .game-actions-card,
 .momentum-card {
@@ -2644,9 +2644,6 @@ body {
         font-size: 0.7rem;
     }
 }
-    justify-content: center;
-    align-items: center;
-}
 
 .quick-action-card:hover {
     transform: translateY(-2px);
@@ -3317,7 +3314,7 @@ body {
 
 .event-actions .btn {
     padding: var(--spacing-xs);
-    min-height: auto;
+    /*min-height: auto;*/
 }
 
 /* Event Info */
@@ -3974,13 +3971,6 @@ body .notification {
     .stats-nav-pill span {
         font-size: 0.7rem;
     }
-}
-    gap: var(--spacing-sm);
-    transition: all 0.3s ease;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    min-height: 80px;
 }
 
 .stats-card::before {

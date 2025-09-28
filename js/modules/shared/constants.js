@@ -13,8 +13,8 @@ export const APP_CONFIG = {
 
 // Cache Configuration
 export const CACHE_CONFIG = {
-  NAME: 'nugt-cache-v313',
-  VERSION: 'v313'
+  NAME: 'nugt-cache-v314',
+  VERSION: 'v314'
 };
 
 // Storage Keys - Local Storage identifiers
@@ -63,11 +63,6 @@ export const GAME_CONFIG = {
   DEFAULT_TEAM1_NAME: 'Netherton',
   DEFAULT_TEAM2_NAME: 'Opposition',
 
-  // Match Settings
-  MAX_PLAYERS_PER_TEAM: 22,
-  MIN_PLAYERS_PER_TEAM: 7,
-  MAX_SUBSTITUTIONS: 5,
-
   // UI Settings
   NOTIFICATION_DURATION: 3000, // 3 seconds
   MODAL_ANIMATION_DURATION: 300, // 0.3 seconds
@@ -84,9 +79,6 @@ export const EVENT_TYPES = {
   // Match Events
   FOUL: 'Foul',
   PENALTY: 'Penalty',
-  FREE_KICK: 'Free Kick',
-  CORNER: 'Corner',
-  THROW_IN: 'Throw In',
   OFFSIDE: 'Offside',
 
   // Game Flow Events
@@ -102,14 +94,6 @@ export const EVENT_TYPES = {
   SUBSTITUTION: 'Substitution'
 };
 
-// Event Categories for filtering and organization
-export const EVENT_CATEGORIES = {
-  DISCIPLINARY: 'disciplinary',
-  MATCH_FLOW: 'match_flow',
-  GAME_EVENTS: 'game_events',
-  ADMINISTRATIVE: 'administrative'
-};
-
 // Event Icons mapping
 export const EVENT_ICONS = {
   [EVENT_TYPES.YELLOW_CARD]: 'fas fa-square text-warning',
@@ -118,8 +102,6 @@ export const EVENT_ICONS = {
   [EVENT_TYPES.FOUL]: 'fas fa-hand-paper text-warning',
   [EVENT_TYPES.OFFSIDE]: 'fas fa-flag text-warning',
   [EVENT_TYPES.PENALTY]: 'fas fa-futbol text-danger',
-  [EVENT_TYPES.FREE_KICK]: 'fas fa-running text-primary',
-  [EVENT_TYPES.CORNER]: 'fas fa-flag text-info',
   [EVENT_TYPES.GAME_STARTED]: 'fas fa-play text-success',
   [EVENT_TYPES.HALF_TIME]: 'fas fa-pause text-secondary',
   [EVENT_TYPES.FULL_TIME]: 'fas fa-stop text-dark',
@@ -137,7 +119,7 @@ export const NOTIFICATION_TYPES = {
 };
 
 export const NOTIFICATION_CONFIG = {
-  DEFAULT_DURATION: 3000, // 3 seconds
+  DEFAULT_DURATION: 2000, // 3 seconds
   PERSISTENT_DURATION: 0, // No auto-hide
   MAX_NOTIFICATIONS: 5,
   ANIMATION_DURATION: 300 // 0.3 seconds

@@ -226,23 +226,3 @@ export const VALIDATION = {
     PATTERN: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   }
 };
-
-// Error Messages
-export const ERROR_MESSAGES = {
-  NETWORK_ERROR: 'Network connection failed. Please check your internet connection.',
-  TIMEOUT_ERROR: 'Request timed out. Please try again.',
-  AUTH_ERROR: 'Authentication failed. Please sign in again.',
-  VALIDATION_ERROR: 'Please check your input and try again.',
-  GENERIC_ERROR: 'An unexpected error occurred. Please try again.',
-  STORAGE_ERROR: 'Failed to save data. Please try again.'
-};
-
-// Success Messages
-export const SUCCESS_MESSAGES = {
-  DATA_SAVED: 'Data saved successfully!',
-  DATA_LOADED: 'Data loaded successfully!',
-  DATA_EXPORTED: 'Data exported successfully!',
-  MATCH_SHARED: 'Match report shared successfully!',
-  PLAYER_ADDED: 'Player added successfully!',
-  SETTINGS_UPDATED: 'Settings updated successfully!'
-};

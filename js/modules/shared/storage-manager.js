@@ -5,7 +5,7 @@
 
 import { notificationManager } from '../services/notifications.js';
 import { ModuleErrorBoundary } from './error-boundary.js';
-import { STORAGE_KEYS, ERROR_MESSAGES, SUCCESS_MESSAGES } from './constants.js';
+import { STORAGE_KEYS } from './constants.js';
 
 // Storage configuration constants
 const STORAGE_CONFIG = {

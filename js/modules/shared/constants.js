@@ -13,8 +13,8 @@ export const APP_CONFIG = {
 
 // Cache Configuration
 export const CACHE_CONFIG = {
-  NAME: 'nugt-cache-v314',
-  VERSION: 'v314'
+  NAME: 'nugt-cache-v315',
+  VERSION: 'v315'
 };
 
 // Storage Keys - Local Storage identifiers
@@ -206,23 +206,4 @@ export const EXPORT_FORMATS = {
   CSV: 'csv',
   TXT: 'txt',
   PDF: 'pdf'
-};
-
-// Validation Rules
-export const VALIDATION = {
-  TEAM_NAME: {
-    MIN_LENGTH: 1,
-    MAX_LENGTH: 50
-  },
-  PLAYER_NAME: {
-    MIN_LENGTH: 1,
-    MAX_LENGTH: 100
-  },
-  EVENT_DESCRIPTION: {
-    MIN_LENGTH: 1,
-    MAX_LENGTH: 500
-  },
-  EMAIL: {
-    PATTERN: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  }
 };

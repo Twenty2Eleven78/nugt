@@ -7,10 +7,15 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "start": "netlify dev"
+    "start": "netlify dev",
+    "build:css": "npx tailwindcss -i ./src/styles/tailwind.css -o ./css/tailwind.css --minify",
+    "watch:css": "npx tailwindcss -i ./src/styles/tailwind.css -o ./css/tailwind.css --watch"
   },
   "dependencies": {},
   "devDependencies": {
-    "netlify-cli": "^15.0.0"
+    "netlify-cli": "^15.0.0",
+  "tailwindcss": "^4.1.13",
+    "postcss": "^8.4.0",
+    "autoprefixer": "^10.4.0"
   }
 }

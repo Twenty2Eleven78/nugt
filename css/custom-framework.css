@@ -3998,6 +3998,60 @@ nsure transfer match modal appears above admin modal */
         margin: 0;
     }
     
+}
+
+/* ===== Desktop-specific responsive overrides ===== */
+@media (min-width: 992px) {
+    /* Allow the app to behave like a regular page on desktop rather than a fixed full-screen app */
+    .main-container {
+        position: relative;
+        height: auto;
+        min-height: 0;
+        padding-bottom: 60px; /* keep space for potential nav */
+    }
+
+    /* Limit content width and center for better readability on large displays */
+    .content-width {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding-left: var(--spacing-md);
+        padding-right: var(--spacing-md);
+    }
+
+    /* Make tab panes flow vertically instead of absolute stacked panels */
+    .tab-content {
+        height: auto;
+        overflow: visible;
+    }
+
+    .tab-pane {
+        position: relative;
+        transform: none !important;
+        transition: none !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: block !important;
+    }
+
+    /* Hide the mobile bottom navigation on large screens and optionally use a top nav */
+    .bottom-nav {
+        display: none !important;
+    }
+
+    /* Provide a small left/right column layout potential for future desktop UI
+       (keeps game container centered and lets Options/Stats appear beside it if desired) */
+    .game-container {
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    .events-container,
+    .options-container,
+    .statistics-container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+}
     .add-player-form .col-md-5,
     .add-player-form .col-md-3,
     .add-player-form .col-md-4 {
@@ -4009,7 +4063,6 @@ nsure transfer match modal appears above admin modal */
     .add-player-form .col-md-4:last-child {
         margin-bottom: 0;
     }
-}
 
 @media (max-width: 480px) {
     .section-header h6 {

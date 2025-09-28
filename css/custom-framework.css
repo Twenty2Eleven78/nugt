@@ -969,7 +969,6 @@ html {
 
 .table-responsive {
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
 /* ===== RESPONSIVE UTILITIES ===== */
@@ -1333,14 +1332,6 @@ body {
     touch-action: pan-x pan-y;
 }
 
-/* Hide scrollbars globally */
-* {
-    scrollbar-width: none;
-    /* Firefox */
-    -ms-overflow-style: none;
-    /* Internet Explorer 10+ */
-}
-
 *::-webkit-scrollbar {
     display: none;
     /* WebKit */
@@ -1517,7 +1508,6 @@ body {
     flex-direction: column;
     padding: var(--spacing-sm);
     touch-action: auto !important;
-    -webkit-overflow-scrolling: touch;
     min-height: 0;
 }
 
@@ -1539,7 +1529,7 @@ body {
     padding: 0 var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
     overscroll-behavior-y: contain;
     touch-action: auto !important;
-    -webkit-overflow-scrolling: touch;
+
     min-height: 0;
     max-height: 100%;
 }
@@ -1878,7 +1868,6 @@ body {
     min-height: 200px;
     overflow-y: scroll !important;
     touch-action: auto !important;
-    -webkit-overflow-scrolling: touch;
     flex: 1;
     max-height: 100%;
 }
@@ -3054,7 +3043,6 @@ body .notification {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
 #statisticsContent {

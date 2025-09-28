@@ -13,8 +13,8 @@ export const APP_CONFIG = {
 
 // Cache Configuration
 export const CACHE_CONFIG = {
-  NAME: 'nugt-cache-v317',
-  VERSION: 'v317'
+  NAME: 'nugt-cache-v318',
+  VERSION: 'v318'
 };
 
 // Storage Keys - Local Storage identifiers
@@ -52,7 +52,6 @@ export const GAME_CONFIG = {
   DEFAULT_GAME_TIME: 4200, // 70 minutes
   HALF_TIME_DURATION: 2100, // 35 minutes
   FULL_TIME_DURATION: 4200, // 70 minutes
-  EXTRA_TIME_DURATION: 1800, // 30 minutes
 
   // Timer Settings (in milliseconds)
   TIMER_UPDATE_INTERVAL: 100,
@@ -64,8 +63,6 @@ export const GAME_CONFIG = {
   DEFAULT_TEAM2_NAME: 'Opposition',
 
   // UI Settings
-  NOTIFICATION_DURATION: 3000, // 3 seconds
-  MODAL_ANIMATION_DURATION: 300, // 0.3 seconds
   DEBOUNCE_DELAY: 300 // 0.3 seconds
 };
 
@@ -85,8 +82,6 @@ export const EVENT_TYPES = {
   GAME_STARTED: 'Game Started',
   HALF_TIME: 'Half Time',
   FULL_TIME: 'Full Time',
-  EXTRA_TIME: 'Extra Time',
-  PENALTY_SHOOTOUT: 'Penalty Shootout',
 
   // General Events
   INCIDENT: 'Incident',
@@ -123,23 +118,6 @@ export const NOTIFICATION_CONFIG = {
   PERSISTENT_DURATION: 0, // No auto-hide
   MAX_NOTIFICATIONS: 5,
   ANIMATION_DURATION: 300 // 0.3 seconds
-};
-
-// Authentication Configuration
-export const AUTH_CONFIG = {
-  SESSION_TIMEOUT: 86400000, // 24 hours in milliseconds
-  TOKEN_REFRESH_INTERVAL: 3600000, // 1 hour in milliseconds
-  AUTH_REQUIRED: false,
-  USAGE_TRACKING: true,
-};
-
-// API Configuration
-export const API_CONFIG = {
-  REQUEST_TIMEOUT: 10000, // 10 seconds
-  MAX_RETRIES: 3,
-  RETRY_DELAY: 1000, // 1 second
-  CACHE_DURATION: 30000, // 30 seconds
-  BASE_URL: '/.netlify/functions'
 };
 
 // UI Constants

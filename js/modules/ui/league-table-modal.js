@@ -45,10 +45,10 @@ class LeagueTableModal {
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" id="predictLeagueBtn" style="display: none;">
+              <button type="button" class="btn btn-primary" id="predictLeagueBtn" style="display: none;">
                 <i class="fas fa-calculator me-1"></i>Predict Maximum Points
               </button>
-              <button type="button" class="btn btn-info" id="actualLeagueBtn" style="display: none;">
+              <button type="button" class="btn btn-primary" id="actualLeagueBtn" style="display: none;">
                 <i class="fas fa-undo me-1"></i>Back to Actual
               </button>
               <button type="button" class="btn btn-primary" id="saveLeagueBtn" style="display: none;">

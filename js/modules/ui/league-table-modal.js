@@ -45,6 +45,12 @@ class LeagueTableModal {
               </div>
             </div>
             <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" id="predictLeagueBtn" style="display: none;">
+                <i class="fas fa-calculator me-1"></i>Predict Maximum Points
+              </button>
+              <button type="button" class="btn btn-info" id="actualLeagueBtn" style="display: none;">
+                <i class="fas fa-undo me-1"></i>Back to Actual
+              </button>
               <button type="button" class="btn btn-primary" id="saveLeagueBtn" style="display: none;">
                 <i class="fas fa-save me-1"></i>Save Table
               </button>
@@ -60,6 +66,98 @@ class LeagueTableModal {
   bindEvents() {
     const saveBtn = document.getElementById('saveLeagueBtn');
     saveBtn?.addEventListener('click', () => this.saveLeagueTable());
+
+    const predictBtn = document.getElementById('predictLeagueBtn');
+    predictBtn?.addEventListener('click', () => this.predictAndShowMaxPoints());
+
+    const actualBtn = document.getElementById('actualLeagueBtn');
+    actualBtn?.addEventListener('click', () => this.showActualTable());
+  }
+
+  predictAndShowMaxPoints() {
+    if (!this.currentTable || !this.currentTable.data || !this.currentTable.data.teams) {
+      notificationManager.warning('No league table data to predict from.');
+      return;
+    }
+
+    const teams = this.currentTable.data.teams;
+    const totalGames = (teams.length - 1) * 2;
+
+    const predictedTeams = teams.map(team => {
+      const remainingGames = totalGames - team.played;
+      const maxPoints = team.points + (remainingGames * 3);
+      return {
+        ...team,
+        predictedPoints: maxPoints,
+        remainingGames: remainingGames,
+      };
+    });
+
+    predictedTeams.sort((a, b) => b.predictedPoints - a.predictedPoints);
+
+    this.renderPredictedTable(predictedTeams);
+
+    document.getElementById('predictLeagueBtn').style.display = 'none';
+    document.getElementById('actualLeagueBtn').style.display = 'inline-block';
+  }
+
+  showActualTable() {
+    const teamName = domCache.get('Team1NameElement')?.textContent || 'Netherton';
+    const content = document.getElementById('leagueTableContent');
+    content.innerHTML = faFullTimeService.renderLeagueTable(this.currentTable.data, teamName);
+
+    document.getElementById('predictLeagueBtn').style.display = 'inline-block';
+    document.getElementById('actualLeagueBtn').style.display = 'none';
+  }
+
+  renderPredictedTable(predictedTeams) {
+    const content = document.getElementById('leagueTableContent');
+    const highlightName = (domCache.get('Team1NameElement')?.textContent || 'Netherton').toLowerCase();
+
+    const tableHTML = `
+      <div class="table-responsive" style="overflow-y: auto;">
+        <table class="table table-sm table-hover" style="font-size: 0.8rem;">
+          <thead class="table-light sticky-top">
+            <tr>
+              <th style="width: 30px; padding: 0.25rem;">Pos</th>
+              <th style="padding: 0.25rem;">Team</th>
+              <th style="padding: 0.25rem;" class="text-center">Current Pts</th>
+              <th style="padding: 0.25rem;" class="text-center">Max Pts</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${predictedTeams.map((team, index) => {
+              const isHighlighted = highlightName && team.team.toLowerCase().includes(highlightName);
+              const rowClass = isHighlighted ? 'table-info fw-bold' : '';
+
+              return `
+                <tr class="${rowClass}">
+                  <td class="text-center" style="padding: 0.25rem;">${index + 1}</td>
+                  <td style="padding: 0.25rem;">
+                    <div style="font-weight: 600; font-size: 0.85rem;">${this.escapeHtml(team.team)}</div>
+                    <div style="font-size: 0.7rem; color: #6c757d;">${team.remainingGames} games remaining</div>
+                  </td>
+                  <td class="text-center" style="padding: 0.25rem;">${team.points}</td>
+                  <td class="text-center fw-bold" style="padding: 0.25rem; color: var(--theme-primary);">${team.predictedPoints}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+        <small class="text-muted">
+          <i class="fas fa-calculator me-1"></i>
+          Predicted table based on teams winning all remaining games.
+        </small>
+      </div>
+    `;
+
+    content.innerHTML = tableHTML;
+  }
+
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   async fetchLeagueTable() {
@@ -93,7 +191,8 @@ class LeagueTableModal {
       content.innerHTML = faFullTimeService.renderLeagueTable(leagueTable, teamName);
       this.currentTable = { url, data: leagueTable };
       
-      saveBtn.style.display = 'inline-block';
+      saveBtn.style.display = 'none'; // Keep save button hidden for now
+      document.getElementById('predictLeagueBtn').style.display = 'inline-block';
       notificationManager.success('League table loaded successfully');
       
     } catch (error) {
@@ -178,7 +277,8 @@ class LeagueTableModal {
       content.innerHTML = faFullTimeService.renderLeagueTable(leagueTable, teamName);
       this.currentTable = { url: hardcodedUrl, data: leagueTable };
       
-      saveBtn.style.display = 'inline-block';
+      saveBtn.style.display = 'none'; // Keep save button hidden for now
+      document.getElementById('predictLeagueBtn').style.display = 'inline-block';
       notificationManager.success('League table loaded');
       
     } catch (error) {

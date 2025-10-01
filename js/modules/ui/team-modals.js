@@ -153,7 +153,7 @@ class TeamModals {
   /**
    * Handle team 1 name update
    */
-  handleTeam1Update() {
+  async handleTeam1Update() {
     const team1Input = document.getElementById('team1Name');
     const team1NameElement = document.getElementById('first-team-name');
     
@@ -186,7 +186,7 @@ class TeamModals {
   /**
    * Handle team 2 name update
    */
-  handleTeam2Update() {
+  async handleTeam2Update() {
     const team2Input = document.getElementById('team2Name');
     const team2NameElement = document.getElementById('second-team-name');
     

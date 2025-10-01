@@ -445,14 +445,25 @@ class ConfigurationModal {
         }
       });
 
-      // Modal events
-      modal.addEventListener('modal.show', () => {
+      // Modal events (Bootstrap 5 events)
+      modal.addEventListener('show.bs.modal', () => {
+        console.log('Modal show event triggered');
         this.loadCurrentConfiguration().catch(error => {
           console.error('Failed to load configuration:', error);
         });
       });
+      
+      modal.addEventListener('shown.bs.modal', () => {
+        console.log('Modal shown event triggered - DOM should be ready');
+        // Ensure form is populated after modal is fully shown
+        setTimeout(() => {
+          this.loadCurrentConfiguration().catch(error => {
+            console.error('Failed to load configuration:', error);
+          });
+        }, 50);
+      });
 
-      modal.addEventListener('modal.hide', () => {
+      modal.addEventListener('hide.bs.modal', () => {
         this.cleanup();
       });
     }, 100);
@@ -460,12 +471,12 @@ class ConfigurationModal {
 
   show() {
     showModal(this.modalId);
-    // Ensure configuration is loaded even if event handlers aren't ready yet
+    // Wait for modal to be fully rendered before loading configuration
     setTimeout(() => {
       this.loadCurrentConfiguration().catch(error => {
         console.error('Failed to load configuration:', error);
       });
-    }, 150);
+    }, 300);
   }
 
   hide() {
@@ -501,6 +512,14 @@ class ConfigurationModal {
     }
 
     console.log('Populating form with config:', this.currentConfig);
+
+    // Check if modal DOM is ready
+    const modal = document.getElementById(this.modalId);
+    if (!modal) {
+      console.warn('Modal DOM not ready, retrying...');
+      setTimeout(() => this.populateForm(), 100);
+      return;
+    }
 
     // Team section
     this.setInputValue('config-team-name', this.currentConfig.team?.name);
@@ -548,6 +567,8 @@ class ConfigurationModal {
     if (element && value !== undefined && value !== null) {
       console.log(`Setting ${id} to:`, value);
       element.value = value;
+      // Trigger input event to ensure any listeners are notified
+      element.dispatchEvent(new Event('input', { bubbles: true }));
     } else if (!element) {
       console.warn(`Element with id '${id}' not found`);
     } else {
@@ -558,8 +579,23 @@ class ConfigurationModal {
   setCheckboxValue(id, value) {
     const element = document.getElementById(id);
     if (element && value !== undefined && value !== null) {
+      console.log(`Setting checkbox ${id} to:`, value);
       element.checked = Boolean(value);
+      // Trigger change event to ensure any listeners are notified
+      element.dispatchEvent(new Event('change', { bubbles: true }));
+    } else if (!element) {
+      console.warn(`Checkbox element with id '${id}' not found`);
+    } else {
+      console.log(`Skipping checkbox ${id} - value is undefined or null:`, value);
     }
+  }
+
+  // Debug method to manually refresh form data
+  refreshForm() {
+    console.log('Manually refreshing form...');
+    this.loadCurrentConfiguration().catch(error => {
+      console.error('Failed to refresh configuration:', error);
+    });
   }
 
   handleInputChange(input) {
@@ -1390,3 +1426,8 @@ class ConfigurationModal {
 
 // Create and export singleton instance
 export const configurationModal = new ConfigurationModal();
+
+// Make available globally for debugging
+if (typeof window !== 'undefined') {
+  window.configurationModal = configurationModal;
+}

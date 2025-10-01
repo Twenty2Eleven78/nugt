@@ -1,5 +1,5 @@
 //Cache Name - Will be updated dynamically by main app
-let CACHE_NAME = "nugt-cache-v323"; // Default fallback
+let CACHE_NAME = "nugt-cache-v324"; // Default fallback
 //Files to cache - Modular Architecture
 const cacheFiles = [
   './',

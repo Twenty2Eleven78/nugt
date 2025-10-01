@@ -447,7 +447,9 @@ class ConfigurationModal {
 
       // Modal events
       modal.addEventListener('modal.show', () => {
-        this.loadCurrentConfiguration();
+        this.loadCurrentConfiguration().catch(error => {
+          console.error('Failed to load configuration:', error);
+        });
       });
 
       modal.addEventListener('modal.hide', () => {
@@ -458,20 +460,47 @@ class ConfigurationModal {
 
   show() {
     showModal(this.modalId);
+    // Ensure configuration is loaded even if event handlers aren't ready yet
+    setTimeout(() => {
+      this.loadCurrentConfiguration().catch(error => {
+        console.error('Failed to load configuration:', error);
+      });
+    }, 150);
   }
 
   hide() {
     hideModal(this.modalId);
   }
 
-  loadCurrentConfiguration() {
-    this.currentConfig = JSON.parse(JSON.stringify(configService.getConfig()));
-    this.originalConfig = JSON.parse(JSON.stringify(this.currentConfig));
-    this.populateForm();
+  async loadCurrentConfiguration() {
+    try {
+      // Ensure configuration is loaded
+      if (!configService.isConfigLoaded()) {
+        console.log('Configuration not loaded yet, waiting...');
+        await configService.loadConfig();
+      }
+      
+      this.currentConfig = JSON.parse(JSON.stringify(configService.getConfig()));
+      this.originalConfig = JSON.parse(JSON.stringify(this.currentConfig));
+      this.populateForm();
+      
+      console.log('Configuration loaded into modal:', this.currentConfig);
+    } catch (error) {
+      console.error('Error loading configuration into modal:', error);
+      // Use default config as fallback
+      this.currentConfig = JSON.parse(JSON.stringify(configService.getConfig()));
+      this.originalConfig = JSON.parse(JSON.stringify(this.currentConfig));
+      this.populateForm();
+    }
   }
 
   populateForm() {
-    if (!this.currentConfig) return;
+    if (!this.currentConfig) {
+      console.warn('No configuration available to populate form');
+      return;
+    }
+
+    console.log('Populating form with config:', this.currentConfig);
 
     // Team section
     this.setInputValue('config-team-name', this.currentConfig.team?.name);
@@ -517,7 +546,12 @@ class ConfigurationModal {
   setInputValue(id, value) {
     const element = document.getElementById(id);
     if (element && value !== undefined && value !== null) {
+      console.log(`Setting ${id} to:`, value);
       element.value = value;
+    } else if (!element) {
+      console.warn(`Element with id '${id}' not found`);
+    } else {
+      console.log(`Skipping ${id} - value is undefined or null:`, value);
     }
   }
 

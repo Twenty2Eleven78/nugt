@@ -1,0 +1,46 @@
+{
+  "team": {
+    "name": "Millfield Athletic FC",
+    "shortName": "MAFC",
+    "abbreviation": "MAFC",
+    "defaultOpponentName": "Away Team"
+  },
+  "branding": {
+    "primaryColor": "#007bff",
+    "secondaryColor": "#ffffff",
+    "logoUrl": "./assets/millfield-logo.png",
+    "faviconUrl": "./assets/favicon.ico",
+    "appIconUrl": "./assets/millfield-icon.png"
+  },
+  "pwa": {
+    "appName": "Millfield Athletic Game Time",
+    "shortName": "MAFC",
+    "description": "Professional match tracking for Millfield Athletic FC",
+    "themeColor": "#007bff",
+    "backgroundColor": "#ffffff"
+  },
+  "integrations": {
+    "leagueTable": {
+      "enabled": true,
+      "defaultUrl": "https://county-league.example.com/division-2/table",
+      "corsProxies": [
+        "https://corsproxy.io/?",
+        "https://cors-anywhere.herokuapp.com/",
+        "https://api.allorigins.win/get?url="
+      ]
+    },
+    "statistics": {
+      "enabled": true,
+      "apiEndpoint": "https://stats-api.example.com/v1/teams/millfield"
+    }
+  },
+  "defaults": {
+    "matchDuration": 5400,
+    "theme": "blue",
+    "darkMode": false
+  },
+  "storage": {
+    "keyPrefix": "mafc_",
+    "cachePrefix": "mafc-cache-"
+  }
+}

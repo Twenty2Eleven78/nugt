@@ -52,7 +52,7 @@ class NewMatchModal {
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label for="newMatchTeam1Name" class="form-label">Home Team</label>
-                  <input type="text" class="form-control" id="newMatchTeam1Name" value="Netherton" required>
+                  <input type="text" class="form-control" id="newMatchTeam1Name" value="" required>
                 </div>
                 <div class="col-md-6 mb-3">
                   <label for="newMatchTeam2Name" class="form-label">Away Team</label>

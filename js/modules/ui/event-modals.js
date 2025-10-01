@@ -44,7 +44,7 @@ class EventModals {
           <label for="eventTeamSelect" class="form-label">Team</label>
           <select class="form-select" id="eventTeamSelect" required>
             <option value="" disabled selected>Select team...</option>
-            <option value="team1" id="team1Option">Netherton</option>
+            <option value="team1" id="team1Option">Team 1</option>
             <option value="team2" id="team2Option">Opposition</option>
           </select>
         </div>
@@ -263,7 +263,7 @@ class EventModals {
             <label for="eventTeamSelect" class="form-label" id="eventTeamLabel">Team</label>
             <select class="form-select" id="eventTeamSelect" required>
               <option value="" disabled selected>Select team...</option>
-              <option value="team1" id="team1Option">Netherton</option>
+              <option value="team1" id="team1Option">Team 1</option>
               <option value="team2" id="team2Option">Opposition</option>
             </select>
           </div>
@@ -381,7 +381,7 @@ class EventModals {
    */
   async updateTeamNames() {
     const { domCache } = await import('../shared/dom.js');
-    const team1Name = domCache.get('Team1NameElement')?.textContent || 'Netherton';
+    const team1Name = domCache.get('Team1NameElement')?.textContent || 'Team 1';
     const team2Name = domCache.get('Team2NameElement')?.textContent || 'Opposition';
     
     // Update record modal options
@@ -402,7 +402,7 @@ class EventModals {
    */
   getTeamName(team) {
     if (team === 'team1') {
-      return document.getElementById('Team1NameElement')?.textContent || 'Netherton';
+      return document.getElementById('Team1NameElement')?.textContent || 'Team 1';
     } else if (team === 'team2') {
       return document.getElementById('Team2NameElement')?.textContent || 'Opposition';
     }

@@ -4,16 +4,23 @@
 
 import { storage } from '../data/storage.js';
 import { notificationManager } from './notifications.js';
+import { configService } from './config.js';
 
-const AUTH_STORAGE_KEYS = {
-  USER_ID: 'nugt_user_id',
-  EMAIL: 'nugt_email',
-  DISPLAY_NAME: 'nugt_display_name',
-  CREDENTIAL_ID: 'nugt_credential_id',
-  IS_AUTHENTICATED: 'nugt_is_authenticated',
-  AUTH_TIMESTAMP: 'nugt_auth_timestamp',
-  USAGE_STATS: 'nugt_usage_stats'
-};
+// Dynamic storage keys based on configuration
+function getAuthStorageKeys() {
+  const storageConfig = configService.getStorageConfig();
+  const prefix = storageConfig?.keyPrefix || 'nugt_';
+  
+  return {
+    USER_ID: `${prefix}user_id`,
+    EMAIL: `${prefix}email`,
+    DISPLAY_NAME: `${prefix}display_name`,
+    CREDENTIAL_ID: `${prefix}credential_id`,
+    IS_AUTHENTICATED: `${prefix}is_authenticated`,
+    AUTH_TIMESTAMP: `${prefix}auth_timestamp`,
+    USAGE_STATS: `${prefix}usage_stats`
+  };
+}
 
 const credentialStore = new Map();
 const TOKEN_CACHE_DURATION = 3600000; // 1 hour
@@ -46,6 +53,19 @@ class AuthService {
     return this.authToken;
   }
 
+  // Get API endpoint from configuration
+  getApiEndpoint(endpoint = 'user-matches') {
+    const integrationConfig = configService.getIntegrationConfig('statistics');
+    const baseEndpoint = integrationConfig?.apiEndpoint || '/.netlify/functions';
+    
+    // Ensure proper URL formatting
+    if (baseEndpoint.endsWith('/')) {
+      return `${baseEndpoint}${endpoint}`;
+    } else {
+      return `${baseEndpoint}/${endpoint}`;
+    }
+  }
+
   onAuthStateChange(callback) {
     this.authStateListeners.delete(callback);
     this.authStateListeners.add(callback);
@@ -74,7 +94,8 @@ class AuthService {
     if (userData.userId !== expectedUserId) {
       console.log('Migrating user ID from', userData.userId, 'to', expectedUserId);
       // Update stored user ID to be consistent across devices
-      storage.saveImmediate(AUTH_STORAGE_KEYS.USER_ID, expectedUserId);
+      const keys = getAuthStorageKeys();
+      storage.saveImmediate(keys.USER_ID, expectedUserId);
       userData.userId = expectedUserId;
     }
 
@@ -136,8 +157,9 @@ class AuthService {
       await this._attemptWebAuthnAuthentication(userData.credentialId);
 
       const authTimestamp = Date.now();
-      storage.saveImmediate(AUTH_STORAGE_KEYS.IS_AUTHENTICATED, true);
-      storage.saveImmediate(AUTH_STORAGE_KEYS.AUTH_TIMESTAMP, authTimestamp);
+      const keys = getAuthStorageKeys();
+      storage.saveImmediate(keys.IS_AUTHENTICATED, true);
+      storage.saveImmediate(keys.AUTH_TIMESTAMP, authTimestamp);
 
       this._setAuthenticatedState({ ...userData, authTimestamp });
       this.trackUsage('login');
@@ -164,7 +186,8 @@ class AuthService {
     this.authTimestamp = null;
     this.authToken = null;
 
-    storage.saveImmediate(AUTH_STORAGE_KEYS.IS_AUTHENTICATED, false);
+    const keys = getAuthStorageKeys();
+    storage.saveImmediate(keys.IS_AUTHENTICATED, false);
 
     Promise.resolve().then(() => {
       this.authStateListeners.forEach(callback => callback(this.isAuthenticated));
@@ -183,7 +206,8 @@ class AuthService {
     try {
       const userId = this.currentUser.id;
       const timestamp = Date.now();
-      const usageStats = storage.load(AUTH_STORAGE_KEYS.USAGE_STATS, {});
+      const keys = getAuthStorageKeys();
+      const usageStats = storage.load(keys.USAGE_STATS, {});
 
       if (!usageStats[userId]) {
         usageStats[userId] = {
@@ -206,7 +230,7 @@ class AuthService {
         usageStats[userId].actions = usageStats[userId].actions.slice(0, MAX_ACTIONS_HISTORY);
       }
 
-      storage.save(AUTH_STORAGE_KEYS.USAGE_STATS, usageStats);
+      storage.save(keys.USAGE_STATS, usageStats);
     } catch (error) {
       console.error('Error tracking usage:', error);
     }
@@ -222,7 +246,8 @@ class AuthService {
     }
 
     const userId = this.currentUser.id;
-    const usageStats = storage.load(AUTH_STORAGE_KEYS.USAGE_STATS, {});
+    const keys = getAuthStorageKeys();
+    const usageStats = storage.load(keys.USAGE_STATS, {});
 
     return usageStats[userId] || null;
   }
@@ -252,7 +277,8 @@ class AuthService {
     // This keeps admin emails secure on the server side
     try {
       const token = await this.getAuthToken();
-      const response = await fetch('/.netlify/functions/user-matches?checkAdmin=true', {
+      const apiUrl = this.getApiEndpoint('user-matches') + '?checkAdmin=true';
+      const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -282,7 +308,8 @@ class AuthService {
    */
   _initializeUsageStats(userId) {
     const timestamp = Date.now();
-    const usageStats = storage.load(AUTH_STORAGE_KEYS.USAGE_STATS, {});
+    const keys = getAuthStorageKeys();
+    const usageStats = storage.load(keys.USAGE_STATS, {});
 
     usageStats[userId] = {
       firstSeen: timestamp,
@@ -294,7 +321,7 @@ class AuthService {
       }]
     };
 
-    storage.save(AUTH_STORAGE_KEYS.USAGE_STATS, usageStats);
+    storage.save(keys.USAGE_STATS, usageStats);
   }
 
   _validateEmail(email) {
@@ -303,22 +330,24 @@ class AuthService {
   }
 
   _loadUserData() {
+    const keys = getAuthStorageKeys();
     return {
-      isAuthenticated: storage.load(AUTH_STORAGE_KEYS.IS_AUTHENTICATED, false),
-      userId: storage.load(AUTH_STORAGE_KEYS.USER_ID, null),
-      email: storage.load(AUTH_STORAGE_KEYS.EMAIL, null),
-      displayName: storage.load(AUTH_STORAGE_KEYS.DISPLAY_NAME, null),
-      credentialId: storage.load(AUTH_STORAGE_KEYS.CREDENTIAL_ID, null),
-      authTimestamp: storage.load(AUTH_STORAGE_KEYS.AUTH_TIMESTAMP, null)
+      isAuthenticated: storage.load(keys.IS_AUTHENTICATED, false),
+      userId: storage.load(keys.USER_ID, null),
+      email: storage.load(keys.EMAIL, null),
+      displayName: storage.load(keys.DISPLAY_NAME, null),
+      credentialId: storage.load(keys.CREDENTIAL_ID, null),
+      authTimestamp: storage.load(keys.AUTH_TIMESTAMP, null)
     };
   }
 
   _saveUserData(userId, email, displayName) {
-    storage.saveImmediate(AUTH_STORAGE_KEYS.USER_ID, userId);
-    storage.saveImmediate(AUTH_STORAGE_KEYS.EMAIL, email);
-    storage.saveImmediate(AUTH_STORAGE_KEYS.DISPLAY_NAME, displayName);
-    storage.saveImmediate(AUTH_STORAGE_KEYS.IS_AUTHENTICATED, true);
-    storage.saveImmediate(AUTH_STORAGE_KEYS.AUTH_TIMESTAMP, Date.now());
+    const keys = getAuthStorageKeys();
+    storage.saveImmediate(keys.USER_ID, userId);
+    storage.saveImmediate(keys.EMAIL, email);
+    storage.saveImmediate(keys.DISPLAY_NAME, displayName);
+    storage.saveImmediate(keys.IS_AUTHENTICATED, true);
+    storage.saveImmediate(keys.AUTH_TIMESTAMP, Date.now());
   }
 
   _setAuthenticatedState(userData) {
@@ -370,7 +399,8 @@ class AuthService {
       if (credential) {
         const credentialId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
         credentialStore.set(userId, { credentialId, email, displayName });
-        storage.saveImmediate(AUTH_STORAGE_KEYS.CREDENTIAL_ID, credentialId);
+        const keys = getAuthStorageKeys();
+        storage.saveImmediate(keys.CREDENTIAL_ID, credentialId);
       }
     } catch (error) {
       console.error('WebAuthn registration failed, using fallback:', error);

@@ -4,6 +4,8 @@
  * @version 4.0
  */
 
+import { configService } from './config.js';
+
 class FAFullTimeService {
   constructor() {
     this.cache = new Map();
@@ -12,6 +14,12 @@ class FAFullTimeService {
 
   // Extract league table from FA Full-Time URL
   async getLeagueTable(url) {
+    // Check if league table integration is enabled
+    const integrationConfig = configService.getIntegrationConfig('leagueTable');
+    if (!integrationConfig || !integrationConfig.enabled) {
+      throw new Error('League table integration is disabled in configuration');
+    }
+
     if (!url || !this.isValidFAUrl(url)) {
       throw new Error('Invalid FA Full-Time URL');
     }
@@ -24,12 +32,23 @@ class FAFullTimeService {
     }
 
     try {
-      // Try multiple CORS proxies
-      const proxies = [
-        `https://corsproxy.io/?${encodeURIComponent(url)}`,
-        `https://cors-anywhere.herokuapp.com/${url}`,
-        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
+      // Get CORS proxies from configuration
+      const corsProxies = integrationConfig.corsProxies || [
+        'https://corsproxy.io/?',
+        'https://cors-anywhere.herokuapp.com/',
+        'https://api.allorigins.win/get?url='
       ];
+      
+      // Build proxy URLs
+      const proxies = corsProxies.map(proxy => {
+        if (proxy.includes('allorigins')) {
+          return `${proxy}${encodeURIComponent(url)}`;
+        } else if (proxy.endsWith('?')) {
+          return `${proxy}${encodeURIComponent(url)}`;
+        } else {
+          return `${proxy}${url}`;
+        }
+      });
       
       let html = null;
       let lastError = null;
@@ -276,6 +295,28 @@ class FAFullTimeService {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  // Get default league table URL from configuration
+  getDefaultLeagueUrl() {
+    const integrationConfig = configService.getIntegrationConfig('leagueTable');
+    return integrationConfig?.defaultUrl || null;
+  }
+
+  // Check if league table integration is enabled
+  isIntegrationEnabled() {
+    const integrationConfig = configService.getIntegrationConfig('leagueTable');
+    return integrationConfig?.enabled === true;
+  }
+
+  // Get configured CORS proxies
+  getCorsProxies() {
+    const integrationConfig = configService.getIntegrationConfig('leagueTable');
+    return integrationConfig?.corsProxies || [
+      'https://corsproxy.io/?',
+      'https://cors-anywhere.herokuapp.com/',
+      'https://api.allorigins.win/get?url='
+    ];
   }
 
   // Clear cache

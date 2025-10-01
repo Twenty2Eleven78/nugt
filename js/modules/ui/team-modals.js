@@ -31,7 +31,7 @@ class TeamModals {
         <div class="col-12 col-md-8">
           <div class="input-group mb-3">
             <div>
-              <input type="text" id="team1Name" class="form-control" placeholder="Netherton">
+              <input type="text" id="team1Name" class="form-control" placeholder="Team Name">
               <br>
               <button class="btn btn-primary btn-custom" id="updTeam1Btn">Update Team Name</button>
             </div>
@@ -165,7 +165,11 @@ class TeamModals {
         
         // Save to localStorage if available
         if (typeof Storage !== 'undefined') {
-          localStorage.setItem('nugt_team1Name', newName);
+          // Use configurable storage prefix
+          const { configService } = await import('../services/config.js');
+          const storageConfig = configService.getStorageConfig();
+          const prefix = storageConfig?.keyPrefix || 'nugt_';
+          localStorage.setItem(`${prefix}team1Name`, newName);
         }
         
         // Hide the modal
@@ -194,7 +198,11 @@ class TeamModals {
         
         // Save to localStorage if available
         if (typeof Storage !== 'undefined') {
-          localStorage.setItem('nugt_team2Name', newName);
+          // Use configurable storage prefix
+          const { configService } = await import('../services/config.js');
+          const storageConfig = configService.getStorageConfig();
+          const prefix = storageConfig?.keyPrefix || 'nugt_';
+          localStorage.setItem(`${prefix}team2Name`, newName);
         }
         
         // Hide the modal

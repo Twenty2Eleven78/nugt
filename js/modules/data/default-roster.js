@@ -9,7 +9,7 @@
 // Default roster configuration
 export const DEFAULT_ROSTER_CONFIG = {
     // Team information
-    teamName: 'Netherton United',
+    teamName: 'Default Team',
     season: '2025-2026',
     ageGroup: 'U13 Girls (U14)',
 

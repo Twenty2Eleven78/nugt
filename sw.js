@@ -1,5 +1,5 @@
-//Cache Name
-const CACHE_NAME = "nugt-cache-v323";
+//Cache Name - Will be updated dynamically by main app
+let CACHE_NAME = "nugt-cache-v323"; // Default fallback
 //Files to cache - Modular Architecture
 const cacheFiles = [
   './',
@@ -137,6 +137,14 @@ self.addEventListener('message', function (event) {
       // Send acknowledgment back to prevent runtime.lastError
       if (event.ports && event.ports[0]) {
         event.ports[0].postMessage({ success: true });
+      }
+    } else if (event.data && event.data.type === 'UPDATE_CACHE_NAME') {
+      console.log('Received UPDATE_CACHE_NAME message:', event.data.cacheName);
+      CACHE_NAME = event.data.cacheName;
+      
+      // Send acknowledgment back
+      if (event.ports && event.ports[0]) {
+        event.ports[0].postMessage({ success: true, cacheName: CACHE_NAME });
       }
     } else if (event.data && event.data.type === 'CLEAR_API_CACHE') {
       console.log('Received CLEAR_API_CACHE message');

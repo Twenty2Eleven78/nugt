@@ -102,7 +102,7 @@ class LeagueTableModal {
   }
 
   showActualTable() {
-    const teamName = domCache.get('Team1NameElement')?.textContent || 'Netherton';
+    const teamName = domCache.get('Team1NameElement')?.textContent || 'Team 1';
     const content = document.getElementById('leagueTableContent');
     content.innerHTML = faFullTimeService.renderLeagueTable(this.currentTable.data, teamName);
 
@@ -112,7 +112,7 @@ class LeagueTableModal {
 
   renderPredictedTable(predictedTeams) {
     const content = document.getElementById('leagueTableContent');
-    const highlightName = (domCache.get('Team1NameElement')?.textContent || 'Netherton').toLowerCase();
+    const highlightName = (domCache.get('Team1NameElement')?.textContent || 'Team 1').toLowerCase();
 
     const tableHTML = `
       <div class="table-responsive" style="overflow-y: auto;">
@@ -186,7 +186,7 @@ class LeagueTableModal {
       const leagueTable = await faFullTimeService.getLeagueTable(url);
       
       // Get team name for highlighting
-      const teamName = domCache.get('Team1NameElement')?.textContent || 'Netherton';
+      const teamName = domCache.get('Team1NameElement')?.textContent || 'Team 1';
       
       content.innerHTML = faFullTimeService.renderLeagueTable(leagueTable, teamName);
       this.currentTable = { url, data: leagueTable };
@@ -235,7 +235,7 @@ class LeagueTableModal {
 
         if (urlInput) urlInput.value = url;
         
-        const teamName = domCache.get('Team1NameElement')?.textContent || 'Netherton';
+        const teamName = domCache.get('Team1NameElement')?.textContent || 'Team 1';
         content.innerHTML = faFullTimeService.renderLeagueTable(data, teamName);
         
         this.currentTable = { url, data };
@@ -272,7 +272,7 @@ class LeagueTableModal {
     
     try {
       const leagueTable = await faFullTimeService.getLeagueTable(hardcodedUrl);
-      const teamName = domCache.get('Team1NameElement')?.textContent || 'Netherton';
+      const teamName = domCache.get('Team1NameElement')?.textContent || 'Team 1';
       
       content.innerHTML = faFullTimeService.renderLeagueTable(leagueTable, teamName);
       this.currentTable = { url: hardcodedUrl, data: leagueTable };

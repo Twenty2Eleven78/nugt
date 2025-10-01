@@ -5,7 +5,8 @@
 
 import { notificationManager } from '../services/notifications.js';
 import { ModuleErrorBoundary } from './error-boundary.js';
-import { STORAGE_KEYS } from './constants.js';
+import { configService } from '../services/config.js';
+import { getStorageKeys } from './constants.js';
 
 // Storage configuration constants
 const STORAGE_CONFIG = {
@@ -21,7 +22,9 @@ const STORAGE_CONFIG = {
   CLEANUP_INTERVAL: 300000,          // 5 minutes
   QUOTA_CHECK_INTERVAL: 60000,       // 1 minute
 
-  STORAGE_KEYS_PREFIX: 'nugt_',
+  // Fallback prefixes when configuration is not available
+  FALLBACK_STORAGE_PREFIX: 'gt_',
+  FALLBACK_CACHE_PREFIX: 'gt-cache-',
   TEMP_KEYS_PATTERNS: ['temp_', 'cache_', '_tmp', '_temp'],
   CACHE_KEYS_PATTERNS: ['cached_', '_cache', 'cache_']
 };
@@ -35,10 +38,165 @@ class StorageQuotaManager {
     this.encryptionEnabled = false;
     this.storageCache = new Map();
     this.observers = new Set();
+    this.migrationCompleted = false;
 
     // Bind methods for event listeners
     this._handleStorageEvent = this._handleStorageEvent.bind(this);
     this._handleBeforeUnload = this._handleBeforeUnload.bind(this);
+  }
+
+  /**
+   * Get current storage key prefix from configuration
+   * @returns {string} Storage key prefix
+   */
+  getStoragePrefix() {
+    if (configService.isConfigLoaded()) {
+      const storageConfig = configService.getStorageConfig();
+      return storageConfig?.keyPrefix || STORAGE_CONFIG.FALLBACK_STORAGE_PREFIX;
+    }
+    return STORAGE_CONFIG.FALLBACK_STORAGE_PREFIX;
+  }
+
+  /**
+   * Get current cache prefix from configuration
+   * @returns {string} Cache prefix
+   */
+  getCachePrefix() {
+    if (configService.isConfigLoaded()) {
+      const storageConfig = configService.getStorageConfig();
+      return storageConfig?.cachePrefix || STORAGE_CONFIG.FALLBACK_CACHE_PREFIX;
+    }
+    return STORAGE_CONFIG.FALLBACK_CACHE_PREFIX;
+  }
+
+  /**
+   * Migrate existing storage keys to new prefixes
+   * @param {string} oldPrefix - Old storage prefix
+   * @param {string} newPrefix - New storage prefix
+   * @returns {Promise<Object>} Migration result
+   */
+  async migrateStorageKeys(oldPrefix = 'nugt_', newPrefix = null) {
+    if (this.migrationCompleted) {
+      console.log('Storage migration already completed');
+      return { migrated: 0, errors: 0, skipped: 0 };
+    }
+
+    return ModuleErrorBoundary.wrap(async () => {
+      const targetPrefix = newPrefix || this.getStoragePrefix();
+      
+      if (oldPrefix === targetPrefix) {
+        console.log('No migration needed - prefixes are the same');
+        this.migrationCompleted = true;
+        return { migrated: 0, errors: 0, skipped: 0 };
+      }
+
+      console.log(`🔄 Migrating storage keys from '${oldPrefix}' to '${targetPrefix}'...`);
+
+      const migrationResults = {
+        migrated: 0,
+        errors: 0,
+        skipped: 0,
+        details: []
+      };
+
+      // Get all keys that match the old prefix
+      const keysToMigrate = [];
+      for (let key in localStorage) {
+        if (key.startsWith(oldPrefix)) {
+          keysToMigrate.push(key);
+        }
+      }
+
+      console.log(`Found ${keysToMigrate.length} keys to migrate`);
+
+      for (const oldKey of keysToMigrate) {
+        try {
+          const newKey = oldKey.replace(oldPrefix, targetPrefix);
+          
+          // Check if new key already exists
+          if (localStorage.getItem(newKey) !== null) {
+            console.log(`Skipping migration of ${oldKey} - target key ${newKey} already exists`);
+            migrationResults.skipped++;
+            migrationResults.details.push({ oldKey, newKey, status: 'skipped', reason: 'target_exists' });
+            continue;
+          }
+
+          // Get the data from old key
+          const data = localStorage.getItem(oldKey);
+          if (data !== null) {
+            // Set data with new key
+            localStorage.setItem(newKey, data);
+            
+            // Verify the migration was successful
+            if (localStorage.getItem(newKey) === data) {
+              // Remove old key only after successful verification
+              localStorage.removeItem(oldKey);
+              migrationResults.migrated++;
+              migrationResults.details.push({ oldKey, newKey, status: 'migrated' });
+              console.log(`✅ Migrated: ${oldKey} → ${newKey}`);
+            } else {
+              migrationResults.errors++;
+              migrationResults.details.push({ oldKey, newKey, status: 'error', reason: 'verification_failed' });
+              console.error(`❌ Migration verification failed: ${oldKey} → ${newKey}`);
+            }
+          } else {
+            migrationResults.skipped++;
+            migrationResults.details.push({ oldKey, newKey, status: 'skipped', reason: 'no_data' });
+          }
+        } catch (error) {
+          migrationResults.errors++;
+          migrationResults.details.push({ oldKey, status: 'error', reason: error.message });
+          console.error(`❌ Error migrating ${oldKey}:`, error);
+        }
+      }
+
+      this.migrationCompleted = true;
+      
+      console.log(`✅ Storage migration completed:`, migrationResults);
+      
+      if (migrationResults.migrated > 0) {
+        this._notifyObservers('migrationCompleted', migrationResults);
+        notificationManager?.success(`Migrated ${migrationResults.migrated} storage keys to new format`);
+      }
+
+      return migrationResults;
+    }, () => ({ migrated: 0, errors: 1, skipped: 0 }), 'StorageMigration')();
+  }
+
+  /**
+   * Validate storage operations use correct prefixes
+   * @param {string} key - Storage key to validate
+   * @returns {boolean} True if key uses correct prefix
+   */
+  validateStorageKey(key) {
+    const currentPrefix = this.getStoragePrefix();
+    const currentCachePrefix = this.getCachePrefix();
+    
+    // Check if key uses current storage prefix or cache prefix
+    return key.startsWith(currentPrefix) || 
+           key.startsWith(currentCachePrefix) ||
+           STORAGE_CONFIG.TEMP_KEYS_PATTERNS.some(pattern => key.includes(pattern)) ||
+           STORAGE_CONFIG.CACHE_KEYS_PATTERNS.some(pattern => key.includes(pattern));
+  }
+
+  /**
+   * Get storage key with correct prefix
+   * @param {string} keyName - Base key name (without prefix)
+   * @returns {string} Full storage key with prefix
+   */
+  getStorageKey(keyName) {
+    const prefix = this.getStoragePrefix();
+    return prefix + keyName;
+  }
+
+  /**
+   * Get cache key with correct prefix
+   * @param {string} keyName - Base key name (without prefix)
+   * @returns {string} Full cache key with prefix
+   */
+  getCacheKey(keyName) {
+    const prefix = this.getCachePrefix();
+    return prefix + keyName;
   }
 
   async checkStorageQuota(force = false) {
@@ -243,7 +401,7 @@ class StorageQuotaManager {
 
   async _cleanupErrorLogs(maxEntries = STORAGE_CONFIG.MAX_ERROR_LOG_ENTRIES) {
     try {
-      const errorLogKey = 'nugt_error_log';
+      const errorLogKey = this.getStorageKey('error_log');
       const errorLog = JSON.parse(localStorage.getItem(errorLogKey) || '[]');
 
       if (errorLog.length <= maxEntries) {
@@ -400,6 +558,15 @@ class StorageQuotaManager {
     try {
       console.log('🚀 Initializing Storage Manager...');
 
+      // Wait for configuration to be loaded if it's not already
+      if (!configService.isConfigLoaded()) {
+        console.log('Waiting for configuration to load...');
+        await configService.loadConfig();
+      }
+
+      // Check if migration is needed
+      await this._checkAndPerformMigration();
+
       // Initial quota check
       await this.checkStorageQuota(true);
 
@@ -408,6 +575,9 @@ class StorageQuotaManager {
 
       // Set up periodic monitoring
       this._setupPeriodicTasks();
+
+      // Set up configuration change listener
+      configService.onConfigChange(this._handleConfigChange.bind(this));
 
       // Perform initial cleanup if needed
       const quotaInfo = await this.checkStorageQuota();
@@ -430,6 +600,41 @@ class StorageQuotaManager {
       console.error('StorageManagerInit error:', error);
       return false;
     }
+  }
+
+  /**
+   * Check if migration is needed and perform it
+   * @private
+   */
+  async _checkAndPerformMigration() {
+    try {
+      const currentPrefix = this.getStoragePrefix();
+      
+      // Check if there are any keys with the old 'nugt_' prefix
+      const oldKeys = [];
+      for (let key in localStorage) {
+        if (key.startsWith('nugt_')) {
+          oldKeys.push(key);
+        }
+      }
+
+      if (oldKeys.length > 0 && currentPrefix !== 'nugt_') {
+        console.log(`Found ${oldKeys.length} keys with old prefix 'nugt_', migrating to '${currentPrefix}'`);
+        await this.migrateStorageKeys('nugt_', currentPrefix);
+      }
+    } catch (error) {
+      console.error('Migration check error:', error);
+    }
+  }
+
+  /**
+   * Handle configuration changes
+   * @private
+   */
+  _handleConfigChange() {
+    console.log('Configuration changed - storage manager updating prefixes');
+    this.migrationCompleted = false; // Allow re-migration if needed
+    this._checkAndPerformMigration();
   }
 
   // Cleanup and destroy
@@ -599,9 +804,10 @@ class StorageQuotaManager {
     try {
       let compressed = 0;
       let bytesFreed = 0;
+      const currentPrefix = this.getStoragePrefix();
 
       for (let key in localStorage) {
-        if (localStorage.hasOwnProperty(key) && key.startsWith(STORAGE_CONFIG.STORAGE_KEYS_PREFIX)) {
+        if (localStorage.hasOwnProperty(key) && key.startsWith(currentPrefix)) {
           const data = localStorage.getItem(key);
           if (data && data.length > STORAGE_CONFIG.COMPRESSION_THRESHOLD && !key.includes('_compressed')) {
             try {
@@ -635,8 +841,10 @@ class StorageQuotaManager {
 
   _getMatchKeys() {
     const keys = [];
+    const prefix = this.getStoragePrefix();
+    
     for (let key in localStorage) {
-      if (key.startsWith('nugt_match_') || key.startsWith('nugt_saved_match_')) {
+      if (key.startsWith(prefix + 'match_') || key.startsWith(prefix + 'saved_match_')) {
         keys.push({
           key,
           timestamp: this._extractTimestamp(key),
@@ -687,11 +895,16 @@ class StorageQuotaManager {
 
   _getOrphanedKeys() {
     const keys = [];
+    const currentPrefix = this.getStoragePrefix();
+    const currentCachePrefix = this.getCachePrefix();
+    
     for (let key in localStorage) {
       // Look for keys that don't match any known patterns
-      if (!key.startsWith(STORAGE_CONFIG.STORAGE_KEYS_PREFIX) &&
+      if (!key.startsWith(currentPrefix) &&
+        !key.startsWith(currentCachePrefix) &&
         !STORAGE_CONFIG.TEMP_KEYS_PATTERNS.some(pattern => key.includes(pattern)) &&
-        !STORAGE_CONFIG.CACHE_KEYS_PATTERNS.some(pattern => key.includes(pattern))) {
+        !STORAGE_CONFIG.CACHE_KEYS_PATTERNS.some(pattern => key.includes(pattern)) &&
+        !key.startsWith('nugt_')) { // Keep old prefix keys for potential migration
         keys.push(key);
       }
     }
@@ -704,12 +917,16 @@ class StorageQuotaManager {
   }
 
   _categorizeKey(key) {
-    if (key.startsWith('nugt_match_') || key.startsWith('nugt_saved_match_')) return 'matches';
-    if (key.startsWith('nugt_error_')) return 'errors';
-    if (key.startsWith('nugt_user_') || key.startsWith('nugt_auth_')) return 'auth';
+    const currentPrefix = this.getStoragePrefix();
+    const currentCachePrefix = this.getCachePrefix();
+    
+    if (key.startsWith(currentPrefix + 'match_') || key.startsWith(currentPrefix + 'saved_match_')) return 'matches';
+    if (key.startsWith(currentPrefix + 'error_')) return 'errors';
+    if (key.startsWith(currentPrefix + 'user_') || key.startsWith(currentPrefix + 'auth_')) return 'auth';
     if (STORAGE_CONFIG.TEMP_KEYS_PATTERNS.some(pattern => key.includes(pattern))) return 'temporary';
     if (STORAGE_CONFIG.CACHE_KEYS_PATTERNS.some(pattern => key.includes(pattern))) return 'cache';
-    if (key.startsWith(STORAGE_CONFIG.STORAGE_KEYS_PREFIX)) return 'app_data';
+    if (key.startsWith(currentPrefix) || key.startsWith(currentCachePrefix)) return 'app_data';
+    if (key.startsWith('nugt_')) return 'legacy'; // Old prefix keys
     return 'other';
   }
 

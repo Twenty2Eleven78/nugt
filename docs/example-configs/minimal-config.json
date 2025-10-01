@@ -1,0 +1,19 @@
+{
+  "team": {
+    "name": "Your Team Name",
+    "shortName": "YTN",
+    "abbreviation": "YTN",
+    "defaultOpponentName": "Opposition"
+  },
+  "branding": {
+    "primaryColor": "#dc3545",
+    "secondaryColor": "#ffffff",
+    "logoUrl": "./your-logo.png",
+    "faviconUrl": "./favicon.ico",
+    "appIconUrl": "./your-icon.png"
+  },
+  "storage": {
+    "keyPrefix": "ytn_",
+    "cachePrefix": "ytn-cache-"
+  }
+}

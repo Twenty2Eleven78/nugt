@@ -10,10 +10,23 @@
 import { initializeApp } from './modules/app.js';
 import { adminModal } from './modules/ui/admin-modal.js';
 import { authService } from './modules/services/auth.js';
+import { configService } from './modules/services/config.js';
 
 // Initialize the application when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  initializeApp();
+document.addEventListener('DOMContentLoaded', async () => {
+  // Load configuration first before initializing the app
+  try {
+    console.log('Loading team configuration...');
+    await configService.loadConfig();
+    console.log('Configuration loaded successfully');
+    
+    // Initialize the application with configuration loaded
+    initializeApp();
+  } catch (error) {
+    console.error('Error loading configuration:', error);
+    // Still initialize the app with default configuration
+    initializeApp();
+  }
 
   const adminModalButton = document.getElementById('admin-modal-button');
   if (adminModalButton) {

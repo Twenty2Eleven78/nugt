@@ -46,6 +46,7 @@ import resetModal from './ui/reset-modal.js';
 import rosterModal from './ui/roster-modal.js';
 import attendanceModal from './ui/attendance-modal.js';
 import sharingModal from './ui/sharing-modal.js';
+import { configurationModal } from './ui/config-modal.js';
 
 // Services
 import { notificationManager } from './services/notifications.js';
@@ -54,6 +55,7 @@ import { pwaUpdater } from './services/pwa-updater.js';
 import { attendanceManager } from './services/attendance.js';
 import { authService } from './services/auth.js';
 import { userMatchesApi } from './services/user-matches-api.js';
+import { teamNameUpdaterService } from './services/team-name-updater.js';
 
 // Initialize custom modal system
 function initializeCustomModals() {
@@ -172,9 +174,110 @@ function enhanceTouchTargets() {
   });
 }
 
+// Import configuration service
+import { configService } from './services/config.js';
+
+// Show configuration loading status to user
+function showConfigurationLoadingStatus() {
+  const diagnostics = configService.getDiagnostics();
+  
+  if (!diagnostics.isLoaded) {
+    console.log('Configuration is still loading...');
+    return;
+  }
+
+  if (!diagnostics.isHealthy) {
+    console.log('Using default configuration due to loading issues');
+  } else {
+    const teamName = configService.getTeamConfig()?.name || 'Unknown Team';
+    console.log(`Configuration loaded for: ${teamName}`);
+  }
+}
+
+// Handle storage configuration changes to ensure data integrity
+async function handleStorageConfigurationChange(newConfig) {
+  try {
+    const { storageQuotaManager } = await import('./shared/storage-manager.js');
+    
+    // Check if storage prefix changed
+    const newStorageConfig = newConfig?.storage;
+    const currentPrefix = storageQuotaManager.getStoragePrefix();
+    
+    if (newStorageConfig?.keyPrefix && newStorageConfig.keyPrefix !== currentPrefix) {
+      console.log(`Storage prefix changed from ${currentPrefix} to ${newStorageConfig.keyPrefix}`);
+      
+      // Migrate existing data to new prefix
+      await storageQuotaManager.migrateStorageKeys(currentPrefix, newStorageConfig.keyPrefix);
+      
+      // Update storage manager configuration
+      storageQuotaManager.updateStorageConfig(newStorageConfig);
+      
+      console.log('Storage migration completed successfully');
+    }
+    
+  } catch (error) {
+    console.error('Error handling storage configuration change:', error);
+    throw error;
+  }
+}
+
+// Set up configuration change handling
+function setupConfigurationChangeHandling() {
+  configService.onConfigChange(async (newConfig) => {
+    console.log('Configuration changed, updating application...');
+    
+    try {
+      // Update branding and visual elements
+      const { brandingService } = await import('./services/branding.js');
+      if (brandingService && typeof brandingService.applyBranding === 'function') {
+        await brandingService.applyBranding();
+      }
+      
+      // Update team names throughout the UI
+      if (teamNameUpdaterService && typeof teamNameUpdaterService.updateTeamNames === 'function') {
+        teamNameUpdaterService.updateTeamNames();
+      }
+      
+      // Update PWA manifest
+      const { manifestGenerator } = await import('./services/manifest-generator.js');
+      if (manifestGenerator && typeof manifestGenerator.updateManifest === 'function') {
+        manifestGenerator.updateManifest();
+      }
+      
+      // Update storage configuration if storage keys changed
+      await handleStorageConfigurationChange(newConfig);
+      
+      // Update cache name in service worker
+      const storageConfig = configService.getStorageConfig();
+      if (storageConfig?.cachePrefix && pwaUpdater) {
+        pwaUpdater.updateCacheName(storageConfig.cachePrefix);
+      }
+      
+      // Show notification about configuration change
+      if (notificationManager) {
+        notificationManager.success('Team configuration updated successfully');
+      }
+      
+    } catch (error) {
+      console.error('Error handling configuration change:', error);
+      if (notificationManager) {
+        notificationManager.error('Error applying configuration changes');
+      }
+    }
+  });
+}
+
 // Initialize application
 export function initializeApp() {
   console.log('Initializing NUFC GameTime App v4.0 - Enhanced with Custom Framework');
+
+  // Show loading indicator if configuration is still loading
+  showConfigurationLoadingStatus();
+
+  // Ensure configuration is loaded before proceeding
+  if (!configService.isConfigLoaded()) {
+    console.warn('Configuration not loaded yet, some features may not work correctly');
+  }
 
   // Initialize custom modal system
   initializeCustomModals();
@@ -185,6 +288,16 @@ export function initializeApp() {
   // Check storage health
   if (!storage.checkStorageHealth()) {
     notificationManager.warning('Storage may not be working properly. Some features may be limited.');
+  }
+
+  // Check configuration health and show status
+  const configStatus = configService.getLoadingStatus();
+  if (configStatus.hasErrors) {
+    notificationManager.warning('Team configuration could not be loaded. Using default settings.');
+  } else if (configStatus.usingDefaults) {
+    console.log('Using default team configuration');
+  } else {
+    console.log('Custom team configuration loaded successfully');
   }
 
   // Initialize authentication
@@ -205,6 +318,9 @@ export function initializeApp() {
   teamManager.initializeTeams();
   rosterManager.init();
   attendanceManager.init();
+  
+  // Initialize team name updater service
+  teamNameUpdaterService.initialize();
   
   // Ensure attendance is properly initialized after roster is loaded
   setTimeout(() => {
@@ -236,12 +352,17 @@ export function initializeApp() {
   rosterModal.init();
   attendanceModal.init();
   sharingModal.init();
+  
+  // Configuration modal is initialized automatically via constructor
 
   // Make modals available globally after initialization
   window.goalModal = goalModal;
 
   // Initialize theme manager
   themeManager.init();
+
+  // Set up configuration change handling
+  setupConfigurationChangeHandling();
 
   // Initialize timer with enhanced state recovery
   timerController.initialize();
@@ -256,6 +377,11 @@ export function initializeApp() {
   pwaUpdater.init().then(success => {
     if (success) {
       // PWA updater initialized successfully
+      // Update cache name based on configuration
+      const storageConfig = configService.getStorageConfig();
+      if (storageConfig?.cachePrefix) {
+        pwaUpdater.updateCacheName(storageConfig.cachePrefix);
+      }
     }
   });
 
@@ -528,6 +654,24 @@ function bindEventListeners() {
     });
   }
 
+  // Configuration modal button
+  const configModalBtn = document.getElementById('config-modal-button');
+  if (configModalBtn) {
+    configModalBtn.addEventListener('click', async () => {
+      // Check if user is admin before showing configuration modal
+      try {
+        const isAdmin = await authService.isAdmin();
+        if (isAdmin) {
+          configurationModal.show();
+        } else {
+          notificationManager.error('Access denied. Admin privileges required to modify team configuration.');
+        }
+      } catch (error) {
+        notificationManager.error('Unable to verify admin access. Please try again.');
+      }
+    });
+  }
+
   // Reset button is now handled by the reset modal system
 }
 
@@ -679,8 +823,23 @@ window.DebugModule = {
 
 
 
+// Configuration reload function for external use
+async function reloadConfiguration() {
+  try {
+    console.log('Reloading configuration...');
+    await configService.reloadConfig();
+    notificationManager.success('Configuration reloaded successfully');
+    return true;
+  } catch (error) {
+    console.error('Error reloading configuration:', error);
+    notificationManager.error('Failed to reload configuration');
+    return false;
+  }
+}
+
 // Global functions for backward compatibility (only keep essential ones)
 window.showGoalModal = goalManager.showGoalModal;
 window.deleteLogEntry = deleteLogEntry;
 window.openEditEventModal = eventsManager.openEditEventModal;
 window.showNewMatchModal = () => newMatchModal.show();
+window.reloadConfiguration = reloadConfiguration;

@@ -1,0 +1,45 @@
+{
+  "team": {
+    "name": "Oakwood Ladies FC",
+    "shortName": "OLFC",
+    "abbreviation": "OLFC",
+    "defaultOpponentName": "Visiting Team"
+  },
+  "branding": {
+    "primaryColor": "#e83e8c",
+    "secondaryColor": "#ffffff",
+    "logoUrl": "./assets/oakwood-ladies-logo.png",
+    "faviconUrl": "./assets/favicon.ico",
+    "appIconUrl": "./assets/oakwood-ladies-icon.png"
+  },
+  "pwa": {
+    "appName": "Oakwood Ladies FC Tracker",
+    "shortName": "OLFC",
+    "description": "Women's football match tracker for Oakwood Ladies FC",
+    "themeColor": "#e83e8c",
+    "backgroundColor": "#ffffff"
+  },
+  "integrations": {
+    "leagueTable": {
+      "enabled": true,
+      "defaultUrl": "https://womens-league.example.com/premier/table",
+      "corsProxies": [
+        "https://corsproxy.io/?",
+        "https://api.allorigins.win/get?url="
+      ]
+    },
+    "statistics": {
+      "enabled": true,
+      "apiEndpoint": "https://womens-stats.example.com/api/teams/oakwood"
+    }
+  },
+  "defaults": {
+    "matchDuration": 5400,
+    "theme": "pink",
+    "darkMode": false
+  },
+  "storage": {
+    "keyPrefix": "olfc_",
+    "cachePrefix": "olfc-cache-"
+  }
+}

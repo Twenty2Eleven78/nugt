@@ -1,0 +1,42 @@
+{
+  "team": {
+    "name": "The Crown FC",
+    "shortName": "Crown",
+    "abbreviation": "CFC",
+    "defaultOpponentName": "Opposition"
+  },
+  "branding": {
+    "primaryColor": "#6f42c1",
+    "secondaryColor": "#ffffff",
+    "logoUrl": "./assets/crown-logo.png",
+    "faviconUrl": "./assets/favicon.ico",
+    "appIconUrl": "./assets/crown-icon.png"
+  },
+  "pwa": {
+    "appName": "The Crown FC Match Tracker",
+    "shortName": "Crown FC",
+    "description": "Sunday league match tracking for The Crown FC",
+    "themeColor": "#6f42c1",
+    "backgroundColor": "#ffffff"
+  },
+  "integrations": {
+    "leagueTable": {
+      "enabled": false,
+      "defaultUrl": null,
+      "corsProxies": []
+    },
+    "statistics": {
+      "enabled": false,
+      "apiEndpoint": null
+    }
+  },
+  "defaults": {
+    "matchDuration": 5400,
+    "theme": "purple",
+    "darkMode": false
+  },
+  "storage": {
+    "keyPrefix": "cfc_",
+    "cachePrefix": "cfc-cache-"
+  }
+}

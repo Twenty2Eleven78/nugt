@@ -42,6 +42,44 @@ class PWAUpdater {
     }
   }
 
+  /**
+   * Update the service worker cache name based on configuration
+   * @param {string} cachePrefix - Cache prefix from configuration
+   */
+  async updateCacheName(cachePrefix) {
+    if (!this.registration || !this.registration.active) {
+      console.warn('No active service worker to update cache name');
+      return false;
+    }
+
+    try {
+      const cacheName = `${cachePrefix}v323`; // Keep version number
+      
+      // Use MessageChannel for proper two-way communication
+      const messageChannel = new MessageChannel();
+      
+      // Set up response handler
+      messageChannel.port1.onmessage = (event) => {
+        if (event.data.success) {
+          console.log('Service worker cache name updated to:', event.data.cacheName);
+        } else {
+          console.error('Failed to update service worker cache name');
+        }
+      };
+      
+      // Send message with response port
+      this.registration.active.postMessage(
+        { type: 'UPDATE_CACHE_NAME', cacheName },
+        [messageChannel.port2]
+      );
+      
+      return true;
+    } catch (error) {
+      console.error('Error updating service worker cache name:', error);
+      return false;
+    }
+  }
+
   _setupEventListeners() {
     this.registration.addEventListener('updatefound', () => {
       console.log('New service worker found');

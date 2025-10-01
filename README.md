@@ -1,4 +1,177 @@
 
+# GameTime - Multi-Team Football Match Tracker
+
+A configurable football match tracking application that can be customized for any team or club. Track matches, manage rosters, record events, and maintain statistics with a professional, mobile-optimized interface.
+
+## Quick Start
+
+1. **Download or clone** this repository
+2. **Configure your team** by editing `team-config.json`
+3. **Deploy** to your web server or hosting platform
+4. **Access** the application and start tracking matches
+
+## Team Configuration Setup
+
+### Overview
+
+GameTime uses a single configuration file (`team-config.json`) to customize the application for your team. This file controls team branding, names, integrations, and default settings without requiring any code changes.
+
+### Configuration File Location
+
+The configuration file should be placed in the root directory of your application:
+```
+your-app/
+├── team-config.json  ← Your team configuration
+├── index.html
+├── js/
+└── css/
+```
+
+### Basic Configuration
+
+Here's a minimal configuration to get started:
+
+```json
+{
+  "team": {
+    "name": "Your Team Name",
+    "shortName": "YTN",
+    "abbreviation": "YTN",
+    "defaultOpponentName": "Opposition"
+  },
+  "branding": {
+    "primaryColor": "#dc3545",
+    "secondaryColor": "#ffffff",
+    "logoUrl": "./your-logo.png",
+    "faviconUrl": "./favicon.ico",
+    "appIconUrl": "./your-app-icon.png"
+  }
+}
+```
+
+### Complete Configuration Options
+
+#### Team Settings
+- `team.name`: Full team name displayed throughout the application
+- `team.shortName`: Abbreviated team name for compact displays
+- `team.abbreviation`: Short code used for storage keys and internal references
+- `team.defaultOpponentName`: Default name for opposition teams
+
+#### Branding Settings
+- `branding.primaryColor`: Main theme color (hex format)
+- `branding.secondaryColor`: Secondary color for accents
+- `branding.logoUrl`: Path to your team logo image
+- `branding.faviconUrl`: Path to favicon file
+- `branding.appIconUrl`: Path to PWA app icon (512x512px recommended)
+
+#### PWA (Progressive Web App) Settings
+- `pwa.appName`: Full application name for PWA
+- `pwa.shortName`: Short name for PWA (12 characters max)
+- `pwa.description`: App description for PWA manifest
+- `pwa.themeColor`: Theme color for PWA (matches branding.primaryColor)
+- `pwa.backgroundColor`: Background color for PWA splash screen
+
+#### Integration Settings
+- `integrations.leagueTable.enabled`: Enable/disable league table integration
+- `integrations.leagueTable.defaultUrl`: Default URL for league table data
+- `integrations.leagueTable.corsProxies`: Array of CORS proxy services
+- `integrations.statistics.enabled`: Enable/disable statistics integration
+- `integrations.statistics.apiEndpoint`: API endpoint for statistics data
+
+#### Default Settings
+- `defaults.matchDuration`: Default match duration in seconds (4200 = 70 minutes)
+- `defaults.theme`: Default color theme ("red", "blue", "green", etc.)
+- `defaults.darkMode`: Enable dark mode by default (true/false)
+
+#### Storage Settings
+- `storage.keyPrefix`: Prefix for localStorage keys (prevents conflicts)
+- `storage.cachePrefix`: Prefix for cache storage keys
+
+### Step-by-Step Setup Guide
+
+#### 1. Prepare Your Assets
+
+Before configuring, prepare these files:
+- **Team Logo**: PNG or JPG, recommended size 200x200px
+- **App Icon**: PNG, 512x512px for PWA functionality
+- **Favicon**: ICO file, 32x32px
+
+#### 2. Edit Configuration File
+
+1. Open `team-config.json` in a text editor
+2. Update the `team` section with your team information
+3. Modify `branding` colors and asset paths
+4. Configure `pwa` settings for mobile app functionality
+5. Set up `integrations` if you have league table URLs
+6. Adjust `defaults` to match your typical match setup
+7. Update `storage.keyPrefix` to use your team abbreviation
+
+#### 3. Upload Assets
+
+Place your logo, icon, and favicon files in the application directory and ensure the paths in your configuration match the file locations.
+
+#### 4. Test Configuration
+
+1. Open the application in a web browser
+2. Check that your team name appears correctly
+3. Verify that your logo and colors are applied
+4. Test creating a new match to ensure defaults work
+5. If you're an admin, use the configuration modal to validate settings
+
+#### 5. Deploy Application
+
+Deploy the configured application to your web server, hosting platform, or CDN. The application works with any static hosting service.
+
+### Configuration Validation
+
+The application automatically validates your configuration on startup:
+- **Missing file**: Uses default Netherton United configuration
+- **Invalid JSON**: Shows error message and uses defaults
+- **Missing required fields**: Uses default values for missing fields
+- **Invalid values**: Shows warnings and uses fallback values
+
+### Advanced Configuration
+
+#### Custom Storage Prefixes
+
+If multiple teams use the same hosting environment, ensure each team has a unique `storage.keyPrefix`:
+
+```json
+{
+  "storage": {
+    "keyPrefix": "myteam_",
+    "cachePrefix": "myteam-cache-"
+  }
+}
+```
+
+#### League Table Integration
+
+To integrate with your league's online table:
+
+```json
+{
+  "integrations": {
+    "leagueTable": {
+      "enabled": true,
+      "defaultUrl": "https://your-league-website.com/table",
+      "corsProxies": [
+        "https://corsproxy.io/?",
+        "https://api.allorigins.win/get?url="
+      ]
+    }
+  }
+}
+```
+
+#### Multiple Team Configurations
+
+For clubs with multiple teams, create separate deployments with different configurations, or use the configuration management UI to switch between team setups.
+
+---
+
+## Version History
+
 🚀 Version 4.0
 **Released: August 2025**
 - Custom CSS Framework: Removed Bootstrap dependency and implemented custom CSS for better performance

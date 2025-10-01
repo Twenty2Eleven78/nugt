@@ -1,70 +1,171 @@
 /**
  * Shared Constants
- * Centralized configuration and constants for the NUFC GameTime application
+ * Centralized configuration and constants for the GameTime application
+ * Now supports dynamic configuration loading from team-config.json
  */
 
-// Application Configuration
-export const APP_CONFIG = {
-  NAME: 'NUFC GameTime',
+import { configService } from '../services/config.js';
+
+// Static fallback values (used when configuration is not available)
+const FALLBACK_VALUES = {
+  APP_NAME: 'GameTime',
   VERSION: '4.0',
-  AUTHOR: 'NUFC GameTime Team',
-  DESCRIPTION: 'Football match tracking and statistics application'
+  AUTHOR: 'GameTime Team',
+  DESCRIPTION: 'Football match tracking and statistics application',
+  CACHE_NAME: 'gametime-cache-v318',
+  CACHE_VERSION: 'v318',
+  STORAGE_PREFIX: 'gt_',
+  CACHE_PREFIX: 'gt-cache-',
+  DEFAULT_TEAM1_NAME: 'Home Team',
+  DEFAULT_TEAM2_NAME: 'Away Team',
+  DEFAULT_GAME_TIME: 4200 // 70 minutes
 };
 
-// Cache Configuration
-export const CACHE_CONFIG = {
-  NAME: 'nugt-cache-v318',
-  VERSION: 'v318'
-};
+/**
+ * Get application configuration with fallback to defaults
+ */
+function getAppConfig() {
+  if (!configService.isConfigLoaded()) {
+    return {
+      NAME: FALLBACK_VALUES.APP_NAME,
+      VERSION: FALLBACK_VALUES.VERSION,
+      AUTHOR: FALLBACK_VALUES.AUTHOR,
+      DESCRIPTION: FALLBACK_VALUES.DESCRIPTION
+    };
+  }
 
-// Storage Keys - Local Storage identifiers
-export const STORAGE_KEYS = {
-  // Timer and Game State
-  START_TIMESTAMP: 'nugt_startTimestamp',
-  IS_RUNNING: 'nugt_isRunning',
-  ELAPSED_TIME: 'nugt_elapsedTime',
-  GAME_TIME: 'nugt_gameTime',
-  IS_SECOND_HALF: 'nugt_isSecondHalf',
+  const teamConfig = configService.getTeamConfig();
+  const pwaConfig = configService.getPWAConfig();
+  
+  return {
+    NAME: pwaConfig?.appName || teamConfig?.name + ' GameTime' || FALLBACK_VALUES.APP_NAME,
+    VERSION: FALLBACK_VALUES.VERSION,
+    AUTHOR: FALLBACK_VALUES.AUTHOR,
+    DESCRIPTION: pwaConfig?.description || FALLBACK_VALUES.DESCRIPTION
+  };
+}
 
-  // Scoring and Goals
-  GOALS: 'nugt_goals',
-  FIRST_SCORE: 'nugt_firstScore',
-  SECOND_SCORE: 'nugt_secondScore',
+/**
+ * Get cache configuration with configurable prefixes
+ */
+function getCacheConfig() {
+  if (!configService.isConfigLoaded()) {
+    return {
+      NAME: FALLBACK_VALUES.CACHE_NAME,
+      VERSION: FALLBACK_VALUES.CACHE_VERSION
+    };
+  }
 
-  // Team Information
-  TEAM1_NAME: 'nugt_team1name',
-  TEAM2_NAME: 'nugt_team2name',
-  TEAM1_HISTORY: 'nugt_team1history',
-  TEAM2_HISTORY: 'nugt_team2history',
+  const storageConfig = configService.getStorageConfig();
+  const cachePrefix = storageConfig?.cachePrefix || FALLBACK_VALUES.CACHE_PREFIX;
+  
+  return {
+    NAME: cachePrefix + 'v318',
+    VERSION: 'v318'
+  };
+}
 
-  // Match Data
-  MATCH_EVENTS: 'nugt_matchEvents',
-  MATCH_ATTENDANCE: 'nugt_matchAttendance',
+/**
+ * Get storage keys with configurable prefixes
+ */
+function getStorageKeys() {
+  const prefix = configService.isConfigLoaded() 
+    ? configService.getStorageConfig()?.keyPrefix || FALLBACK_VALUES.STORAGE_PREFIX
+    : FALLBACK_VALUES.STORAGE_PREFIX;
 
-  // Player Management
-  ROSTER: 'nugt_roster',
-  PLAYER_STATS: 'nugt_playerStats'
-};
+  return {
+    // Timer and Game State
+    START_TIMESTAMP: prefix + 'startTimestamp',
+    IS_RUNNING: prefix + 'isRunning',
+    ELAPSED_TIME: prefix + 'elapsedTime',
+    GAME_TIME: prefix + 'gameTime',
+    IS_SECOND_HALF: prefix + 'isSecondHalf',
 
-// Game Configuration
-export const GAME_CONFIG = {
-  // Time Settings (in seconds)
-  DEFAULT_GAME_TIME: 4200, // 70 minutes
-  HALF_TIME_DURATION: 2100, // 35 minutes
-  FULL_TIME_DURATION: 4200, // 70 minutes
+    // Scoring and Goals
+    GOALS: prefix + 'goals',
+    FIRST_SCORE: prefix + 'firstScore',
+    SECOND_SCORE: prefix + 'secondScore',
 
-  // Timer Settings (in milliseconds)
-  TIMER_UPDATE_INTERVAL: 100,
-  STORAGE_DEBOUNCE_DELAY: 100,
-  AUTO_SAVE_INTERVAL: 5000, // 5 seconds
+    // Team Information
+    TEAM1_NAME: prefix + 'team1name',
+    TEAM2_NAME: prefix + 'team2name',
+    TEAM1_HISTORY: prefix + 'team1history',
+    TEAM2_HISTORY: prefix + 'team2history',
 
-  // Team Defaults
-  DEFAULT_TEAM1_NAME: 'Netherton',
-  DEFAULT_TEAM2_NAME: 'Opposition',
+    // Match Data
+    MATCH_EVENTS: prefix + 'matchEvents',
+    MATCH_ATTENDANCE: prefix + 'matchAttendance',
 
-  // UI Settings
-  DEBOUNCE_DELAY: 300 // 0.3 seconds
-};
+    // Player Management
+    ROSTER: prefix + 'roster',
+    PLAYER_STATS: prefix + 'playerStats'
+  };
+}
+
+/**
+ * Get game configuration with configurable values
+ */
+function getGameConfig() {
+  if (!configService.isConfigLoaded()) {
+    return {
+      // Time Settings (in seconds)
+      DEFAULT_GAME_TIME: FALLBACK_VALUES.DEFAULT_GAME_TIME,
+      HALF_TIME_DURATION: Math.floor(FALLBACK_VALUES.DEFAULT_GAME_TIME / 2),
+      FULL_TIME_DURATION: FALLBACK_VALUES.DEFAULT_GAME_TIME,
+
+      // Timer Settings (in milliseconds)
+      TIMER_UPDATE_INTERVAL: 100,
+      STORAGE_DEBOUNCE_DELAY: 100,
+      AUTO_SAVE_INTERVAL: 5000, // 5 seconds
+
+      // Team Defaults
+      DEFAULT_TEAM1_NAME: FALLBACK_VALUES.DEFAULT_TEAM1_NAME,
+      DEFAULT_TEAM2_NAME: FALLBACK_VALUES.DEFAULT_TEAM2_NAME,
+
+      // UI Settings
+      DEBOUNCE_DELAY: 300 // 0.3 seconds
+    };
+  }
+
+  const teamConfig = configService.getTeamConfig();
+  const defaultsConfig = configService.getDefaultsConfig();
+  const matchDuration = defaultsConfig?.matchDuration || FALLBACK_VALUES.DEFAULT_GAME_TIME;
+
+  return {
+    // Time Settings (in seconds)
+    DEFAULT_GAME_TIME: matchDuration,
+    HALF_TIME_DURATION: Math.floor(matchDuration / 2),
+    FULL_TIME_DURATION: matchDuration,
+
+    // Timer Settings (in milliseconds)
+    TIMER_UPDATE_INTERVAL: 100,
+    STORAGE_DEBOUNCE_DELAY: 100,
+    AUTO_SAVE_INTERVAL: 5000, // 5 seconds
+
+    // Team Defaults
+    DEFAULT_TEAM1_NAME: teamConfig?.name || FALLBACK_VALUES.DEFAULT_TEAM1_NAME,
+    DEFAULT_TEAM2_NAME: teamConfig?.defaultOpponentName || FALLBACK_VALUES.DEFAULT_TEAM2_NAME,
+
+    // UI Settings
+    DEBOUNCE_DELAY: 300 // 0.3 seconds
+  };
+}
+
+// Export dynamic configuration getters
+export const APP_CONFIG = getAppConfig();
+export const CACHE_CONFIG = getCacheConfig();
+export const STORAGE_KEYS = getStorageKeys();
+export const GAME_CONFIG = getGameConfig();
+
+// Export functions for dynamic access (when config changes)
+export { getAppConfig, getCacheConfig, getStorageKeys, getGameConfig };
+
+// Update configurations when config changes
+configService.onConfigChange(() => {
+  // Note: Since these are exported as constants, modules that import them
+  // will need to re-import or use the getter functions for updates
+  console.log('Configuration changed - constants updated');
+});
 
 // Match Event Types
 export const EVENT_TYPES = {

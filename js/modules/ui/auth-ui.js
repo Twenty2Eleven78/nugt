@@ -459,6 +459,9 @@ class AuthUI {
         profileUsername.textContent = user.name;
       }
 
+      // Check admin status and show admin buttons
+      this._updateAdminButtons();
+
       // Show options for authenticated users
       if (dropdownMenu) {
         dropdownMenu.innerHTML = `
@@ -496,6 +499,9 @@ class AuthUI {
         profileUsername.textContent = 'Guest';
       }
 
+      // Hide admin buttons for non-authenticated users
+      this._hideAdminButtons();
+
       // Show Sign In option for guest users
       if (dropdownMenu) {
         dropdownMenu.innerHTML = `
@@ -508,6 +514,46 @@ class AuthUI {
           </button>
         `;
       }
+    }
+  }
+
+  /**
+   * Update admin button visibility based on user permissions
+   * @private
+   */
+  async _updateAdminButtons() {
+    try {
+      const isAdmin = await authService.isAdmin();
+      const adminModalBtn = document.getElementById('admin-modal-button');
+      const configModalBtn = document.getElementById('config-modal-button');
+      
+      if (adminModalBtn) {
+        adminModalBtn.style.display = isAdmin ? 'block' : 'none';
+      }
+      
+      if (configModalBtn) {
+        configModalBtn.style.display = isAdmin ? 'block' : 'none';
+      }
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      this._hideAdminButtons();
+    }
+  }
+
+  /**
+   * Hide admin buttons
+   * @private
+   */
+  _hideAdminButtons() {
+    const adminModalBtn = document.getElementById('admin-modal-button');
+    const configModalBtn = document.getElementById('config-modal-button');
+    
+    if (adminModalBtn) {
+      adminModalBtn.style.display = 'none';
+    }
+    
+    if (configModalBtn) {
+      configModalBtn.style.display = 'none';
     }
   }
 

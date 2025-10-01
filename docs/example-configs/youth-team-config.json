@@ -1,0 +1,45 @@
+{
+  "team": {
+    "name": "Riverside Youth FC",
+    "shortName": "RYFC",
+    "abbreviation": "RYFC",
+    "defaultOpponentName": "Opposition"
+  },
+  "branding": {
+    "primaryColor": "#28a745",
+    "secondaryColor": "#ffffff",
+    "logoUrl": "./assets/riverside-youth-logo.png",
+    "faviconUrl": "./assets/favicon.ico",
+    "appIconUrl": "./assets/riverside-youth-icon.png"
+  },
+  "pwa": {
+    "appName": "Riverside Youth FC Game Time",
+    "shortName": "RYFC",
+    "description": "Youth football match tracker for Riverside Youth FC",
+    "themeColor": "#28a745",
+    "backgroundColor": "#ffffff"
+  },
+  "integrations": {
+    "leagueTable": {
+      "enabled": true,
+      "defaultUrl": "https://youth-league.example.com/table/u16",
+      "corsProxies": [
+        "https://corsproxy.io/?",
+        "https://api.allorigins.win/get?url="
+      ]
+    },
+    "statistics": {
+      "enabled": false,
+      "apiEndpoint": null
+    }
+  },
+  "defaults": {
+    "matchDuration": 3600,
+    "theme": "green",
+    "darkMode": false
+  },
+  "storage": {
+    "keyPrefix": "ryfc_",
+    "cachePrefix": "ryfc-cache-"
+  }
+}

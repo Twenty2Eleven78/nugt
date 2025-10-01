@@ -1,110 +1,46 @@
 {
-    "_comment": "Team Configuration File - Customize this file for your team",
-    "_documentation": "This file contains all team-specific settings for the GameTime application. Modify the values below to customize the app for your team.",
-    "team": {
-        "_description": "Basic team information and naming conventions",
-        "name": "Netherton United",
-        "shortName": "NUFC",
-        "abbreviation": "NUGT",
-        "defaultOpponentName": "Opposition Team",
-        "_notes": {
-            "name": "Full team name displayed throughout the application",
-            "shortName": "Abbreviated team name for compact displays",
-            "abbreviation": "Very short team identifier (2-4 characters)",
-            "defaultOpponentName": "Default name used for opponent team in match setup"
-        }
+  "team": {
+    "name": "Netherton United",
+    "shortName": "Netherton",
+    "abbreviation": "NUGT",
+    "defaultOpponentName": "Opposition"
+  },
+  "branding": {
+    "primaryColor": "#dc3545",
+    "secondaryColor": "#ffffff",
+    "logoUrl": "./nugtlogo.png",
+    "faviconUrl": "./favicon.ico",
+    "appIconUrl": "./nugt512.png"
+  },
+  "pwa": {
+    "appName": "Netherton United Game Time App",
+    "shortName": "NUGT",
+    "description": "Advanced football match tracker with attendance, statistics, and enhanced event management",
+    "themeColor": "#dc3545",
+    "backgroundColor": "#ffffff"
+  },
+  "integrations": {
+    "leagueTable": {
+      "enabled": true,
+      "defaultUrl": "https://example-league-url.com",
+      "corsProxies": [
+        "https://corsproxy.io/?",
+        "https://cors-anywhere.herokuapp.com/",
+        "https://api.allorigins.win/get?url="
+      ]
     },
-    "branding": {
-        "_description": "Visual branding and theme customization",
-        "primaryColor": "#dc3545",
-        "secondaryColor": "#ffffff",
-        "logoUrl": "./nugtlogo.png",
-        "faviconUrl": "./favicon.ico",
-        "appIconUrl": "./nugt512.png",
-        "_notes": {
-            "primaryColor": "Main theme color (hex, rgb, or named color)",
-            "secondaryColor": "Secondary color for contrast and accents",
-            "logoUrl": "Path or URL to team logo image",
-            "faviconUrl": "Path or URL to favicon image",
-            "appIconUrl": "Path or URL to PWA app icon (512x512 recommended)"
-        }
-    },
-    "pwa": {
-        "_description": "Progressive Web App configuration",
-        "appName": "Netherton United Game Time App",
-        "shortName": "NUGT",
-        "description": "Advanced football match tracker with attendance, statistics, and enhanced event management",
-        "themeColor": "#dc3545",
-        "backgroundColor": "#ffffff",
-        "_notes": {
-            "appName": "Full application name for PWA manifest",
-            "shortName": "Short name for PWA (12 characters or less recommended)",
-            "description": "App description for PWA manifest and app stores",
-            "themeColor": "Theme color for PWA (matches primaryColor typically)",
-            "backgroundColor": "Background color for PWA splash screen"
-        }
-    },
-    "integrations": {
-        "_description": "External service integrations and API configurations",
-        "leagueTable": {
-            "_description": "FA Full-Time league table integration",
-            "enabled": true,
-            "defaultUrl": "https://example-league-url.com",
-            "corsProxies": [
-                "https://corsproxy.io/?",
-                "https://cors-anywhere.herokuapp.com/",
-                "https://api.allorigins.win/get?url="
-            ],
-            "_notes": {
-                "enabled": "Set to false to disable league table features",
-                "defaultUrl": "Default league table URL (users can override in UI)",
-                "corsProxies": "List of CORS proxy services for accessing league data"
-            }
-        },
-        "statistics": {
-            "_description": "Statistics API integration (future feature)",
-            "enabled": true,
-            "apiEndpoint": null,
-            "_notes": {
-                "enabled": "Set to false to disable statistics features",
-                "apiEndpoint": "API endpoint for statistics service (null = not configured)"
-            }
-        }
-    },
-    "defaults": {
-        "_description": "Default application settings and preferences",
-        "matchDuration": 4200,
-        "theme": "red",
-        "darkMode": false,
-        "_notes": {
-            "matchDuration": "Default match duration in seconds (4200 = 70 minutes)",
-            "theme": "Default color theme identifier",
-            "darkMode": "Default dark mode setting (true/false)"
-        }
-    },
-    "storage": {
-        "_description": "Local storage configuration and key prefixes",
-        "keyPrefix": "nugt_",
-        "cachePrefix": "nugt-cache-",
-        "_notes": {
-            "keyPrefix": "Prefix for localStorage keys (prevents conflicts between teams)",
-            "cachePrefix": "Prefix for cache storage keys (service worker caching)"
-        }
-    },
-    "_setup_instructions": {
-        "1": "Customize the 'team' section with your team's information",
-        "2": "Update 'branding' section with your team's colors and logo URLs",
-        "3": "Modify 'pwa' section to reflect your team's app name and description",
-        "4": "Configure 'integrations' with your league's specific URLs and settings",
-        "5": "Adjust 'defaults' to match your typical match duration and preferences",
-        "6": "Update 'storage' prefixes to be unique for your team (use team abbreviation)",
-        "7": "Remove all '_comment', '_description', '_notes', and '_setup_instructions' sections before deployment"
-    },
-    "_validation_notes": {
-        "colors": "Colors must be valid CSS colors (hex like #ff0000, rgb like rgb(255,0,0), or named colors like 'red')",
-        "urls": "URLs can be relative (./logo.png) or absolute (https://example.com/logo.png)",
-        "prefixes": "Storage prefixes should be unique and end with underscore for clarity",
-        "booleans": "Use true/false (lowercase) for boolean values",
-        "numbers": "Match duration should be in seconds (90 minutes = 5400 seconds)"
+    "statistics": {
+      "enabled": true,
+      "apiEndpoint": null
     }
+  },
+  "defaults": {
+    "matchDuration": 4200,
+    "theme": "red",
+    "darkMode": false
+  },
+  "storage": {
+    "keyPrefix": "nugt_",
+    "cachePrefix": "nugt-cache-"
+  }
 }

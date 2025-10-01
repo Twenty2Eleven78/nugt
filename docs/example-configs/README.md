@@ -37,6 +37,12 @@ This directory contains example configuration files for different types of footb
 - **Contains**: Only essential fields required for basic functionality
 - **Use Case**: Quick setup, testing, or when you want to configure everything through the UI
 
+### 6. Documented Template (`documented-config-template.json`)
+**Scenario**: Comprehensive template with inline documentation
+- **Contains**: All configuration options with detailed explanations and notes
+- **Use Case**: Learning about all available options, understanding configuration structure
+- **Note**: Remove all documentation fields (starting with `_`) before using in production
+
 ## How to Use These Examples
 
 ### 1. Choose Your Starting Point

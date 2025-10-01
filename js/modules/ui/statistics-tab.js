@@ -264,7 +264,7 @@ class StatisticsTab {
 
             <!-- Top Performers Section -->
             <div class="row g-2">
-                <div class="col-12 col-md-6">
+                <div class="col-6">
                     <div class="stats-section">
                         <div class="stats-section-header">
                             <i class="fas fa-trophy text-warning me-2"></i>
@@ -275,7 +275,7 @@ class StatisticsTab {
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-md-6">
+                <div class="col-6">
                     <div class="stats-section">
                         <div class="stats-section-header">
                             <i class="fas fa-handshake text-info me-2"></i>

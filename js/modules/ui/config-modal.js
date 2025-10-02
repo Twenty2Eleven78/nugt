@@ -4,7 +4,7 @@
  * @version 1.0
  */
 
-import { createAndAppendModal, showModal, hideModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
+import { createAndAppendModal, showModal, hideModal } from '../shared/modal-factory.js';
 import { configService } from '../services/config.js';
 import { brandingService } from '../services/branding.js';
 
@@ -16,7 +16,7 @@ class ConfigurationModal {
     this.validationErrors = {};
     this.previewMode = false;
     this.activeTab = 'team';
-    
+
     this.init();
   }
 
@@ -27,9 +27,9 @@ class ConfigurationModal {
 
   createModal() {
     const modalContent = this.generateModalContent();
-    
+
     const modalOptions = {
-      ...MODAL_CONFIGS.EXTRA_LARGE,
+      size: 'modal-xl modal-dialog-scrollable',
       backdrop: 'static',
       keyboard: false,
       footerContent: this.generateFooterContent()
@@ -45,6 +45,47 @@ class ConfigurationModal {
 
   generateModalContent() {
     return `
+      <style>
+        #${this.modalId} .modal-dialog {
+          max-height: 90vh;
+        }
+        #${this.modalId} .modal-content {
+          height: 85vh;
+          max-height: 85vh;
+        }
+        #${this.modalId} .modal-body {
+          overflow-y: auto;
+          flex: 1;
+        }
+        .config-modal-container {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        }
+        .config-modal-container .tab-content {
+          flex: 1;
+          overflow-y: auto;
+          min-height: 400px;
+        }
+        #${this.modalId} .modal-footer {
+          flex-shrink: 0;
+        }
+        .tab-pane {
+          padding: 1rem 0;
+        }
+        @media (max-height: 600px) {
+          #${this.modalId} .modal-content {
+            height: 95vh;
+            max-height: 95vh;
+          }
+        }
+        @media (min-height: 800px) {
+          #${this.modalId} .modal-content {
+            height: 80vh;
+            max-height: 80vh;
+          }
+        }
+      </style>
       <div class="config-modal-container">
         <!-- Tab Navigation -->
         <ul class="nav nav-pills nav-fill mb-4" role="tablist">
@@ -385,8 +426,8 @@ class ConfigurationModal {
         <i class="fas fa-save me-2"></i>Save Configuration
       </button>
     `;
-  }  bindEvents
-() {
+  } bindEvents
+    () {
     // Wait for modal to be created
     setTimeout(() => {
       const modal = document.getElementById(this.modalId);
@@ -452,7 +493,7 @@ class ConfigurationModal {
           console.error('Failed to load configuration:', error);
         });
       });
-      
+
       modal.addEventListener('shown.bs.modal', () => {
         console.log('Modal shown event triggered - DOM should be ready');
         // Ensure form is populated after modal is fully shown
@@ -490,11 +531,11 @@ class ConfigurationModal {
         console.log('Configuration not loaded yet, waiting...');
         await configService.loadConfig();
       }
-      
+
       this.currentConfig = JSON.parse(JSON.stringify(configService.getConfig()));
       this.originalConfig = JSON.parse(JSON.stringify(this.currentConfig));
       this.populateForm();
-      
+
       console.log('Configuration loaded into modal:', this.currentConfig);
     } catch (error) {
       console.error('Error loading configuration into modal:', error);
@@ -601,17 +642,17 @@ class ConfigurationModal {
   handleInputChange(input) {
     // Update current config with new value
     this.updateConfigFromInput(input);
-    
+
     // Validate the specific field
     this.validateField(input);
-    
+
     // Update validation display
     this.updateValidationDisplay();
   }
 
   updateConfigFromInput(input) {
     const value = input.type === 'checkbox' ? input.checked : input.value;
-    
+
     switch (input.id) {
       // Team fields
       case 'config-team-name':
@@ -626,7 +667,7 @@ class ConfigurationModal {
       case 'config-default-opponent':
         this.currentConfig.team.defaultOpponentName = value;
         break;
-      
+
       // Branding fields
       case 'config-primary-color':
       case 'config-primary-color-text':
@@ -645,7 +686,7 @@ class ConfigurationModal {
       case 'config-app-icon-url':
         this.currentConfig.branding.appIconUrl = value;
         break;
-      
+
       // Integration fields
       case 'config-league-enabled':
         this.currentConfig.integrations.leagueTable.enabled = value;
@@ -654,7 +695,7 @@ class ConfigurationModal {
         this.currentConfig.integrations.leagueTable.defaultUrl = value;
         break;
       case 'config-cors-proxies':
-        this.currentConfig.integrations.leagueTable.corsProxies = 
+        this.currentConfig.integrations.leagueTable.corsProxies =
           value.split('\n').filter(line => line.trim()).map(line => line.trim());
         break;
       case 'config-stats-enabled':
@@ -663,7 +704,7 @@ class ConfigurationModal {
       case 'config-stats-endpoint':
         this.currentConfig.integrations.statistics.apiEndpoint = value || null;
         break;
-      
+
       // Defaults fields
       case 'config-match-duration':
         this.currentConfig.defaults.matchDuration = parseInt(value);
@@ -674,7 +715,7 @@ class ConfigurationModal {
       case 'config-default-dark-mode':
         this.currentConfig.defaults.darkMode = value;
         break;
-      
+
       // Storage fields
       case 'config-key-prefix':
         this.currentConfig.storage.keyPrefix = value;
@@ -688,10 +729,10 @@ class ConfigurationModal {
   validateField(input) {
     const fieldId = input.id;
     const value = input.type === 'checkbox' ? input.checked : input.value;
-    
+
     // Clear previous error for this field
     delete this.validationErrors[fieldId];
-    
+
     // Validate based on field type
     switch (fieldId) {
       case 'config-team-name':
@@ -701,21 +742,21 @@ class ConfigurationModal {
           this.validationErrors[fieldId] = 'Team name must be 50 characters or less';
         }
         break;
-        
+
       case 'config-primary-color':
       case 'config-primary-color-text':
         if (!this.isValidColor(value)) {
           this.validationErrors[fieldId] = 'Primary color must be a valid hex color (e.g., #dc3545)';
         }
         break;
-        
+
       case 'config-secondary-color':
       case 'config-secondary-color-text':
         if (value && !this.isValidColor(value)) {
           this.validationErrors[fieldId] = 'Secondary color must be a valid hex color (e.g., #ffffff)';
         }
         break;
-        
+
       case 'config-logo-url':
       case 'config-favicon-url':
       case 'config-app-icon-url':
@@ -723,19 +764,19 @@ class ConfigurationModal {
           this.validationErrors[fieldId] = 'Must be a valid URL or file path';
         }
         break;
-        
+
       case 'config-league-url':
         if (value && !this.isValidUrl(value)) {
           this.validationErrors[fieldId] = 'League table URL must be a valid URL';
         }
         break;
-        
+
       case 'config-stats-endpoint':
         if (value && !this.isValidUrl(value)) {
           this.validationErrors[fieldId] = 'Statistics endpoint must be a valid URL';
         }
         break;
-        
+
       case 'config-key-prefix':
       case 'config-cache-prefix':
         if (value && !/^[a-zA-Z0-9_-]+$/.test(value)) {
@@ -743,7 +784,7 @@ class ConfigurationModal {
         }
         break;
     }
-    
+
     // Update field visual state
     this.updateFieldValidationState(input, !this.validationErrors[fieldId]);
   }
@@ -766,19 +807,19 @@ class ConfigurationModal {
   updateValidationDisplay() {
     const errorContainer = document.getElementById('config-validation-errors');
     const errorList = document.getElementById('config-error-list');
-    
+
     if (Object.keys(this.validationErrors).length === 0) {
       errorContainer.style.display = 'none';
       return;
     }
-    
+
     errorList.innerHTML = '';
     Object.values(this.validationErrors).forEach(error => {
       const li = document.createElement('li');
       li.textContent = error;
       errorList.appendChild(li);
     });
-    
+
     errorContainer.style.display = 'block';
   }
 
@@ -799,17 +840,17 @@ class ConfigurationModal {
     const previewTeamName = document.getElementById('config-preview-team-name');
     const previewPrimary = document.getElementById('config-preview-primary');
     const previewSecondary = document.getElementById('config-preview-secondary');
-    
+
     // Update preview content
     const teamName = document.getElementById('config-team-name').value || 'Team Name';
     const logoUrl = document.getElementById('config-logo-url').value;
     const primaryColor = document.getElementById('config-primary-color').value;
     const secondaryColor = document.getElementById('config-secondary-color').value;
-    
+
     previewTeamName.textContent = teamName;
     previewPrimary.textContent = primaryColor;
     previewSecondary.textContent = secondaryColor;
-    
+
     if (logoUrl) {
       previewLogo.src = logoUrl;
       previewLogo.style.display = 'block';
@@ -819,12 +860,12 @@ class ConfigurationModal {
     } else {
       previewLogo.style.display = 'none';
     }
-    
+
     // Apply temporary styling
     previewContainer.style.display = 'block';
     previewContainer.style.borderColor = primaryColor;
     previewTeamName.style.color = primaryColor;
-    
+
     // Show preview notice
     const previewNotice = document.getElementById('config-preview-notice');
     previewNotice.style.display = 'block';
@@ -838,12 +879,12 @@ class ConfigurationModal {
 
   isValidUrl(url) {
     if (!url || typeof url !== 'string') return false;
-    
+
     // Allow relative paths
     if (url.startsWith('./') || url.startsWith('../') || url.startsWith('/')) {
       return true;
     }
-    
+
     // Validate full URLs
     try {
       new URL(url);
@@ -856,7 +897,7 @@ class ConfigurationModal {
   cleanup() {
     this.previewMode = false;
     this.validationErrors = {};
-    
+
     // Hide preview elements
     const previewContainer = document.getElementById('config-branding-preview');
     const previewNotice = document.getElementById('config-preview-notice');
@@ -866,16 +907,16 @@ class ConfigurationModal {
   async saveConfiguration() {
     // Validate entire configuration
     this.validateAllFields();
-    
+
     if (Object.keys(this.validationErrors).length > 0) {
       this.updateValidationDisplay();
       return;
     }
-    
+
     try {
       // Update configuration service
       const validationResult = configService.updateConfig(this.currentConfig);
-      
+
       if (!validationResult.isValid) {
         // Show validation errors from service
         this.validationErrors = {};
@@ -885,23 +926,23 @@ class ConfigurationModal {
         this.updateValidationDisplay();
         return;
       }
-      
+
       // Apply branding changes immediately
       if (brandingService && typeof brandingService.applyBranding === 'function') {
         await brandingService.applyBranding();
       }
-      
+
       // Save configuration to file if possible (for persistence)
       await this.saveConfigurationToFile();
-      
+
       // Show success message
       this.showSuccessMessage('Configuration saved successfully!');
-      
+
       // Close modal after short delay
       setTimeout(() => {
         this.hide();
       }, 1500);
-      
+
     } catch (error) {
       console.error('Error saving configuration:', error);
       this.showErrorMessage('Failed to save configuration. Please try again.');
@@ -912,26 +953,26 @@ class ConfigurationModal {
     try {
       // Create a clean configuration object without internal properties
       const configToSave = JSON.parse(JSON.stringify(this.currentConfig));
-      
+
       // Create downloadable file
       const configJson = JSON.stringify(configToSave, null, 2);
       const blob = new Blob([configJson], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
-      
+
       // Create temporary download link
       const a = document.createElement('a');
       a.href = url;
       a.download = 'team-config.json';
       a.style.display = 'none';
-      
+
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      
+
       URL.revokeObjectURL(url);
-      
+
       console.log('Configuration file downloaded successfully');
-      
+
     } catch (error) {
       console.warn('Could not save configuration to file:', error);
       // This is not a critical error, so we don't throw
@@ -943,14 +984,14 @@ class ConfigurationModal {
       // Get default configuration
       const defaultConfig = configService._getDefaultConfig();
       this.currentConfig = JSON.parse(JSON.stringify(defaultConfig));
-      
+
       // Repopulate form
       this.populateForm();
-      
+
       // Clear validation errors
       this.validationErrors = {};
       this.updateValidationDisplay();
-      
+
       // Show notice
       this.showSuccessMessage('Configuration reset to defaults');
     }
@@ -965,12 +1006,12 @@ class ConfigurationModal {
         teamName: this.currentConfig.team?.name || 'Unknown Team',
         configuration: this.currentConfig
       };
-      
+
       // Create and download file
       const blob = new Blob([JSON.stringify(exportData, null, 2)], {
         type: 'application/json'
       });
-      
+
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -979,9 +1020,9 @@ class ConfigurationModal {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      
+
       this.showSuccessMessage('Configuration exported successfully!');
-      
+
     } catch (error) {
       console.error('Error exporting configuration:', error);
       this.showErrorMessage('Failed to export configuration. Please try again.');
@@ -1078,78 +1119,78 @@ class ConfigurationModal {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    
+
     input.onchange = async (e) => {
       const file = e.target.files[0];
       if (!file) return;
-      
+
       try {
         const text = await file.text();
         const importData = JSON.parse(text);
-        
+
         // Validate import data structure
         if (!this.validateImportData(importData)) {
           this.showErrorMessage('Invalid configuration file format. Please check the file and try again.');
           return;
         }
-        
+
         // Confirm import
         const teamName = importData.configuration?.team?.name || 'Unknown Team';
         const confirmMessage = `Import configuration for "${teamName}"?\n\nThis will replace your current settings.`;
-        
+
         if (!confirm(confirmMessage)) {
           return;
         }
-        
+
         // Apply imported configuration
         this.currentConfig = JSON.parse(JSON.stringify(importData.configuration));
         this.populateForm();
-        
+
         // Clear validation errors and validate
         this.validationErrors = {};
         this.validateAllFields();
         this.updateValidationDisplay();
-        
+
         this.showSuccessMessage(`Configuration imported for ${teamName}`);
-        
+
         // Close import modal
         const importModal = document.getElementById('configImportModal');
         if (importModal) {
           importModal.remove();
         }
-        
+
       } catch (error) {
         console.error('Error importing configuration:', error);
         this.showErrorMessage('Failed to import configuration. Please check the file format.');
       }
     };
-    
+
     input.click();
   }
 
   loadTemplate(templateType) {
     const templates = this.getConfigurationTemplates();
     const template = templates[templateType];
-    
+
     if (!template) {
       this.showErrorMessage('Template not found');
       return;
     }
-    
+
     // Confirm template load
     const confirmMessage = `Load ${template.name} template?\n\nThis will replace your current settings.`;
     if (!confirm(confirmMessage)) {
       return;
     }
-    
+
     // Apply template configuration
     this.currentConfig = JSON.parse(JSON.stringify(template.configuration));
     this.populateForm();
-    
+
     // Clear validation errors
     this.validationErrors = {};
     this.updateValidationDisplay();
-    
+
     this.showSuccessMessage(`${template.name} template loaded successfully`);
   }
 
@@ -1355,21 +1396,21 @@ class ConfigurationModal {
     // Check basic structure
     if (!data || typeof data !== 'object') return false;
     if (!data.configuration || typeof data.configuration !== 'object') return false;
-    
+
     // Check required sections
     const requiredSections = ['team', 'branding', 'pwa', 'integrations', 'defaults', 'storage'];
-    return requiredSections.every(section => 
+    return requiredSections.every(section =>
       data.configuration[section] && typeof data.configuration[section] === 'object'
     );
   }
 
   validateAllFields() {
     this.validationErrors = {};
-    
+
     // Get all form inputs
     const modal = document.getElementById(this.modalId);
     const inputs = modal.querySelectorAll('input, select, textarea');
-    
+
     inputs.forEach(input => {
       this.validateField(input);
     });
@@ -1387,14 +1428,14 @@ class ConfigurationModal {
       alert.id = 'config-success-alert';
       alert.className = 'alert alert-success';
       alert.innerHTML = `<i class="fas fa-check-circle me-2"></i><span></span>`;
-      
+
       const container = document.querySelector(`#${this.modalId} .modal-body`);
       container.insertBefore(alert, container.firstChild);
     }
-    
+
     alert.querySelector('span').textContent = message;
     alert.style.display = 'block';
-    
+
     // Auto-hide after 3 seconds
     setTimeout(() => {
       alert.style.display = 'none';
@@ -1409,14 +1450,14 @@ class ConfigurationModal {
       alert.id = 'config-error-alert';
       alert.className = 'alert alert-danger';
       alert.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i><span></span>`;
-      
+
       const container = document.querySelector(`#${this.modalId} .modal-body`);
       container.insertBefore(alert, container.firstChild);
     }
-    
+
     alert.querySelector('span').textContent = message;
     alert.style.display = 'block';
-    
+
     // Auto-hide after 5 seconds
     setTimeout(() => {
       alert.style.display = 'none';

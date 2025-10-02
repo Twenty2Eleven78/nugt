@@ -28,6 +28,14 @@ class ConfigManager {
       this.loaded = true;
       
       console.log('Configuration loaded successfully:', this.config.app.name);
+      
+      // Dispatch event to notify other modules that config is loaded
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('configLoaded', { 
+          detail: { config: this.config } 
+        }));
+      }
+      
       return this.config;
     } catch (error) {
       console.error('Failed to load configuration, using defaults:', error);
@@ -47,7 +55,7 @@ class ConfigManager {
    */
   get(path, defaultValue = null) {
     if (!this.config) {
-      console.warn('Configuration not loaded yet. Call load() first.');
+      // Silently return default value if config not loaded yet
       return defaultValue;
     }
 

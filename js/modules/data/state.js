@@ -11,7 +11,7 @@ export const gameState = {
   seconds: 0,
   isRunning: false,
   startTimestamp: null,
-  gameTime: GAME_CONFIG.DEFAULT_GAME_TIME,
+  gameTime: 4200, // Default value, will be updated from config when loaded
   isSecondHalf: false,
 
   // Match data
@@ -138,7 +138,7 @@ export const stateManager = {
     this.resetTimer();
     this.resetMatch();
     this.resetTeams();
-    gameState.gameTime = GAME_CONFIG.DEFAULT_GAME_TIME;
+    gameState.gameTime = GAME_CONFIG.DEFAULT_GAME_TIME; // This will now safely return default if config not loaded
     this.clearEditingEvent();
   }
 };

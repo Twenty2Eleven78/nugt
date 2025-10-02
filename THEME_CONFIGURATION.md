@@ -82,6 +82,19 @@ Copy from `config-examples/`:
 4. **PWA Manifest** - Updates app manifest with theme colors and team name
 5. **User Override** - Users can still change themes manually, which overrides the default
 
+## ⚠️ Important: User Preferences Override Config
+
+The configuration `defaultTheme` only applies when:
+- No theme is saved in localStorage (first time users)
+- User clears their browser data
+- User hasn't manually selected a theme
+
+If you've previously selected a theme, it will be saved and override the config. To test config themes:
+1. Open browser developer tools (F12)
+2. Go to Application/Storage tab
+3. Clear localStorage for the site
+4. Reload the page
+
 ## 🛠 Tools Available
 
 - **Theme Tester** - `tools/color-tester.html` - Preview themes and generate config

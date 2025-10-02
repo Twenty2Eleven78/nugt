@@ -178,7 +178,13 @@ export async function initializeApp() {
     // Load configuration first
     console.log('Loading application configuration...');
     const { config } = await import('./shared/config.js');
-    await config.load();
+    
+    try {
+      await config.load();
+      console.log('✓ Configuration loaded successfully');
+    } catch (error) {
+      console.warn('⚠ Configuration loading failed, using defaults:', error.message);
+    }
     
     // Validate configuration
     const validation = config.validate();
@@ -193,6 +199,12 @@ export async function initializeApp() {
     // Initialize team branding
     const { initTeamBranding } = await import('./ui/team-branding.js');
     initTeamBranding();
+
+    // Update game state with config values now that config is loaded
+    const { gameState } = await import('./data/state.js');
+    if (gameState.gameTime === 4200) { // Only update if still using default
+      gameState.gameTime = config.get('match.defaultGameTime', 4200);
+    }
 
     console.log(`Initializing ${config.get('app.name', 'NUFC GameTime')} v${config.get('app.version', '4.0')} - Enhanced with Custom Framework`);
 
@@ -260,7 +272,7 @@ export async function initializeApp() {
   // Make modals available globally after initialization
   window.goalModal = goalModal;
 
-  // Initialize theme manager
+  // Initialize theme manager first
   await themeManager.init();
 
   // Initialize timer with enhanced state recovery

@@ -6,12 +6,36 @@
 
 import { config } from './config.js';
 
-// Application Configuration - now loaded from config.json
+// Application Configuration - now loaded from config.json with fallbacks
 export const APP_CONFIG = {
-  get NAME() { return config.get('app.name', 'NUFC GameTime'); },
-  get VERSION() { return config.get('app.version', '4.0'); },
-  get AUTHOR() { return config.get('app.author', 'NUFC GameTime Team'); },
-  get DESCRIPTION() { return config.get('app.description', 'Football match tracking and statistics application'); }
+  get NAME() { 
+    try {
+      return config.get('app.name', 'NUFC GameTime');
+    } catch (error) {
+      return 'NUFC GameTime';
+    }
+  },
+  get VERSION() { 
+    try {
+      return config.get('app.version', '4.0');
+    } catch (error) {
+      return '4.0';
+    }
+  },
+  get AUTHOR() { 
+    try {
+      return config.get('app.author', 'NUFC GameTime Team');
+    } catch (error) {
+      return 'NUFC GameTime Team';
+    }
+  },
+  get DESCRIPTION() { 
+    try {
+      return config.get('app.description', 'Football match tracking and statistics application');
+    } catch (error) {
+      return 'Football match tracking and statistics application';
+    }
+  }
 };
 
 // Cache Configuration
@@ -49,24 +73,72 @@ export const STORAGE_KEYS = {
   PLAYER_STATS: 'nugt_playerStats'
 };
 
-// Game Configuration - now loaded from config.json
+// Game Configuration - now loaded from config.json with fallbacks
 export const GAME_CONFIG = {
   // Time Settings (in seconds)
-  get DEFAULT_GAME_TIME() { return config.get('match.defaultGameTime', 4200); },
-  get HALF_TIME_DURATION() { return Math.floor(config.get('match.defaultGameTime', 4200) / 2); },
-  get FULL_TIME_DURATION() { return config.get('match.defaultGameTime', 4200); },
+  get DEFAULT_GAME_TIME() { 
+    try {
+      return config.get('match.defaultGameTime', 4200);
+    } catch (error) {
+      return 4200;
+    }
+  },
+  get HALF_TIME_DURATION() { 
+    try {
+      return Math.floor(config.get('match.defaultGameTime', 4200) / 2);
+    } catch (error) {
+      return 2100;
+    }
+  },
+  get FULL_TIME_DURATION() { 
+    try {
+      return config.get('match.defaultGameTime', 4200);
+    } catch (error) {
+      return 4200;
+    }
+  },
 
   // Timer Settings (in milliseconds)
-  get TIMER_UPDATE_INTERVAL() { return config.get('match.timerUpdateInterval', 100); },
+  get TIMER_UPDATE_INTERVAL() { 
+    try {
+      return config.get('match.timerUpdateInterval', 100);
+    } catch (error) {
+      return 100;
+    }
+  },
   STORAGE_DEBOUNCE_DELAY: 100,
-  get AUTO_SAVE_INTERVAL() { return config.get('match.autoSaveInterval', 5000); },
+  get AUTO_SAVE_INTERVAL() { 
+    try {
+      return config.get('match.autoSaveInterval', 5000);
+    } catch (error) {
+      return 5000;
+    }
+  },
 
   // Team Defaults - now configurable
-  get DEFAULT_TEAM1_NAME() { return config.get('team.defaultTeam1Name', 'Netherton'); },
-  get DEFAULT_TEAM2_NAME() { return config.get('team.defaultTeam2Name', 'Opposition'); },
+  get DEFAULT_TEAM1_NAME() { 
+    try {
+      return config.get('team.defaultTeam1Name', 'Netherton');
+    } catch (error) {
+      return 'Netherton';
+    }
+  },
+  get DEFAULT_TEAM2_NAME() { 
+    try {
+      return config.get('team.defaultTeam2Name', 'Opposition');
+    } catch (error) {
+      return 'Opposition';
+    }
+  },
 
   // UI Settings
-  get DEBOUNCE_DELAY() { return config.get('ui.debounceDelay', 300); }
+  get DEBOUNCE_DELAY() { 
+    try {
+      return config.get('ui.debounceDelay', 300);
+    } catch (error) {
+      return 300;
+    }
+  }
 };
 
 // Match Event Types
@@ -117,9 +189,21 @@ export const NOTIFICATION_TYPES = {
 };
 
 export const NOTIFICATION_CONFIG = {
-  get DEFAULT_DURATION() { return config.get('ui.notifications.defaultDuration', 2000); },
+  get DEFAULT_DURATION() { 
+    try {
+      return config.get('ui.notifications.defaultDuration', 2000);
+    } catch (error) {
+      return 2000;
+    }
+  },
   PERSISTENT_DURATION: 0, // No auto-hide
-  get MAX_NOTIFICATIONS() { return config.get('ui.notifications.maxNotifications', 5); },
+  get MAX_NOTIFICATIONS() { 
+    try {
+      return config.get('ui.notifications.maxNotifications', 5);
+    } catch (error) {
+      return 5;
+    }
+  },
   ANIMATION_DURATION: 300 // 0.3 seconds
 };
 

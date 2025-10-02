@@ -63,27 +63,53 @@ export function updateAppBranding() {
 /**
  * Apply default theme from configuration
  */
-export function applyDefaultTheme() {
+export async function applyDefaultTheme() {
   const defaultTheme = config.get('ui.theme.defaultTheme', 'red');
   
-  // Only apply if no theme is already saved in localStorage
+  // Check if there's a saved theme
   const savedTheme = localStorage.getItem('app-theme');
-  if (!savedTheme) {
-    // Set the default theme from config
-    try {
-      import('../shared/theme-manager.js').then(({ default: themeManager }) => {
-        if (themeManager && themeManager.changeTheme) {
-          themeManager.changeTheme(defaultTheme);
-          console.log(`Default theme applied from config: ${defaultTheme}`);
-        }
-      });
-    } catch (error) {
-      console.warn('Could not apply default theme from config');
+  
+  try {
+    const { default: themeManager } = await import('../shared/theme-manager.js');
+    
+    if (!savedTheme) {
+      // No saved theme, apply config default
+      if (themeManager && themeManager.changeTheme) {
+        themeManager.changeTheme(defaultTheme);
+        console.log(`✓ Default theme applied from config: ${defaultTheme}`);
+      }
+    } else {
+      // There's a saved theme, but check if it matches config
+      if (savedTheme !== defaultTheme) {
+        console.log(`ℹ Using saved theme: ${savedTheme}, config suggests: ${defaultTheme}`);
+        console.log(`ℹ To use config theme, clear localStorage or change theme manually`);
+      } else {
+        console.log(`✓ Saved theme matches config: ${savedTheme}`);
+      }
     }
+  } catch (error) {
+    console.warn('Could not apply default theme from config:', error);
   }
 
   // Update theme-color meta tag with the theme's primary color
   updateThemeColorMeta(defaultTheme);
+}
+
+/**
+ * Force apply theme from config (ignores saved theme)
+ */
+export async function forceApplyConfigTheme() {
+  const defaultTheme = config.get('ui.theme.defaultTheme', 'red');
+  
+  try {
+    const { default: themeManager } = await import('../shared/theme-manager.js');
+    if (themeManager && themeManager.changeTheme) {
+      themeManager.changeTheme(defaultTheme);
+      console.log(`✓ Config theme force applied: ${defaultTheme}`);
+    }
+  } catch (error) {
+    console.warn('Could not force apply config theme:', error);
+  }
 }
 
 /**
@@ -112,12 +138,12 @@ function updateThemeColorMeta(themeName) {
 /**
  * Initialize all team branding
  */
-export function initTeamBranding() {
+export async function initTeamBranding() {
   // Wait a bit for DOM to be ready
-  setTimeout(() => {
+  setTimeout(async () => {
     updateTeamNames();
     updateAppBranding();
-    applyDefaultTheme();
+    await applyDefaultTheme();
     
     console.log('Team branding initialization complete');
   }, 100);

@@ -121,9 +121,9 @@ class ThemeManager {
       // Try to get default theme from config
       try {
         const { config } = await import('./config.js');
-        if (config.loaded) {
-          defaultTheme = config.get('ui.theme.defaultTheme', 'red');
-        }
+        // Try to get the theme regardless of loaded status, as get() will return default if not loaded
+        defaultTheme = config.get('ui.theme.defaultTheme', 'red');
+        console.log(`Theme manager using default theme from config: ${defaultTheme}`);
       } catch (error) {
         console.warn('Could not load theme from config, using default');
       }

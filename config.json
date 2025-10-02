@@ -27,7 +27,16 @@
   "ui": {
     "theme": {
       "defaultTheme": "green",
-      "availableThemes": ["red", "blue", "green", "purple", "orange", "yellow", "cyan", "pink"]
+      "availableThemes": [
+        "red",
+        "blue",
+        "green",
+        "purple",
+        "orange",
+        "yellow",
+        "cyan",
+        "pink"
+      ]
     },
     "notifications": {
       "defaultDuration": 2000,

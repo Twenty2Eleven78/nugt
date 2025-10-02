@@ -26,6 +26,8 @@ Follow the prompts to configure your team.
 
 2. **Reload the app** - Changes apply immediately!
 
+**Note:** If you've previously selected a theme, clear your browser's localStorage to see the config theme.
+
 ### Option 3: Use Examples
 Copy from `config-examples/`:
 - `manchester-united.json` - Professional club setup

@@ -1,0 +1,50 @@
+{
+  "app": {
+    "name": "Manchester United GameTime",
+    "shortName": "MUGT",
+    "version": "4.0",
+    "description": "Manchester United youth match tracker",
+    "author": "Manchester United FC"
+  },
+  "team": {
+    "defaultTeam1Name": "Manchester United",
+    "defaultTeam2Name": "Opposition",
+    "clubName": "Manchester United FC",
+    "clubColors": {
+      "primary": "#da020e",
+      "secondary": "#ffd700"
+    }
+  },
+  "match": {
+    "defaultGameTime": 3600,
+    "gameDurations": {
+      "7v7_40min": 2400,
+      "7v7_50min": 3000,
+      "9v9_60min": 3600,
+      "11v11_70min": 4200,
+      "11v11_80min": 4800,
+      "11v11_90min": 5400
+    },
+    "timerUpdateInterval": 100,
+    "autoSaveInterval": 5000
+  },
+  "ui": {
+    "theme": {
+      "defaultTheme": "red",
+      "availableThemes": ["red", "blue", "green", "purple", "orange", "yellow", "cyan", "pink"]
+    },
+    "notifications": {
+      "defaultDuration": 2000,
+      "maxNotifications": 5
+    },
+    "debounceDelay": 300
+  },
+  "features": {
+    "authentication": true,
+    "cloudStorage": true,
+    "attendance": true,
+    "statistics": true,
+    "sharing": true,
+    "pwa": true
+  }
+}

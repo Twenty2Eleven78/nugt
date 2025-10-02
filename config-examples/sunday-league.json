@@ -1,0 +1,50 @@
+{
+  "app": {
+    "name": "Sunday League Tracker",
+    "shortName": "SLT",
+    "version": "4.0",
+    "description": "Sunday league match tracking application",
+    "author": "Sunday League FC"
+  },
+  "team": {
+    "defaultTeam1Name": "Local FC",
+    "defaultTeam2Name": "Opposition",
+    "clubName": "Sunday League",
+    "clubColors": {
+      "primary": "#28a745",
+      "secondary": "#ffffff"
+    }
+  },
+  "match": {
+    "defaultGameTime": 5400,
+    "gameDurations": {
+      "7v7_40min": 2400,
+      "7v7_50min": 3000,
+      "9v9_60min": 3600,
+      "11v11_70min": 4200,
+      "11v11_80min": 4800,
+      "11v11_90min": 5400
+    },
+    "timerUpdateInterval": 100,
+    "autoSaveInterval": 3000
+  },
+  "ui": {
+    "theme": {
+      "defaultTheme": "green",
+      "availableThemes": ["red", "blue", "green", "purple", "orange", "yellow", "cyan", "pink"]
+    },
+    "notifications": {
+      "defaultDuration": 3000,
+      "maxNotifications": 3
+    },
+    "debounceDelay": 300
+  },
+  "features": {
+    "authentication": false,
+    "cloudStorage": false,
+    "attendance": true,
+    "statistics": true,
+    "sharing": false,
+    "pwa": true
+  }
+}

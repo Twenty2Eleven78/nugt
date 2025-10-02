@@ -173,8 +173,28 @@ function enhanceTouchTargets() {
 }
 
 // Initialize application
-export function initializeApp() {
-  console.log('Initializing NUFC GameTime App v4.0 - Enhanced with Custom Framework');
+export async function initializeApp() {
+  try {
+    // Load configuration first
+    console.log('Loading application configuration...');
+    const { config } = await import('./shared/config.js');
+    await config.load();
+    
+    // Validate configuration
+    const validation = config.validate();
+    if (!validation.isValid) {
+      console.warn('Configuration validation warnings:', validation.errors);
+    }
+
+    // Initialize manifest and page metadata
+    const { initManifest } = await import('./services/manifest-generator.js');
+    initManifest();
+
+    // Initialize team branding
+    const { initTeamBranding } = await import('./ui/team-branding.js');
+    initTeamBranding();
+
+    console.log(`Initializing ${config.get('app.name', 'NUFC GameTime')} v${config.get('app.version', '4.0')} - Enhanced with Custom Framework`);
 
   // Initialize custom modal system
   initializeCustomModals();
@@ -264,6 +284,15 @@ export function initializeApp() {
   updateMatchLog();
 
   console.log('App initialization complete');
+
+  } catch (error) {
+    console.error('Failed to initialize application:', error);
+    
+    // Show error notification if notification service is available
+    if (notificationManager) {
+      notificationManager.error('Failed to initialize application');
+    }
+  }
 }
 
 // Load application state from storage

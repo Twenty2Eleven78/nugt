@@ -1,14 +1,17 @@
 /**
  * Shared Constants
  * Centralized configuration and constants for the NUFC GameTime application
+ * Note: Many values are now loaded from config.json via the config manager
  */
 
-// Application Configuration
+import { config } from './config.js';
+
+// Application Configuration - now loaded from config.json
 export const APP_CONFIG = {
-  NAME: 'NUFC GameTime',
-  VERSION: '4.0',
-  AUTHOR: 'NUFC GameTime Team',
-  DESCRIPTION: 'Football match tracking and statistics application'
+  get NAME() { return config.get('app.name', 'NUFC GameTime'); },
+  get VERSION() { return config.get('app.version', '4.0'); },
+  get AUTHOR() { return config.get('app.author', 'NUFC GameTime Team'); },
+  get DESCRIPTION() { return config.get('app.description', 'Football match tracking and statistics application'); }
 };
 
 // Cache Configuration
@@ -46,24 +49,24 @@ export const STORAGE_KEYS = {
   PLAYER_STATS: 'nugt_playerStats'
 };
 
-// Game Configuration
+// Game Configuration - now loaded from config.json
 export const GAME_CONFIG = {
   // Time Settings (in seconds)
-  DEFAULT_GAME_TIME: 4200, // 70 minutes
-  HALF_TIME_DURATION: 2100, // 35 minutes
-  FULL_TIME_DURATION: 4200, // 70 minutes
+  get DEFAULT_GAME_TIME() { return config.get('match.defaultGameTime', 4200); },
+  get HALF_TIME_DURATION() { return Math.floor(config.get('match.defaultGameTime', 4200) / 2); },
+  get FULL_TIME_DURATION() { return config.get('match.defaultGameTime', 4200); },
 
   // Timer Settings (in milliseconds)
-  TIMER_UPDATE_INTERVAL: 100,
+  get TIMER_UPDATE_INTERVAL() { return config.get('match.timerUpdateInterval', 100); },
   STORAGE_DEBOUNCE_DELAY: 100,
-  AUTO_SAVE_INTERVAL: 5000, // 5 seconds
+  get AUTO_SAVE_INTERVAL() { return config.get('match.autoSaveInterval', 5000); },
 
-  // Team Defaults
-  DEFAULT_TEAM1_NAME: 'Netherton',
-  DEFAULT_TEAM2_NAME: 'Opposition',
+  // Team Defaults - now configurable
+  get DEFAULT_TEAM1_NAME() { return config.get('team.defaultTeam1Name', 'Netherton'); },
+  get DEFAULT_TEAM2_NAME() { return config.get('team.defaultTeam2Name', 'Opposition'); },
 
   // UI Settings
-  DEBOUNCE_DELAY: 300 // 0.3 seconds
+  get DEBOUNCE_DELAY() { return config.get('ui.debounceDelay', 300); }
 };
 
 // Match Event Types
@@ -114,9 +117,9 @@ export const NOTIFICATION_TYPES = {
 };
 
 export const NOTIFICATION_CONFIG = {
-  DEFAULT_DURATION: 2000, // 3 seconds
+  get DEFAULT_DURATION() { return config.get('ui.notifications.defaultDuration', 2000); },
   PERSISTENT_DURATION: 0, // No auto-hide
-  MAX_NOTIFICATIONS: 5,
+  get MAX_NOTIFICATIONS() { return config.get('ui.notifications.maxNotifications', 5); },
   ANIMATION_DURATION: 300 // 0.3 seconds
 };
 

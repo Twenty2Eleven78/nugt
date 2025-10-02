@@ -13,8 +13,21 @@ export function generateManifest() {
   const appName = config.get('app.name', 'NUFC GameTime');
   const shortName = config.get('app.shortName', 'NUGT');
   const description = config.get('app.description', 'Football match tracking application');
-  const themeColor = config.get('team.clubColors.primary', '#dc3545');
   const clubName = config.get('team.clubName', 'Netherton United');
+  
+  // Get theme color based on default theme
+  const defaultTheme = config.get('ui.theme.defaultTheme', 'red');
+  const themeColors = {
+    red: '#dc3545',
+    blue: '#007bff',
+    green: '#28a745',
+    purple: '#6f42c1',
+    orange: '#fd7e14',
+    yellow: '#ffc107',
+    cyan: '#17a2b8',
+    pink: '#e83e8c'
+  };
+  const themeColor = themeColors[defaultTheme] || themeColors.red;
 
   return {
     name: `${clubName} Game Time App`,
@@ -100,10 +113,23 @@ export function updatePageTitle() {
 }
 
 /**
- * Update theme color meta tag
+ * Update theme color meta tag based on default theme
  */
 export function updateThemeColor() {
-  const themeColor = config.get('team.clubColors.primary', '#dc3545');
+  const defaultTheme = config.get('ui.theme.defaultTheme', 'red');
+  
+  const themeColors = {
+    red: '#dc3545',
+    blue: '#007bff',
+    green: '#28a745',
+    purple: '#6f42c1',
+    orange: '#fd7e14',
+    yellow: '#ffc107',
+    cyan: '#17a2b8',
+    pink: '#e83e8c'
+  };
+
+  const themeColor = themeColors[defaultTheme] || themeColors.red;
   
   // Update theme-color meta tag
   let themeColorMeta = document.querySelector('meta[name="theme-color"]');

@@ -1,6 +1,9 @@
 
 🚀 Version 4.0
 **Released: August 2025**
+- **Configuration System**: Complete team customization without code changes - team names, colors, match settings
+- **Team Branding**: Dynamic team colors, logos, and theming based on configuration
+- **Setup Tools**: Interactive team setup, configuration generator, and validation tools
 - Custom CSS Framework: Removed Bootstrap dependency and implemented custom CSS for better performance
 - Enhanced Authentication: Resolved auth issues and improved user profile functionality
 - New Match Workflow: Streamlined start new match process with improved modal system
@@ -88,3 +91,39 @@ Version 1.0 - Initial Release
 - Foundation: Core app architecture and functionality
 
 </details>
+
+## 🔧 Team Configuration
+
+**New in v4.0**: Easy team customization without code changes!
+
+### Quick Setup
+```bash
+npm run setup-team        # Interactive team setup
+npm run validate-config   # Validate your configuration
+```
+
+### Manual Setup
+1. Edit `config.json` with your team details:
+```json
+{
+  "team": {
+    "defaultTeam1Name": "Your Team Name",
+    "clubName": "Your Football Club"
+  },
+  "ui": {
+    "theme": {
+      "defaultTheme": "blue"
+    }
+  }
+}
+```
+
+2. Reload the app - changes apply immediately!
+
+### Tools Available
+- **Configuration Generator**: `tools/config-generator.html` - Visual config builder
+- **Theme Tester**: `tools/color-tester.html` - Test themes and generate config
+- **Validation**: `validate-config.js` - Check configuration
+- **Examples**: `config-examples/` - Pre-built team configs
+
+See `docs/CONFIGURATION.md` for complete setup guide.

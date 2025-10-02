@@ -115,7 +115,7 @@
 <body>
     <div class="container">
         <h1>🏈 GameTime Configuration Generator</h1>
-        <p>Generate a custom configuration file for your team's GameTime app deployment.</p>
+        <p>Generate a custom configuration file for your team's GameTime app deployment. Choose from predefined themes and customize team settings.</p>
 
         <form id="configForm">
             <!-- App Settings -->
@@ -158,19 +158,28 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col">
-                        <div class="form-group">
-                            <label for="primaryColor">Primary Color</label>
-                            <input type="color" id="primaryColor" value="#dc3545" class="color-input">
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-group">
-                            <label for="secondaryColor">Secondary Color</label>
-                            <input type="color" id="secondaryColor" value="#ffffff" class="color-input">
-                        </div>
-                    </div>
+            </div>
+
+            <!-- Theme Settings -->
+            <div class="section">
+                <h3>🎨 Theme Settings</h3>
+                <div class="form-group">
+                    <label for="defaultTheme">Default Theme</label>
+                    <select id="defaultTheme">
+                        <option value="red" selected>Red - Manchester United, Liverpool, Arsenal</option>
+                        <option value="blue">Blue - Chelsea, Manchester City, Everton</option>
+                        <option value="green">Green - Celtic, Norwich, Sporting</option>
+                        <option value="purple">Purple - Custom, unique branding</option>
+                        <option value="orange">Orange - Netherlands, Blackpool</option>
+                        <option value="yellow">Yellow - Borussia Dortmund, Norwich</option>
+                        <option value="cyan">Cyan - Manchester City (away), custom</option>
+                        <option value="pink">Pink - Custom, unique branding</option>
+                    </select>
+                    <small class="text-muted">Choose the default color theme for your team. Users can still change themes manually.</small>
+                </div>
+                <div class="theme-preview-container" style="margin-top: 15px;">
+                    <label>Theme Preview:</label>
+                    <div id="themePreviewBox" style="width: 100px; height: 40px; border-radius: 5px; background: #dc3545; display: inline-block; margin-left: 10px; border: 1px solid #ccc;"></div>
                 </div>
             </div>
 
@@ -243,11 +252,7 @@
                 team: {
                     defaultTeam1Name: document.getElementById('team1Name').value,
                     defaultTeam2Name: "Opposition",
-                    clubName: document.getElementById('clubName').value,
-                    clubColors: {
-                        primary: document.getElementById('primaryColor').value,
-                        secondary: document.getElementById('secondaryColor').value
-                    }
+                    clubName: document.getElementById('clubName').value
                 },
                 match: {
                     defaultGameTime: parseInt(document.getElementById('defaultGameTime').value),
@@ -264,7 +269,7 @@
                 },
                 ui: {
                     theme: {
-                        defaultTheme: "red",
+                        defaultTheme: document.getElementById('defaultTheme').value,
                         availableThemes: ["red", "blue", "green", "purple", "orange", "yellow", "cyan", "pink"]
                     },
                     notifications: {
@@ -310,6 +315,25 @@
             URL.revokeObjectURL(url);
         }
 
+        // Theme colors mapping
+        const themeColors = {
+            red: '#dc3545',
+            blue: '#007bff',
+            green: '#28a745',
+            purple: '#6f42c1',
+            orange: '#fd7e14',
+            yellow: '#ffc107',
+            cyan: '#17a2b8',
+            pink: '#e83e8c'
+        };
+
+        // Update theme preview
+        function updateThemePreview() {
+            const selectedTheme = document.getElementById('defaultTheme').value;
+            const previewBox = document.getElementById('themePreviewBox');
+            previewBox.style.backgroundColor = themeColors[selectedTheme] || themeColors.red;
+        }
+
         // Auto-generate short name from app name
         document.getElementById('appName').addEventListener('input', function() {
             const appName = this.value;
@@ -326,8 +350,14 @@
             document.getElementById('shortName').value = shortName.substring(0, 4);
         });
 
+        // Update theme preview when selection changes
+        document.getElementById('defaultTheme').addEventListener('change', updateThemePreview);
+
         // Generate initial config on page load
-        window.addEventListener('load', generateConfig);
+        window.addEventListener('load', function() {
+            updateThemePreview();
+            generateConfig();
+        });
     </script>
 </body>
 </html>

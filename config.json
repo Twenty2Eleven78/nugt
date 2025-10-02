@@ -7,16 +7,12 @@
     "author": "NUFC GameTime Team"
   },
   "team": {
-    "defaultTeam1Name": "Netherton United",
-    "defaultTeam2Name": "bebebebe",
-    "clubName": "bebebebe",
-    "clubColors": {
-      "primary": "#dc3545",
-      "secondary": "#ffffff"
-    }
+    "defaultTeam1Name": "Netherton",
+    "defaultTeam2Name": "Opposition",
+    "clubName": "Netherton United"
   },
   "match": {
-    "defaultGameTime": 4800,
+    "defaultGameTime": 4200,
     "gameDurations": {
       "7v7_40min": 2400,
       "7v7_50min": 3000,
@@ -30,7 +26,7 @@
   },
   "ui": {
     "theme": {
-      "defaultTheme": "blue",
+      "defaultTheme": "green",
       "availableThemes": ["red", "blue", "green", "purple", "orange", "yellow", "cyan", "pink"]
     },
     "notifications": {

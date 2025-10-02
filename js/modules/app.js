@@ -261,7 +261,7 @@ export async function initializeApp() {
   window.goalModal = goalModal;
 
   // Initialize theme manager
-  themeManager.init();
+  await themeManager.init();
 
   // Initialize timer with enhanced state recovery
   timerController.initialize();

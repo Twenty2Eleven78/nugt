@@ -62,19 +62,6 @@ function validateConfig(configPath = './config.json') {
       if (!config.team.defaultTeam1Name) errors.push('Missing team.defaultTeam1Name');
       if (!config.team.defaultTeam2Name) warnings.push('Missing team.defaultTeam2Name');
       if (!config.team.clubName) warnings.push('Missing team.clubName');
-      
-      if (config.team.clubColors) {
-        if (!config.team.clubColors.primary) warnings.push('Missing team.clubColors.primary');
-        
-        // Validate color format
-        const colorRegex = /^#[0-9A-Fa-f]{6}$/;
-        if (config.team.clubColors.primary && !colorRegex.test(config.team.clubColors.primary)) {
-          warnings.push('team.clubColors.primary should be a valid hex color (e.g., #dc3545)');
-        }
-        if (config.team.clubColors.secondary && !colorRegex.test(config.team.clubColors.secondary)) {
-          warnings.push('team.clubColors.secondary should be a valid hex color (e.g., #ffffff)');
-        }
-      }
     }
 
     // Match validation
@@ -92,6 +79,12 @@ function validateConfig(configPath = './config.json') {
     // UI validation
     if (config.ui) {
       if (!config.ui.theme) warnings.push('Missing ui.theme');
+      if (config.ui.theme && config.ui.theme.defaultTheme) {
+        const validThemes = ['red', 'blue', 'green', 'purple', 'orange', 'yellow', 'cyan', 'pink'];
+        if (!validThemes.includes(config.ui.theme.defaultTheme)) {
+          warnings.push(`ui.theme.defaultTheme should be one of: ${validThemes.join(', ')}`);
+        }
+      }
       if (!config.ui.notifications) warnings.push('Missing ui.notifications');
       if (!config.ui.debounceDelay) warnings.push('Missing ui.debounceDelay');
     }
@@ -125,7 +118,7 @@ function validateConfig(configPath = './config.json') {
     console.log(`   Short Name: ${config.app?.shortName || 'Not set'}`);
     console.log(`   Team Name: ${config.team?.defaultTeam1Name || 'Not set'}`);
     console.log(`   Club Name: ${config.team?.clubName || 'Not set'}`);
-    console.log(`   Primary Color: ${config.team?.clubColors?.primary || 'Not set'}`);
+    console.log(`   Default Theme: ${config.ui?.theme?.defaultTheme || 'Not set'}`);
     console.log(`   Default Game Time: ${config.match?.defaultGameTime || 'Not set'} seconds`);
     console.log(`   Authentication: ${config.features?.authentication ? 'Enabled' : 'Disabled'}`);
     console.log(`   Cloud Storage: ${config.features?.cloudStorage ? 'Enabled' : 'Disabled'}`);

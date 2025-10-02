@@ -61,33 +61,66 @@ export function updateAppBranding() {
 }
 
 /**
- * Apply team colors to the UI
+ * Apply default theme from configuration
  */
-export function applyTeamColors() {
-  const primaryColor = config.get('team.clubColors.primary', '#dc3545');
-  const secondaryColor = config.get('team.clubColors.secondary', '#ffffff');
-
-  // Create or update CSS custom properties
-  const root = document.documentElement;
-  root.style.setProperty('--team-primary-color', primaryColor);
-  root.style.setProperty('--team-secondary-color', secondaryColor);
-
-  // Update theme-color meta tag
-  let themeColorMeta = document.querySelector('meta[name="theme-color"]');
-  if (themeColorMeta) {
-    themeColorMeta.content = primaryColor;
+export function applyDefaultTheme() {
+  const defaultTheme = config.get('ui.theme.defaultTheme', 'red');
+  
+  // Only apply if no theme is already saved in localStorage
+  const savedTheme = localStorage.getItem('app-theme');
+  if (!savedTheme) {
+    // Set the default theme from config
+    try {
+      import('../shared/theme-manager.js').then(({ default: themeManager }) => {
+        if (themeManager && themeManager.changeTheme) {
+          themeManager.changeTheme(defaultTheme);
+          console.log(`Default theme applied from config: ${defaultTheme}`);
+        }
+      });
+    } catch (error) {
+      console.warn('Could not apply default theme from config');
+    }
   }
 
-  console.log(`Team colors applied: Primary ${primaryColor}, Secondary ${secondaryColor}`);
+  // Update theme-color meta tag with the theme's primary color
+  updateThemeColorMeta(defaultTheme);
+}
+
+/**
+ * Update theme-color meta tag based on theme
+ */
+function updateThemeColorMeta(themeName) {
+  const themeColors = {
+    red: '#dc3545',
+    blue: '#007bff',
+    green: '#28a745',
+    purple: '#6f42c1',
+    orange: '#fd7e14',
+    yellow: '#ffc107',
+    cyan: '#17a2b8',
+    pink: '#e83e8c'
+  };
+
+  const themeColor = themeColors[themeName] || themeColors.red;
+  
+  let themeColorMeta = document.querySelector('meta[name="theme-color"]');
+  if (themeColorMeta) {
+    themeColorMeta.content = themeColor;
+  }
 }
 
 /**
  * Initialize all team branding
  */
 export function initTeamBranding() {
-  updateTeamNames();
-  updateAppBranding();
-  applyTeamColors();
+  // Wait a bit for DOM to be ready
+  setTimeout(() => {
+    updateTeamNames();
+    updateAppBranding();
+    applyDefaultTheme();
+    
+    console.log('Team branding initialization complete');
+  }, 100);
 }
 
 /**
@@ -95,4 +128,11 @@ export function initTeamBranding() {
  */
 export function refreshBranding() {
   initTeamBranding();
+}
+
+/**
+ * Apply default theme immediately (for testing)
+ */
+export function applyDefaultThemeNow() {
+  applyDefaultTheme();
 }

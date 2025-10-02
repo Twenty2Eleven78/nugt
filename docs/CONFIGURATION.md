@@ -27,11 +27,7 @@ The main configuration is stored in `config.json` at the root of the application
   "team": {
     "defaultTeam1Name": "Your Team Name",
     "defaultTeam2Name": "Opposition",
-    "clubName": "Your Football Club",
-    "clubColors": {
-      "primary": "#your-primary-color",
-      "secondary": "#your-secondary-color"
-    }
+    "clubName": "Your Football Club"
   }
 }
 ```
@@ -97,18 +93,21 @@ The main configuration is stored in `config.json` at the root of the application
    - `team.clubName`: "Your Football Club"
    - `team.clubColors.primary`: Your team's primary color
 
-### 2. Color Customization
-The `team.clubColors.primary` field controls:
+### 2. Theme Selection
+The `ui.theme.defaultTheme` field controls the app's color scheme:
 - App theme color
 - PWA manifest theme
 - Primary UI elements
 
-Common team colors:
-- Red: `#dc3545`
-- Blue: `#0d6efd`
-- Green: `#198754`
-- Yellow: `#ffc107`
-- Purple: `#6f42c1`
+Available themes:
+- Red: `red` (Default)
+- Blue: `blue`
+- Green: `green`
+- Purple: `purple`
+- Orange: `orange`
+- Yellow: `yellow`
+- Cyan: `cyan`
+- Pink: `pink`
 
 ### 3. Match Duration Setup
 Adjust `match.defaultGameTime` based on your league:
@@ -171,10 +170,11 @@ Adjust performance settings:
   },
   "team": {
     "defaultTeam1Name": "Manchester United",
-    "clubName": "Manchester United FC",
-    "clubColors": {
-      "primary": "#da020e",
-      "secondary": "#ffd700"
+    "clubName": "Manchester United FC"
+  },
+  "ui": {
+    "theme": {
+      "defaultTheme": "red"
     }
   },
   "match": {
@@ -192,9 +192,11 @@ Adjust performance settings:
   },
   "team": {
     "defaultTeam1Name": "Local FC",
-    "clubName": "Sunday League",
-    "clubColors": {
-      "primary": "#28a745"
+    "clubName": "Sunday League"
+  },
+  "ui": {
+    "theme": {
+      "defaultTheme": "green"
     }
   },
   "match": {

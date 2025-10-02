@@ -33,8 +33,21 @@ async function setupTeam() {
     const teamName = await question('What is your team name? (e.g., Manchester United): ');
     const clubName = await question('What is your club name? (e.g., Manchester United FC): ');
     const shortName = await question(`What should the short name be? (max 4 chars, default: ${teamName.substring(0, 4).toUpperCase()}): `) || teamName.substring(0, 4).toUpperCase();
-    const primaryColor = await question('What is your primary team color? (hex code, e.g., #dc3545): ') || '#dc3545';
-    
+
+    console.log('\nTheme Options:');
+    console.log('1. Red (Default)');
+    console.log('2. Blue');
+    console.log('3. Green');
+    console.log('4. Purple');
+    console.log('5. Orange');
+    console.log('6. Yellow');
+    console.log('7. Cyan');
+    console.log('8. Pink');
+
+    const themeChoice = await question('Select default theme (1-8): ') || '1';
+    const themes = ['red', 'blue', 'green', 'purple', 'orange', 'yellow', 'cyan', 'pink'];
+    const defaultTheme = themes[parseInt(themeChoice) - 1] || 'red';
+
     console.log('\nMatch Duration Options:');
     console.log('1. 40 minutes (7v7 Youth)');
     console.log('2. 50 minutes (7v7 Youth)');
@@ -42,7 +55,7 @@ async function setupTeam() {
     console.log('4. 70 minutes (11v11 Youth) - Default');
     console.log('5. 80 minutes (11v11 Youth)');
     console.log('6. 90 minutes (11v11 Adult)');
-    
+
     const durationChoice = await question('Select default match duration (1-6): ') || '4';
     const durations = [2400, 3000, 3600, 4200, 4800, 5400];
     const defaultGameTime = durations[parseInt(durationChoice) - 1] || 4200;
@@ -64,11 +77,7 @@ async function setupTeam() {
       team: {
         defaultTeam1Name: teamName,
         defaultTeam2Name: "Opposition",
-        clubName: clubName,
-        clubColors: {
-          primary: primaryColor,
-          secondary: "#ffffff"
-        }
+        clubName: clubName
       },
       match: {
         defaultGameTime: defaultGameTime,
@@ -85,7 +94,7 @@ async function setupTeam() {
       },
       ui: {
         theme: {
-          defaultTheme: "red",
+          defaultTheme: defaultTheme,
           availableThemes: ["red", "blue", "green", "purple", "orange", "yellow", "cyan", "pink"]
         },
         notifications: {

@@ -1,23 +1,28 @@
 {
-  // App branding and identity
+  "_comments": {
+    "app": "App branding and identity - customize name, shortName (4 chars max), version, description, author",
+    "team": "Team information - set your team name, opponent default, club name, season, age group",
+    "roster": "Default player roster - add your team's players with names and shirt numbers",
+    "match": "Match timing - defaultGameTime in seconds (70min=4200s), timer intervals in milliseconds",
+    "sharing": "Match sharing options - platforms (whatsapp/clipboard), messages, what to include",
+    "ui": "User interface - theme colors and performance settings"
+  },
   "app": {
-    "name": "NUFC GameTime", // Full app name (appears in browser tab)
-    "shortName": "NUGT", // Short name for PWA (4 chars max)
-    "version": "4.0", // App version
+    "name": "NUFC GameTime",
+    "shortName": "NUGT",
+    "version": "4.0",
     "description": "Football match tracking and statistics application",
-    "author": "Mark Van-Kerro" // Your name or organization
+    "author": "Mark Van-Kerro"
   },
-  // Team information and defaults
   "team": {
-    "defaultTeam1Name": "Netherton", // Your team name (home team)
-    "defaultTeam2Name": "Opposition", // Default opponent name
-    "clubName": "Netherton United", // Full club name
-    "season": "2025-2026", // Current season
-    "ageGroup": "U13 Girls (U14)" // Age group/division
+    "defaultTeam1Name": "Netherton",
+    "defaultTeam2Name": "Opposition",
+    "clubName": "Netherton United",
+    "season": "2025-2026",
+    "ageGroup": "U13 Girls (U14)"
   },
-  // Default player roster (customize with your players)
   "roster": {
-    "defaultPlayers": [ // Add your team's players here
+    "defaultPlayers": [
       {
         "name": "Rae",
         "shirtNumber": 3
@@ -99,33 +104,30 @@
         "shirtNumber": 11
       }
     ],
-    "maxPlayers": 25, // Maximum roster size
-    "allowDuplicateNumbers": false, // Allow duplicate shirt numbers
-    "autoSort": true // Auto-sort players alphabetically
+    "maxPlayers": 25,
+    "allowDuplicateNumbers": false,
+    "autoSort": true
   },
-  // Match timing and behavior
   "match": {
-    "defaultGameTime": 4200, // Default match duration in seconds (70 min)
-    "timerUpdateInterval": 100, // Timer refresh rate (milliseconds)
-    "autoSaveInterval": 5000 // Auto-save frequency (milliseconds)
-    // Available durations: 40min=2400s, 50min=3000s, 60min=3600s, 70min=4200s, 80min=4800s, 90min=5400s
+    "defaultGameTime": 4200,
+    "timerUpdateInterval": 100,
+    "autoSaveInterval": 5000,
+    "_availableDurations": "40min=2400s, 50min=3000s, 60min=3600s, 70min=4200s, 80min=4800s, 90min=5400s"
   },
-  // Match sharing options
   "sharing": {
-    "enabledPlatforms": [ // Available sharing platforms
-      "whatsapp", // WhatsApp sharing
-      "clipboard" // Copy to clipboard
+    "enabledPlatforms": [
+      "whatsapp",
+      "clipboard"
     ],
-    "defaultMessage": "Check out our match results!", // Default share message
-    "includeScore": true, // Include final score in shares
-    "includeEvents": true, // Include match events in shares
-    "includeStatistics": false // Include player stats in shares
+    "defaultMessage": "Check out our match results!",
+    "includeScore": true,
+    "includeEvents": true,
+    "includeStatistics": false
   },
-  // User interface settings
   "ui": {
     "theme": {
-      "defaultTheme": "red", // Default color theme
-      "availableThemes": [ // Available color themes
+      "defaultTheme": "red",
+      "availableThemes": [
         "red",
         "blue",
         "green",
@@ -136,6 +138,6 @@
         "pink"
       ]
     },
-    "debounceDelay": 300 // Input delay for performance (milliseconds)
+    "debounceDelay": 300
   }
 }

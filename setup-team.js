@@ -60,6 +60,11 @@ async function setupTeam() {
     const durations = [2400, 3000, 3600, 4200, 4800, 5400];
     const defaultGameTime = durations[parseInt(durationChoice) - 1] || 4200;
 
+    console.log('\nRoster Options:');
+    const season = await question('What season? (e.g., 2025-2026): ') || '2025-2026';
+    const ageGroup = await question('What age group? (e.g., U13 Girls): ') || 'U13';
+    const useDefaultRoster = (await question('Use default roster? (y/n): ')).toLowerCase().startsWith('y');
+
     console.log('\nFeature Options:');
     const useAuth = (await question('Enable user authentication? (y/n): ')).toLowerCase().startsWith('y');
     const useCloud = (await question('Enable cloud storage? (y/n): ')).toLowerCase().startsWith('y');
@@ -77,7 +82,26 @@ async function setupTeam() {
       team: {
         defaultTeam1Name: teamName,
         defaultTeam2Name: "Opposition",
-        clubName: clubName
+        clubName: clubName,
+        season: season,
+        ageGroup: ageGroup
+      },
+      roster: useDefaultRoster ? {
+        defaultPlayers: [
+          { name: "Player 1", shirtNumber: 1 },
+          { name: "Player 2", shirtNumber: 2 },
+          { name: "Player 3", shirtNumber: 3 },
+          { name: "Player 4", shirtNumber: 4 },
+          { name: "Player 5", shirtNumber: 5 }
+        ],
+        maxPlayers: 25,
+        allowDuplicateNumbers: false,
+        autoSort: true
+      } : {
+        defaultPlayers: [],
+        maxPlayers: 25,
+        allowDuplicateNumbers: false,
+        autoSort: true
       },
       match: {
         defaultGameTime: defaultGameTime,

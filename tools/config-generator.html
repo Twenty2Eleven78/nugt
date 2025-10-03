@@ -148,15 +148,69 @@
                     <div class="col">
                         <div class="form-group">
                             <label for="team1Name">Default Team Name</label>
-                            <input type="text" id="team1Name" value="Netherton" placeholder="Your Team Name">
+                            <input type="text" id="team1Name" value="Your Team" placeholder="Your Team Name">
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-group">
                             <label for="clubName">Club Name</label>
-                            <input type="text" id="clubName" value="Netherton United" placeholder="Your Football Club">
+                            <input type="text" id="clubName" value="Your Football Club" placeholder="Your Football Club">
                         </div>
                     </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="season">Season</label>
+                            <input type="text" id="season" value="2025-2026" placeholder="2025-2026">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="ageGroup">Age Group</label>
+                            <input type="text" id="ageGroup" value="Youth" placeholder="U13 Girls">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Roster Settings -->
+            <div class="section">
+                <h3>👥 Roster Settings</h3>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="maxPlayers">Maximum Players</label>
+                            <input type="number" id="maxPlayers" value="25" min="1" max="50">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="autoSort" checked>
+                                <label for="autoSort">Auto-sort players alphabetically</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="allowDuplicateNumbers">
+                                <label for="allowDuplicateNumbers">Allow duplicate shirt numbers</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="defaultPlayers">Default Players (one per line, format: Name,ShirtNumber)</label>
+                    <textarea id="defaultPlayers" rows="8" placeholder="Player 1,1&#10;Player 2,2&#10;Player 3,3">Player 1,1
+Player 2,2
+Player 3,3
+Player 4,4
+Player 5,5
+Player 6,6
+Player 7,7
+Player 8,8
+Player 9,9
+Player 10,10
+Player 11,11</textarea>
+                    <small class="text-muted">Leave shirt number empty for no number (e.g., "Player Name,")</small>
                 </div>
             </div>
 
@@ -252,7 +306,15 @@
                 team: {
                     defaultTeam1Name: document.getElementById('team1Name').value,
                     defaultTeam2Name: "Opposition",
-                    clubName: document.getElementById('clubName').value
+                    clubName: document.getElementById('clubName').value,
+                    season: document.getElementById('season').value,
+                    ageGroup: document.getElementById('ageGroup').value
+                },
+                roster: {
+                    defaultPlayers: parseDefaultPlayers(),
+                    maxPlayers: parseInt(document.getElementById('maxPlayers').value),
+                    allowDuplicateNumbers: document.getElementById('allowDuplicateNumbers').checked,
+                    autoSort: document.getElementById('autoSort').checked
                 },
                 match: {
                     defaultGameTime: parseInt(document.getElementById('defaultGameTime').value),
@@ -349,6 +411,20 @@
             
             document.getElementById('shortName').value = shortName.substring(0, 4);
         });
+
+        // Parse default players from textarea
+        function parseDefaultPlayers() {
+            const playersText = document.getElementById('defaultPlayers').value;
+            const lines = playersText.split('\n').filter(line => line.trim());
+            
+            return lines.map(line => {
+                const [name, shirtNumber] = line.split(',').map(s => s.trim());
+                return {
+                    name: name || 'Unnamed Player',
+                    shirtNumber: shirtNumber && shirtNumber !== '' ? parseInt(shirtNumber) : null
+                };
+            }).filter(player => player.name !== 'Unnamed Player');
+        }
 
         // Update theme preview when selection changes
         document.getElementById('defaultTheme').addEventListener('change', updateThemePreview);

@@ -9,7 +9,36 @@
   "team": {
     "defaultTeam1Name": "Netherton",
     "defaultTeam2Name": "Opposition",
-    "clubName": "Netherton United"
+    "clubName": "Netherton United",
+    "season": "2025-2026",
+    "ageGroup": "U13 Girls (U14)"
+  },
+  "roster": {
+    "defaultPlayers": [
+      { "name": "Rae", "shirtNumber": 3 },
+      { "name": "Amelia O", "shirtNumber": 6 },
+      { "name": "Amelia P", "shirtNumber": 17 },
+      { "name": "Aoife", "shirtNumber": 2 },
+      { "name": "Cimmy", "shirtNumber": 16 },
+      { "name": "Ciana", "shirtNumber": 14 },
+      { "name": "Daisy", "shirtNumber": 15 },
+      { "name": "Ella D", "shirtNumber": 8 },
+      { "name": "Ella VK", "shirtNumber": 12 },
+      { "name": "Emily", "shirtNumber": 10 },
+      { "name": "Farah", "shirtNumber": null },
+      { "name": "Freya B", "shirtNumber": 4 },
+      { "name": "Freya K", "shirtNumber": 1 },
+      { "name": "Havana", "shirtNumber": 18 },
+      { "name": "Megan", "shirtNumber": 9 },
+      { "name": "Mia", "shirtNumber": 19 },
+      { "name": "Miliana", "shirtNumber": null },
+      { "name": "Sienna", "shirtNumber": 7 },
+      { "name": "Tulula", "shirtNumber": 5 },
+      { "name": "Veronica", "shirtNumber": 11 }
+    ],
+    "maxPlayers": 25,
+    "allowDuplicateNumbers": false,
+    "autoSort": true
   },
   "match": {
     "defaultGameTime": 4200,

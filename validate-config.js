@@ -62,6 +62,38 @@ function validateConfig(configPath = './config.json') {
       if (!config.team.defaultTeam1Name) errors.push('Missing team.defaultTeam1Name');
       if (!config.team.defaultTeam2Name) warnings.push('Missing team.defaultTeam2Name');
       if (!config.team.clubName) warnings.push('Missing team.clubName');
+      if (config.team.season && typeof config.team.season !== 'string') {
+        warnings.push('team.season should be a string');
+      }
+      if (config.team.ageGroup && typeof config.team.ageGroup !== 'string') {
+        warnings.push('team.ageGroup should be a string');
+      }
+    }
+
+    // Roster validation
+    if (config.roster) {
+      if (config.roster.defaultPlayers && !Array.isArray(config.roster.defaultPlayers)) {
+        errors.push('roster.defaultPlayers should be an array');
+      }
+      if (config.roster.defaultPlayers && Array.isArray(config.roster.defaultPlayers)) {
+        config.roster.defaultPlayers.forEach((player, index) => {
+          if (!player.name || typeof player.name !== 'string') {
+            warnings.push(`roster.defaultPlayers[${index}] missing or invalid name`);
+          }
+          if (player.shirtNumber !== null && (typeof player.shirtNumber !== 'number' || player.shirtNumber < 1 || player.shirtNumber > 99)) {
+            warnings.push(`roster.defaultPlayers[${index}] invalid shirt number (should be 1-99 or null)`);
+          }
+        });
+      }
+      if (config.roster.maxPlayers && (typeof config.roster.maxPlayers !== 'number' || config.roster.maxPlayers < 1)) {
+        warnings.push('roster.maxPlayers should be a positive number');
+      }
+      if (config.roster.allowDuplicateNumbers && typeof config.roster.allowDuplicateNumbers !== 'boolean') {
+        warnings.push('roster.allowDuplicateNumbers should be a boolean');
+      }
+      if (config.roster.autoSort && typeof config.roster.autoSort !== 'boolean') {
+        warnings.push('roster.autoSort should be a boolean');
+      }
     }
 
     // Match validation
@@ -118,8 +150,11 @@ function validateConfig(configPath = './config.json') {
     console.log(`   Short Name: ${config.app?.shortName || 'Not set'}`);
     console.log(`   Team Name: ${config.team?.defaultTeam1Name || 'Not set'}`);
     console.log(`   Club Name: ${config.team?.clubName || 'Not set'}`);
+    console.log(`   Season: ${config.team?.season || 'Not set'}`);
+    console.log(`   Age Group: ${config.team?.ageGroup || 'Not set'}`);
     console.log(`   Default Theme: ${config.ui?.theme?.defaultTheme || 'Not set'}`);
     console.log(`   Default Game Time: ${config.match?.defaultGameTime || 'Not set'} seconds`);
+    console.log(`   Default Players: ${config.roster?.defaultPlayers?.length || 0} players`);
     console.log(`   Authentication: ${config.features?.authentication ? 'Enabled' : 'Disabled'}`);
     console.log(`   Cloud Storage: ${config.features?.cloudStorage ? 'Enabled' : 'Disabled'}`);
 

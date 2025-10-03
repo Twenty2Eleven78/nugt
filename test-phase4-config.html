@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 4 Configuration Test</title>
+    <link href="css/custom-framework.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        .config-item {
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+        .enabled {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .disabled {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .config-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-enabled {
+            background: #28a745;
+        }
+        .status-disabled {
+            background: #dc3545;
+        }
+        .status-partial {
+            background: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Phase 4: Integration & Advanced Configuration Test</h1>
+    <p>Testing storage, statistics, league settings, and integrations.</p>
+    
+    <div class="config-grid">
+        <!-- Storage Configuration -->
+        <div class="test-section">
+            <h2>💾 Storage Configuration</h2>
+            <div id="storage-config">Loading...</div>
+            <button class="btn" onclick="testStorageConfig()">Test Storage Config</button>
+        </div>
+
+        <!-- Statistics Configuration -->
+        <div class="test-section">
+            <h2>📊 Statistics Configuration</h2>
+            <div id="statistics-config">Loading...</div>
+            <button class="btn" onclick="testStatisticsConfig()">Test Statistics Config</button>
+        </div>
+
+        <!-- League Configuration -->
+        <div class="test-section">
+            <h2>🏆 League Configuration</h2>
+            <div id="league-config">Loading...</div>
+            <button class="btn" onclick="testLeagueConfig()">Test League Config</button>
+        </div>
+
+        <!-- Integrations Configuration -->
+        <div class="test-section">
+            <h2>🔗 Integrations Configuration</h2>
+            <div id="integrations-config">Loading...</div>
+            <button class="btn" onclick="testIntegrationsConfig()">Test Integrations Config</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 Test Results</h2>
+        <div id="test-results">No tests run yet.</div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Configuration Validation</h2>
+        <button class="btn" onclick="validateAllConfigs()">Validate All Configurations</button>
+        <div id="validation-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📄 Raw Configuration</h2>
+        <button class="btn" onclick="showRawConfig()">Show/Hide Raw Config</button>
+        <div class="config-display" id="raw-config" style="display: none;"></div>
+    </div>
+
+    <script type="module">
+        let storageConfig = null;
+        let statisticsConfig = null;
+        let leagueConfig = null;
+        let integrationsConfig = null;
+        let config = null;
+
+        async function initTest() {
+            try {
+                // Load configuration modules
+                const configModule = await import('./js/modules/shared/config.js');
+                config = configModule.config;
+                await config.load();
+
+                const storageModule = await import('./js/modules/shared/storage-config.js');
+                const statisticsModule = await import('./js/modules/shared/statistics-config.js');
+                const leagueModule = await import('./js/modules/shared/league-config.js');
+                const integrationsModule = await import('./js/modules/shared/integrations-config.js');
+
+                // Get configurations
+                storageConfig = storageModule.getStorageConfig();
+                statisticsConfig = statisticsModule.getStatisticsConfig();
+                leagueConfig = leagueModule.getLeagueConfig();
+                integrationsConfig = integrationsModule.getIntegrationsConfig();
+
+                // Update displays
+                updateStorageDisplay();
+                updateStatisticsDisplay();
+                updateLeagueDisplay();
+                updateIntegrationsDisplay();
+
+                console.log('Phase 4 test initialized successfully');
+            } catch (error) {
+                console.error('Test initialization failed:', error);
+                document.getElementById('test-results').innerHTML = `<span style="color: red;">Error: ${error.message}</span>`;
+            }
+        }
+
+        function updateStorageDisplay() {
+            const html = `
+                <div class="config-item">
+                    <strong>Cache Version:</strong> ${storageConfig.cacheVersion}
+                </div>
+                <div class="config-item">
+                    <strong>Max Storage:</strong> ${storageConfig.maxStorageSize}MB
+                </div>
+                <div class="config-item ${storageConfig.autoCleanup ? 'enabled' : 'disabled'}">
+                    <span class="status-indicator ${storageConfig.autoCleanup ? 'status-enabled' : 'status-disabled'}"></span>
+                    <strong>Auto Cleanup:</strong> ${storageConfig.autoCleanup ? 'Enabled' : 'Disabled'}
+                </div>
+                <div class="config-item">
+                    <strong>Retention:</strong> ${storageConfig.retentionDays} days
+                </div>
+                <div class="config-item">
+                    <strong>Key Prefix:</strong> ${storageConfig.storageKeys.prefix}
+                </div>
+            `;
+            document.getElementById('storage-config').innerHTML = html;
+        }
+
+        function updateStatisticsDisplay() {
+            const html = `
+                <div class="config-item ${statisticsConfig.enableAdvancedStats ? 'enabled' : 'disabled'}">
+                    <span class="status-indicator ${statisticsConfig.enableAdvancedStats ? 'status-enabled' : 'status-disabled'}"></span>
+                    <strong>Advanced Stats:</strong> ${statisticsConfig.enableAdvancedStats ? 'Enabled' : 'Disabled'}
+                </div>
+                <div class="config-item ${statisticsConfig.enableCharts ? 'enabled' : 'disabled'}">
+                    <span class="status-indicator ${statisticsConfig.enableCharts ? 'status-enabled' : 'status-disabled'}"></span>
+                    <strong>Charts:</strong> ${statisticsConfig.enableCharts ? 'Enabled' : 'Disabled'}
+                </div>
+                <div class="config-item">
+                    <strong>Chart Types:</strong> ${statisticsConfig.chartTypes.join(', ')}
+                </div>
+                <div class="config-item">
+                    <strong>Report Formats:</strong> ${statisticsConfig.reportFormats.join(', ')}
+                </div>
+                <div class="config-item">
+                    <strong>Retention:</strong> ${statisticsConfig.retentionPeriod} days
+                </div>
+            `;
+            document.getElementById('statistics-config').innerHTML = html;
+        }
+
+        function updateLeagueDisplay() {
+            const html = `
+                <div class="config-item">
+                    <strong>League:</strong> ${leagueConfig.leagueName}
+                </div>
+                <div class="config-item">
+                    <strong>Season:</strong> ${leagueConfig.season}
+                </div>
+                <div class="config-item">
+                    <strong>Division:</strong> ${leagueConfig.division}
+                </div>
+                <div class="config-item">
+                    <strong>Type:</strong> ${leagueConfig.competitionType}
+                </div>
+                <div class="config-item">
+                    <strong>Points System:</strong> Win: ${leagueConfig.pointsSystem.win}, Draw: ${leagueConfig.pointsSystem.draw}, Loss: ${leagueConfig.pointsSystem.loss}
+                </div>
+                <div class="config-item">
+                    <strong>Match Duration:</strong> ${leagueConfig.matchDuration} minutes
+                </div>
+            `;
+            document.getElementById('league-config').innerHTML = html;
+        }
+
+        function updateIntegrationsDisplay() {
+            const html = `
+                <div class="config-item ${integrationsConfig.enableWebhooks ? 'enabled' : 'disabled'}">
+                    <span class="status-indicator ${integrationsConfig.enableWebhooks ? 'status-enabled' : 'status-disabled'}"></span>
+                    <strong>Webhooks:</strong> ${integrationsConfig.enableWebhooks ? 'Enabled' : 'Disabled'}
+                </div>
+                <div class="config-item ${integrationsConfig.enableExports ? 'enabled' : 'disabled'}">
+                    <span class="status-indicator ${integrationsConfig.enableExports ? 'status-enabled' : 'status-disabled'}"></span>
+                    <strong>Exports:</strong> ${integrationsConfig.enableExports ? 'Enabled' : 'Disabled'}
+                </div>
+                <div class="config-item">
+                    <strong>Export Formats:</strong> ${integrationsConfig.exportFormats.join(', ')}
+                </div>
+                <div class="config-item ${integrationsConfig.apiSettings.enableApi ? 'enabled' : 'disabled'}">
+                    <span class="status-indicator ${integrationsConfig.apiSettings.enableApi ? 'status-enabled' : 'status-disabled'}"></span>
+                    <strong>API:</strong> ${integrationsConfig.apiSettings.enableApi ? 'Enabled' : 'Disabled'}
+                </div>
+                <div class="config-item ${integrationsConfig.externalServices.enableLeagueSync ? 'enabled' : 'disabled'}">
+                    <span class="status-indicator ${integrationsConfig.externalServices.enableLeagueSync ? 'status-enabled' : 'status-disabled'}"></span>
+                    <strong>League Sync:</strong> ${integrationsConfig.externalServices.enableLeagueSync ? 'Enabled' : 'Disabled'}
+                </div>
+            `;
+            document.getElementById('integrations-config').innerHTML = html;
+        }
+
+        window.testStorageConfig = function() {
+            const results = [];
+            results.push(`✓ Cache version: ${storageConfig.cacheVersion}`);
+            results.push(`✓ Storage limit: ${storageConfig.maxStorageSize}MB`);
+            results.push(`✓ Auto cleanup: ${storageConfig.autoCleanup ? 'Enabled' : 'Disabled'}`);
+            results.push(`✓ Retention period: ${storageConfig.retentionDays} days`);
+            
+            document.getElementById('test-results').innerHTML = results.join('<br>');
+        };
+
+        window.testStatisticsConfig = function() {
+            const results = [];
+            results.push(`✓ Advanced stats: ${statisticsConfig.enableAdvancedStats ? 'Enabled' : 'Disabled'}`);
+            results.push(`✓ Charts: ${statisticsConfig.enableCharts ? 'Enabled' : 'Disabled'}`);
+            results.push(`✓ Chart types: ${statisticsConfig.chartTypes.length} available`);
+            results.push(`✓ Report formats: ${statisticsConfig.reportFormats.length} available`);
+            
+            document.getElementById('test-results').innerHTML = results.join('<br>');
+        };
+
+        window.testLeagueConfig = function() {
+            const results = [];
+            results.push(`✓ League: ${leagueConfig.leagueName}`);
+            results.push(`✓ Competition type: ${leagueConfig.competitionType}`);
+            results.push(`✓ Points system configured`);
+            results.push(`✓ Match duration: ${leagueConfig.matchDuration} minutes`);
+            
+            document.getElementById('test-results').innerHTML = results.join('<br>');
+        };
+
+        window.testIntegrationsConfig = function() {
+            const results = [];
+            results.push(`✓ Webhooks: ${integrationsConfig.enableWebhooks ? 'Enabled' : 'Disabled'}`);
+            results.push(`✓ Exports: ${integrationsConfig.enableExports ? 'Enabled' : 'Disabled'}`);
+            results.push(`✓ API: ${integrationsConfig.apiSettings.enableApi ? 'Enabled' : 'Disabled'}`);
+            results.push(`✓ External services configured`);
+            
+            document.getElementById('test-results').innerHTML = results.join('<br>');
+        };
+
+        window.validateAllConfigs = async function() {
+            try {
+                const leagueModule = await import('./js/modules/shared/league-config.js');
+                const integrationsModule = await import('./js/modules/shared/integrations-config.js');
+
+                const leagueValidation = leagueModule.validateLeagueConfig();
+                const integrationsValidation = integrationsModule.validateIntegrationsConfig();
+
+                let html = '<h4>Validation Results:</h4>';
+                
+                // League validation
+                html += '<div><strong>League Configuration:</strong></div>';
+                if (leagueValidation.isValid) {
+                    html += '<div style="color: green;">✓ Valid</div>';
+                } else {
+                    html += '<div style="color: red;">✗ Errors found:</div>';
+                    leagueValidation.errors.forEach(error => {
+                        html += `<div style="color: red; margin-left: 20px;">• ${error}</div>`;
+                    });
+                }
+                if (leagueValidation.warnings.length > 0) {
+                    html += '<div style="color: orange;">⚠ Warnings:</div>';
+                    leagueValidation.warnings.forEach(warning => {
+                        html += `<div style="color: orange; margin-left: 20px;">• ${warning}</div>`;
+                    });
+                }
+
+                // Integrations validation
+                html += '<div style="margin-top: 15px;"><strong>Integrations Configuration:</strong></div>';
+                if (integrationsValidation.isValid) {
+                    html += '<div style="color: green;">✓ Valid</div>';
+                } else {
+                    html += '<div style="color: red;">✗ Errors found:</div>';
+                    integrationsValidation.errors.forEach(error => {
+                        html += `<div style="color: red; margin-left: 20px;">• ${error}</div>`;
+                    });
+                }
+                if (integrationsValidation.warnings.length > 0) {
+                    html += '<div style="color: orange;">⚠ Warnings:</div>';
+                    integrationsValidation.warnings.forEach(warning => {
+                        html += `<div style="color: orange; margin-left: 20px;">• ${warning}</div>`;
+                    });
+                }
+
+                document.getElementById('validation-results').innerHTML = html;
+            } catch (error) {
+                document.getElementById('validation-results').innerHTML = `<div style="color: red;">Validation error: ${error.message}</div>`;
+            }
+        };
+
+        window.showRawConfig = function() {
+            const display = document.getElementById('raw-config');
+            if (display.style.display === 'none') {
+                display.style.display = 'block';
+                display.textContent = JSON.stringify(config.getAll(), null, 2);
+            } else {
+                display.style.display = 'none';
+            }
+        };
+
+        // Initialize test
+        initTest();
+    </script>
+</body>
+</html>

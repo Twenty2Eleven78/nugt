@@ -181,6 +181,65 @@
     },
     "debounceDelay": 300
   },
+  "storage": {
+    "cacheVersion": "v318",
+    "cacheName": "nugt-cache-v318",
+    "maxStorageSize": 50,
+    "autoCleanup": true,
+    "cleanupInterval": 86400000,
+    "retentionDays": 30,
+    "storageKeys": {
+      "prefix": "nugt_",
+      "teamPrefix": "team_",
+      "matchPrefix": "match_",
+      "statsPrefix": "stats_"
+    }
+  },
+  "statistics": {
+    "enableAdvancedStats": true,
+    "enableCharts": true,
+    "chartTypes": ["line", "bar", "pie"],
+    "trackPlayerStats": true,
+    "trackTeamStats": true,
+    "trackSeasonStats": true,
+    "autoGenerateReports": true,
+    "reportFormats": ["summary", "detailed", "charts"],
+    "retentionPeriod": 365
+  },
+  "league": {
+    "leagueName": "Local League",
+    "season": "2025-2026",
+    "division": "U13 Girls",
+    "competitionType": "league",
+    "pointsSystem": {
+      "win": 3,
+      "draw": 1,
+      "loss": 0
+    },
+    "matchDuration": 70,
+    "enableLeagueTable": true,
+    "enableFixtures": true,
+    "enableStandings": true
+  },
+  "integrations": {
+    "enableWebhooks": false,
+    "webhookUrl": "",
+    "enableExports": true,
+    "exportFormats": ["json", "csv"],
+    "enableImports": true,
+    "importSources": ["csv", "json"],
+    "apiSettings": {
+      "enableApi": false,
+      "apiKey": "",
+      "baseUrl": ""
+    },
+    "externalServices": {
+      "enableLeagueSync": false,
+      "leagueApiUrl": "",
+      "enableStatsSync": false,
+      "statsApiUrl": ""
+    }
+  },
   "features": {
     "authentication": true,
     "cloudStorage": true,

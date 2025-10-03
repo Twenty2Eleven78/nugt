@@ -141,7 +141,8 @@ export const GAME_CONFIG = {
   }
 };
 
-// Match Event Types
+// Match Event Types - now configurable via event-config.js
+// These are kept for backward compatibility
 export const EVENT_TYPES = {
   // Disciplinary Events
   YELLOW_CARD: 'Yellow Card',
@@ -164,7 +165,8 @@ export const EVENT_TYPES = {
   SUBSTITUTION: 'Substitution'
 };
 
-// Event Icons mapping
+// Event Icons mapping - now configurable via event-config.js
+// These are kept for backward compatibility
 export const EVENT_ICONS = {
   [EVENT_TYPES.YELLOW_CARD]: 'fas fa-square text-warning',
   [EVENT_TYPES.RED_CARD]: 'fas fa-square text-danger',
@@ -245,7 +247,8 @@ export const MATCH_RESULTS = {
   DRAW: 'DRAW'
 };
 
-// Sharing Platforms
+// Sharing Platforms - now configurable via sharing-config.js
+// These are kept for backward compatibility
 export const SHARE_PLATFORMS = {
   WHATSAPP: 'whatsapp',
   TWITTER: 'twitter',

@@ -121,6 +121,54 @@ function validateConfig(configPath = './config.json') {
       if (!config.ui.debounceDelay) warnings.push('Missing ui.debounceDelay');
     }
 
+    // Events validation
+    if (config.events) {
+      if (config.events.customEventTypes && typeof config.events.customEventTypes !== 'object') {
+        warnings.push('events.customEventTypes should be an object');
+      }
+      if (config.events.enabledEventTypes && !Array.isArray(config.events.enabledEventTypes)) {
+        warnings.push('events.enabledEventTypes should be an array');
+      }
+      if (config.events.eventIcons && typeof config.events.eventIcons !== 'object') {
+        warnings.push('events.eventIcons should be an object');
+      }
+    }
+
+    // Sharing validation
+    if (config.sharing) {
+      if (config.sharing.enabledPlatforms && !Array.isArray(config.sharing.enabledPlatforms)) {
+        warnings.push('sharing.enabledPlatforms should be an array');
+      }
+      if (config.sharing.defaultMessage && typeof config.sharing.defaultMessage !== 'string') {
+        warnings.push('sharing.defaultMessage should be a string');
+      }
+      const booleanSharingFields = ['includeScore', 'includeEvents', 'includeStatistics'];
+      booleanSharingFields.forEach(field => {
+        if (config.sharing[field] !== undefined && typeof config.sharing[field] !== 'boolean') {
+          warnings.push(`sharing.${field} should be a boolean`);
+        }
+      });
+    }
+
+    // Enhanced UI validation
+    if (config.ui) {
+      if (!config.ui.theme) warnings.push('Missing ui.theme');
+      if (config.ui.theme && config.ui.theme.defaultTheme) {
+        const validThemes = ['red', 'blue', 'green', 'purple', 'orange', 'yellow', 'cyan', 'pink'];
+        if (!validThemes.includes(config.ui.theme.defaultTheme)) {
+          warnings.push(`ui.theme.defaultTheme should be one of: ${validThemes.join(', ')}`);
+        }
+      }
+      if (!config.ui.notifications) warnings.push('Missing ui.notifications');
+      if (config.ui.animations) {
+        const validSpeeds = ['fast', 'normal', 'slow'];
+        if (config.ui.animations.animationSpeed && !validSpeeds.includes(config.ui.animations.animationSpeed)) {
+          warnings.push(`ui.animations.animationSpeed should be one of: ${validSpeeds.join(', ')}`);
+        }
+      }
+      if (!config.ui.debounceDelay) warnings.push('Missing ui.debounceDelay');
+    }
+
     // Features validation
     if (config.features) {
       const expectedFeatures = ['authentication', 'cloudStorage', 'attendance', 'statistics', 'sharing', 'pwa'];
@@ -155,6 +203,9 @@ function validateConfig(configPath = './config.json') {
     console.log(`   Default Theme: ${config.ui?.theme?.defaultTheme || 'Not set'}`);
     console.log(`   Default Game Time: ${config.match?.defaultGameTime || 'Not set'} seconds`);
     console.log(`   Default Players: ${config.roster?.defaultPlayers?.length || 0} players`);
+    console.log(`   Enabled Event Types: ${config.events?.enabledEventTypes?.length || 0} events`);
+    console.log(`   Sharing Platforms: ${config.sharing?.enabledPlatforms?.length || 0} platforms`);
+    console.log(`   Animations: ${config.ui?.animations?.enableAnimations !== false ? 'Enabled' : 'Disabled'}`);
     console.log(`   Authentication: ${config.features?.authentication ? 'Enabled' : 'Disabled'}`);
     console.log(`   Cloud Storage: ${config.features?.cloudStorage ? 'Enabled' : 'Disabled'}`);
 

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 3 Configuration Test</title>
+    <link href="css/custom-framework.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .event-list, .platform-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .event-item, .platform-item {
+            padding: 4px 8px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .enabled {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .disabled {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .config-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .animation-test {
+            width: 50px;
+            height: 50px;
+            background: #007bff;
+            border-radius: 4px;
+            transition: all var(--transition-duration, 300ms) ease;
+            cursor: pointer;
+        }
+        .animation-test:hover {
+            transform: scale(1.1);
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Phase 3: Advanced Configuration Test</h1>
+    <p>Testing event types, sharing platforms, and UI customization.</p>
+    
+    <div class="config-grid">
+        <!-- Event Configuration -->
+        <div class="test-section">
+            <h2>📋 Event Configuration</h2>
+            <div>
+                <strong>Available Event Types:</strong>
+                <div class="event-list" id="available-events">Loading...</div>
+            </div>
+            <div>
+                <strong>Enabled Event Types:</strong>
+                <div class="event-list" id="enabled-events">Loading...</div>
+            </div>
+            <button class="btn" onclick="testEventConfig()">Test Event Config</button>
+        </div>
+
+        <!-- Sharing Configuration -->
+        <div class="test-section">
+            <h2>📤 Sharing Configuration</h2>
+            <div>
+                <strong>Available Platforms:</strong>
+                <div class="platform-list" id="available-platforms">Loading...</div>
+            </div>
+            <div>
+                <strong>Sharing Settings:</strong>
+                <div id="sharing-settings">Loading...</div>
+            </div>
+            <button class="btn" onclick="testSharingConfig()">Test Sharing Config</button>
+        </div>
+
+        <!-- UI Configuration -->
+        <div class="test-section">
+            <h2>🎨 UI Configuration</h2>
+            <div>
+                <strong>Notification Settings:</strong>
+                <div id="notification-settings">Loading...</div>
+            </div>
+            <div>
+                <strong>Animation Settings:</strong>
+                <div id="animation-settings">Loading...</div>
+            </div>
+            <div>
+                <strong>Animation Test:</strong>
+                <div class="animation-test" onclick="this.style.transform = this.style.transform ? '' : 'rotate(45deg)'"></div>
+                <small>Click the box to test animations</small>
+            </div>
+            <button class="btn" onclick="testUIConfig()">Test UI Config</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 Test Results</h2>
+        <div id="test-results">No tests run yet.</div>
+    </div>
+
+    <div class="test-section">
+        <h2>📄 Raw Configuration</h2>
+        <button class="btn" onclick="showRawConfig()">Show/Hide Raw Config</button>
+        <div class="config-display" id="raw-config" style="display: none;"></div>
+    </div>
+
+    <script type="module">
+        let eventConfig = null;
+        let sharingConfig = null;
+        let uiConfig = null;
+        let config = null;
+
+        async function initTest() {
+            try {
+                // Load configuration modules
+                const configModule = await import('./js/modules/shared/config.js');
+                config = configModule.config;
+                await config.load();
+
+                const eventModule = await import('./js/modules/shared/event-config.js');
+                const sharingModule = await import('./js/modules/shared/sharing-config.js');
+                const uiModule = await import('./js/modules/shared/ui-config.js');
+
+                // Get configurations
+                eventConfig = eventModule.getEventConfig();
+                sharingConfig = sharingModule.getSharingConfig();
+                uiConfig = uiModule.getUIConfig();
+
+                // Apply UI config
+                uiModule.applyUIConfig();
+
+                // Update displays
+                updateEventDisplay();
+                await updateSharingDisplay();
+                updateUIDisplay();
+
+                console.log('Phase 3 test initialized successfully');
+            } catch (error) {
+                console.error('Test initialization failed:', error);
+                document.getElementById('test-results').innerHTML = `<span style="color: red;">Error: ${error.message}</span>`;
+            }
+        }
+
+        function updateEventDisplay() {
+            // Available events
+            const availableHtml = Object.entries(eventConfig.types).map(([key, name]) => 
+                `<span class="event-item">${name} (${key})</span>`
+            ).join('');
+            document.getElementById('available-events').innerHTML = availableHtml;
+
+            // Enabled events
+            const enabledHtml = eventConfig.enabled.map(key => 
+                `<span class="event-item enabled">${eventConfig.types[key] || key}</span>`
+            ).join('');
+            document.getElementById('enabled-events').innerHTML = enabledHtml;
+        }
+
+        async function updateSharingDisplay() {
+            // Available platforms
+            const { getAvailableSharingPlatforms } = await import('./js/modules/shared/sharing-config.js');
+            const platforms = getAvailableSharingPlatforms();
+            
+            const platformsHtml = Object.entries(platforms).map(([key, platform]) => 
+                `<span class="platform-item enabled" title="${platform.description}">
+                    <i class="${platform.icon}"></i> ${platform.name}
+                </span>`
+            ).join('');
+            document.getElementById('available-platforms').innerHTML = platformsHtml;
+
+            // Sharing settings
+            const settingsHtml = `
+                <p><strong>Default Message:</strong> "${sharingConfig.defaultMessage}"</p>
+                <p><strong>Include Score:</strong> ${sharingConfig.includeScore ? 'Yes' : 'No'}</p>
+                <p><strong>Include Events:</strong> ${sharingConfig.includeEvents ? 'Yes' : 'No'}</p>
+                <p><strong>Include Statistics:</strong> ${sharingConfig.includeStatistics ? 'Yes' : 'No'}</p>
+            `;
+            document.getElementById('sharing-settings').innerHTML = settingsHtml;
+        }
+
+        function updateUIDisplay() {
+            // Notification settings
+            const notificationHtml = `
+                <p><strong>Duration:</strong> ${uiConfig.notifications.defaultDuration}ms</p>
+                <p><strong>Max Notifications:</strong> ${uiConfig.notifications.maxNotifications}</p>
+                <p><strong>Position:</strong> ${uiConfig.notifications.position}</p>
+                <p><strong>Sound:</strong> ${uiConfig.notifications.enableSound ? 'Enabled' : 'Disabled'}</p>
+            `;
+            document.getElementById('notification-settings').innerHTML = notificationHtml;
+
+            // Animation settings
+            const animationHtml = `
+                <p><strong>Animations:</strong> ${uiConfig.animations.enableAnimations ? 'Enabled' : 'Disabled'}</p>
+                <p><strong>Speed:</strong> ${uiConfig.animations.speedName} (${uiConfig.animations.animationSpeed}ms)</p>
+                <p><strong>Transitions:</strong> ${uiConfig.animations.enableTransitions ? 'Enabled' : 'Disabled'}</p>
+                <p><strong>Debounce Delay:</strong> ${uiConfig.debounceDelay}ms</p>
+            `;
+            document.getElementById('animation-settings').innerHTML = animationHtml;
+        }
+
+        window.testEventConfig = function() {
+            const results = [];
+            results.push(`✓ Loaded ${Object.keys(eventConfig.types).length} event types`);
+            results.push(`✓ ${eventConfig.enabled.length} events enabled`);
+            results.push(`✓ Event icons configured: ${Object.keys(eventConfig.icons).length}`);
+            
+            document.getElementById('test-results').innerHTML = results.join('<br>');
+        };
+
+        window.testSharingConfig = function() {
+            const results = [];
+            results.push(`✓ ${sharingConfig.enabledPlatforms.length} sharing platforms enabled`);
+            results.push(`✓ Default message: "${sharingConfig.defaultMessage}"`);
+            results.push(`✓ Content settings configured`);
+            
+            document.getElementById('test-results').innerHTML = results.join('<br>');
+        };
+
+        window.testUIConfig = function() {
+            const results = [];
+            results.push(`✓ Notification duration: ${uiConfig.notifications.defaultDuration}ms`);
+            results.push(`✓ Animation speed: ${uiConfig.animations.animationSpeed}ms`);
+            results.push(`✓ UI config applied to document`);
+            
+            document.getElementById('test-results').innerHTML = results.join('<br>');
+        };
+
+        window.showRawConfig = function() {
+            const display = document.getElementById('raw-config');
+            if (display.style.display === 'none') {
+                display.style.display = 'block';
+                display.textContent = JSON.stringify(config.getAll(), null, 2);
+            } else {
+                display.style.display = 'none';
+            }
+        };
+
+        // Initialize test
+        initTest();
+    </script>
+</body>
+</html>

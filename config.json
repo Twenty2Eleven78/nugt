@@ -15,26 +15,86 @@
   },
   "roster": {
     "defaultPlayers": [
-      { "name": "Rae", "shirtNumber": 3 },
-      { "name": "Amelia O", "shirtNumber": 6 },
-      { "name": "Amelia P", "shirtNumber": 17 },
-      { "name": "Aoife", "shirtNumber": 2 },
-      { "name": "Cimmy", "shirtNumber": 16 },
-      { "name": "Ciana", "shirtNumber": 14 },
-      { "name": "Daisy", "shirtNumber": 15 },
-      { "name": "Ella D", "shirtNumber": 8 },
-      { "name": "Ella VK", "shirtNumber": 12 },
-      { "name": "Emily", "shirtNumber": 10 },
-      { "name": "Farah", "shirtNumber": null },
-      { "name": "Freya B", "shirtNumber": 4 },
-      { "name": "Freya K", "shirtNumber": 1 },
-      { "name": "Havana", "shirtNumber": 18 },
-      { "name": "Megan", "shirtNumber": 9 },
-      { "name": "Mia", "shirtNumber": 19 },
-      { "name": "Miliana", "shirtNumber": null },
-      { "name": "Sienna", "shirtNumber": 7 },
-      { "name": "Tulula", "shirtNumber": 5 },
-      { "name": "Veronica", "shirtNumber": 11 }
+      {
+        "name": "Rae",
+        "shirtNumber": 3
+      },
+      {
+        "name": "Amelia O",
+        "shirtNumber": 6
+      },
+      {
+        "name": "Amelia P",
+        "shirtNumber": 17
+      },
+      {
+        "name": "Aoife",
+        "shirtNumber": 2
+      },
+      {
+        "name": "Cimmy",
+        "shirtNumber": 16
+      },
+      {
+        "name": "Ciana",
+        "shirtNumber": 14
+      },
+      {
+        "name": "Daisy",
+        "shirtNumber": 15
+      },
+      {
+        "name": "Ella D",
+        "shirtNumber": 8
+      },
+      {
+        "name": "Ella VK",
+        "shirtNumber": 12
+      },
+      {
+        "name": "Emily",
+        "shirtNumber": 10
+      },
+      {
+        "name": "Farah",
+        "shirtNumber": null
+      },
+      {
+        "name": "Freya B",
+        "shirtNumber": 4
+      },
+      {
+        "name": "Freya K",
+        "shirtNumber": 1
+      },
+      {
+        "name": "Havana",
+        "shirtNumber": 18
+      },
+      {
+        "name": "Megan",
+        "shirtNumber": 9
+      },
+      {
+        "name": "Mia",
+        "shirtNumber": 19
+      },
+      {
+        "name": "Miliana",
+        "shirtNumber": null
+      },
+      {
+        "name": "Sienna",
+        "shirtNumber": 7
+      },
+      {
+        "name": "Tulula",
+        "shirtNumber": 5
+      },
+      {
+        "name": "Veronica",
+        "shirtNumber": 11
+      }
     ],
     "maxPlayers": 25,
     "allowDuplicateNumbers": false,
@@ -53,9 +113,50 @@
     "timerUpdateInterval": 100,
     "autoSaveInterval": 5000
   },
+  "events": {
+    "customEventTypes": {
+      "YELLOW_CARD": "Yellow Card",
+      "RED_CARD": "Red Card",
+      "SIN_BIN": "Sin Bin",
+      "FOUL": "Foul",
+      "PENALTY": "Penalty",
+      "OFFSIDE": "Offside",
+      "INJURY": "Injury",
+      "SUBSTITUTION": "Substitution"
+    },
+    "enabledEventTypes": [
+      "YELLOW_CARD",
+      "RED_CARD",
+      "FOUL",
+      "PENALTY",
+      "INCIDENT",
+      "INJURY",
+      "SUBSTITUTION"
+    ],
+    "eventIcons": {
+      "YELLOW_CARD": "fas fa-square text-warning",
+      "RED_CARD": "fas fa-square text-danger",
+      "SIN_BIN": "fas fa-clock text-info",
+      "FOUL": "fas fa-hand-paper text-warning",
+      "PENALTY": "fas fa-futbol text-danger",
+      "INCIDENT": "fas fa-exclamation-triangle text-warning",
+      "INJURY": "fas fa-plus text-danger",
+      "SUBSTITUTION": "fas fa-exchange-alt text-success"
+    }
+  },
+  "sharing": {
+    "enabledPlatforms": [
+      "whatsapp",
+      "clipboard"
+    ],
+    "defaultMessage": "Check out our match results!",
+    "includeScore": true,
+    "includeEvents": true,
+    "includeStatistics": false
+  },
   "ui": {
     "theme": {
-      "defaultTheme": "red",
+      "defaultTheme": "green",
       "availableThemes": [
         "red",
         "blue",
@@ -69,7 +170,14 @@
     },
     "notifications": {
       "defaultDuration": 2000,
-      "maxNotifications": 5
+      "maxNotifications": 5,
+      "position": "top-right",
+      "enableSound": false
+    },
+    "animations": {
+      "enableAnimations": true,
+      "animationSpeed": "normal",
+      "enableTransitions": true
     },
     "debounceDelay": 300
   },

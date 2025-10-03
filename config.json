@@ -1,0 +1,143 @@
+{
+  "_comments": {
+    "app": "App branding and identity - customize name, shortName (4 chars max), version, description, author",
+    "team": "Team information - set your team name, opponent default, club name, season, age group",
+    "roster": "Default player roster - add your team's players with names and shirt numbers",
+    "match": "Match timing - defaultGameTime in seconds (70min=4200s), timer intervals in milliseconds",
+    "sharing": "Match sharing options - platforms (whatsapp/clipboard), messages, what to include",
+    "ui": "User interface - theme colors and performance settings"
+  },
+  "app": {
+    "name": "NUFC GameTime",
+    "shortName": "NUGT",
+    "version": "4.0",
+    "description": "Football match tracking and statistics application",
+    "author": "Mark Van-Kerro"
+  },
+  "team": {
+    "defaultTeam1Name": "Netherton",
+    "defaultTeam2Name": "Opposition",
+    "clubName": "Netherton United",
+    "season": "2025-2026",
+    "ageGroup": "U13 Girls (U14)"
+  },
+  "roster": {
+    "defaultPlayers": [
+      {
+        "name": "Rae",
+        "shirtNumber": 3
+      },
+      {
+        "name": "Amelia O",
+        "shirtNumber": 6
+      },
+      {
+        "name": "Amelia P",
+        "shirtNumber": 17
+      },
+      {
+        "name": "Aoife",
+        "shirtNumber": 2
+      },
+      {
+        "name": "Cimmy",
+        "shirtNumber": 16
+      },
+      {
+        "name": "Ciana",
+        "shirtNumber": 14
+      },
+      {
+        "name": "Daisy",
+        "shirtNumber": 15
+      },
+      {
+        "name": "Ella D",
+        "shirtNumber": 8
+      },
+      {
+        "name": "Ella VK",
+        "shirtNumber": 12
+      },
+      {
+        "name": "Emily",
+        "shirtNumber": 10
+      },
+      {
+        "name": "Farah",
+        "shirtNumber": null
+      },
+      {
+        "name": "Freya B",
+        "shirtNumber": 4
+      },
+      {
+        "name": "Freya K",
+        "shirtNumber": 1
+      },
+      {
+        "name": "Havana",
+        "shirtNumber": 18
+      },
+      {
+        "name": "Megan",
+        "shirtNumber": 9
+      },
+      {
+        "name": "Mia",
+        "shirtNumber": 19
+      },
+      {
+        "name": "Miliana",
+        "shirtNumber": null
+      },
+      {
+        "name": "Sienna",
+        "shirtNumber": 7
+      },
+      {
+        "name": "Tulula",
+        "shirtNumber": 5
+      },
+      {
+        "name": "Veronica",
+        "shirtNumber": 11
+      }
+    ],
+    "maxPlayers": 25,
+    "allowDuplicateNumbers": false,
+    "autoSort": true
+  },
+  "match": {
+    "defaultGameTime": 4200,
+    "timerUpdateInterval": 100,
+    "autoSaveInterval": 5000,
+    "_availableDurations": "40min=2400s, 50min=3000s, 60min=3600s, 70min=4200s, 80min=4800s, 90min=5400s"
+  },
+  "sharing": {
+    "enabledPlatforms": [
+      "whatsapp",
+      "clipboard"
+    ],
+    "defaultMessage": "Check out our match results!",
+    "includeScore": true,
+    "includeEvents": true,
+    "includeStatistics": false
+  },
+  "ui": {
+    "theme": {
+      "defaultTheme": "red",
+      "availableThemes": [
+        "red",
+        "blue",
+        "green",
+        "purple",
+        "orange",
+        "yellow",
+        "cyan",
+        "pink"
+      ]
+    },
+    "debounceDelay": 300
+  }
+}

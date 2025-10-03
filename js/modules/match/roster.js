@@ -87,9 +87,27 @@ class RosterManager {
     }
   }
 
-  // Get default roster
+  // Get default roster from configuration
   _getDefaultRoster() {
-    return rosterUtils.getDefaultRoster();
+    try {
+      return rosterUtils.getDefaultRoster();
+    } catch (error) {
+      console.error('Error getting default roster from config:', error);
+      // Fallback to hardcoded roster if config fails
+      return [
+        { name: 'Player 1', shirtNumber: 1 },
+        { name: 'Player 2', shirtNumber: 2 },
+        { name: 'Player 3', shirtNumber: 3 },
+        { name: 'Player 4', shirtNumber: 4 },
+        { name: 'Player 5', shirtNumber: 5 },
+        { name: 'Player 6', shirtNumber: 6 },
+        { name: 'Player 7', shirtNumber: 7 },
+        { name: 'Player 8', shirtNumber: 8 },
+        { name: 'Player 9', shirtNumber: 9 },
+        { name: 'Player 10', shirtNumber: 10 },
+        { name: 'Player 11', shirtNumber: 11 }
+      ];
+    }
   }
 
   // Sort roster alphabetically

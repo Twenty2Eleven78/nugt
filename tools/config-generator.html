@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NUFC GameTime - Configuration Generator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #dc3545;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .color-input {
+            width: 60px;
+            height: 40px;
+            padding: 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .row {
+            display: flex;
+            gap: 20px;
+        }
+        .col {
+            flex: 1;
+        }
+        .section {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .btn {
+            background: #dc3545;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background: #c82333;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        #output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏈 GameTime Configuration Generator</h1>
+        <p>Generate a custom configuration file for your team's GameTime app deployment. Choose from predefined themes and customize team settings.</p>
+
+        <form id="configForm">
+            <!-- App Settings -->
+            <div class="section">
+                <h3>📱 App Settings</h3>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="appName">App Name</label>
+                            <input type="text" id="appName" value="NUFC GameTime" placeholder="Your Team GameTime">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="shortName">Short Name (4 chars max)</label>
+                            <input type="text" id="shortName" value="NUGT" maxlength="4" placeholder="YTGT">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <input type="text" id="description" value="Football match tracking and statistics application">
+                </div>
+            </div>
+
+            <!-- Team Settings -->
+            <div class="section">
+                <h3>⚽ Team Settings</h3>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="team1Name">Default Team Name</label>
+                            <input type="text" id="team1Name" value="Your Team" placeholder="Your Team Name">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="clubName">Club Name</label>
+                            <input type="text" id="clubName" value="Your Football Club" placeholder="Your Football Club">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="season">Season</label>
+                            <input type="text" id="season" value="2025-2026" placeholder="2025-2026">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="ageGroup">Age Group</label>
+                            <input type="text" id="ageGroup" value="Youth" placeholder="U13 Girls">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Roster Settings -->
+            <div class="section">
+                <h3>👥 Roster Settings</h3>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="maxPlayers">Maximum Players</label>
+                            <input type="number" id="maxPlayers" value="25" min="1" max="50">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="autoSort" checked>
+                                <label for="autoSort">Auto-sort players alphabetically</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="allowDuplicateNumbers">
+                                <label for="allowDuplicateNumbers">Allow duplicate shirt numbers</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="defaultPlayers">Default Players (one per line, format: Name,ShirtNumber)</label>
+                    <textarea id="defaultPlayers" rows="8" placeholder="Player 1,1&#10;Player 2,2&#10;Player 3,3">Player 1,1
+Player 2,2
+Player 3,3
+Player 4,4
+Player 5,5
+Player 6,6
+Player 7,7
+Player 8,8
+Player 9,9
+Player 10,10
+Player 11,11</textarea>
+                    <small class="text-muted">Leave shirt number empty for no number (e.g., "Player Name,")</small>
+                </div>
+            </div>
+
+            <!-- Theme Settings -->
+            <div class="section">
+                <h3>🎨 Theme Settings</h3>
+                <div class="form-group">
+                    <label for="defaultTheme">Default Theme</label>
+                    <select id="defaultTheme">
+                        <option value="red" selected>Red - Manchester United, Liverpool, Arsenal</option>
+                        <option value="blue">Blue - Chelsea, Manchester City, Everton</option>
+                        <option value="green">Green - Celtic, Norwich, Sporting</option>
+                        <option value="purple">Purple - Custom, unique branding</option>
+                        <option value="orange">Orange - Netherlands, Blackpool</option>
+                        <option value="yellow">Yellow - Borussia Dortmund, Norwich</option>
+                        <option value="cyan">Cyan - Manchester City (away), custom</option>
+                        <option value="pink">Pink - Custom, unique branding</option>
+                    </select>
+                    <small class="text-muted">Choose the default color theme for your team. Users can still change themes manually.</small>
+                </div>
+                <div class="theme-preview-container" style="margin-top: 15px;">
+                    <label>Theme Preview:</label>
+                    <div id="themePreviewBox" style="width: 100px; height: 40px; border-radius: 5px; background: #dc3545; display: inline-block; margin-left: 10px; border: 1px solid #ccc;"></div>
+                </div>
+            </div>
+
+            <!-- Match Settings -->
+            <div class="section">
+                <h3>⏱️ Match Settings</h3>
+                <div class="form-group">
+                    <label for="defaultGameTime">Default Match Duration</label>
+                    <select id="defaultGameTime">
+                        <option value="2400">40 minutes (7v7 Youth)</option>
+                        <option value="3000">50 minutes (7v7 Youth)</option>
+                        <option value="3600">60 minutes (9v9 Youth)</option>
+                        <option value="4200" selected>70 minutes (11v11 Youth)</option>
+                        <option value="4800">80 minutes (11v11 Youth)</option>
+                        <option value="5400">90 minutes (11v11 Adult)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="section">
+                <h3>🔧 Features</h3>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="featureAuth" checked>
+                        <label for="featureAuth">User Authentication</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="featureCloud" checked>
+                        <label for="featureCloud">Cloud Storage</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="featureAttendance" checked>
+                        <label for="featureAttendance">Attendance Tracking</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="featureStats" checked>
+                        <label for="featureStats">Statistics</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="featureSharing" checked>
+                        <label for="featureSharing">Match Sharing</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="featurePWA" checked>
+                        <label for="featurePWA">PWA Support</label>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <button type="button" class="btn" onclick="generateConfig()">Generate Configuration</button>
+                <button type="button" class="btn btn-secondary" onclick="downloadConfig()">Download config.json</button>
+            </div>
+        </form>
+
+        <div id="output" style="display: none;"></div>
+    </div>
+
+    <script>
+        function generateConfig() {
+            const config = {
+                app: {
+                    name: document.getElementById('appName').value,
+                    shortName: document.getElementById('shortName').value,
+                    version: "4.0",
+                    description: document.getElementById('description').value,
+                    author: document.getElementById('clubName').value + " Team"
+                },
+                team: {
+                    defaultTeam1Name: document.getElementById('team1Name').value,
+                    defaultTeam2Name: "Opposition",
+                    clubName: document.getElementById('clubName').value,
+                    season: document.getElementById('season').value,
+                    ageGroup: document.getElementById('ageGroup').value
+                },
+                roster: {
+                    defaultPlayers: parseDefaultPlayers(),
+                    maxPlayers: parseInt(document.getElementById('maxPlayers').value),
+                    allowDuplicateNumbers: document.getElementById('allowDuplicateNumbers').checked,
+                    autoSort: document.getElementById('autoSort').checked
+                },
+                match: {
+                    defaultGameTime: parseInt(document.getElementById('defaultGameTime').value),
+                    gameDurations: {
+                        "7v7_40min": 2400,
+                        "7v7_50min": 3000,
+                        "9v9_60min": 3600,
+                        "11v11_70min": 4200,
+                        "11v11_80min": 4800,
+                        "11v11_90min": 5400
+                    },
+                    timerUpdateInterval: 100,
+                    autoSaveInterval: 5000
+                },
+                ui: {
+                    theme: {
+                        defaultTheme: document.getElementById('defaultTheme').value,
+                        availableThemes: ["red", "blue", "green", "purple", "orange", "yellow", "cyan", "pink"]
+                    },
+                    notifications: {
+                        defaultDuration: 2000,
+                        maxNotifications: 5
+                    },
+                    debounceDelay: 300
+                },
+                features: {
+                    authentication: document.getElementById('featureAuth').checked,
+                    cloudStorage: document.getElementById('featureCloud').checked,
+                    attendance: document.getElementById('featureAttendance').checked,
+                    statistics: document.getElementById('featureStats').checked,
+                    sharing: document.getElementById('featureSharing').checked,
+                    pwa: document.getElementById('featurePWA').checked
+                }
+            };
+
+            const output = document.getElementById('output');
+            output.textContent = JSON.stringify(config, null, 2);
+            output.style.display = 'block';
+            
+            // Store for download
+            window.generatedConfig = config;
+        }
+
+        function downloadConfig() {
+            if (!window.generatedConfig) {
+                generateConfig();
+            }
+
+            const blob = new Blob([JSON.stringify(window.generatedConfig, null, 2)], {
+                type: 'application/json'
+            });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'config.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Theme colors mapping
+        const themeColors = {
+            red: '#dc3545',
+            blue: '#007bff',
+            green: '#28a745',
+            purple: '#6f42c1',
+            orange: '#fd7e14',
+            yellow: '#ffc107',
+            cyan: '#17a2b8',
+            pink: '#e83e8c'
+        };
+
+        // Update theme preview
+        function updateThemePreview() {
+            const selectedTheme = document.getElementById('defaultTheme').value;
+            const previewBox = document.getElementById('themePreviewBox');
+            previewBox.style.backgroundColor = themeColors[selectedTheme] || themeColors.red;
+        }
+
+        // Auto-generate short name from app name
+        document.getElementById('appName').addEventListener('input', function() {
+            const appName = this.value;
+            const words = appName.split(' ');
+            let shortName = '';
+            
+            for (let word of words) {
+                if (word.length > 0) {
+                    shortName += word[0].toUpperCase();
+                }
+                if (shortName.length >= 4) break;
+            }
+            
+            document.getElementById('shortName').value = shortName.substring(0, 4);
+        });
+
+        // Parse default players from textarea
+        function parseDefaultPlayers() {
+            const playersText = document.getElementById('defaultPlayers').value;
+            const lines = playersText.split('\n').filter(line => line.trim());
+            
+            return lines.map(line => {
+                const [name, shirtNumber] = line.split(',').map(s => s.trim());
+                return {
+                    name: name || 'Unnamed Player',
+                    shirtNumber: shirtNumber && shirtNumber !== '' ? parseInt(shirtNumber) : null
+                };
+            }).filter(player => player.name !== 'Unnamed Player');
+        }
+
+        // Update theme preview when selection changes
+        document.getElementById('defaultTheme').addEventListener('change', updateThemePreview);
+
+        // Generate initial config on page load
+        window.addEventListener('load', function() {
+            updateThemePreview();
+            generateConfig();
+        });
+    </script>
+</body>
+</html>

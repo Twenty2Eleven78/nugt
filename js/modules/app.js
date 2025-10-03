@@ -181,7 +181,7 @@ export async function initializeApp() {
     
     try {
       await config.load();
-      console.log('✓ Configuration loaded successfully');
+      console.log('Configuration loaded successfully into app');
     } catch (error) {
       console.warn('⚠ Configuration loading failed, using defaults:', error.message);
     }
@@ -206,7 +206,7 @@ export async function initializeApp() {
       gameState.gameTime = config.get('match.defaultGameTime', 4200);
     }
 
-    console.log(`Initializing ${config.get('app.name', 'NUFC GameTime')} v${config.get('app.version', '4.0')} - Enhanced with Custom Framework`);
+    console.log(`Initializing ${config.get('app.name', 'NUFC GameTime')} v${config.get('app.version', '4.0')}`);
 
   // Initialize custom modal system
   initializeCustomModals();

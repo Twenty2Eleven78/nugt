@@ -2,8 +2,6 @@
 🚀 Version 4.0
 **Released: August 2025**
 - **Configuration System**: Complete team customization without code changes - team names, colors, match settings
-- **Team Branding**: Dynamic team colors, logos, and theming based on configuration
-- **Setup Tools**: Interactive team setup, configuration generator, and validation tools
 - Custom CSS Framework: Removed Bootstrap dependency and implemented custom CSS for better performance
 - Enhanced Authentication: Resolved auth issues and improved user profile functionality
 - New Match Workflow: Streamlined start new match process with improved modal system

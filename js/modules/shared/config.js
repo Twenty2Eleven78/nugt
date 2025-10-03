@@ -131,22 +131,10 @@ class ConfigManager {
       team: {
         defaultTeam1Name: 'Netherton',
         defaultTeam2Name: 'Opposition',
-        clubName: 'Netherton United',
-        clubColors: {
-          primary: '#dc3545',
-          secondary: '#ffffff'
-        }
+        clubName: 'Netherton United'
       },
       match: {
         defaultGameTime: 4200,
-        gameDurations: {
-          '7v7_40min': 2400,
-          '7v7_50min': 3000,
-          '9v9_60min': 3600,
-          '11v11_70min': 4200,
-          '11v11_80min': 4800,
-          '11v11_90min': 5400
-        },
         timerUpdateInterval: 100,
         autoSaveInterval: 5000
       },

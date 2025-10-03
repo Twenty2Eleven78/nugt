@@ -1,20 +1,23 @@
 {
+  // App branding and identity
   "app": {
-    "name": "NUFC GameTime",
-    "shortName": "NUGT",
-    "version": "4.0",
+    "name": "NUFC GameTime", // Full app name (appears in browser tab)
+    "shortName": "NUGT", // Short name for PWA (4 chars max)
+    "version": "4.0", // App version
     "description": "Football match tracking and statistics application",
-    "author": "NUFC GameTime Team"
+    "author": "Mark Van-Kerro" // Your name or organization
   },
+  // Team information and defaults
   "team": {
-    "defaultTeam1Name": "Netherton",
-    "defaultTeam2Name": "Opposition",
-    "clubName": "Netherton United",
-    "season": "2025-2026",
-    "ageGroup": "U13 Girls (U14)"
+    "defaultTeam1Name": "Netherton", // Your team name (home team)
+    "defaultTeam2Name": "Opposition", // Default opponent name
+    "clubName": "Netherton United", // Full club name
+    "season": "2025-2026", // Current season
+    "ageGroup": "U13 Girls (U14)" // Age group/division
   },
+  // Default player roster (customize with your players)
   "roster": {
-    "defaultPlayers": [
+    "defaultPlayers": [ // Add your team's players here
       {
         "name": "Rae",
         "shirtNumber": 3
@@ -96,68 +99,33 @@
         "shirtNumber": 11
       }
     ],
-    "maxPlayers": 25,
-    "allowDuplicateNumbers": false,
-    "autoSort": true
+    "maxPlayers": 25, // Maximum roster size
+    "allowDuplicateNumbers": false, // Allow duplicate shirt numbers
+    "autoSort": true // Auto-sort players alphabetically
   },
+  // Match timing and behavior
   "match": {
-    "defaultGameTime": 4200,
-    "gameDurations": {
-      "7v7_40min": 2400,
-      "7v7_50min": 3000,
-      "9v9_60min": 3600,
-      "11v11_70min": 4200,
-      "11v11_80min": 4800,
-      "11v11_90min": 5400
-    },
-    "timerUpdateInterval": 100,
-    "autoSaveInterval": 5000
+    "defaultGameTime": 4200, // Default match duration in seconds (70 min)
+    "timerUpdateInterval": 100, // Timer refresh rate (milliseconds)
+    "autoSaveInterval": 5000 // Auto-save frequency (milliseconds)
+    // Available durations: 40min=2400s, 50min=3000s, 60min=3600s, 70min=4200s, 80min=4800s, 90min=5400s
   },
-  "events": {
-    "customEventTypes": {
-      "YELLOW_CARD": "Yellow Card",
-      "RED_CARD": "Red Card",
-      "SIN_BIN": "Sin Bin",
-      "FOUL": "Foul",
-      "PENALTY": "Penalty",
-      "OFFSIDE": "Offside",
-      "INJURY": "Injury",
-      "SUBSTITUTION": "Substitution"
-    },
-    "enabledEventTypes": [
-      "YELLOW_CARD",
-      "RED_CARD",
-      "FOUL",
-      "PENALTY",
-      "INCIDENT",
-      "INJURY",
-      "SUBSTITUTION"
-    ],
-    "eventIcons": {
-      "YELLOW_CARD": "fas fa-square text-warning",
-      "RED_CARD": "fas fa-square text-danger",
-      "SIN_BIN": "fas fa-clock text-info",
-      "FOUL": "fas fa-hand-paper text-warning",
-      "PENALTY": "fas fa-futbol text-danger",
-      "INCIDENT": "fas fa-exclamation-triangle text-warning",
-      "INJURY": "fas fa-plus text-danger",
-      "SUBSTITUTION": "fas fa-exchange-alt text-success"
-    }
-  },
+  // Match sharing options
   "sharing": {
-    "enabledPlatforms": [
-      "whatsapp",
-      "clipboard"
+    "enabledPlatforms": [ // Available sharing platforms
+      "whatsapp", // WhatsApp sharing
+      "clipboard" // Copy to clipboard
     ],
-    "defaultMessage": "Check out our match results!",
-    "includeScore": true,
-    "includeEvents": true,
-    "includeStatistics": false
+    "defaultMessage": "Check out our match results!", // Default share message
+    "includeScore": true, // Include final score in shares
+    "includeEvents": true, // Include match events in shares
+    "includeStatistics": false // Include player stats in shares
   },
+  // User interface settings
   "ui": {
     "theme": {
-      "defaultTheme": "green",
-      "availableThemes": [
+      "defaultTheme": "red", // Default color theme
+      "availableThemes": [ // Available color themes
         "red",
         "blue",
         "green",
@@ -168,84 +136,6 @@
         "pink"
       ]
     },
-    "notifications": {
-      "defaultDuration": 2000,
-      "maxNotifications": 5,
-      "position": "top-right",
-      "enableSound": false
-    },
-    "animations": {
-      "enableAnimations": true,
-      "animationSpeed": "normal",
-      "enableTransitions": true
-    },
-    "debounceDelay": 300
-  },
-  "storage": {
-    "cacheVersion": "v318",
-    "cacheName": "nugt-cache-v318",
-    "maxStorageSize": 50,
-    "autoCleanup": true,
-    "cleanupInterval": 86400000,
-    "retentionDays": 30,
-    "storageKeys": {
-      "prefix": "nugt_",
-      "teamPrefix": "team_",
-      "matchPrefix": "match_",
-      "statsPrefix": "stats_"
-    }
-  },
-  "statistics": {
-    "enableAdvancedStats": true,
-    "enableCharts": true,
-    "chartTypes": ["line", "bar", "pie"],
-    "trackPlayerStats": true,
-    "trackTeamStats": true,
-    "trackSeasonStats": true,
-    "autoGenerateReports": true,
-    "reportFormats": ["summary", "detailed", "charts"],
-    "retentionPeriod": 365
-  },
-  "league": {
-    "leagueName": "Local League",
-    "season": "2025-2026",
-    "division": "U13 Girls",
-    "competitionType": "league",
-    "pointsSystem": {
-      "win": 3,
-      "draw": 1,
-      "loss": 0
-    },
-    "matchDuration": 70,
-    "enableLeagueTable": true,
-    "enableFixtures": true,
-    "enableStandings": true
-  },
-  "integrations": {
-    "enableWebhooks": false,
-    "webhookUrl": "",
-    "enableExports": true,
-    "exportFormats": ["json", "csv"],
-    "enableImports": true,
-    "importSources": ["csv", "json"],
-    "apiSettings": {
-      "enableApi": false,
-      "apiKey": "",
-      "baseUrl": ""
-    },
-    "externalServices": {
-      "enableLeagueSync": false,
-      "leagueApiUrl": "",
-      "enableStatsSync": false,
-      "statsApiUrl": ""
-    }
-  },
-  "features": {
-    "authentication": true,
-    "cloudStorage": true,
-    "attendance": true,
-    "statistics": true,
-    "sharing": true,
-    "pwa": true
+    "debounceDelay": 300 // Input delay for performance (milliseconds)
   }
 }

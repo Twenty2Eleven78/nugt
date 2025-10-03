@@ -103,7 +103,6 @@ function validateConfig(configPath = './config.json') {
         warnings.push('match.defaultGameTime should be between 600 (10 min) and 7200 (120 min) seconds');
       }
       
-      if (!config.match.gameDurations) warnings.push('Missing match.gameDurations');
       if (!config.match.timerUpdateInterval) warnings.push('Missing match.timerUpdateInterval');
       if (!config.match.autoSaveInterval) warnings.push('Missing match.autoSaveInterval');
     }
@@ -117,22 +116,10 @@ function validateConfig(configPath = './config.json') {
           warnings.push(`ui.theme.defaultTheme should be one of: ${validThemes.join(', ')}`);
         }
       }
-      if (!config.ui.notifications) warnings.push('Missing ui.notifications');
       if (!config.ui.debounceDelay) warnings.push('Missing ui.debounceDelay');
     }
 
-    // Events validation
-    if (config.events) {
-      if (config.events.customEventTypes && typeof config.events.customEventTypes !== 'object') {
-        warnings.push('events.customEventTypes should be an object');
-      }
-      if (config.events.enabledEventTypes && !Array.isArray(config.events.enabledEventTypes)) {
-        warnings.push('events.enabledEventTypes should be an array');
-      }
-      if (config.events.eventIcons && typeof config.events.eventIcons !== 'object') {
-        warnings.push('events.eventIcons should be an object');
-      }
-    }
+
 
     // Sharing validation
     if (config.sharing) {
@@ -159,78 +146,16 @@ function validateConfig(configPath = './config.json') {
           warnings.push(`ui.theme.defaultTheme should be one of: ${validThemes.join(', ')}`);
         }
       }
-      if (!config.ui.notifications) warnings.push('Missing ui.notifications');
-      if (config.ui.animations) {
-        const validSpeeds = ['fast', 'normal', 'slow'];
-        if (config.ui.animations.animationSpeed && !validSpeeds.includes(config.ui.animations.animationSpeed)) {
-          warnings.push(`ui.animations.animationSpeed should be one of: ${validSpeeds.join(', ')}`);
-        }
-      }
       if (!config.ui.debounceDelay) warnings.push('Missing ui.debounceDelay');
     }
 
-    // Storage validation
-    if (config.storage) {
-      if (config.storage.maxStorageSize && (typeof config.storage.maxStorageSize !== 'number' || config.storage.maxStorageSize < 1)) {
-        warnings.push('storage.maxStorageSize should be a positive number (MB)');
-      }
-      if (config.storage.retentionDays && (typeof config.storage.retentionDays !== 'number' || config.storage.retentionDays < 1)) {
-        warnings.push('storage.retentionDays should be a positive number');
-      }
-      const booleanStorageFields = ['autoCleanup'];
-      booleanStorageFields.forEach(field => {
-        if (config.storage[field] !== undefined && typeof config.storage[field] !== 'boolean') {
-          warnings.push(`storage.${field} should be a boolean`);
-        }
-      });
-    }
 
-    // Statistics validation
-    if (config.statistics) {
-      const booleanStatsFields = ['enableAdvancedStats', 'enableCharts', 'trackPlayerStats', 'trackTeamStats', 'trackSeasonStats', 'autoGenerateReports'];
-      booleanStatsFields.forEach(field => {
-        if (config.statistics[field] !== undefined && typeof config.statistics[field] !== 'boolean') {
-          warnings.push(`statistics.${field} should be a boolean`);
-        }
-      });
-      if (config.statistics.chartTypes && !Array.isArray(config.statistics.chartTypes)) {
-        warnings.push('statistics.chartTypes should be an array');
-      }
-      if (config.statistics.reportFormats && !Array.isArray(config.statistics.reportFormats)) {
-        warnings.push('statistics.reportFormats should be an array');
-      }
-    }
 
-    // League validation
-    if (config.league) {
-      if (config.league.pointsSystem) {
-        const pointsFields = ['win', 'draw', 'loss'];
-        pointsFields.forEach(field => {
-          if (config.league.pointsSystem[field] !== undefined && (typeof config.league.pointsSystem[field] !== 'number' || config.league.pointsSystem[field] < 0)) {
-            warnings.push(`league.pointsSystem.${field} should be a non-negative number`);
-          }
-        });
-      }
-      if (config.league.matchDuration && (typeof config.league.matchDuration !== 'number' || config.league.matchDuration < 10 || config.league.matchDuration > 120)) {
-        warnings.push('league.matchDuration should be between 10 and 120 minutes');
-      }
-    }
 
-    // Integrations validation
-    if (config.integrations) {
-      if (config.integrations.enableWebhooks && !config.integrations.webhookUrl) {
-        warnings.push('integrations.webhookUrl is required when webhooks are enabled');
-      }
-      if (config.integrations.apiSettings && config.integrations.apiSettings.enableApi && !config.integrations.apiSettings.apiKey) {
-        warnings.push('integrations.apiSettings.apiKey is required when API is enabled');
-      }
-      if (config.integrations.exportFormats && !Array.isArray(config.integrations.exportFormats)) {
-        warnings.push('integrations.exportFormats should be an array');
-      }
-      if (config.integrations.importSources && !Array.isArray(config.integrations.importSources)) {
-        warnings.push('integrations.importSources should be an array');
-      }
-    }
+
+
+
+
 
     // Features validation
     if (config.features) {

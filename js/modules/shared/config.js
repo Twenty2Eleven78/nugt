@@ -23,23 +23,23 @@ class ConfigManager {
       if (!response.ok) {
         throw new Error(`Failed to load config: ${response.status}`);
       }
-      
+
       this.config = await response.json();
       this.loaded = true;
-      
+
       console.log('Configuration loaded successfully:', this.config.app.name);
-      
+
       // Dispatch event to notify other modules that config is loaded
       if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('configLoaded', { 
-          detail: { config: this.config } 
+        window.dispatchEvent(new CustomEvent('configLoaded', {
+          detail: { config: this.config }
         }));
       }
-      
+
       return this.config;
     } catch (error) {
       console.error('Failed to load configuration, using defaults:', error);
-      
+
       // Fallback to default configuration
       this.config = this.getDefaultConfig();
       this.loaded = true;
@@ -131,31 +131,34 @@ class ConfigManager {
       team: {
         defaultTeam1Name: 'Netherton',
         defaultTeam2Name: 'Opposition',
-        clubName: 'Netherton United'
+        clubName: 'Netherton United',
+        season: '2025-2026',
+        ageGroup: 'U13 Girls (U14)'
+      },
+      roster: {
+        defaultPlayers: [],
+        maxPlayers: 25,
+        allowDuplicateNumbers: false,
+        autoSort: true
       },
       match: {
         defaultGameTime: 4200,
         timerUpdateInterval: 100,
         autoSaveInterval: 5000
       },
+      sharing: {
+        enabledPlatforms: ['whatsapp', 'clipboard'],
+        defaultMessage: 'Check out our match results!',
+        includeScore: true,
+        includeEvents: true,
+        includeStatistics: false
+      },
       ui: {
         theme: {
           defaultTheme: 'red',
           availableThemes: ['red', 'blue', 'green', 'purple', 'orange', 'yellow', 'cyan', 'pink']
         },
-        notifications: {
-          defaultDuration: 2000,
-          maxNotifications: 5
-        },
         debounceDelay: 300
-      },
-      features: {
-        authentication: true,
-        cloudStorage: true,
-        attendance: true,
-        statistics: true,
-        sharing: true,
-        pwa: true
       }
     };
   }
@@ -174,14 +177,14 @@ class ConfigManager {
    */
   validate() {
     const errors = [];
-    
+
     if (!this.config) {
       errors.push('Configuration not loaded');
       return { isValid: false, errors };
     }
 
     // Required sections
-    const requiredSections = ['app', 'team', 'match', 'ui', 'features'];
+    const requiredSections = ['app', 'team', 'roster', 'match', 'sharing', 'ui'];
     for (const section of requiredSections) {
       if (!this.config[section]) {
         errors.push(`Missing required section: ${section}`);

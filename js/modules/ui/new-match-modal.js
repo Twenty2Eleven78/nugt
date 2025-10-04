@@ -435,9 +435,18 @@ class NewMatchModal {
             subsCount: !!subsCountElement
         });
         
-        if (selectedCountElement) selectedCountElement.textContent = attending;
-        if (startingCountElement) startingCountElement.textContent = starting;
-        if (subsCountElement) subsCountElement.textContent = substitutes;
+        if (selectedCountElement) {
+            selectedCountElement.textContent = attending;
+            console.log('Updated selectedCount to:', attending);
+        }
+        if (startingCountElement) {
+            startingCountElement.textContent = starting;
+            console.log('Updated startingCount to:', starting);
+        }
+        if (subsCountElement) {
+            subsCountElement.textContent = substitutes;
+            console.log('Updated subsCount to:', substitutes);
+        }
     }
 
     syncUIWithSelectedState() {

@@ -202,6 +202,8 @@ class NewMatchModal {
                     const playerId = parseInt(btn.dataset.playerId);
                     const currentState = this.playerStates.get(playerId) || 'absent';
                     
+                    console.log('Starter button clicked! PlayerId:', playerId, 'Current state:', currentState);
+                    
                     if (currentState === 'attending') {
                         const currentStarters = this.getStarterCount();
                         if (currentStarters >= 11) {
@@ -211,10 +213,12 @@ class NewMatchModal {
                         this.playerStates.set(playerId, 'starting');
                         btn.classList.remove('btn-outline-success');
                         btn.classList.add('btn-success');
+                        console.log('Set player to starting! PlayerId:', playerId);
                     } else if (currentState === 'starting') {
                         this.playerStates.set(playerId, 'attending');
                         btn.classList.remove('btn-success');
                         btn.classList.add('btn-outline-success');
+                        console.log('Set player to attending! PlayerId:', playerId);
                     }
                     
                     this.updateCounts();

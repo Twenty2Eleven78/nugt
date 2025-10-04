@@ -425,9 +425,11 @@ class NewMatchModal {
         console.log('UpdateCounts - Player States:', Array.from(this.playerStates.entries()));
         console.log('UpdateCounts - Attending:', attending, 'Starting:', starting, 'Substitutes:', substitutes);
         
-        const selectedCountElement = document.getElementById('selectedCount');
-        const startingCountElement = document.getElementById('startingCount');
-        const subsCountElement = document.getElementById('subsCount');
+        // Target elements specifically within the modal to avoid duplicate ID issues
+        const modal = document.getElementById('newMatchModal');
+        const selectedCountElement = modal ? modal.querySelector('#selectedCount') : document.getElementById('selectedCount');
+        const startingCountElement = modal ? modal.querySelector('#startingCount') : document.getElementById('startingCount');
+        const subsCountElement = modal ? modal.querySelector('#subsCount') : document.getElementById('subsCount');
         
         console.log('UpdateCounts - Elements found:', {
             selectedCount: !!selectedCountElement,

@@ -54,20 +54,6 @@ class RosterModal {
         </div>
       </div>
 
-      <!-- Bulk Add Section -->
-      <div class="roster-section mb-4">
-        <div class="section-header">
-          <h6><i class="fas fa-list-ul me-2"></i>Bulk Add Players</h6>
-          <small class="text-muted">Add multiple players at once</small>
-        </div>
-        <div class="bulk-add-form">
-          <textarea id="bulkPlayerNames" class="form-control mb-2" rows="3" placeholder="Enter player names separated by commas or new lines:\ne.g. John Smith, Jane Doe\nMike Johnson"></textarea>
-          <button id="addPlayersBulkBtn" class="btn btn-primary w-100" type="button">
-            <i class="fas fa-users me-1"></i>Add All Players
-          </button>
-        </div>
-      </div>
-
       <!-- Current Roster Section -->
       <div class="roster-section">
         <div class="section-header">

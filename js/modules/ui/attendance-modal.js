@@ -6,6 +6,9 @@
 import { CustomModal } from '../shared/custom-modal.js';
 import { createAndAppendModal, MODAL_CONFIGS } from '../shared/modal-factory.js';
 import { attendanceManager } from '../services/attendance.js';
+import { rosterManager } from '../match/roster.js';
+import { storage } from '../data/storage.js';
+import { STORAGE_KEYS } from '../shared/constants.js';
 
 class AttendanceModal {
   constructor() {
@@ -29,48 +32,34 @@ class AttendanceModal {
    */
   createModal() {
     const bodyContent = `
-      <!-- Attendance Summary -->
-      <div class="attendance-summary mb-4">
-        <div id="attendanceSummaryMain" class="text-center">
-          <i class="fas fa-users me-1"></i>
-          <strong>Loading...</strong>
+      <!-- Attendance Header -->
+      <div class="attendance-header mb-3">
+        <div class="attendance-info">
+          <h6 class="mb-1"><i class="fas fa-users me-2"></i>Match Attendance</h6>
+          <small class="text-muted">
+            <i class="fas fa-info-circle me-1"></i>
+            Attending: <span id="attendingCount">0</span> | 
+            Starting XI: <span id="startingCount">0</span> | 
+            Substitutes: <span id="subsCount">0</span> | 
+            Absent: <span id="absentCount">0</span>
+          </small>
         </div>
-      </div>
-
-      <!-- Attendance Controls -->
-      <div class="attendance-controls-header mb-4">
-        <div class="controls-info">
-          <h6 class="mb-1"><i class="fas fa-sliders-h me-2"></i>Quick Actions</h6>
-          <small class="text-muted">Manage attendance for all players at once</small>
-        </div>
-        <div class="controls-buttons">
-          <button id="markAllAttendingBtnMain" class="btn btn-success">
-            <i class="fas fa-user-check me-1"></i>All Present
+        <div class="attendance-controls">
+          <button type="button" class="btn btn-sm btn-outline-success" id="markAllAttendingBtn">
+            <i class="fas fa-check-double me-1"></i>All Attending
           </button>
-          <button id="markAllAbsentBtnMain" class="btn btn-warning">
-            <i class="fas fa-user-times me-1"></i>All Absent
+          <button type="button" class="btn btn-sm btn-outline-danger" id="markAllAbsentBtn">
+            <i class="fas fa-times me-1"></i>All Absent
           </button>
-          <button id="clearAttendanceBtnMain" class="btn btn-outline-danger">
+          <button type="button" class="btn btn-sm btn-outline-secondary" id="clearAttendanceBtn">
             <i class="fas fa-undo me-1"></i>Reset
           </button>
         </div>
       </div>
 
-      <!-- Attendance List -->
-      <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-        <table class="table table-striped table-hover">
-          <thead class="table-dark sticky-top">
-            <tr>
-              <th>Player</th>
-              <th>Shirt #</th>
-              <th>Status</th>
-              <th class="text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody id="attendanceList">
-            <!-- Attendance rows will be populated here -->
-          </tbody>
-        </table>
+      <!-- Players Grid -->
+      <div id="attendancePlayersGrid" class="row g-2" style="max-height: 500px; overflow-y: auto;">
+        <!-- Players will be populated here -->
       </div>
 
       <!-- No Players Message -->
@@ -102,11 +91,10 @@ class AttendanceModal {
   show() {
     if (this.modal) {
       this.modal.show();
-      // Update attendance list when modal is shown
+      // Update attendance grid when modal is shown
       setTimeout(() => {
-        if (attendanceManager && attendanceManager.updateAttendanceList) {
-          attendanceManager.updateAttendanceList();
-        }
+        this.populateAttendanceGrid();
+        this.updateCounts();
       }, 200);
     }
   }
@@ -121,36 +109,269 @@ class AttendanceModal {
   }
 
   /**
+   * Populate attendance grid with current roster and attendance data
+   */
+  populateAttendanceGrid() {
+    const playersGrid = document.getElementById('attendancePlayersGrid');
+    const noPlayersMessage = document.getElementById('noPlayersMessage');
+    
+    if (!playersGrid) return;
+
+    // Get roster from roster manager
+    const roster = rosterManager ? rosterManager.getRoster() : [];
+    
+    if (roster.length === 0) {
+      playersGrid.style.display = 'none';
+      noPlayersMessage.style.display = 'block';
+      return;
+    }
+
+    playersGrid.style.display = 'block';
+    noPlayersMessage.style.display = 'none';
+
+    // Get current attendance data from storage (same format as new match modal)
+    const savedAttendance = storage.load(STORAGE_KEYS.MATCH_ATTENDANCE, []);
+    
+    playersGrid.innerHTML = roster.map((player, index) => {
+      const playerId = index;
+      const attendanceRecord = savedAttendance.find(a => a.playerName === player.name);
+      const isAttending = attendanceRecord ? attendanceRecord.attending : false;
+      const lineupRole = attendanceRecord ? attendanceRecord.lineupRole : null;
+      const isStarting = lineupRole === 'starter';
+      
+      // Determine status
+      let status = 'absent';
+      let statusText = 'Absent';
+      if (isAttending && isStarting) {
+        status = 'starting';
+        statusText = 'Starting XI';
+      } else if (isAttending) {
+        status = 'attending';
+        statusText = 'Substitute';
+      }
+      
+      return `
+        <div class="col-12">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <div class="player-card flex-grow-1 ${status !== 'absent' ? 'selected' : ''}" 
+                 data-player-id="${playerId}" 
+                 data-player-name="${player.name}" 
+                 style="min-height: 45px; padding: 0.5rem; cursor: pointer; border: 2px solid ${status !== 'absent' ? 'var(--theme-primary)' : '#dee2e6'}; border-radius: 8px; background: ${status !== 'absent' ? 'rgba(var(--theme-primary-rgb), 0.1)' : '#fff'}; transition: all 0.2s ease;">
+              <div class="d-flex align-items-center">
+                <span class="badge bg-primary me-2" style="font-size: 0.7rem;">#${player.shirtNumber || '?'}</span>
+                <div class="flex-grow-1">
+                  <div class="fw-medium" style="font-size: 0.9rem;">${player.name}</div>
+                  <small class="text-muted" style="font-size: 0.75rem;">${statusText}</small>
+                </div>
+                <div class="selection-indicator" style="display: ${status !== 'absent' ? 'block' : 'none'};">
+                  <i class="fas fa-check text-success"></i>
+                </div>
+              </div>
+            </div>
+            <button type="button" 
+                    class="btn btn-sm ${status === 'starting' ? 'btn-success' : 'btn-outline-success'} starter-btn" 
+                    data-player-id="${playerId}" 
+                    data-player-name="${player.name}"
+                    style="min-width: 60px;" 
+                    ${status === 'absent' ? 'disabled' : ''}>
+              <i class="fas fa-play"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  /**
+   * Update attendance counts display
+   */
+  updateCounts() {
+    const savedAttendance = storage.load(STORAGE_KEYS.MATCH_ATTENDANCE, []);
+    const roster = rosterManager ? rosterManager.getRoster() : [];
+    
+    let attending = 0;
+    let starting = 0;
+    let substitutes = 0;
+    let absent = 0;
+    
+    roster.forEach(player => {
+      const attendanceRecord = savedAttendance.find(a => a.playerName === player.name);
+      const isAttending = attendanceRecord ? attendanceRecord.attending : false;
+      const lineupRole = attendanceRecord ? attendanceRecord.lineupRole : null;
+      
+      if (isAttending) {
+        attending++;
+        if (lineupRole === 'starter') {
+          starting++;
+        } else {
+          substitutes++;
+        }
+      } else {
+        absent++;
+      }
+    });
+    
+    // Update count displays
+    const attendingEl = document.getElementById('attendingCount');
+    const startingEl = document.getElementById('startingCount');
+    const subsEl = document.getElementById('subsCount');
+    const absentEl = document.getElementById('absentCount');
+    
+    if (attendingEl) attendingEl.textContent = attending;
+    if (startingEl) startingEl.textContent = starting;
+    if (subsEl) subsEl.textContent = substitutes;
+    if (absentEl) absentEl.textContent = absent;
+  }
+
+  /**
+   * Toggle player attendance status
+   */
+  togglePlayerAttendance(playerName) {
+    const savedAttendance = storage.load(STORAGE_KEYS.MATCH_ATTENDANCE, []);
+    const roster = rosterManager.getRoster();
+    
+    // Find or create attendance record for this player
+    let playerRecord = savedAttendance.find(a => a.playerName === playerName);
+    
+    if (!playerRecord) {
+      // Create new record
+      playerRecord = {
+        playerName: playerName,
+        attending: false,
+        lineupRole: null
+      };
+      savedAttendance.push(playerRecord);
+    }
+    
+    // Toggle attendance
+    playerRecord.attending = !playerRecord.attending;
+    
+    // If setting to absent, clear lineup role
+    if (!playerRecord.attending) {
+      playerRecord.lineupRole = null;
+    }
+    
+    // Save updated attendance
+    storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, savedAttendance);
+    
+    // Refresh the grid and counts
+    this.populateAttendanceGrid();
+    this.updateCounts();
+  }
+
+  /**
+   * Toggle player starting status
+   */
+  togglePlayerStarting(playerName) {
+    const savedAttendance = storage.load(STORAGE_KEYS.MATCH_ATTENDANCE, []);
+    const playerRecord = savedAttendance.find(a => a.playerName === playerName);
+    
+    if (!playerRecord || !playerRecord.attending) return;
+    
+    // Count current starters
+    const currentStarters = savedAttendance.filter(a => a.lineupRole === 'starter').length;
+    
+    if (playerRecord.lineupRole !== 'starter' && currentStarters >= 11) {
+      // Show notification that max starters reached
+      if (window.notificationManager) {
+        window.notificationManager.warning('Maximum 11 starters allowed');
+      }
+      return;
+    }
+    
+    // Toggle starting status
+    if (playerRecord.lineupRole === 'starter') {
+      playerRecord.lineupRole = 'substitute';
+    } else {
+      playerRecord.lineupRole = 'starter';
+    }
+    
+    // Save updated attendance
+    storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, savedAttendance);
+    
+    // Refresh the grid and counts
+    this.populateAttendanceGrid();
+    this.updateCounts();
+  }
+
+  /**
+   * Mark all players as attending
+   */
+  markAllAttending() {
+    const roster = rosterManager.getRoster();
+    const attendanceData = roster.map(player => ({
+      playerName: player.name,
+      attending: true,
+      lineupRole: 'substitute' // Default to substitute when marking all attending
+    }));
+    
+    storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
+    this.populateAttendanceGrid();
+    this.updateCounts();
+  }
+
+  /**
+   * Mark all players as absent
+   */
+  markAllAbsent() {
+    const roster = rosterManager.getRoster();
+    const attendanceData = roster.map(player => ({
+      playerName: player.name,
+      attending: false,
+      lineupRole: null
+    }));
+    
+    storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
+    this.populateAttendanceGrid();
+    this.updateCounts();
+  }
+
+  /**
+   * Clear attendance (reset all)
+   */
+  clearAttendance() {
+    storage.remove(STORAGE_KEYS.MATCH_ATTENDANCE);
+    this.populateAttendanceGrid();
+    this.updateCounts();
+  }
+
+  /**
    * Bind event listeners
    */
   _bindEvents() {
     // Use event delegation for dynamically created buttons
     document.addEventListener('click', (e) => {
       // Handle attendance control buttons
-      if (e.target.id === 'markAllAttendingBtnMain') {
+      if (e.target.id === 'markAllAttendingBtn') {
         e.preventDefault();
-        if (attendanceManager && attendanceManager.markAllAttending) {
-          attendanceManager.markAllAttending();
-        }
-      } else if (e.target.id === 'markAllAbsentBtnMain') {
+        this.markAllAttending();
+      } else if (e.target.id === 'markAllAbsentBtn') {
         e.preventDefault();
-        if (attendanceManager && attendanceManager.markAllAbsent) {
-          attendanceManager.markAllAbsent();
-        }
-      } else if (e.target.id === 'clearAttendanceBtnMain') {
+        this.markAllAbsent();
+      } else if (e.target.id === 'clearAttendanceBtn') {
         e.preventDefault();
-        if (attendanceManager && attendanceManager.clearAttendance) {
-          attendanceManager.clearAttendance();
-        }
+        this.clearAttendance();
       }
       
-      // Handle individual attendance toggle buttons
-      if (e.target.closest('.toggle-attendance-btn')) {
+      // Handle starter button clicks
+      if (e.target.closest('.starter-btn')) {
         e.preventDefault();
-        const button = e.target.closest('.toggle-attendance-btn');
+        e.stopPropagation();
+        const button = e.target.closest('.starter-btn');
         const playerName = button.dataset.playerName;
-        if (playerName && attendanceManager && attendanceManager.togglePlayerAttendance) {
-          attendanceManager.togglePlayerAttendance(playerName);
+        if (playerName) {
+          this.togglePlayerStarting(playerName);
+        }
+        return;
+      }
+      
+      // Handle player card clicks (toggle attendance)
+      if (e.target.closest('.player-card')) {
+        e.preventDefault();
+        const card = e.target.closest('.player-card');
+        const playerName = card.dataset.playerName;
+        if (playerName) {
+          this.togglePlayerAttendance(playerName);
         }
       }
     });

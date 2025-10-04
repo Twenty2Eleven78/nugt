@@ -4774,28 +4774,7 @@ nsure transfer match modal appears above admin modal */
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* Bulk Add Form */
-.bulk-add-form textarea {
-    border-width: 2px;
-    resize: vertical;
-    min-height: 80px;
-}
 
-.bulk-add-form textarea:focus {
-    border-color: var(--theme-primary);
-    box-shadow: 0 0 0 0.2rem rgba(var(--theme-primary-rgb), 0.25);
-}
-
-.bulk-add-form .btn {
-    font-weight: 500;
-    border-width: 2px;
-    transition: all 0.2s ease;
-}
-
-.bulk-add-form .btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
 
 /* Roster Actions */
 .roster-actions .btn {
@@ -4842,7 +4821,6 @@ nsure transfer match modal appears above admin modal */
     }
     
     .add-player-form .btn,
-    .bulk-add-form .btn,
     .roster-actions .btn {
         font-size: 0.8rem;
         padding: var(--spacing-xs) var(--spacing-sm);

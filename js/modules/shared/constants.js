@@ -1,14 +1,41 @@
 /**
  * Shared Constants
  * Centralized configuration and constants for the NUFC GameTime application
+ * Note: Many values are now loaded from config.json via the config manager
  */
 
-// Application Configuration
+import { config } from './config.js';
+
+// Application Configuration - now loaded from config.json with fallbacks
 export const APP_CONFIG = {
-  NAME: 'NUFC GameTime',
-  VERSION: '4.0',
-  AUTHOR: 'NUFC GameTime Team',
-  DESCRIPTION: 'Football match tracking and statistics application'
+  get NAME() { 
+    try {
+      return config.get('app.name', 'NUFC GameTime');
+    } catch (error) {
+      return 'NUFC GameTime';
+    }
+  },
+  get VERSION() { 
+    try {
+      return config.get('app.version', '4.0');
+    } catch (error) {
+      return '4.0';
+    }
+  },
+  get AUTHOR() { 
+    try {
+      return config.get('app.author', 'NUFC GameTime Team');
+    } catch (error) {
+      return 'NUFC GameTime Team';
+    }
+  },
+  get DESCRIPTION() { 
+    try {
+      return config.get('app.description', 'Football match tracking and statistics application');
+    } catch (error) {
+      return 'Football match tracking and statistics application';
+    }
+  }
 };
 
 // Cache Configuration
@@ -46,27 +73,76 @@ export const STORAGE_KEYS = {
   PLAYER_STATS: 'nugt_playerStats'
 };
 
-// Game Configuration
+// Game Configuration - now loaded from config.json with fallbacks
 export const GAME_CONFIG = {
   // Time Settings (in seconds)
-  DEFAULT_GAME_TIME: 4200, // 70 minutes
-  HALF_TIME_DURATION: 2100, // 35 minutes
-  FULL_TIME_DURATION: 4200, // 70 minutes
+  get DEFAULT_GAME_TIME() { 
+    try {
+      return config.get('match.defaultGameTime', 4200);
+    } catch (error) {
+      return 4200;
+    }
+  },
+  get HALF_TIME_DURATION() { 
+    try {
+      return Math.floor(config.get('match.defaultGameTime', 4200) / 2);
+    } catch (error) {
+      return 2100;
+    }
+  },
+  get FULL_TIME_DURATION() { 
+    try {
+      return config.get('match.defaultGameTime', 4200);
+    } catch (error) {
+      return 4200;
+    }
+  },
 
   // Timer Settings (in milliseconds)
-  TIMER_UPDATE_INTERVAL: 100,
+  get TIMER_UPDATE_INTERVAL() { 
+    try {
+      return config.get('match.timerUpdateInterval', 100);
+    } catch (error) {
+      return 100;
+    }
+  },
   STORAGE_DEBOUNCE_DELAY: 100,
-  AUTO_SAVE_INTERVAL: 5000, // 5 seconds
+  get AUTO_SAVE_INTERVAL() { 
+    try {
+      return config.get('match.autoSaveInterval', 5000);
+    } catch (error) {
+      return 5000;
+    }
+  },
 
-  // Team Defaults
-  DEFAULT_TEAM1_NAME: 'Netherton',
-  DEFAULT_TEAM2_NAME: 'Opposition',
+  // Team Defaults - now configurable
+  get DEFAULT_TEAM1_NAME() { 
+    try {
+      return config.get('team.defaultTeam1Name', 'Netherton');
+    } catch (error) {
+      return 'Netherton';
+    }
+  },
+  get DEFAULT_TEAM2_NAME() { 
+    try {
+      return config.get('team.defaultTeam2Name', 'Opposition');
+    } catch (error) {
+      return 'Opposition';
+    }
+  },
 
   // UI Settings
-  DEBOUNCE_DELAY: 300 // 0.3 seconds
+  get DEBOUNCE_DELAY() { 
+    try {
+      return config.get('ui.debounceDelay', 300);
+    } catch (error) {
+      return 300;
+    }
+  }
 };
 
-// Match Event Types
+// Match Event Types - now configurable via event-config.js
+// These are kept for backward compatibility
 export const EVENT_TYPES = {
   // Disciplinary Events
   YELLOW_CARD: 'Yellow Card',
@@ -89,7 +165,8 @@ export const EVENT_TYPES = {
   SUBSTITUTION: 'Substitution'
 };
 
-// Event Icons mapping
+// Event Icons mapping - now configurable via event-config.js
+// These are kept for backward compatibility
 export const EVENT_ICONS = {
   [EVENT_TYPES.YELLOW_CARD]: 'fas fa-square text-warning',
   [EVENT_TYPES.RED_CARD]: 'fas fa-square text-danger',
@@ -114,9 +191,21 @@ export const NOTIFICATION_TYPES = {
 };
 
 export const NOTIFICATION_CONFIG = {
-  DEFAULT_DURATION: 2000, // 3 seconds
+  get DEFAULT_DURATION() { 
+    try {
+      return config.get('ui.notifications.defaultDuration', 2000);
+    } catch (error) {
+      return 2000;
+    }
+  },
   PERSISTENT_DURATION: 0, // No auto-hide
-  MAX_NOTIFICATIONS: 5,
+  get MAX_NOTIFICATIONS() { 
+    try {
+      return config.get('ui.notifications.maxNotifications', 5);
+    } catch (error) {
+      return 5;
+    }
+  },
   ANIMATION_DURATION: 300 // 0.3 seconds
 };
 
@@ -158,7 +247,8 @@ export const MATCH_RESULTS = {
   DRAW: 'DRAW'
 };
 
-// Sharing Platforms
+// Sharing Platforms - now configurable via sharing-config.js
+// These are kept for backward compatibility
 export const SHARE_PLATFORMS = {
   WHATSAPP: 'whatsapp',
   TWITTER: 'twitter',

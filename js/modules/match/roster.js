@@ -87,9 +87,27 @@ class RosterManager {
     }
   }
 
-  // Get default roster
+  // Get default roster from configuration
   _getDefaultRoster() {
-    return rosterUtils.getDefaultRoster();
+    try {
+      return rosterUtils.getDefaultRoster();
+    } catch (error) {
+      console.error('Error getting default roster from config:', error);
+      // Fallback to hardcoded roster if config fails
+      return [
+        { name: 'Player 1', shirtNumber: 1 },
+        { name: 'Player 2', shirtNumber: 2 },
+        { name: 'Player 3', shirtNumber: 3 },
+        { name: 'Player 4', shirtNumber: 4 },
+        { name: 'Player 5', shirtNumber: 5 },
+        { name: 'Player 6', shirtNumber: 6 },
+        { name: 'Player 7', shirtNumber: 7 },
+        { name: 'Player 8', shirtNumber: 8 },
+        { name: 'Player 9', shirtNumber: 9 },
+        { name: 'Player 10', shirtNumber: 10 },
+        { name: 'Player 11', shirtNumber: 11 }
+      ];
+    }
   }
 
   // Sort roster alphabetically
@@ -322,66 +340,7 @@ class RosterManager {
     return true;
   }
 
-  // Add multiple players from bulk input
-  addPlayersBulk(namesString) {
-    if (!namesString?.trim()) {
-      notificationManager.warning('No player names provided for bulk add.');
-      return;
-    }
 
-    const namesArray = namesString
-      .split(/[,\n]+/)
-      .map(name => name.trim())
-      .filter(name => name !== '');
-
-    if (namesArray.length === 0) {
-      notificationManager.warning('No valid player names found.');
-      return;
-    }
-
-    const results = this._processBulkAdd(namesArray);
-
-    if (results.added.length > 0) {
-      this.roster.push(...results.added);
-      this.roster = this._sortRoster(this.roster);
-      this._saveAndRefresh();
-
-      const successMsg = `Successfully added ${results.added.length} player(s): ${results.added.map(p => p.name).join(', ')}. Shirt numbers can be added via Edit.`;
-      notificationManager.success(successMsg);
-    }
-
-    if (results.failed.length > 0) {
-      const failedMsg = `Could not add ${results.failed.length} player(s): ${results.failed.map(f => `"${f.name}" (${f.reason})`).join(', ')}`;
-      notificationManager.warning(failedMsg, 10000);
-    }
-
-    if (results.added.length === 0 && results.failed.length === 0) {
-      notificationManager.info('No new players were added from the list.');
-    }
-  }
-
-  // Process bulk add operation
-  _processBulkAdd(namesArray) {
-    const added = [];
-    const failed = [];
-
-    namesArray.forEach(name => {
-      const trimmedName = name.trim();
-      if (!trimmedName) return;
-
-      if (trimmedName.length > ROSTER_CONFIG.MAX_PLAYER_NAME_LENGTH) {
-        failed.push({ name: trimmedName, reason: `Name too long (max ${ROSTER_CONFIG.MAX_PLAYER_NAME_LENGTH} chars)` });
-      } else if (this._playerExists(trimmedName)) {
-        failed.push({ name: trimmedName, reason: 'Player already exists' });
-      } else if (added.some(p => p.name.toLowerCase() === trimmedName.toLowerCase())) {
-        failed.push({ name: trimmedName, reason: 'Duplicate in current bulk list' });
-      } else {
-        added.push({ name: trimmedName, shirtNumber: null });
-      }
-    });
-
-    return { added, failed };
-  }
 
   // Clear entire roster
   clearRoster() {
@@ -458,7 +417,6 @@ class RosterManager {
     // The roster-modal.js now handles these events when the modal is shown
     if (document.getElementById('addPlayerBtn')) {
       this._bindAddPlayerEvents();
-      this._bindBulkAddEvents();
       this._bindRosterListEvents();
       this._bindEditPlayerEvents();
       this._bindClearRosterEvents();
@@ -493,19 +451,7 @@ class RosterManager {
     }
   }
 
-  // Bind bulk add events
-  _bindBulkAddEvents() {
-    const addPlayersBulkBtn = document.getElementById('addPlayersBulkBtn');
-    const bulkPlayerNamesTextarea = document.getElementById('bulkPlayerNames');
 
-    if (addPlayersBulkBtn && bulkPlayerNamesTextarea) {
-      addPlayersBulkBtn.addEventListener('click', () => {
-        const namesString = bulkPlayerNamesTextarea.value;
-        this.addPlayersBulk(namesString);
-        bulkPlayerNamesTextarea.value = '';
-      });
-    }
-  }
 
   // Bind roster list events
   _bindRosterListEvents() {

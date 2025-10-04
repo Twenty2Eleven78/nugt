@@ -31,11 +31,7 @@ class NewMatchModal {
         if (this.isInitialized) return;
 
         this.createModal();
-        
-        // Bind events after a short delay to ensure DOM is ready
-        setTimeout(() => {
-            this.bindEvents();
-        }, 100);
+        this.bindEvents();
         
         this.isInitialized = true;
     }
@@ -206,6 +202,8 @@ class NewMatchModal {
                     const playerId = parseInt(btn.dataset.playerId);
                     const currentState = this.playerStates.get(playerId) || 'absent';
                     
+                    console.log('Starter button clicked! PlayerId:', playerId, 'Current state:', currentState);
+                    
                     if (currentState === 'attending') {
                         const currentStarters = this.getStarterCount();
                         if (currentStarters >= 11) {
@@ -215,10 +213,12 @@ class NewMatchModal {
                         this.playerStates.set(playerId, 'starting');
                         btn.classList.remove('btn-outline-success');
                         btn.classList.add('btn-success');
+                        console.log('Set player to starting! PlayerId:', playerId);
                     } else if (currentState === 'starting') {
                         this.playerStates.set(playerId, 'attending');
                         btn.classList.remove('btn-success');
                         btn.classList.add('btn-outline-success');
+                        console.log('Set player to attending! PlayerId:', playerId);
                     }
                     
                     this.updateCounts();
@@ -261,6 +261,8 @@ class NewMatchModal {
             });
         }
     }
+
+
 
     bindFormEvents() {
         // Use event delegation on the modal container
@@ -420,13 +422,33 @@ class NewMatchModal {
         const starting = Array.from(this.playerStates.values()).filter(state => state === 'starting').length;
         const substitutes = Array.from(this.playerStates.values()).filter(state => state === 'attending').length;
         
-        const selectedCountElement = document.getElementById('selectedCount');
-        const startingCountElement = document.getElementById('startingCount');
-        const subsCountElement = document.getElementById('subsCount');
+        console.log('UpdateCounts - Player States:', Array.from(this.playerStates.entries()));
+        console.log('UpdateCounts - Attending:', attending, 'Starting:', starting, 'Substitutes:', substitutes);
         
-        if (selectedCountElement) selectedCountElement.textContent = attending;
-        if (startingCountElement) startingCountElement.textContent = starting;
-        if (subsCountElement) subsCountElement.textContent = substitutes;
+        // Target elements specifically within the modal to avoid duplicate ID issues
+        const modal = document.getElementById('newMatchModal');
+        const selectedCountElement = modal ? modal.querySelector('#selectedCount') : document.getElementById('selectedCount');
+        const startingCountElement = modal ? modal.querySelector('#startingCount') : document.getElementById('startingCount');
+        const subsCountElement = modal ? modal.querySelector('#subsCount') : document.getElementById('subsCount');
+        
+        console.log('UpdateCounts - Elements found:', {
+            selectedCount: !!selectedCountElement,
+            startingCount: !!startingCountElement,
+            subsCount: !!subsCountElement
+        });
+        
+        if (selectedCountElement) {
+            selectedCountElement.textContent = attending;
+            console.log('Updated selectedCount to:', attending);
+        }
+        if (startingCountElement) {
+            startingCountElement.textContent = starting;
+            console.log('Updated startingCount to:', starting);
+        }
+        if (subsCountElement) {
+            subsCountElement.textContent = substitutes;
+            console.log('Updated subsCount to:', substitutes);
+        }
     }
 
     syncUIWithSelectedState() {

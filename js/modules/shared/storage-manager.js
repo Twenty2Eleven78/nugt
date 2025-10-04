@@ -398,7 +398,7 @@ class StorageQuotaManager {
   // Enhanced initialization
   async init() {
     try {
-      console.log('🚀 Initializing Storage Manager...');
+      console.log('Initializing Storage Manager...');
 
       // Initial quota check
       await this.checkStorageQuota(true);
@@ -416,13 +416,13 @@ class StorageQuotaManager {
       }
       
       // Check memory usage and trigger cleanup if high
-      if (performance.memory) {
-        const memoryUsage = performance.memory.usedJSHeapSize / performance.memory.totalJSHeapSize;
-        if (memoryUsage > 0.9) {
-          console.log('🧹 High memory usage detected during init, performing cleanup...');
-          await this.performRoutineCleanup();
-        }
-      }
+      //if (performance.memory) {
+      //  const memoryUsage = performance.memory.usedJSHeapSize / performance.memory.totalJSHeapSize;
+      //  if (memoryUsage > 0.9) {
+      //    console.log('🧹 High memory usage detected during init, performing cleanup...');
+      //    await this.performRoutineCleanup();
+      //  }
+      //}
 
       console.log('✅ Storage Manager initialized successfully');
       return true;

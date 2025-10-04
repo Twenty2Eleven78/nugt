@@ -258,82 +258,7 @@ class NewMatchModal {
         }
     }
 
-    bindPlayerEvents() {
-        // Event delegation for player card clicks - called after modal is shown
-        const playersGrid = document.getElementById('playersGrid');
-        if (playersGrid) {
-            // Remove any existing listeners to prevent duplicates
-            const newGrid = playersGrid.cloneNode(true);
-            playersGrid.parentNode.replaceChild(newGrid, playersGrid);
-            
-            newGrid.addEventListener('click', (e) => {
-                if (e.target.closest('.starter-btn')) {
-                    e.stopPropagation();
-                    const btn = e.target.closest('.starter-btn');
-                    const playerId = parseInt(btn.dataset.playerId);
-                    const currentState = this.playerStates.get(playerId) || 'absent';
-                    
-                    console.log('Starter button clicked:', playerId, currentState); // Debug log
-                    
-                    if (currentState === 'attending') {
-                        const currentStarters = this.getStarterCount();
-                        if (currentStarters >= 11) {
-                            this.showModalNotification('Maximum 11 starters allowed', 'warning');
-                            return;
-                        }
-                        this.playerStates.set(playerId, 'starting');
-                        btn.classList.remove('btn-outline-success');
-                        btn.classList.add('btn-success');
-                    } else if (currentState === 'starting') {
-                        this.playerStates.set(playerId, 'attending');
-                        btn.classList.remove('btn-success');
-                        btn.classList.add('btn-outline-success');
-                    }
-                    
-                    this.updateCounts();
-                    this.updateSummary();
-                    return;
-                }
-                
-                const playerCard = e.target.closest('.player-card');
-                if (playerCard) {
-                    const playerId = parseInt(playerCard.dataset.playerId);
-                    const currentState = this.playerStates.get(playerId) || 'absent';
-                    const starterBtn = document.querySelector(`[data-player-id="${playerId}"].starter-btn`);
-                    
-                    console.log('Player card clicked:', playerId, currentState); // Debug log
-                    
-                    if (currentState === 'absent' || currentState === 'attending') {
-                        // Toggle attendance
-                        const newState = currentState === 'absent' ? 'attending' : 'absent';
-                        this.playerStates.set(playerId, newState);
-                        
-                        if (newState === 'attending') {
-                            playerCard.classList.add('selected');
-                            starterBtn.disabled = false;
-                        } else {
-                            playerCard.classList.remove('selected');
-                            starterBtn.disabled = true;
-                            starterBtn.classList.remove('btn-success');
-                            starterBtn.classList.add('btn-outline-success');
-                        }
-                    } else if (currentState === 'starting') {
-                        // If currently starting, set to absent
-                        this.playerStates.set(playerId, 'absent');
-                        playerCard.classList.remove('selected');
-                        starterBtn.disabled = true;
-                        starterBtn.classList.remove('btn-success');
-                        starterBtn.classList.add('btn-outline-success');
-                    }
-                    
-                    this.updateCounts();
-                    this.updateSummary();
-                }
-            });
-        } else {
-            console.error('playersGrid not found when binding events'); // Debug log
-        }
-    }
+
 
     bindFormEvents() {
         // Use event delegation on the modal container
@@ -373,8 +298,6 @@ class NewMatchModal {
         setTimeout(() => {
             this.bindFormEvents();
             this.setDefaultValues();
-            // Re-bind events after modal is fully shown and players are populated
-            this.bindPlayerEvents();
             // Force update summary after everything is ready
             this.updateSummary();
         }, 300);
@@ -495,9 +418,18 @@ class NewMatchModal {
         const starting = Array.from(this.playerStates.values()).filter(state => state === 'starting').length;
         const substitutes = Array.from(this.playerStates.values()).filter(state => state === 'attending').length;
         
+        console.log('UpdateCounts - Player States:', Array.from(this.playerStates.entries()));
+        console.log('UpdateCounts - Attending:', attending, 'Starting:', starting, 'Substitutes:', substitutes);
+        
         const selectedCountElement = document.getElementById('selectedCount');
         const startingCountElement = document.getElementById('startingCount');
         const subsCountElement = document.getElementById('subsCount');
+        
+        console.log('UpdateCounts - Elements found:', {
+            selectedCount: !!selectedCountElement,
+            startingCount: !!startingCountElement,
+            subsCount: !!subsCountElement
+        });
         
         if (selectedCountElement) selectedCountElement.textContent = attending;
         if (startingCountElement) startingCountElement.textContent = starting;

@@ -69,14 +69,53 @@ class ReleaseNotesManager {
   }
 
   _parseMarkdown(markdown) {
-    // Simple conversion - just escape HTML and preserve line breaks
+    // Enhanced markdown parsing with proper formatting
     let html = markdown
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\r?\n/g, '<br>');
-    
-    return `<div class="release-notes-content" style="white-space: pre-wrap; font-family: monospace;">${html}</div>`;
+      .replace(/>/g, '&gt;');
+
+    // Parse headers
+    html = html.replace(/^# (.+)$/gm, '<h1 class="release-notes-h1">$1</h1>');
+    html = html.replace(/^## (.+)$/gm, '<h2 class="release-notes-h2">$1</h2>');
+    html = html.replace(/^### (.+)$/gm, '<h3 class="release-notes-h3">$1</h3>');
+
+    // Parse horizontal rules
+    html = html.replace(/^---+$/gm, '<hr class="release-notes-hr">');
+
+    // Parse bold text
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong class="fw-bold text-primary">$1</strong>');
+
+    // Parse emoji and version headers (special formatting)
+    html = html.replace(/^(🚀|📋|📊|⚽|🎨|🔧|💾|🌟|📱|⏱️|👥|🎯) (.+)$/gm, '<div class="version-header"><span class="version-emoji">$1</span> <span class="version-title">$2</span></div>');
+
+    // Parse bullet points
+    html = html.replace(/^- (.+)$/gm, '<li class="release-item">$1</li>');
+
+    // Wrap consecutive list items in ul tags
+    html = html.replace(/(<li class="release-item">.*?<\/li>)(\n|$)/gs, (match, items) => {
+      const listItems = items.split('</li>').filter(item => item.trim()).map(item => item + '</li>').join('');
+      return `<ul class="release-list">${listItems}</ul>\n`;
+    });
+
+    // Parse version blocks (special formatting for version sections)
+    html = html.replace(/^Version (\d+\.\d+(?:\.\d+)?)(.*?)$/gm, '<div class="version-block"><h3 class="version-number">Version $1</h3><span class="version-description">$2</span></div>');
+
+    // Parse release dates
+    html = html.replace(/\*\*Released: (.+?)\*\*/g, '<span class="release-date"><i class="fas fa-calendar-alt me-1"></i>Released: $1</span>');
+
+    // Convert line breaks to proper HTML
+    //html = html.replace(/\n\n/g, '</p><p class="release-paragraph">');
+    //html = html.replace(/\n/g, '<br>');
+
+    // Wrap in paragraphs
+    html = `<p class="release-paragraph">${html}</p>`;
+
+    // Clean up empty paragraphs
+    html = html.replace(/<p class="release-paragraph"><\/p>/g, '');
+    html = html.replace(/<p class="release-paragraph"><br><\/p>/g, '');
+
+    return `<div class="release-notes-content">${html}</div>`;
   }
 }
 

@@ -4558,8 +4558,243 @@ nsure transfer match modal appears above admin modal */
 .readme-content {
     padding: var(--spacing-lg);
     line-height: 1.6;
-    max-height: 70vh;
+    max-height: 75vh;
     overflow-y: auto;
+}
+
+.release-notes-content {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+.release-paragraph {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+.version-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin: var(--spacing-lg) 0 var(--spacing-md) 0;
+    padding: var(--spacing-md);
+    background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-light) 100%);
+    color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow-sm);
+}
+
+.version-emoji {
+    font-size: 1.3rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.version-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.version-block {
+    margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-sm);
+    border-left: 4px solid var(--theme-primary);
+}
+
+.version-number {
+    color: var(--theme-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    display: inline-block;
+}
+
+.version-description {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-left: var(--spacing-sm);
+}
+
+.release-date {
+    display: inline-block;
+    background: var(--bg-tertiary);
+    color: var(--theme-primary);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin: var(--spacing-xs) 0;
+    border: 1px solid var(--border-color);
+}
+
+.release-list {
+    margin: var(--spacing-sm) 0 var(--spacing-md) 0;
+    padding-left: var(--spacing-md);
+    list-style: none;
+}
+
+.release-item {
+    position: relative;
+    margin-bottom: var(--spacing-xs);
+    padding-left: var(--spacing-md);
+    color: var(--text-primary);
+    line-height: 1.5;
+    font-size: 0.9rem;
+}
+
+/* Mobile text formatting optimizations - keep original modal size */
+@media (max-width: 768px) {
+    .readme-content {
+        padding: var(--spacing-sm);
+    }
+    
+    .version-header {
+        margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+        padding: var(--spacing-sm);
+        gap: var(--spacing-xs);
+    }
+    
+    .version-emoji {
+        font-size: 1.3rem;
+    }
+    
+    .version-title {
+        font-size: 1rem;
+        line-height: 1.3;
+    }
+    
+    .version-block {
+        margin: var(--spacing-sm) 0;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    
+    .version-number {
+        font-size: 0.9rem;
+    }
+    
+    .version-description {
+        font-size: 0.8rem;
+    }
+    
+    .release-date {
+        font-size: 0.75rem;
+        padding: calc(var(--spacing-xs) / 2) var(--spacing-xs);
+    }
+    
+    .release-list {
+        padding-left: var(--spacing-sm);
+        margin: var(--spacing-xs) 0 var(--spacing-sm) 0;
+    }
+    
+    .release-item {
+        font-size: 0.85rem;
+        line-height: 1.4;
+        margin-bottom: calc(var(--spacing-xs) / 2);
+        padding-left: var(--spacing-sm);
+    }
+    
+    .release-notes-h1 {
+        font-size: 1.4rem;
+        margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+        padding-bottom: var(--spacing-xs);
+    }
+    
+    .release-notes-h2 {
+        font-size: 1.1rem;
+        margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    
+    .release-notes-h3 {
+        font-size: 0.95rem;
+        margin: var(--spacing-sm) 0 var(--spacing-xs) 0;
+        padding: var(--spacing-xs);
+    }
+}
+
+@media (max-width: 480px) {
+    .readme-content {
+        padding: var(--spacing-xs);
+    }
+    
+    .version-header {
+        padding: var(--spacing-xs);
+        margin: var(--spacing-sm) 0;
+    }
+    
+    .version-title {
+        font-size: 0.9rem;
+    }
+    
+    .version-emoji {
+        font-size: 1.1rem;
+    }
+    
+    .release-item {
+        font-size: 0.8rem;
+        padding-left: var(--spacing-xs);
+    }
+    
+    .release-list {
+        padding-left: var(--spacing-xs);
+    }
+    
+    .release-notes-h1 {
+        font-size: 1.2rem;
+    }
+    
+    .release-notes-h2 {
+        font-size: 1rem;
+    }
+    
+    .release-notes-h3 {
+        font-size: 0.9rem;
+    }
+}
+
+/* Release notes modal - extend to bottom nav */
+#releasenotesmodal .modal-dialog {
+    margin: var(--spacing-sm) var(--spacing-sm) calc(80px + var(--spacing-sm)) var(--spacing-sm);
+    max-height: calc(100vh - 80px - var(--spacing-lg));
+}
+
+#releasenotesmodal .modal-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#releasenotesmodal .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    max-height: none;
+}
+
+@media (max-width: 768px) {
+    #releasenotesmodal .modal-dialog {
+        margin: var(--spacing-sm) var(--spacing-sm) calc(70px + var(--spacing-sm)) var(--spacing-sm);
+        max-width: calc(100% - var(--spacing-lg));
+        max-height: calc(100vh - 70px - var(--spacing-lg));
+    }
+}
+
+@media (max-width: 400px) {
+    #releasenotesmodal .modal-dialog {
+        margin: var(--spacing-xs) var(--spacing-xs) calc(60px + var(--spacing-xs)) var(--spacing-xs);
+        max-width: calc(100% - var(--spacing-sm));
+        max-height: calc(100vh - 60px - var(--spacing-md));
+    }
+}
+
+@media (max-width: 360px) {
+    #releasenotesmodal .modal-dialog {
+        margin: var(--spacing-xs) var(--spacing-xs) calc(50px + var(--spacing-xs)) var(--spacing-xs);
+        max-height: calc(100vh - 50px - var(--spacing-sm));
+    }
 }
 
 .release-notes-h1 {

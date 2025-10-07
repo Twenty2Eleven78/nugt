@@ -664,7 +664,7 @@ class StatsPage {
                                 <i class="fas fa-users text-info me-2"></i>
                                 <span>Opposition Teams (${opponents.length})</span>
                             </div>
-                            <div class="stats-section-body" style="max-height: 120px; min-height: 80px; overflow-y: auto; -webkit-overflow-scrolling: touch;">
+                            <div class="stats-section-body" style="padding: 1rem; overflow: visible;">
                                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: flex-start;">
                                     ${opponents.map(opponent => `
                                         <span class="opposition-team-badge">${this._escapeHtml(opponent)}</span>

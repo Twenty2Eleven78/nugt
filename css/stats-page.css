@@ -1928,13 +1928,13 @@ BILE NAVIGATION IMPROVEMENTS ===== */
     background: var(--bg-secondary, #f8f9fa);
     border: 1px solid var(--border-color, #dee2e6);
     border-radius: 6px;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.8rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.9rem;
     font-weight: 500;
     color: var(--text-primary, #212529);
     white-space: nowrap;
     transition: all 0.2s ease;
-    line-height: 1.2;
+    line-height: 1.3;
 }
 
 .opposition-team-badge:hover {
@@ -1952,21 +1952,24 @@ BILE NAVIGATION IMPROVEMENTS ===== */
     word-break: break-word;
 }
 
+/* Flexible opposition teams container */
+.stats-section .stats-section-body[style*="overflow: visible"] {
+    height: auto !important;
+    max-height: none !important;
+    min-height: auto !important;
+    flex: 0 0 auto;
+}
+
 /* Responsive adjustments for opposition teams */
 @media (max-width: 576px) {
     .opposition-team-badge {
-        font-size: 0.75rem;
-        padding: 0.2rem 0.4rem;
-    }
-    
-    .stats-section-body[style*="max-height: 120px"] {
-        max-height: 100px !important;
-        min-height: 70px !important;
+        font-size: 0.85rem;
+        padding: 0.3rem 0.6rem;
     }
 }
 
 @media (min-width: 577px) and (max-width: 991px) {
     .opposition-team-badge {
-        font-size: 0.78rem;
+        font-size: 0.9rem;
     }
 }

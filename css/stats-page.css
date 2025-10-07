@@ -1252,3 +1252,23 @@
     --border-radius: 8px;
     --theme-primary: #dc3545;
 }
+
+/* Fix responsive display utilities */
+.d-none {
+    display: none !important;
+}
+
+.d-block {
+    display: block !important;
+}
+
+/* Medium screens and up (≥768px) */
+@media (min-width: 768px) {
+    .d-md-none {
+        display: none !important;
+    }
+    
+    .d-md-block {
+        display: block !important;
+    }
+}

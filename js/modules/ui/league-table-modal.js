@@ -8,6 +8,7 @@ import { faFullTimeService } from '../services/fa-fulltime.js';
 import { notificationManager } from '../services/notifications.js';
 import { domCache } from '../shared/dom.js';
 import { CustomModal } from '../shared/custom-modal.js';
+import { config } from '../shared/config.js';
 
 class LeagueTableModal {
   constructor() {
@@ -127,10 +128,10 @@ class LeagueTableModal {
           </thead>
           <tbody>
             ${predictedTeams.map((team, index) => {
-              const isHighlighted = highlightName && team.team.toLowerCase().includes(highlightName);
-              const rowClass = isHighlighted ? 'table-info fw-bold' : '';
+      const isHighlighted = highlightName && team.team.toLowerCase().includes(highlightName);
+      const rowClass = isHighlighted ? 'table-info fw-bold' : '';
 
-              return `
+      return `
                 <tr class="${rowClass}">
                   <td class="text-center" style="padding: 0.25rem;">${index + 1}</td>
                   <td style="padding: 0.25rem;">
@@ -141,7 +142,7 @@ class LeagueTableModal {
                   <td class="text-center fw-bold" style="padding: 0.25rem; color: var(--theme-primary);">${team.predictedPoints}</td>
                 </tr>
               `;
-            }).join('')}
+    }).join('')}
           </tbody>
         </table>
         <small class="text-muted">
@@ -184,17 +185,17 @@ class LeagueTableModal {
 
     try {
       const leagueTable = await faFullTimeService.getLeagueTable(url);
-      
+
       // Get team name for highlighting
       const teamName = domCache.get('Team1NameElement')?.textContent || 'Netherton';
-      
+
       content.innerHTML = faFullTimeService.renderLeagueTable(leagueTable, teamName);
       this.currentTable = { url, data: leagueTable };
-      
+
       saveBtn.style.display = 'none'; // Keep save button hidden for now
       document.getElementById('predictLeagueBtn').style.display = 'inline-block';
       notificationManager.success('League table loaded successfully');
-      
+
     } catch (error) {
       content.innerHTML = `
         <div class="alert alert-danger">
@@ -234,10 +235,10 @@ class LeagueTableModal {
         const saveBtn = document.getElementById('saveLeagueBtn');
 
         if (urlInput) urlInput.value = url;
-        
+
         const teamName = domCache.get('Team1NameElement')?.textContent || 'Netherton';
         content.innerHTML = faFullTimeService.renderLeagueTable(data, teamName);
-        
+
         this.currentTable = { url, data };
         saveBtn.style.display = 'inline-block';
       }
@@ -249,38 +250,52 @@ class LeagueTableModal {
   show() {
     const modal = CustomModal.getOrCreateInstance('leagueTableModal');
     modal.show();
-    
+
     // Auto-fetch with hardcoded URL
     this.autoFetchLeagueTable();
   }
 
   async autoFetchLeagueTable() {
-    const hardcodedUrl = 'https://fulltime.thefa.com/table.html?league=2373903&selectedSeason=83710004&selectedFixtureGroupAgeGroup=9&previousSelectedFixtureGroupAgeGroup=9&selectedDivision=497213589&selectedCompetition=0&selectedFixtureGroupKey=1_458390244%20#tab-2';
-    
+    // Get league table URL from config
+    const leagueTableUrl = config.get('team.leagueTableUrl');
+
+    if (!leagueTableUrl) {
+      const content = document.getElementById('leagueTableContent');
+      content.innerHTML = `
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <strong>League Table URL Not Configured</strong><br>
+          Please configure the league table URL in the team settings.
+        </div>
+      `;
+      notificationManager.warning('League table URL not configured');
+      return;
+    }
+
     const urlInput = document.getElementById('faUrlInput');
     const content = document.getElementById('leagueTableContent');
     const saveBtn = document.getElementById('saveLeagueBtn');
 
-    if (urlInput) urlInput.value = hardcodedUrl;
-    
+    if (urlInput) urlInput.value = leagueTableUrl;
+
     content.innerHTML = `
       <div class="text-center py-4">
         <div class="spinner-border text-primary mb-3" role="status"></div>
         <p class="text-muted">Loading league table...</p>
       </div>
     `;
-    
+
     try {
-      const leagueTable = await faFullTimeService.getLeagueTable(hardcodedUrl);
-      const teamName = domCache.get('Team1NameElement')?.textContent || 'Netherton';
-      
+      const leagueTable = await faFullTimeService.getLeagueTable(leagueTableUrl);
+      const teamName = domCache.get('Team1NameElement')?.textContent || config.get('team.defaultTeam1Name', 'Netherton');
+
       content.innerHTML = faFullTimeService.renderLeagueTable(leagueTable, teamName);
-      this.currentTable = { url: hardcodedUrl, data: leagueTable };
-      
+      this.currentTable = { url: leagueTableUrl, data: leagueTable };
+
       saveBtn.style.display = 'none'; // Keep save button hidden for now
       document.getElementById('predictLeagueBtn').style.display = 'inline-block';
       notificationManager.success('League table loaded');
-      
+
     } catch (error) {
       content.innerHTML = `
         <div class="alert alert-danger">

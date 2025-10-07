@@ -6,6 +6,7 @@
 import { notificationManager } from './modules/services/notifications.js';
 import { faFullTimeService } from './modules/services/fa-fulltime.js';
 import { seasonCharts } from './modules/ui/season-charts.js';
+import { config } from './modules/shared/config.js';
 
 class StatsPage {
     constructor() {
@@ -19,6 +20,14 @@ class StatsPage {
         if (this.isInitialized) return;
         
         try {
+            // Load configuration first
+            try {
+                await config.load();
+                console.log('Configuration loaded successfully');
+            } catch (error) {
+                console.warn('Configuration loading failed, using defaults:', error.message);
+            }
+            
             // Load statistics data
             await this._loadStatistics();
             
@@ -587,13 +596,24 @@ class StatsPage {
 
     async _renderLeagueTable() {
         try {
-            const hardcodedUrl = 'https://fulltime.thefa.com/table.html?league=2373903&selectedSeason=83710004&selectedFixtureGroupAgeGroup=9&previousSelectedFixtureGroupAgeGroup=9&selectedDivision=497213589&selectedCompetition=0&selectedFixtureGroupKey=1_458390244%20#tab-2';
+            // Get league table URL from config
+            const leagueTableUrl = config.get('team.leagueTableUrl');
+            
+            if (!leagueTableUrl) {
+                return `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>League Table URL Not Configured</strong><br>
+                        Please configure the league table URL in the team settings to view the league table.
+                    </div>
+                `;
+            }
             
             if (!this.leagueTable) {
                 // Show loading state
                 setTimeout(async () => {
                     try {
-                        this.leagueTable = await faFullTimeService.getLeagueTable(hardcodedUrl);
+                        this.leagueTable = await faFullTimeService.getLeagueTable(leagueTableUrl);
                         await this._renderCurrentView(); // Re-render with data
                     } catch (error) {
                         console.error('Failed to load league table:', error);
@@ -618,7 +638,8 @@ class StatsPage {
                 `;
             }
 
-            return faFullTimeService.renderLeagueTable(this.leagueTable, 'Netherton');
+            const teamName = config.get('team.defaultTeam1Name', 'Netherton');
+            return faFullTimeService.renderLeagueTable(this.leagueTable, teamName);
         } catch (error) {
             return `
                 <div class="alert alert-danger">

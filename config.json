@@ -1,7 +1,7 @@
 {
   "_comments": {
     "app": "App branding and identity - customize name, shortName (4 chars max), version, description, author",
-    "team": "Team information - set your team name, opponent default, club name, season, age group",
+    "team": "Team information - set your team name, opponent default, club name, season, age group, league table URL",
     "roster": "Default player roster - add your team's players with names and shirt numbers",
     "match": "Match timing - defaultGameTime in seconds (70min=4200s), timer intervals in milliseconds",
     "sharing": "Match sharing options - platforms (whatsapp/clipboard), messages, what to include",
@@ -19,7 +19,8 @@
     "defaultTeam2Name": "Opposition",
     "clubName": "Netherton United",
     "season": "2025-2026",
-    "ageGroup": "U13 Girls (U14)"
+    "ageGroup": "U13 Girls (U14)",
+    "leagueTableUrl": "https://fulltime.thefa.com/table.html?league=2373903&selectedSeason=83710004&selectedFixtureGroupAgeGroup=9&previousSelectedFixtureGroupAgeGroup=9&selectedDivision=497213589&selectedCompetition=0&selectedFixtureGroupKey=1_458390244%20#tab-2"
   },
   "roster": {
     "defaultPlayers": [

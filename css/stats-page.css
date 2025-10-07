@@ -112,6 +112,56 @@
 /* Width utilities */
 .w-100 { width: 100% !important; }
 
+/* Main content layout - keeps page structure constant */
+.stats-main-content {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    flex-direction: column;
+}
+
+.stats-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1rem 0;
+}
+
+/* Ensure consistent spacing */
+.stats-content > * {
+    margin-bottom: 1.5rem;
+}
+
+.stats-content > *:last-child {
+    margin-bottom: 0;
+}
+
+/* Table responsive improvements */
+.table-responsive {
+    max-height: 400px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.table-responsive::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: var(--bg-light);
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
 /* Desktop Navigation Pills */
 .stats-nav-container {
     background: var(--bg-card);
@@ -161,6 +211,40 @@
     font-size: 1rem;
 }
 
+/* Back button styling */
+.stats-nav-back {
+    background: var(--theme-primary) !important;
+    color: white !important;
+    text-decoration: none;
+    border: 2px solid var(--theme-primary);
+}
+
+.stats-nav-back:hover {
+    background: var(--theme-primary) !important;
+    color: white !important;
+    opacity: 0.9;
+    text-decoration: none;
+}
+
+.mobile-nav-back {
+    background: var(--bg-light) !important;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--theme-primary) !important;
+    text-decoration: none;
+}
+
+.mobile-nav-back:hover {
+    background: var(--bg-hover) !important;
+    color: var(--theme-primary) !important;
+    text-decoration: none;
+}
+
+.mobile-nav-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 0.5rem 0;
+}
+
 /* Mobile Navigation Toggle */
 #mobile-nav-toggle {
     display: flex !important;
@@ -174,10 +258,6 @@
     transition: all 0.2s ease;
     width: 100%;
     min-height: 50px;
-    /* Debug styling */
-    background: yellow !important;
-    border: 3px solid red !important;
-    color: black !important;
 }
 
 #mobile-nav-toggle:hover {
@@ -307,16 +387,7 @@
     z-index: 9999 !important;
 }
 
-/* Debug styles for mobile sidebar */
-.mobile-nav-sidebar.show {
-    background: rgba(255, 0, 0, 0.1) !important; /* Temporary debug background */
-}
-
-.mobile-nav-content {
-    border: 2px solid red !important; /* Temporary debug border */
-}
-
-/* Stats Cards */
+/* Stats Cards - Responsive and flexible */
 .stats-card {
     background: var(--bg-card, #ffffff);
     border-radius: var(--border-radius, 8px);
@@ -328,11 +399,42 @@
     gap: 0.75rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     height: 100%;
+    min-height: 100px;
+    flex: 1;
 }
 
 .stats-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--box-shadow-md, 0 4px 6px rgba(0,0,0,0.1));
+}
+
+/* Responsive card container */
+.stats-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stats-cards-container > * {
+    flex: 1;
+    min-width: 250px;
+}
+
+@media (max-width: 768px) {
+    .stats-cards-container > * {
+        min-width: 200px;
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-cards-container {
+        flex-direction: column;
+    }
+    
+    .stats-cards-container > * {
+        min-width: 100%;
+    }
 }
 
 .stats-icon {
@@ -396,7 +498,7 @@
     color: var(--text-muted, #6c757d);
 }
 
-/* Stats Sections */
+/* Stats Sections - Improved scrolling and responsiveness */
 .stats-section {
     background: var(--bg-card, #ffffff);
     border-radius: var(--border-radius, 8px);
@@ -405,6 +507,8 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    min-height: 300px;
+    max-height: 500px;
 }
 
 .stats-section-header {
@@ -417,12 +521,67 @@
     display: flex;
     align-items: center;
     border-radius: var(--border-radius, 8px) var(--border-radius, 8px) 0 0;
+    flex-shrink: 0;
 }
 
 .stats-section-body {
     padding: 1rem;
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+.stats-section-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.stats-section-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.stats-section-body::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.stats-section-body::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* Responsive sections container */
+.stats-sections-container {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.stats-sections-container > * {
+    flex: 1;
+    min-width: 300px;
+}
+
+@media (max-width: 768px) {
+    .stats-sections-container {
+        flex-direction: column;
+    }
+    
+    .stats-sections-container > * {
+        min-width: 100%;
+    }
+    
+    .stats-section {
+        max-height: 400px;
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-section {
+        max-height: 350px;
+        min-height: 250px;
+    }
 }
 
 /* Player Stats */

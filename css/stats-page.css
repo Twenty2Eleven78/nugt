@@ -387,64 +387,90 @@
     z-index: 9999 !important;
 }
 
-/* Stats Cards - Responsive and flexible */
+/* Stats Cards - Compact and responsive */
 .stats-card {
     background: var(--bg-card, #ffffff);
-    border-radius: var(--border-radius, 8px);
-    padding: 1rem;
+    border-radius: var(--border-radius, 6px);
+    padding: 0.75rem;
     box-shadow: var(--box-shadow-sm, 0 1px 3px rgba(0,0,0,0.1));
     border: 1px solid var(--border-color, #e9ecef);
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     height: 100%;
-    min-height: 100px;
+    min-height: 70px;
     flex: 1;
 }
 
 .stats-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--box-shadow-md, 0 4px 6px rgba(0,0,0,0.1));
+    transform: translateY(-1px);
+    box-shadow: var(--box-shadow-md, 0 2px 4px rgba(0,0,0,0.15));
 }
 
 /* Responsive card container */
 .stats-cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.stats-cards-container > * {
-    flex: 1;
-    min-width: 250px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
 }
 
 @media (max-width: 768px) {
-    .stats-cards-container > * {
-        min-width: 200px;
+    .stats-cards-container {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.5rem;
     }
 }
 
 @media (max-width: 576px) {
     .stats-cards-container {
-        flex-direction: column;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .stats-cards-container {
+        grid-template-columns: 1fr;
     }
     
-    .stats-cards-container > * {
-        min-width: 100%;
+    /* Vertical orientation for very small screens */
+    .stats-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 0.5rem;
+        min-height: 80px;
+        gap: 0.25rem;
+    }
+    
+    .stats-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.9rem;
+    }
+    
+    .stats-number {
+        font-size: 1.2rem;
+    }
+    
+    .stats-label {
+        font-size: 0.7rem;
+    }
+    
+    .stats-sub {
+        font-size: 0.6rem;
     }
 }
 
 .stats-icon {
-    width: 48px;
-    height: 48px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     flex-shrink: 0;
 }
 
@@ -479,23 +505,25 @@
 }
 
 .stats-number {
-    font-size: 1.75rem;
+    font-size: 1.4rem;
     font-weight: 700;
     line-height: 1;
     color: var(--text-primary, #212529);
-    margin-bottom: 0.25rem;
-}
-
-.stats-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-secondary, #495057);
     margin-bottom: 0.125rem;
 }
 
-.stats-sub {
+.stats-label {
     font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary, #495057);
+    margin-bottom: 0.125rem;
+    line-height: 1.2;
+}
+
+.stats-sub {
+    font-size: 0.65rem;
     color: var(--text-muted, #6c757d);
+    line-height: 1.2;
 }
 
 /* Stats Sections - Improved scrolling and responsiveness */
@@ -804,30 +832,29 @@
         gap: 0.75rem;
     }
     
-    /* Stats cards */
+    /* Stats cards - more compact */
     .stats-card {
-        padding: 0.75rem;
-        flex-direction: column;
-        text-align: center;
-        gap: 0.5rem;
+        padding: 0.6rem;
+        gap: 0.4rem;
+        min-height: 65px;
     }
     
     .stats-icon {
-        width: 42px;
-        height: 42px;
-        font-size: 1.3rem;
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
     }
     
     .stats-number {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
     }
     
     .stats-label {
-        font-size: 0.8rem;
+        font-size: 0.7rem;
     }
     
     .stats-sub {
-        font-size: 0.7rem;
+        font-size: 0.6rem;
     }
     
     /* Stats sections */
@@ -933,28 +960,29 @@
         font-size: 0.8rem;
     }
     
-    /* Stats cards */
+    /* Stats cards - compact horizontal layout */
     .stats-card {
-        padding: 0.6rem;
-        min-height: 85px;
+        padding: 0.5rem;
+        min-height: 60px;
+        gap: 0.4rem;
     }
     
     .stats-icon {
-        width: 38px;
-        height: 38px;
-        font-size: 1.2rem;
+        width: 30px;
+        height: 30px;
+        font-size: 0.95rem;
     }
     
     .stats-number {
-        font-size: 1.4rem;
+        font-size: 1.2rem;
     }
     
     .stats-label {
-        font-size: 0.75rem;
+        font-size: 0.65rem;
     }
     
     .stats-sub {
-        font-size: 0.7rem;
+        font-size: 0.6rem;
     }
     
     /* Stats sections */

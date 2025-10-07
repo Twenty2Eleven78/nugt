@@ -138,69 +138,18 @@ class StatsPage {
         const container = document.getElementById('stats-content');
         if (!container) return;
 
-        // Handle navigation pill clicks with touch support
+        // Handle desktop navigation pill clicks
         document.addEventListener('click', (e) => {
             const button = e.target.closest('.stats-nav-pill');
             if (button) {
                 e.preventDefault();
                 e.stopPropagation();
-
-                const view = button.getAttribute('data-view');
-                if (view && view !== this.currentView) {
-                    // Update active button
-                    const buttons = document.querySelectorAll('.stats-nav-pill');
-                    buttons.forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
-
-                    // Scroll active pill into view on mobile
-                    if (window.innerWidth <= 768) {
-                        button.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'nearest',
-                            inline: 'center'
-                        });
-                    }
-
-                    // Add loading state
-                    container.style.opacity = '0.5';
-                    setTimeout(async () => {
-                        this.currentView = view;
-                        await this._renderCurrentView();
-                        container.style.opacity = '1';
-
-                        // Scroll to top of content on mobile
-                        if (window.innerWidth <= 768) {
-                            container.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'start'
-                            });
-                        }
-
-                        // Initialize charts if charts view
-                        if (view === 'charts') {
-                            setTimeout(() => {
-                                seasonCharts.initializeCharts(this.statistics);
-                            }, 200);
-                        }
-                    }, 150);
-                }
+                this._handleViewChange(button);
             }
         });
 
-        // Add touch feedback for navigation pills
-        document.addEventListener('touchstart', (e) => {
-            const button = e.target.closest('.stats-nav-pill');
-            if (button && !button.classList.contains('active')) {
-                button.style.transform = 'scale(0.95)';
-            }
-        });
-
-        document.addEventListener('touchend', (e) => {
-            const button = e.target.closest('.stats-nav-pill');
-            if (button) {
-                button.style.transform = '';
-            }
-        });
+        // Handle mobile navigation
+        this._bindMobileNavigation();
 
         // Handle window resize for responsive adjustments
         let resizeTimeout;
@@ -212,17 +161,147 @@ class StatsPage {
         });
     }
 
-    _handleResize() {
-        // Adjust layout based on screen size
-        const isMobile = window.innerWidth <= 768;
-        const navPills = document.querySelectorAll('.stats-nav-pill');
+    _bindMobileNavigation() {
+        const mobileToggle = document.getElementById('mobile-nav-toggle');
+        const mobileSidebar = document.getElementById('mobile-nav-sidebar');
+        const mobileOverlay = document.getElementById('mobile-nav-overlay');
+        const mobileClose = document.getElementById('mobile-nav-close');
 
-        navPills.forEach(pill => {
-            const span = pill.querySelector('span');
-            if (span) {
-                span.style.display = isMobile ? 'none' : '';
+        // Toggle mobile sidebar
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', () => {
+                this._showMobileSidebar();
+            });
+        }
+
+        // Close sidebar when clicking overlay
+        if (mobileOverlay) {
+            mobileOverlay.addEventListener('click', () => {
+                this._hideMobileSidebar();
+            });
+        }
+
+        // Close sidebar when clicking close button
+        if (mobileClose) {
+            mobileClose.addEventListener('click', () => {
+                this._hideMobileSidebar();
+            });
+        }
+
+        // Handle mobile navigation item clicks
+        document.addEventListener('click', (e) => {
+            const mobileNavItem = e.target.closest('.mobile-nav-item');
+            if (mobileNavItem) {
+                e.preventDefault();
+                e.stopPropagation();
+                this._handleViewChange(mobileNavItem);
+                this._hideMobileSidebar();
             }
         });
+
+        // Close sidebar on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && mobileSidebar && mobileSidebar.classList.contains('show')) {
+                this._hideMobileSidebar();
+            }
+        });
+    }
+
+    _showMobileSidebar() {
+        const sidebar = document.getElementById('mobile-nav-sidebar');
+        const toggle = document.getElementById('mobile-nav-toggle');
+
+        if (sidebar) {
+            sidebar.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        if (toggle) {
+            toggle.classList.add('active');
+        }
+    }
+
+    _hideMobileSidebar() {
+        const sidebar = document.getElementById('mobile-nav-sidebar');
+        const toggle = document.getElementById('mobile-nav-toggle');
+
+        if (sidebar) {
+            sidebar.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        if (toggle) {
+            toggle.classList.remove('active');
+        }
+    }
+
+    _handleViewChange(button) {
+        const view = button.getAttribute('data-view');
+        if (!view || view === this.currentView) return;
+
+        // Update active states for both desktop and mobile
+        const desktopButtons = document.querySelectorAll('.stats-nav-pill');
+        const mobileButtons = document.querySelectorAll('.mobile-nav-item');
+
+        desktopButtons.forEach(btn => btn.classList.remove('active'));
+        mobileButtons.forEach(btn => btn.classList.remove('active'));
+
+        // Set active state for current view
+        const activeDesktop = document.querySelector(`.stats-nav-pill[data-view="${view}"]`);
+        const activeMobile = document.querySelector(`.mobile-nav-item[data-view="${view}"]`);
+
+        if (activeDesktop) activeDesktop.classList.add('active');
+        if (activeMobile) activeMobile.classList.add('active');
+
+        // Update mobile toggle label
+        this._updateMobileToggleLabel(view);
+
+        // Add loading state and change view
+        const container = document.getElementById('stats-content');
+        if (container) {
+            container.style.opacity = '0.5';
+            setTimeout(async () => {
+                this.currentView = view;
+                await this._renderCurrentView();
+                container.style.opacity = '1';
+
+                // Scroll to top of content
+                container.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+
+                // Initialize charts if charts view
+                if (view === 'charts') {
+                    setTimeout(() => {
+                        seasonCharts.initializeCharts(this.statistics);
+                    }, 200);
+                }
+            }, 150);
+        }
+    }
+
+    _updateMobileToggleLabel(view) {
+        const label = document.getElementById('current-view-label');
+        if (!label) return;
+
+        const viewLabels = {
+            'overview': 'Overview',
+            'players': 'Players',
+            'teams': 'Team',
+            'matches': 'Matches',
+            'league': 'League Table',
+            'charts': 'Charts'
+        };
+
+        label.textContent = viewLabels[view] || 'Overview';
+    }
+
+    _handleResize() {
+        // Close mobile sidebar if screen becomes large
+        if (window.innerWidth > 768) {
+            this._hideMobileSidebar();
+        }
 
         // Re-render charts if visible and screen size changed significantly
         if (this.currentView === 'charts' && this.statistics) {

@@ -90,8 +90,19 @@
                 </div>
                 <!-- END Header -->
 
-                <!-- Navigation Tabs -->
-                <div class="row mb-3">
+                <!-- Mobile Navigation Toggle -->
+                <div class="row mb-3 d-md-none">
+                    <div class="col-12">
+                        <button type="button" class="btn btn-outline-primary w-100" id="mobile-nav-toggle">
+                            <i class="fas fa-bars me-2"></i>
+                            <span id="current-view-label">Overview</span>
+                            <i class="fas fa-chevron-down ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation Tabs -->
+                <div class="row mb-3 d-none d-md-block">
                     <div class="col-12">
                         <div class="stats-nav-container">
                             <div class="stats-nav-pills">
@@ -120,6 +131,51 @@
                                     <span>Charts</span>
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Sidebar Navigation -->
+                <div class="mobile-nav-sidebar" id="mobile-nav-sidebar">
+                    <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+                    <div class="mobile-nav-content">
+                        <div class="mobile-nav-header">
+                            <h5 class="mb-0">Navigation</h5>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="mobile-nav-close">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="mobile-nav-body">
+                            <button type="button" class="mobile-nav-item active" data-view="overview">
+                                <i class="fas fa-chart-pie"></i>
+                                <span>Overview</span>
+                                <i class="fas fa-check ms-auto"></i>
+                            </button>
+                            <button type="button" class="mobile-nav-item" data-view="players">
+                                <i class="fas fa-users"></i>
+                                <span>Players</span>
+                                <i class="fas fa-check ms-auto"></i>
+                            </button>
+                            <button type="button" class="mobile-nav-item" data-view="teams">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Team</span>
+                                <i class="fas fa-check ms-auto"></i>
+                            </button>
+                            <button type="button" class="mobile-nav-item" data-view="matches">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Matches</span>
+                                <i class="fas fa-check ms-auto"></i>
+                            </button>
+                            <button type="button" class="mobile-nav-item" data-view="league">
+                                <i class="fas fa-table"></i>
+                                <span>League Table</span>
+                                <i class="fas fa-check ms-auto"></i>
+                            </button>
+                            <button type="button" class="mobile-nav-item" data-view="charts">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Charts</span>
+                                <i class="fas fa-check ms-auto"></i>
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -59,6 +59,11 @@
     <meta name="msapplication-TileColor" content="#dc3545">
     <meta name="msapplication-TileImage" content="nugt512.png">
 
+    <!-- Prevent caching for fresh data -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <!-- Module preload for better performance -->
     <link rel="modulepreload" href="js/stats-page.js">
 </head>
@@ -79,6 +84,12 @@
                                     <h1 class="h4 mb-0">Statistics Dashboard</h1>
                                     <small class="text-muted d-block" id="stats-subtitle">Team performance and league standings</small>
                                 </div>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="refresh-data-btn" title="Refresh Data">
+                                    <i class="fas fa-sync-alt"></i>
+                                    <span class="d-none d-sm-inline ms-1">Refresh</span>
+                                </button>
                             </div>
                         </div>
                     </div>

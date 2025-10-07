@@ -20,6 +20,9 @@ class StatsPage {
         if (this.isInitialized) return;
 
         try {
+            // Clear any cached data first
+            this._clearAllCaches();
+
             // Load configuration first
             try {
                 await config.load();
@@ -48,20 +51,61 @@ class StatsPage {
         }
     }
 
+    _clearAllCaches() {
+        // Clear browser caches
+        if ('caches' in window) {
+            caches.keys().then(names => {
+                names.forEach(name => {
+                    caches.delete(name);
+                });
+            });
+        }
+        
+        // Clear any localStorage related to stats
+        try {
+            localStorage.removeItem('generatedStatistics');
+            localStorage.removeItem('saved-league-table');
+        } catch (error) {
+            console.warn('Could not clear localStorage:', error);
+        }
+        
+        // Reset internal cache
+        this.leagueTable = null;
+        this.statistics = null;
+        
+        console.log('🧹 All caches cleared for fresh data');
+    }
+
     async _loadStatistics() {
         try {
-            // Try to load from Netlify function or fallback to demo data
-            const response = await fetch('/.netlify/functions/public-stats');
+            // Force fresh data by adding cache-busting parameters
+            const timestamp = Date.now();
+            const cacheBuster = `?t=${timestamp}&nocache=true`;
+            
+            console.log('📊 Loading fresh statistics data...');
+            
+            // Try to load from Netlify function with cache busting
+            const response = await fetch(`/.netlify/functions/public-stats${cacheBuster}`, {
+                method: 'GET',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                }
+            });
+            
             if (response.ok) {
                 this.statistics = await response.json();
+                console.log('✅ Fresh statistics loaded from server');
                 this._updateDataSourceIndicator();
             } else {
+                console.warn('⚠️ Failed to load statistics from server, using demo data');
                 // Fallback to demo data
                 this.statistics = this._getDemoStatistics();
                 this._updateDataSourceIndicator();
             }
         } catch (error) {
-            console.warn('Could not load live statistics, using demo data:', error);
+            console.warn('❌ Could not load live statistics, using demo data:', error);
             this.statistics = this._getDemoStatistics();
             this._updateDataSourceIndicator();
         }
@@ -771,34 +815,37 @@ class StatsPage {
                 `;
             }
 
-            if (!this.leagueTable) {
-                // Show loading state
-                setTimeout(async () => {
-                    try {
-                        this.leagueTable = await faFullTimeService.getLeagueTable(leagueTableUrl);
-                        await this._renderCurrentView(); // Re-render with data
-                    } catch (error) {
-                        console.error('Failed to load league table:', error);
-                        const container = document.getElementById('stats-content');
-                        if (container) {
-                            container.innerHTML = `
-                                <div class="alert alert-warning">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                    <strong>League Table Unavailable</strong><br>
-                                    Could not load the league table at this time. Please try again later.
-                                </div>
-                            `;
-                        }
+            // Always reload league table for fresh data
+            console.log('🏆 Loading fresh league table data...');
+            
+            // Show loading state
+            setTimeout(async () => {
+                try {
+                    // Force fresh league table data
+                    this.leagueTable = await faFullTimeService.getLeagueTable(leagueTableUrl);
+                    console.log('✅ Fresh league table loaded');
+                    await this._renderCurrentView(); // Re-render with data
+                } catch (error) {
+                    console.error('❌ Failed to load league table:', error);
+                    const container = document.getElementById('stats-content');
+                    if (container) {
+                        container.innerHTML = `
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>League Table Unavailable</strong><br>
+                                Could not load the league table at this time. Please try again later.
+                            </div>
+                        `;
                     }
-                }, 100);
+                }
+            }, 100);
 
-                return `
-                    <div class="text-center py-4">
-                        <div class="spinner-border text-primary mb-3" role="status"></div>
-                        <p class="text-muted">Loading league table...</p>
-                    </div>
-                `;
-            }
+            return `
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary mb-3" role="status"></div>
+                    <p class="text-muted">Loading fresh league table...</p>
+                </div>
+            `;
 
             const teamName = config.get('team.defaultTeam1Name', 'Netherton');
             return this._renderLeagueTableWithControls(this.leagueTable, teamName);

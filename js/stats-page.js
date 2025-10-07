@@ -664,10 +664,10 @@ class StatsPage {
                                 <i class="fas fa-users text-info me-2"></i>
                                 <span>Opposition Teams (${opponents.length})</span>
                             </div>
-                            <div class="stats-section-body" style="max-height: 150px; overflow-y: auto;">
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem;">
+                            <div class="stats-section-body" style="max-height: 120px; min-height: 80px; overflow-y: auto; -webkit-overflow-scrolling: touch;">
+                                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: flex-start;">
                                     ${opponents.map(opponent => `
-                                        <span class="text-wrap">${this._escapeHtml(opponent)}</span>
+                                        <span class="opposition-team-badge">${this._escapeHtml(opponent)}</span>
                                     `).join('')}
                                 </div>
                             </div>

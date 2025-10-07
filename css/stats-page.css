@@ -1919,4 +1919,54 @@ BILE NAVIGATION IMPROVEMENTS ===== */
     #current-view-label {
         font-size: 0.9rem;
     }
+}/
+* ===== OPPOSITION TEAMS STYLING ===== */
+
+/* Opposition team badge styling */
+.opposition-team-badge {
+    display: inline-block;
+    background: var(--bg-secondary, #f8f9fa);
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-primary, #212529);
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    line-height: 1.2;
+}
+
+.opposition-team-badge:hover {
+    background: var(--theme-primary, #007bff);
+    color: white;
+    border-color: var(--theme-primary, #007bff);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Flexible container for opposition teams */
+.stats-section-body .opposition-team-badge {
+    flex: 0 0 auto;
+    max-width: 100%;
+    word-break: break-word;
+}
+
+/* Responsive adjustments for opposition teams */
+@media (max-width: 576px) {
+    .opposition-team-badge {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.4rem;
+    }
+    
+    .stats-section-body[style*="max-height: 120px"] {
+        max-height: 100px !important;
+        min-height: 70px !important;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 991px) {
+    .opposition-team-badge {
+        font-size: 0.78rem;
+    }
 }

@@ -18,7 +18,7 @@ class StatsPage {
 
     async init() {
         if (this.isInitialized) return;
-        
+
         try {
             // Load configuration first
             try {
@@ -27,19 +27,19 @@ class StatsPage {
             } catch (error) {
                 console.warn('Configuration loading failed, using defaults:', error.message);
             }
-            
+
             // Load statistics data
             await this._loadStatistics();
-            
+
             // Bind event listeners
             this._bindEventListeners();
-            
+
             // Render initial view
             await this._renderCurrentView();
-            
+
             this.isInitialized = true;
             console.log('Stats page initialized successfully');
-            
+
             // Show data source notification
             this._showDataSourceNotification();
         } catch (error) {
@@ -138,7 +138,7 @@ class StatsPage {
         const container = document.getElementById('stats-content');
         if (!container) return;
 
-        // Handle navigation pill clicks
+        // Handle navigation pill clicks with touch support
         document.addEventListener('click', (e) => {
             const button = e.target.closest('.stats-nav-pill');
             if (button) {
@@ -152,13 +152,30 @@ class StatsPage {
                     buttons.forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
 
+                    // Scroll active pill into view on mobile
+                    if (window.innerWidth <= 768) {
+                        button.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'nearest',
+                            inline: 'center'
+                        });
+                    }
+
                     // Add loading state
                     container.style.opacity = '0.5';
                     setTimeout(async () => {
                         this.currentView = view;
                         await this._renderCurrentView();
                         container.style.opacity = '1';
-                        
+
+                        // Scroll to top of content on mobile
+                        if (window.innerWidth <= 768) {
+                            container.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+
                         // Initialize charts if charts view
                         if (view === 'charts') {
                             setTimeout(() => {
@@ -169,6 +186,50 @@ class StatsPage {
                 }
             }
         });
+
+        // Add touch feedback for navigation pills
+        document.addEventListener('touchstart', (e) => {
+            const button = e.target.closest('.stats-nav-pill');
+            if (button && !button.classList.contains('active')) {
+                button.style.transform = 'scale(0.95)';
+            }
+        });
+
+        document.addEventListener('touchend', (e) => {
+            const button = e.target.closest('.stats-nav-pill');
+            if (button) {
+                button.style.transform = '';
+            }
+        });
+
+        // Handle window resize for responsive adjustments
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                this._handleResize();
+            }, 250);
+        });
+    }
+
+    _handleResize() {
+        // Adjust layout based on screen size
+        const isMobile = window.innerWidth <= 768;
+        const navPills = document.querySelectorAll('.stats-nav-pill');
+
+        navPills.forEach(pill => {
+            const span = pill.querySelector('span');
+            if (span) {
+                span.style.display = isMobile ? 'none' : '';
+            }
+        });
+
+        // Re-render charts if visible and screen size changed significantly
+        if (this.currentView === 'charts' && this.statistics) {
+            setTimeout(() => {
+                seasonCharts.initializeCharts(this.statistics);
+            }, 100);
+        }
     }
 
     async _renderCurrentView() {
@@ -206,7 +267,7 @@ class StatsPage {
         const stats = this.statistics;
         const avgGoalsPerMatch = stats.totalMatches > 0 ? (stats.totalGoals / stats.totalMatches).toFixed(1) : '0.0';
         const avgAssistsPerMatch = stats.totalMatches > 0 ? (stats.totalAssists / stats.totalMatches).toFixed(1) : '0.0';
-        
+
         return `
             <!-- Mobile-Optimized Summary Cards -->
             <div class="row g-2 mb-3">
@@ -289,7 +350,7 @@ class StatsPage {
 
     _renderPlayerStats() {
         if (!this.statistics) return this._renderNoDataMessage();
-        
+
         const playerStats = this.statistics.playerStats;
         if (!playerStats || !Array.isArray(playerStats)) {
             return '<div class="stats-empty"><i class="fas fa-info-circle me-2"></i>No player statistics available</div>';
@@ -370,7 +431,7 @@ class StatsPage {
 
     _renderTeamStats() {
         if (!this.statistics) return this._renderNoDataMessage();
-        
+
         const stats = this.statistics;
         const teamStats = stats.teamStats || {};
         const matchStats = stats.matchStats || [];
@@ -503,7 +564,7 @@ class StatsPage {
 
     _renderMatchStats() {
         if (!this.statistics) return this._renderNoDataMessage();
-        
+
         const stats = this.statistics;
         const matchStats = stats.matchStats || [];
 
@@ -598,7 +659,7 @@ class StatsPage {
         try {
             // Get league table URL from config
             const leagueTableUrl = config.get('team.leagueTableUrl');
-            
+
             if (!leagueTableUrl) {
                 return `
                     <div class="alert alert-warning">
@@ -608,7 +669,7 @@ class StatsPage {
                     </div>
                 `;
             }
-            
+
             if (!this.leagueTable) {
                 // Show loading state
                 setTimeout(async () => {
@@ -652,7 +713,7 @@ class StatsPage {
 
     async _renderChartsView() {
         if (!this.statistics) return this._renderNoDataMessage();
-        
+
         const matchStats = this.statistics.matchStats || [];
         if (matchStats.length === 0) {
             return `
@@ -755,10 +816,10 @@ class StatsPage {
 
     _renderMatchCards(matchStats) {
         return matchStats.map(match => {
-            const result = match.ourGoals > match.theirGoals ? 'W' : 
-                          match.ourGoals < match.theirGoals ? 'L' : 'D';
+            const result = match.ourGoals > match.theirGoals ? 'W' :
+                match.ourGoals < match.theirGoals ? 'L' : 'D';
             const resultClass = result === 'W' ? 'success' : result === 'L' ? 'danger' : 'warning';
-            
+
             return `
                 <div class="match-card mb-2">
                     <div class="match-card-header">

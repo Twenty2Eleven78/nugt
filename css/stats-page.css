@@ -3,6 +3,29 @@
  * Styles specific to the standalone stats page
  */
 
+/* Mobile-first utility classes */
+.min-width-0 {
+    min-width: 0;
+}
+
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Improved container for mobile */
+.content-width {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+@media (min-width: 1200px) {
+    .content-width {
+        max-width: 1140px;
+    }
+}
+
 /* Stats Navigation Pills */
 .stats-nav-container {
     background: var(--bg-card, #ffffff);
@@ -325,13 +348,50 @@
 }
 
 /* Responsive adjustments */
+
+/* Large tablets and small desktops */
+@media (max-width: 992px) {
+    .stats-section-body {
+        max-height: 300px;
+    }
+    
+    .stats-number {
+        font-size: 1.6rem;
+    }
+    
+    .stats-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 1.4rem;
+    }
+}
+
+/* Tablets */
 @media (max-width: 768px) {
+    /* Header adjustments */
+    .header-container {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .header-container .d-flex {
+        justify-content: center;
+    }
+    
+    /* Navigation pills - horizontal scroll */
+    .stats-nav-container {
+        padding: 0.375rem;
+        margin: 0 -1rem;
+    }
+    
     .stats-nav-pills {
         justify-content: flex-start;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
         -ms-overflow-style: none;
+        padding: 0 1rem;
     }
     
     .stats-nav-pills::-webkit-scrollbar {
@@ -341,6 +401,8 @@
     .stats-nav-pill {
         flex-shrink: 0;
         padding: 0.5rem 0.75rem;
+        min-width: 60px;
+        justify-content: center;
     }
     
     .stats-nav-pill span {
@@ -349,10 +411,15 @@
     
     .stats-nav-pill i {
         margin: 0;
+        font-size: 1.1rem;
     }
     
+    /* Stats cards */
     .stats-card {
         padding: 0.75rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
     }
     
     .stats-icon {
@@ -363,6 +430,390 @@
     
     .stats-number {
         font-size: 1.5rem;
+    }
+    
+    .stats-label {
+        font-size: 0.8rem;
+    }
+    
+    .stats-sub {
+        font-size: 0.7rem;
+    }
+    
+    /* Stats sections */
+    .stats-section-header {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
+    
+    .stats-section-body {
+        padding: 0.75rem;
+        max-height: 250px;
+    }
+    
+    /* Player stats */
+    .player-stat-item {
+        gap: 0.5rem;
+        padding: 0.375rem 0;
+    }
+    
+    .player-rank {
+        width: 20px;
+        height: 20px;
+        font-size: 0.7rem;
+    }
+    
+    .player-name {
+        font-size: 0.8rem;
+    }
+    
+    .player-details {
+        font-size: 0.7rem;
+    }
+    
+    .player-stat-value {
+        font-size: 1rem;
+    }
+    
+    /* Match cards */
+    .match-card-header {
+        padding: 0.375rem 0.5rem;
+    }
+    
+    .match-card-body {
+        padding: 0.5rem;
+    }
+    
+    .match-teams {
+        flex-direction: column;
+        gap: 0.25rem;
+        text-align: center;
+    }
+    
+    .team-name:last-child {
+        text-align: center;
+    }
+    
+    .match-score {
+        padding: 0;
+        font-size: 1rem;
+    }
+    
+    /* Empty states */
+    .stats-empty-state {
+        padding: 2rem 1rem;
+    }
+    
+    .empty-state-icon {
+        font-size: 2.5rem;
+    }
+    
+    .empty-state-content h4 {
+        font-size: 1.1rem;
+    }
+    
+    .empty-state-content p {
+        font-size: 0.8rem;
+    }
+}
+
+/* Mobile phones */
+@media (max-width: 576px) {
+    /* Container adjustments */
+    .container-fluid {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+    
+    /* Header */
+    .header-container img {
+        height: 32px;
+    }
+    
+    .header-container h1 {
+        font-size: 1.1rem;
+    }
+    
+    .header-container small {
+        font-size: 0.75rem;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    /* Navigation */
+    .stats-nav-container {
+        margin: 0 -0.75rem;
+    }
+    
+    .stats-nav-pill {
+        min-width: 50px;
+        padding: 0.4rem 0.6rem;
+    }
+    
+    .stats-nav-pill i {
+        font-size: 1rem;
+    }
+    
+    /* Stats cards - stack vertically on very small screens */
+    .stats-card {
+        padding: 0.5rem;
+        min-height: 80px;
+    }
+    
+    .stats-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.1rem;
+    }
+    
+    .stats-number {
+        font-size: 1.3rem;
+    }
+    
+    .stats-label {
+        font-size: 0.75rem;
+    }
+    
+    .stats-sub {
+        font-size: 0.65rem;
+    }
+    
+    /* Stats sections */
+    .stats-section-header {
+        padding: 0.4rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .stats-section-body {
+        padding: 0.5rem;
+        max-height: 200px;
+    }
+    
+    /* Player stats - more compact */
+    .player-stat-item {
+        gap: 0.4rem;
+        padding: 0.3rem 0;
+    }
+    
+    .player-rank {
+        width: 18px;
+        height: 18px;
+        font-size: 0.65rem;
+    }
+    
+    .player-name {
+        font-size: 0.75rem;
+    }
+    
+    .player-details {
+        font-size: 0.65rem;
+    }
+    
+    .player-stat-value {
+        font-size: 0.9rem;
+    }
+    
+    /* Match cards - simplified layout */
+    .match-card {
+        margin-bottom: 0.5rem;
+    }
+    
+    .match-card-header {
+        padding: 0.3rem 0.4rem;
+    }
+    
+    .match-date {
+        font-size: 0.7rem;
+    }
+    
+    .match-card-body {
+        padding: 0.4rem;
+    }
+    
+    .match-score {
+        font-size: 0.9rem;
+    }
+    
+    .team-name {
+        font-size: 0.8rem;
+    }
+    
+    .match-details {
+        font-size: 0.7rem;
+    }
+    
+    /* Tables - horizontal scroll */
+    .table-responsive {
+        font-size: 0.75rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 0.25rem 0.125rem;
+        font-size: 0.7rem;
+    }
+    
+    /* Stat values in team stats */
+    .stat-value {
+        font-size: 1.2rem;
+    }
+    
+    .stat-label {
+        font-size: 0.65rem;
+    }
+    
+    /* Empty states */
+    .stats-empty-state {
+        padding: 1.5rem 0.5rem;
+    }
+    
+    .empty-state-icon {
+        font-size: 2rem;
+    }
+    
+    .empty-state-content h4 {
+        font-size: 1rem;
+    }
+    
+    .empty-state-content p {
+        font-size: 0.75rem;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 400px) {
+    /* Further reduce spacing and sizes */
+    .container-fluid {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+    
+    .stats-nav-pill {
+        min-width: 45px;
+        padding: 0.35rem 0.5rem;
+    }
+    
+    .stats-card {
+        padding: 0.4rem;
+        min-height: 70px;
+    }
+    
+    .stats-number {
+        font-size: 1.2rem;
+    }
+    
+    .stats-section-body {
+        max-height: 180px;
+    }
+    
+    /* Grid adjustments for very small screens */
+    .row.g-2 {
+        --bs-gutter-x: 0.5rem;
+        --bs-gutter-y: 0.5rem;
+    }
+}
+
+/* Landscape orientation on mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .stats-section-body {
+        max-height: 150px;
+    }
+    
+    .stats-empty-state {
+        padding: 1rem;
+    }
+    
+    .empty-state-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+    .stats-nav-pill {
+        min-height: 44px;
+        min-width: 44px;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .stats-card:hover {
+        transform: none;
+        box-shadow: var(--box-shadow-sm, 0 1px 3px rgba(0,0,0,0.1));
+    }
+    
+    .match-card:hover {
+        box-shadow: none;
+    }
+    
+    /* Remove tap highlights */
+    .stats-nav-pill,
+    .stats-card,
+    .match-card,
+    .player-stat-item {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+}
+
+/* Smooth scrolling for navigation */
+.stats-nav-pills {
+    scroll-behavior: smooth;
+}
+
+/* Loading states for mobile */
+.stats-content {
+    transition: opacity 0.2s ease;
+}
+
+/* Improved focus states for accessibility */
+.stats-nav-pill:focus {
+    outline: 2px solid var(--theme-primary, #dc3545);
+    outline-offset: 2px;
+}
+
+.stats-nav-pill:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Better spacing for mobile content */
+@media (max-width: 576px) {
+    .row.g-2 > * {
+        margin-bottom: 0.5rem;
+    }
+    
+    .mb-3 {
+        margin-bottom: 1rem !important;
+    }
+    
+    .py-3 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+}
+
+/* Prevent horizontal scroll on very small screens */
+@media (max-width: 320px) {
+    .container-fluid {
+        padding-left: 0.25rem !important;
+        padding-right: 0.25rem !important;
+    }
+    
+    .stats-nav-container {
+        margin: 0 -0.25rem;
+    }
+    
+    .stats-nav-pill {
+        min-width: 40px;
+        padding: 0.3rem 0.4rem;
+        font-size: 0.9rem;
     }
 }
 

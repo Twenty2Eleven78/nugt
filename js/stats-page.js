@@ -187,7 +187,7 @@ class StatsPage {
         // Handle desktop navigation pill clicks
         document.addEventListener('click', (e) => {
             const button = e.target.closest('.stats-nav-pill');
-            if (button) {
+            if (button && !button.classList.contains('stats-nav-back')) {
                 e.preventDefault();
                 e.stopPropagation();
                 this._handleViewChange(button);
@@ -263,7 +263,7 @@ class StatsPage {
         // Handle mobile navigation item clicks
         document.addEventListener('click', (e) => {
             const mobileNavItem = e.target.closest('.mobile-nav-item');
-            if (mobileNavItem) {
+            if (mobileNavItem && !mobileNavItem.classList.contains('mobile-nav-back')) {
                 e.preventDefault();
                 e.stopPropagation();
                 this._handleViewChange(mobileNavItem);

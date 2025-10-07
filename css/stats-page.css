@@ -1848,4 +1848,75 @@
     #league-table-container[style*="calc(100vh"] {
         height: calc(100vh - 360px) !important;
     }
+}/* ===== MO
+BILE NAVIGATION IMPROVEMENTS ===== */
+
+/* Mobile navigation bar styling */
+.d-md-none .d-flex {
+    gap: 0.75rem;
+}
+
+/* Burger menu button styling */
+#mobile-nav-toggle {
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+#mobile-nav-toggle:hover {
+    background-color: var(--theme-primary, #007bff);
+    border-color: var(--theme-primary, #007bff);
+    color: white;
+}
+
+/* Current view label styling */
+#current-view-label {
+    font-size: 0.95rem;
+    color: var(--text-muted, #6c757d);
+    font-weight: 500;
+}
+
+/* Mobile refresh button styling */
+#mobile-refresh-btn {
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+#mobile-refresh-btn:hover {
+    background-color: var(--bg-secondary, #f8f9fa);
+    border-color: var(--border-color, #dee2e6);
+}
+
+/* Spinning animation for refresh icons */
+.fa-spin {
+    animation: fa-spin 1s infinite linear;
+}
+
+@keyframes fa-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Ensure buttons maintain consistent size */
+#mobile-nav-toggle,
+#mobile-refresh-btn {
+    min-width: 44px;
+    min-height: 44px;
+    flex-shrink: 0;
+}
+
+/* Improve touch targets for mobile */
+@media (max-width: 576px) {
+    #mobile-nav-toggle,
+    #mobile-refresh-btn {
+        min-width: 40px;
+        min-height: 40px;
+    }
+    
+    #current-view-label {
+        font-size: 0.9rem;
+    }
 }

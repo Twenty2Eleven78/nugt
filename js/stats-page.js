@@ -201,6 +201,13 @@ class StatsPage {
             }
         });
 
+        // Handle refresh button clicks (both desktop and mobile)
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#refresh-data-btn') || e.target.closest('#mobile-refresh-btn')) {
+                this._refreshAllData();
+            }
+        });
+
         // Handle mobile navigation
         this._bindMobileNavigation();
 
@@ -1219,6 +1226,60 @@ class StatsPage {
             const infoElement = document.getElementById('league-table-info');
             if (infoElement) {
                 infoElement.innerHTML = '<i class="fas fa-calculator me-1"></i>Showing predicted maximum points';
+            }
+        }
+    }
+
+    async _refreshAllData() {
+        const refreshBtn = document.getElementById('refresh-data-btn');
+        const mobileRefreshBtn = document.getElementById('mobile-refresh-btn');
+        const refreshIcon = refreshBtn?.querySelector('i');
+        const mobileRefreshIcon = mobileRefreshBtn?.querySelector('i');
+
+        try {
+            // Show loading state on both buttons
+            if (refreshBtn) {
+                refreshBtn.disabled = true;
+                if (refreshIcon) {
+                    refreshIcon.classList.add('fa-spin');
+                }
+            }
+            if (mobileRefreshBtn) {
+                mobileRefreshBtn.disabled = true;
+                if (mobileRefreshIcon) {
+                    mobileRefreshIcon.classList.add('fa-spin');
+                }
+            }
+
+            console.log('🔄 Refreshing all data...');
+
+            // Clear all caches
+            this._clearAllCaches();
+
+            // Reload statistics
+            await this._loadStatistics();
+
+            // Re-render current view
+            await this._renderCurrentView();
+
+            // Show success notification (if notification system is available)
+            console.log('✅ All data refreshed');
+
+        } catch (error) {
+            console.error('❌ Failed to refresh data:', error);
+        } finally {
+            // Reset button states
+            if (refreshBtn) {
+                refreshBtn.disabled = false;
+                if (refreshIcon) {
+                    refreshIcon.classList.remove('fa-spin');
+                }
+            }
+            if (mobileRefreshBtn) {
+                mobileRefreshBtn.disabled = false;
+                if (mobileRefreshIcon) {
+                    mobileRefreshIcon.classList.remove('fa-spin');
+                }
             }
         }
     }

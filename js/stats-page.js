@@ -14,6 +14,7 @@ class StatsPage {
         this.statistics = null;
         this.leagueTable = null;
         this.isInitialized = false;
+        this.isLoadingLeagueTable = false;
     }
 
     async init() {
@@ -72,6 +73,7 @@ class StatsPage {
         // Reset internal cache
         this.leagueTable = null;
         this.statistics = null;
+        this.isLoadingLeagueTable = false;
 
         console.log('🧹 All caches cleared for fresh data');
     }
@@ -811,8 +813,10 @@ class StatsPage {
         try {
             // Get league table URL from config
             const leagueTableUrl = config.get('team.leagueTableUrl');
+            console.log('🔍 League table URL from config:', leagueTableUrl);
 
             if (!leagueTableUrl) {
+                console.warn('⚠️ No league table URL configured');
                 return `
                     <div class="alert alert-warning">
                         <i class="fas fa-exclamation-triangle me-2"></i>
@@ -822,41 +826,61 @@ class StatsPage {
                 `;
             }
 
-            // Always reload league table for fresh data
+            // Check if we already have league table data
+            if (this.leagueTable) {
+                console.log('📋 Using cached league table data');
+                const teamName = config.get('team.defaultTeam1Name', 'Netherton');
+                return this._renderLeagueTableWithControls(this.leagueTable, teamName);
+            }
+
+            // Prevent multiple simultaneous calls
+            if (this.isLoadingLeagueTable) {
+                console.log('⏳ League table already loading, showing loading state...');
+                return `
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary mb-3" role="status"></div>
+                        <p class="text-muted">Loading league table...</p>
+                    </div>
+                `;
+            }
+
+            // Set loading flag
+            this.isLoadingLeagueTable = true;
             console.log('🏆 Loading fresh league table data...');
 
-            // Show loading state
-            setTimeout(async () => {
-                try {
-                    // Force fresh league table data
-                    this.leagueTable = await faFullTimeService.getLeagueTable(leagueTableUrl);
-                    console.log('✅ Fresh league table loaded');
-                    await this._renderCurrentView(); // Re-render with data
-                } catch (error) {
-                    console.error('❌ Failed to load league table:', error);
-                    const container = document.getElementById('stats-content');
-                    if (container) {
-                        container.innerHTML = `
-                            <div class="alert alert-warning">
-                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                <strong>League Table Unavailable</strong><br>
-                                Could not load the league table at this time. Please try again later.
-                            </div>
-                        `;
-                    }
+            try {
+                // Force fresh league table data
+                console.log('🌐 Calling faFullTimeService.getLeagueTable...');
+                this.leagueTable = await faFullTimeService.getLeagueTable(leagueTableUrl);
+                console.log('✅ Fresh league table loaded:', this.leagueTable);
+
+                if (!this.leagueTable || !this.leagueTable.teams) {
+                    throw new Error('Invalid league table data received');
                 }
-            }, 100);
 
-            return `
-                <div class="text-center py-4">
-                    <div class="spinner-border text-primary mb-3" role="status"></div>
-                    <p class="text-muted">Loading fresh league table...</p>
-                </div>
-            `;
+                const teamName = config.get('team.defaultTeam1Name', 'Netherton');
+                console.log('🏆 Rendering league table with team name:', teamName);
+                return this._renderLeagueTableWithControls(this.leagueTable, teamName);
 
-            const teamName = config.get('team.defaultTeam1Name', 'Netherton');
-            return this._renderLeagueTableWithControls(this.leagueTable, teamName);
+            } catch (error) {
+                console.error('❌ Failed to load league table:', error);
+                return `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>League Table Unavailable</strong><br>
+                        Could not load the league table at this time. Please try again later.
+                        <br><small class="text-muted">Error: ${error.message}</small>
+                    </div>
+                `;
+            } finally {
+                // Always clear the loading flag
+                this.isLoadingLeagueTable = false;
+                console.log('🏁 League table loading completed');
+            }
+
         } catch (error) {
+            this.isLoadingLeagueTable = false;
+            console.error('❌ League table render error:', error);
             return `
                 <div class="alert alert-danger">
                     <i class="fas fa-exclamation-triangle me-2"></i>

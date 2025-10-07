@@ -3,6 +3,26 @@
  * Styles specific to the standalone stats page
  */
 
+/* CRITICAL: Responsive display utilities - must be at top */
+.d-none {
+    display: none !important;
+}
+
+.d-block {
+    display: block !important;
+}
+
+/* Medium screens and up (≥768px) */
+@media (min-width: 768px) {
+    .d-md-none {
+        display: none !important;
+    }
+    
+    .d-md-block {
+        display: block !important;
+    }
+}
+
 /* Mobile-first utility classes */
 .min-width-0 {
     min-width: 0;
@@ -25,6 +45,72 @@
         max-width: 1140px;
     }
 }
+
+/* Fix container and scrolling issues */
+.container-fluid {
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+}
+
+.row > * {
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 100%;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/* Grid columns */
+.col-12 { flex: 0 0 auto; width: 100%; }
+.col-6 { flex: 0 0 auto; width: 50%; }
+.col-4 { flex: 0 0 auto; width: 33.333333%; }
+.col-3 { flex: 0 0 auto; width: 25%; }
+
+@media (min-width: 768px) {
+    .col-md-6 { flex: 0 0 auto; width: 50%; }
+    .col-md-4 { flex: 0 0 auto; width: 33.333333%; }
+    .col-md-3 { flex: 0 0 auto; width: 25%; }
+}
+
+@media (min-width: 992px) {
+    .col-lg-6 { flex: 0 0 auto; width: 50%; }
+    .col-lg-4 { flex: 0 0 auto; width: 33.333333%; }
+    .col-lg-3 { flex: 0 0 auto; width: 25%; }
+}
+
+/* Gap utilities */
+.g-2 > * {
+    padding: 0.5rem;
+}
+
+/* Margin utilities */
+.mb-3 {
+    margin-bottom: 1rem !important;
+}
+
+.me-1 { margin-right: 0.25rem !important; }
+.me-2 { margin-right: 0.5rem !important; }
+.ms-2 { margin-left: 0.5rem !important; }
+.ms-3 { margin-left: 1rem !important; }
+.ms-auto { margin-left: auto !important; }
+
+/* Padding utilities */
+.py-3 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+.py-5 { padding-top: 3rem !important; padding-bottom: 3rem !important; }
+.px-4 { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
+
+/* Width utilities */
+.w-100 { width: 100% !important; }
 
 /* Desktop Navigation Pills */
 .stats-nav-container {
@@ -77,7 +163,7 @@
 
 /* Mobile Navigation Toggle */
 #mobile-nav-toggle {
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: center;
     padding: 0.75rem 1rem;
@@ -86,6 +172,12 @@
     color: var(--theme-primary);
     background: white;
     transition: all 0.2s ease;
+    width: 100%;
+    min-height: 50px;
+    /* Debug styling */
+    background: yellow !important;
+    border: 3px solid red !important;
+    color: black !important;
 }
 
 #mobile-nav-toggle:hover {
@@ -1300,22 +1392,4 @@
     --theme-primary: #dc3545;
 }
 
-/* Fix responsive display utilities */
-.d-none {
-    display: none !important;
-}
-
-.d-block {
-    display: block !important;
-}
-
-/* Medium screens and up (≥768px) */
-@media (min-width: 768px) {
-    .d-md-none {
-        display: none !important;
-    }
-    
-    .d-md-block {
-        display: block !important;
-    }
-}
+/* Responsive display utilities moved to top of file */

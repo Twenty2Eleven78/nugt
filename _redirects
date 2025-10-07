@@ -1,0 +1,9 @@
+# Netlify redirects file
+# Handle /stats URL to serve the stats page
+/stats /stats.html 200
+
+# Handle any other routes that might be needed in the future
+# /api/* /.netlify/functions/:splat 200
+
+# Fallback for SPA-like behavior (optional)
+# /* /index.html 200

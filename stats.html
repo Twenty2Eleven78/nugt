@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>NUFC GameTime - Statistics</title>
+
+    <!-- Critical CSS for CLS prevention -->
+    <style>
+        /* Prevent layout shifts during font loading */
+        .fa,
+        .fas,
+        .far,
+        .fab {
+            min-width: 1em;
+            text-align: center;
+        }
+
+        .stat-number {
+            min-width: 2ch;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Prevent flash of unstyled content */
+        body {
+            visibility: hidden;
+        }
+
+        body.loaded {
+            visibility: visible;
+        }
+    </style>
+
+    <!-- Preload critical resources -->
+    <link rel="preload" href="css/custom-framework.css" as="style">
+    <link rel="preload" href="webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="webfonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+
+    <!-- Custom Framework CSS - All styles merged -->
+    <link href="css/custom-framework.css" rel="stylesheet">
+    <link href="css/stats-page.css" rel="stylesheet">
+
+    <!-- Font Awesome for icons - optimized loading -->
+    <link href="css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'; this.onload=null;">
+    <noscript>
+        <link href="css/all.min.css" rel="stylesheet">
+    </noscript>
+
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" href="nugt512.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="NUGT">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="msapplication-TileColor" content="#dc3545">
+    <meta name="msapplication-TileImage" content="nugt512.png">
+
+    <!-- Prevent caching for fresh data -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <!-- Module preload for better performance -->
+    <link rel="modulepreload" href="js/stats-page.js">
+</head>
+
+<body>
+    <!-- Main Container -->
+    <div class="main-container app-content">
+        <!-- Main Content Container-->
+        <div class="container-fluid px-4 py-3">
+            <div class="content-width">
+                <!-- Header -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="header-container d-flex align-items-center">
+                            <div class="d-flex align-items-center flex-grow-1">
+                                <img src="nugtlogo.png" alt="NUGT gametime App logo" style="height: 40px;" class="flex-shrink-0">
+                                <div class="ms-3">
+                                    <h1 class="h4 mb-0">Statistics Dashboard</h1>
+                                    <small class="text-muted d-block" id="stats-subtitle">Team performance and league standings</small>
+                                </div>
+                            </div>
+                            <!-- Desktop refresh button -->
+                            <div class="flex-shrink-0 d-none d-md-block">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="refresh-data-btn" title="Refresh Data">
+                                    <i class="fas fa-sync-alt"></i>
+                                    <span class="d-none d-lg-inline ms-1">Refresh</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END Header -->
+
+                <!-- Desktop Navigation Tabs -->
+                <div class="row mb-3 d-none d-md-block">
+                    <div class="col-12">
+                        <div class="stats-nav-container">
+                            <div class="stats-nav-pills">
+                                <a href="index.html" class="stats-nav-pill stats-nav-back">
+                                    <i class="fas fa-arrow-left"></i>
+                                    <span>Back</span>
+                                </a>
+                                <button type="button" class="stats-nav-pill active" data-view="overview">
+                                    <i class="fas fa-chart-pie"></i>
+                                    <span>Overview</span>
+                                </button>
+                                <button type="button" class="stats-nav-pill" data-view="players">
+                                    <i class="fas fa-users"></i>
+                                    <span>Players</span>
+                                </button>
+                                <button type="button" class="stats-nav-pill" data-view="teams">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span>Team</span>
+                                </button>
+                                <button type="button" class="stats-nav-pill" data-view="matches">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>Matches</span>
+                                </button>
+                                <button type="button" class="stats-nav-pill" data-view="league">
+                                    <i class="fas fa-table"></i>
+                                    <span>League Table</span>
+                                </button>
+                                <button type="button" class="stats-nav-pill" data-view="charts">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>Charts</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Toggle -->
+                <div class="row mb-3 d-md-none">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="button" class="btn btn-outline-primary" id="mobile-nav-toggle" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-bars"></i>
+                            </button>
+                            <div class="flex-grow-1 text-center">
+                                <span id="current-view-label" class="fw-medium text-muted">Overview</span>
+                            </div>
+                            <button type="button" class="btn btn-outline-secondary" id="mobile-refresh-btn" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;" title="Refresh Data">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Sidebar Navigation -->
+                <div class="mobile-nav-sidebar" id="mobile-nav-sidebar">
+                    <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+                    <div class="mobile-nav-content">
+                        <div class="mobile-nav-header">
+                            <h5 class="mb-0">Navigation</h5>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="mobile-nav-close">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="mobile-nav-body">
+                            <a href="index.html" class="mobile-nav-item mobile-nav-back">
+                                <i class="fas fa-arrow-left"></i>
+                                <span>Back to Game</span>
+                                <i class="fas fa-external-link-alt ms-auto"></i>
+                            </a>
+                            <div class="mobile-nav-divider"></div>
+                            <button type="button" class="mobile-nav-item active" data-view="overview">
+                                <i class="fas fa-chart-pie"></i>
+                                <span>Overview</span>
+                                <i class="fas fa-check ms-auto"></i>
+                            </button>
+                            <button type="button" class="mobile-nav-item" data-view="players">
+                                <i class="fas fa-users"></i>
+                                <span>Players</span>
+                                <i class="fas fa-check ms-auto"></i>
+                            </button>
+                            <button type="button" class="mobile-nav-item" data-view="teams">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Team</span>
+                                <i class="fas fa-check ms-auto"></i>
+                            </button>
+                            <button type="button" class="mobile-nav-item" data-view="matches">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Matches</span>
+                                <i class="fas fa-check ms-auto"></i>
+                            </button>
+                            <button type="button" class="mobile-nav-item" data-view="league">
+                                <i class="fas fa-table"></i>
+                                <span>League Table</span>
+                                <i class="fas fa-check ms-auto"></i>
+                            </button>
+                            <button type="button" class="mobile-nav-item" data-view="charts">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Charts</span>
+                                <i class="fas fa-check ms-auto"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Area -->
+                <div class="stats-main-content">
+                    <div id="stats-content" class="stats-content">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary mb-3" role="status"></div>
+                            <p class="text-muted">Loading statistics...</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- END Main Content Container -->
+    </div>
+    <!-- END MAIN CONTAINER -->
+
+    <!-- Scripts -->
+    <script>
+        // Show body once DOM is ready to prevent FOUC
+        document.addEventListener('DOMContentLoaded', function () {
+            document.body.classList.add('loaded');
+        });
+    </script>
+    <script src="js/stats-page.js" type="module"></script>
+    <!-- END Scripts -->
+</body>
+
+</html>

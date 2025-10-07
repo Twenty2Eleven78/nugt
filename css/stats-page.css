@@ -1705,4 +1705,147 @@
     --theme-primary: #dc3545;
 }
 
-/* Responsive display utilities moved to top of file */
+/* Responsive display utilities moved to top of file *//* =
+==== ENHANCED STATS PAGE LAYOUT ===== */
+
+/* League table controls styling */
+.league-controls-header {
+    background: var(--bg-card, #f8f9fa);
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: var(--border-radius, 0.375rem);
+    padding: 1rem;
+}
+
+/* Enhanced button group styling for stats page */
+.league-controls-header .btn-group .btn {
+    border-radius: 0;
+    position: relative;
+    font-weight: 500;
+}
+
+.league-controls-header .btn-group .btn:first-child {
+    border-top-left-radius: var(--border-radius, 0.375rem);
+    border-bottom-left-radius: var(--border-radius, 0.375rem);
+}
+
+.league-controls-header .btn-group .btn:last-child {
+    border-top-right-radius: var(--border-radius, 0.375rem);
+    border-bottom-right-radius: var(--border-radius, 0.375rem);
+}
+
+.league-controls-header .btn-group .btn.active {
+    z-index: 1;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Enhanced stats sections */
+.stats-section {
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: var(--border-radius, 0.375rem);
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.stats-section-header {
+    background: var(--bg-secondary, #f8f9fa);
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color, #dee2e6);
+    font-weight: 600;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.stats-section-body {
+    padding: 1rem;
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* League table container styling */
+#league-table-container {
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: var(--border-radius, 0.375rem);
+    overflow: hidden;
+}
+
+/* Enhanced scrollbar styling */
+.stats-section-body::-webkit-scrollbar,
+#league-table-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.stats-section-body::-webkit-scrollbar-track,
+#league-table-container::-webkit-scrollbar-track {
+    background: var(--bg-secondary, #f8f9fa);
+    border-radius: 3px;
+}
+
+.stats-section-body::-webkit-scrollbar-thumb,
+#league-table-container::-webkit-scrollbar-thumb {
+    background: var(--border-color, #dee2e6);
+    border-radius: 3px;
+}
+
+.stats-section-body::-webkit-scrollbar-thumb:hover,
+#league-table-container::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted, #6c757d);
+}
+
+/* Table improvements */
+.table thead th {
+    border-bottom: 2px solid var(--border-color, #dee2e6);
+    background: var(--bg-secondary, #f8f9fa);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 576px) {
+    .league-controls-header {
+        padding: 0.75rem;
+    }
+    
+    .league-controls-header .btn-group .btn {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .stats-section-header {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+    
+    .stats-section-body {
+        padding: 0.75rem;
+    }
+    
+    /* Adjust heights for mobile */
+    .stats-section-body[style*="calc(100vh"] {
+        height: calc(100vh - 300px) !important;
+        min-height: 250px !important;
+    }
+    
+    #league-table-container[style*="calc(100vh"] {
+        height: calc(100vh - 320px) !important;
+        min-height: 300px !important;
+    }
+}
+
+/* Tablet responsive improvements */
+@media (min-width: 577px) and (max-width: 991px) {
+    .stats-section-body[style*="calc(100vh"] {
+        height: calc(100vh - 340px) !important;
+    }
+    
+    #league-table-container[style*="calc(100vh"] {
+        height: calc(100vh - 360px) !important;
+    }
+}

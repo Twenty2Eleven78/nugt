@@ -60,7 +60,7 @@ class StatsPage {
                 });
             });
         }
-        
+
         // Clear any localStorage related to stats
         try {
             localStorage.removeItem('generatedStatistics');
@@ -68,11 +68,11 @@ class StatsPage {
         } catch (error) {
             console.warn('Could not clear localStorage:', error);
         }
-        
+
         // Reset internal cache
         this.leagueTable = null;
         this.statistics = null;
-        
+
         console.log('🧹 All caches cleared for fresh data');
     }
 
@@ -81,9 +81,9 @@ class StatsPage {
             // Force fresh data by adding cache-busting parameters
             const timestamp = Date.now();
             const cacheBuster = `?t=${timestamp}&nocache=true`;
-            
+
             console.log('📊 Loading fresh statistics data...');
-            
+
             // Try to load from Netlify function with cache busting
             const response = await fetch(`/.netlify/functions/public-stats${cacheBuster}`, {
                 method: 'GET',
@@ -93,7 +93,7 @@ class StatsPage {
                     'Expires': '0'
                 }
             });
-            
+
             if (response.ok) {
                 this.statistics = await response.json();
                 console.log('✅ Fresh statistics loaded from server');
@@ -473,7 +473,7 @@ class StatsPage {
                             <i class="fas fa-trophy text-warning me-2"></i>
                             <span>Top Goal Scorers</span>
                         </div>
-                        <div class="stats-section-body" style="height: calc(100vh - 480px); min-height: 250px; max-height: 400px; overflow-y: auto;">
+                        <div class="stats-section-body" style="height: calc(100vh - 320px); min-height: 350px; max-height: 600px; overflow-y: auto; -webkit-overflow-scrolling: touch;">
                             ${this._renderTopScorers(stats.playerStats || [])}
                         </div>
                     </div>
@@ -484,7 +484,7 @@ class StatsPage {
                             <i class="fas fa-handshake text-info me-2"></i>
                             <span>Top Assist Providers</span>
                         </div>
-                        <div class="stats-section-body" style="height: calc(100vh - 480px); min-height: 250px; max-height: 400px; overflow-y: auto;">
+                        <div class="stats-section-body" style="height: calc(100vh - 320px); min-height: 350px; max-height: 600px; overflow-y: auto; -webkit-overflow-scrolling: touch;">
                             ${this._renderTopAssists(stats.playerStats || [])}
                         </div>
                     </div>
@@ -565,7 +565,7 @@ class StatsPage {
                             <i class="fas fa-trophy text-warning me-2"></i>
                             <span>Player Performance Rankings (${playerStats.length})</span>
                         </div>
-                        <div class="stats-section-body" style="max-height: 425px; overflow-y: auto; -webkit-overflow-scrolling: touch;">
+                        <div class="stats-section-body" style="height: calc(100vh - 380px); min-height: 350px; max-height: 600px; overflow-y: auto; -webkit-overflow-scrolling: touch;">
                             ${this._renderPlayerRankings(playerStats)}
                         </div>
                     </div>
@@ -791,7 +791,7 @@ class StatsPage {
                             <i class="fas fa-list text-primary me-2"></i>
                             <span>Match Results (${matchStats.length})</span>
                         </div>
-                        <div class="stats-section-body" style="max-height: 400px; overflow-y: auto; -webkit-overflow-scrolling: touch;">
+                        <div class="stats-section-body" style="height: calc(100vh - 380px); min-height: 350px; max-height: 600px; overflow-y: auto; -webkit-overflow-scrolling: touch;">
                             ${this._renderMatchCards(matchStats)}
                         </div>
                     </div>
@@ -817,7 +817,7 @@ class StatsPage {
 
             // Always reload league table for fresh data
             console.log('🏆 Loading fresh league table data...');
-            
+
             // Show loading state
             setTimeout(async () => {
                 try {
@@ -870,20 +870,29 @@ class StatsPage {
         }
 
         return `
-            <!-- League Table Controls -->
-            <div class="league-controls mb-3">
-                <div class="btn-group w-100" role="group">
-                    <button type="button" class="btn btn-primary active" id="actual-table-btn">
-                        <i class="fas fa-table me-1"></i>Current Table
-                    </button>
-                    <button type="button" class="btn btn-outline-primary" id="predicted-table-btn">
-                        <i class="fas fa-calculator me-1"></i>Max Points Prediction
-                    </button>
+            <!-- Enhanced League Table Controls -->
+            <div class="league-controls-header mb-3" style="background: var(--bg-card, #f8f9fa); border: 1px solid var(--border-color, #dee2e6); border-radius: var(--border-radius, 0.375rem); padding: 1rem;">
+                <div class="d-flex justify-content-center">
+                    <div class="btn-group" role="group" aria-label="League table view options">
+                        <button type="button" class="btn btn-outline-primary active" id="actual-table-btn">
+                            <i class="fas fa-table me-1"></i>
+                            <span class="d-none d-sm-inline">Current </span>Table
+                        </button>
+                        <button type="button" class="btn btn-outline-success" id="predicted-table-btn">
+                            <i class="fas fa-calculator me-1"></i>
+                            <span class="d-none d-sm-inline">Predicted </span>Max Points
+                        </button>
+                    </div>
+                </div>
+                <div class="text-center mt-2">
+                    <small class="text-muted" id="league-table-info">
+                        <i class="fas fa-table me-1"></i>Showing current league standings
+                    </small>
                 </div>
             </div>
 
-            <!-- League Table Container -->
-            <div id="league-table-container" class="league-table-full">
+            <!-- League Table Container - Extended to bottom -->
+            <div id="league-table-container" class="league-table-full" style="height: calc(100vh - 380px); min-height: 400px; max-height: 700px; overflow-y: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border-color, #dee2e6); border-radius: var(--border-radius, 0.375rem);">
                 ${this._renderActualTable(leagueData, teamName)}
             </div>
         `;
@@ -891,10 +900,10 @@ class StatsPage {
 
     _renderActualTable(leagueData, teamName) {
         const highlightName = teamName.toLowerCase();
-        
+
         return `
-            <div class="table-responsive league-table-wrapper">
-                <table class="table table-sm table-hover league-table">
+            <div class="table-responsive" style="height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch;">
+                <table class="table table-sm table-hover mb-0" style="font-size: 0.85rem;">
                     <thead class="table-light sticky-top">
                         <tr>
                             <th class="position-col">Pos</th>
@@ -911,12 +920,12 @@ class StatsPage {
                     </thead>
                     <tbody>
                         ${leagueData.teams.map((team, index) => {
-                            const isHighlighted = highlightName && team.team.toLowerCase().includes(highlightName);
-                            const rowClass = isHighlighted ? 'table-info fw-bold' : '';
-                            const goalDiff = team.goalsFor - team.goalsAgainst;
-                            const goalDiffDisplay = goalDiff > 0 ? `+${goalDiff}` : goalDiff.toString();
-                            
-                            return `
+            const isHighlighted = highlightName && team.team.toLowerCase().includes(highlightName);
+            const rowClass = isHighlighted ? 'table-info fw-bold' : '';
+            const goalDiff = team.goalsFor - team.goalsAgainst;
+            const goalDiffDisplay = goalDiff > 0 ? `+${goalDiff}` : goalDiff.toString();
+
+            return `
                                 <tr class="${rowClass}">
                                     <td class="text-center position-col">${index + 1}</td>
                                     <td class="team-col">
@@ -932,7 +941,7 @@ class StatsPage {
                                     <td class="text-center fw-bold points-col">${team.points}</td>
                                 </tr>
                             `;
-                        }).join('')}
+        }).join('')}
                     </tbody>
                 </table>
             </div>
@@ -957,8 +966,8 @@ class StatsPage {
         predictedTeams.sort((a, b) => b.predictedPoints - a.predictedPoints);
 
         return `
-            <div class="table-responsive league-table-wrapper">
-                <table class="table table-sm table-hover league-table">
+            <div class="table-responsive" style="height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch;">
+                <table class="table table-sm table-hover mb-0" style="font-size: 0.85rem;">
                     <thead class="table-light sticky-top">
                         <tr>
                             <th class="position-col">Pos</th>
@@ -970,10 +979,10 @@ class StatsPage {
                     </thead>
                     <tbody>
                         ${predictedTeams.map((team, index) => {
-                            const isHighlighted = highlightName && team.team.toLowerCase().includes(highlightName);
-                            const rowClass = isHighlighted ? 'table-info fw-bold' : '';
-                            
-                            return `
+            const isHighlighted = highlightName && team.team.toLowerCase().includes(highlightName);
+            const rowClass = isHighlighted ? 'table-info fw-bold' : '';
+
+            return `
                                 <tr class="${rowClass}">
                                     <td class="text-center position-col">${index + 1}</td>
                                     <td class="team-col">
@@ -985,7 +994,7 @@ class StatsPage {
                                     <td class="text-center fw-bold points-col text-primary">${team.predictedPoints}</td>
                                 </tr>
                             `;
-                        }).join('')}
+        }).join('')}
                     </tbody>
                 </table>
                 <div class="mt-2">
@@ -1160,43 +1169,57 @@ class StatsPage {
 
     _showActualTable() {
         if (!this.leagueTable) return;
-        
+
         const container = document.getElementById('league-table-container');
         const actualBtn = document.getElementById('actual-table-btn');
         const predictedBtn = document.getElementById('predicted-table-btn');
-        
+
         if (container && actualBtn && predictedBtn) {
             const teamName = config.get('team.defaultTeam1Name', 'Netherton');
             container.innerHTML = this._renderActualTable(this.leagueTable, teamName);
-            
+
+            // Update button states
             actualBtn.classList.add('active');
             actualBtn.classList.remove('btn-outline-primary');
             actualBtn.classList.add('btn-primary');
-            
+
             predictedBtn.classList.remove('active');
-            predictedBtn.classList.remove('btn-primary');
-            predictedBtn.classList.add('btn-outline-primary');
+            predictedBtn.classList.remove('btn-primary', 'btn-success');
+            predictedBtn.classList.add('btn-outline-success');
+
+            // Update info text
+            const infoElement = document.getElementById('league-table-info');
+            if (infoElement) {
+                infoElement.innerHTML = '<i class="fas fa-table me-1"></i>Showing current league standings';
+            }
         }
     }
 
     _showPredictedTable() {
         if (!this.leagueTable) return;
-        
+
         const container = document.getElementById('league-table-container');
         const actualBtn = document.getElementById('actual-table-btn');
         const predictedBtn = document.getElementById('predicted-table-btn');
-        
+
         if (container && actualBtn && predictedBtn) {
             const teamName = config.get('team.defaultTeam1Name', 'Netherton');
             container.innerHTML = this._renderPredictedTable(this.leagueTable, teamName);
-            
+
+            // Update button states
             predictedBtn.classList.add('active');
-            predictedBtn.classList.remove('btn-outline-primary');
-            predictedBtn.classList.add('btn-primary');
-            
+            predictedBtn.classList.remove('btn-outline-success');
+            predictedBtn.classList.add('btn-success');
+
             actualBtn.classList.remove('active');
             actualBtn.classList.remove('btn-primary');
             actualBtn.classList.add('btn-outline-primary');
+
+            // Update info text
+            const infoElement = document.getElementById('league-table-info');
+            if (infoElement) {
+                infoElement.innerHTML = '<i class="fas fa-calculator me-1"></i>Showing predicted maximum points';
+            }
         }
     }
 

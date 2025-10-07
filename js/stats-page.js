@@ -167,9 +167,19 @@ class StatsPage {
         const mobileOverlay = document.getElementById('mobile-nav-overlay');
         const mobileClose = document.getElementById('mobile-nav-close');
 
+        // Debug: Check if elements exist
+        console.log('Mobile nav elements:', {
+            toggle: !!mobileToggle,
+            sidebar: !!mobileSidebar,
+            overlay: !!mobileOverlay,
+            close: !!mobileClose
+        });
+
         // Toggle mobile sidebar
         if (mobileToggle) {
-            mobileToggle.addEventListener('click', () => {
+            mobileToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Mobile toggle clicked');
                 this._showMobileSidebar();
             });
         }
@@ -211,9 +221,12 @@ class StatsPage {
         const sidebar = document.getElementById('mobile-nav-sidebar');
         const toggle = document.getElementById('mobile-nav-toggle');
 
+        console.log('Showing mobile sidebar:', !!sidebar);
+
         if (sidebar) {
             sidebar.classList.add('show');
             document.body.style.overflow = 'hidden';
+            console.log('Sidebar classes:', sidebar.className);
         }
 
         if (toggle) {

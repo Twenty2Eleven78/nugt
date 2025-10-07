@@ -148,6 +148,15 @@ class StatsPage {
             }
         });
 
+        // Handle league table controls
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#actual-table-btn')) {
+                this._showActualTable();
+            } else if (e.target.closest('#predicted-table-btn')) {
+                this._showPredictedTable();
+            }
+        });
+
         // Handle mobile navigation
         this._bindMobileNavigation();
 
@@ -792,7 +801,7 @@ class StatsPage {
             }
 
             const teamName = config.get('team.defaultTeam1Name', 'Netherton');
-            return faFullTimeService.renderLeagueTable(this.leagueTable, teamName);
+            return this._renderLeagueTableWithControls(this.leagueTable, teamName);
         } catch (error) {
             return `
                 <div class="alert alert-danger">
@@ -801,6 +810,145 @@ class StatsPage {
                 </div>
             `;
         }
+    }
+
+    _renderLeagueTableWithControls(leagueData, teamName) {
+        if (!leagueData || !leagueData.teams) {
+            return `
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No league table data available.
+                </div>
+            `;
+        }
+
+        return `
+            <!-- League Table Controls -->
+            <div class="league-controls mb-3">
+                <div class="btn-group w-100" role="group">
+                    <button type="button" class="btn btn-primary active" id="actual-table-btn">
+                        <i class="fas fa-table me-1"></i>Current Table
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="predicted-table-btn">
+                        <i class="fas fa-calculator me-1"></i>Max Points Prediction
+                    </button>
+                </div>
+            </div>
+
+            <!-- League Table Container -->
+            <div id="league-table-container" class="league-table-full">
+                ${this._renderActualTable(leagueData, teamName)}
+            </div>
+        `;
+    }
+
+    _renderActualTable(leagueData, teamName) {
+        const highlightName = teamName.toLowerCase();
+        
+        return `
+            <div class="table-responsive league-table-wrapper">
+                <table class="table table-sm table-hover league-table">
+                    <thead class="table-light sticky-top">
+                        <tr>
+                            <th class="position-col">Pos</th>
+                            <th class="team-col">Team</th>
+                            <th class="text-center">P</th>
+                            <th class="text-center">W</th>
+                            <th class="text-center">D</th>
+                            <th class="text-center">L</th>
+                            <th class="text-center">GF</th>
+                            <th class="text-center">GA</th>
+                            <th class="text-center">GD</th>
+                            <th class="text-center points-col">Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${leagueData.teams.map((team, index) => {
+                            const isHighlighted = highlightName && team.team.toLowerCase().includes(highlightName);
+                            const rowClass = isHighlighted ? 'table-info fw-bold' : '';
+                            const goalDiff = team.goalsFor - team.goalsAgainst;
+                            const goalDiffDisplay = goalDiff > 0 ? `+${goalDiff}` : goalDiff.toString();
+                            
+                            return `
+                                <tr class="${rowClass}">
+                                    <td class="text-center position-col">${index + 1}</td>
+                                    <td class="team-col">
+                                        <div class="team-name">${this._escapeHtml(team.team)}</div>
+                                    </td>
+                                    <td class="text-center">${team.played}</td>
+                                    <td class="text-center">${team.won}</td>
+                                    <td class="text-center">${team.drawn}</td>
+                                    <td class="text-center">${team.lost}</td>
+                                    <td class="text-center">${team.goalsFor}</td>
+                                    <td class="text-center">${team.goalsAgainst}</td>
+                                    <td class="text-center ${goalDiff > 0 ? 'text-success' : goalDiff < 0 ? 'text-danger' : ''}">${goalDiffDisplay}</td>
+                                    <td class="text-center fw-bold points-col">${team.points}</td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    _renderPredictedTable(leagueData, teamName) {
+        const highlightName = teamName.toLowerCase();
+        const teams = leagueData.teams;
+        const totalGames = (teams.length - 1) * 2;
+
+        const predictedTeams = teams.map(team => {
+            const remainingGames = totalGames - team.played;
+            const maxPoints = team.points + (remainingGames * 3);
+            return {
+                ...team,
+                predictedPoints: maxPoints,
+                remainingGames: remainingGames,
+            };
+        });
+
+        predictedTeams.sort((a, b) => b.predictedPoints - a.predictedPoints);
+
+        return `
+            <div class="table-responsive league-table-wrapper">
+                <table class="table table-sm table-hover league-table">
+                    <thead class="table-light sticky-top">
+                        <tr>
+                            <th class="position-col">Pos</th>
+                            <th class="team-col">Team</th>
+                            <th class="text-center">Current Pts</th>
+                            <th class="text-center">Remaining</th>
+                            <th class="text-center points-col">Max Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${predictedTeams.map((team, index) => {
+                            const isHighlighted = highlightName && team.team.toLowerCase().includes(highlightName);
+                            const rowClass = isHighlighted ? 'table-info fw-bold' : '';
+                            
+                            return `
+                                <tr class="${rowClass}">
+                                    <td class="text-center position-col">${index + 1}</td>
+                                    <td class="team-col">
+                                        <div class="team-name">${this._escapeHtml(team.team)}</div>
+                                        <small class="text-muted">${team.remainingGames} games left</small>
+                                    </td>
+                                    <td class="text-center">${team.points}</td>
+                                    <td class="text-center">${team.remainingGames}</td>
+                                    <td class="text-center fw-bold points-col text-primary">${team.predictedPoints}</td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+                <div class="mt-2">
+                    <small class="text-muted">
+                        <i class="fas fa-calculator me-1"></i>
+                        Predicted table based on teams winning all remaining games.
+                    </small>
+                </div>
+            </div>
+        `;
     }
 
     async _renderChartsView() {
@@ -960,6 +1108,48 @@ class StatsPage {
                     <strong>Error:</strong> ${message}
                 </div>
             `;
+        }
+    }
+
+    _showActualTable() {
+        if (!this.leagueTable) return;
+        
+        const container = document.getElementById('league-table-container');
+        const actualBtn = document.getElementById('actual-table-btn');
+        const predictedBtn = document.getElementById('predicted-table-btn');
+        
+        if (container && actualBtn && predictedBtn) {
+            const teamName = config.get('team.defaultTeam1Name', 'Netherton');
+            container.innerHTML = this._renderActualTable(this.leagueTable, teamName);
+            
+            actualBtn.classList.add('active');
+            actualBtn.classList.remove('btn-outline-primary');
+            actualBtn.classList.add('btn-primary');
+            
+            predictedBtn.classList.remove('active');
+            predictedBtn.classList.remove('btn-primary');
+            predictedBtn.classList.add('btn-outline-primary');
+        }
+    }
+
+    _showPredictedTable() {
+        if (!this.leagueTable) return;
+        
+        const container = document.getElementById('league-table-container');
+        const actualBtn = document.getElementById('actual-table-btn');
+        const predictedBtn = document.getElementById('predicted-table-btn');
+        
+        if (container && actualBtn && predictedBtn) {
+            const teamName = config.get('team.defaultTeam1Name', 'Netherton');
+            container.innerHTML = this._renderPredictedTable(this.leagueTable, teamName);
+            
+            predictedBtn.classList.add('active');
+            predictedBtn.classList.remove('btn-outline-primary');
+            predictedBtn.classList.add('btn-primary');
+            
+            actualBtn.classList.remove('active');
+            actualBtn.classList.remove('btn-primary');
+            actualBtn.classList.add('btn-outline-primary');
         }
     }
 

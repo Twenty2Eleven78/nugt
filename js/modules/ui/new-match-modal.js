@@ -422,33 +422,12 @@ class NewMatchModal {
         const starting = Array.from(this.playerStates.values()).filter(state => state === 'starting').length;
         const substitutes = Array.from(this.playerStates.values()).filter(state => state === 'attending').length;
         
-        console.log('UpdateCounts - Player States:', Array.from(this.playerStates.entries()));
-        console.log('UpdateCounts - Attending:', attending, 'Starting:', starting, 'Substitutes:', substitutes);
-        
         // Target elements specifically within the modal to avoid duplicate ID issues
         const modal = document.getElementById('newMatchModal');
         const selectedCountElement = modal ? modal.querySelector('#selectedCount') : document.getElementById('selectedCount');
         const startingCountElement = modal ? modal.querySelector('#startingCount') : document.getElementById('startingCount');
         const subsCountElement = modal ? modal.querySelector('#subsCount') : document.getElementById('subsCount');
         
-        console.log('UpdateCounts - Elements found:', {
-            selectedCount: !!selectedCountElement,
-            startingCount: !!startingCountElement,
-            subsCount: !!subsCountElement
-        });
-        
-        if (selectedCountElement) {
-            selectedCountElement.textContent = attending;
-            console.log('Updated selectedCount to:', attending);
-        }
-        if (startingCountElement) {
-            startingCountElement.textContent = starting;
-            console.log('Updated startingCount to:', starting);
-        }
-        if (subsCountElement) {
-            subsCountElement.textContent = substitutes;
-            console.log('Updated subsCount to:', substitutes);
-        }
     }
 
     syncUIWithSelectedState() {

@@ -178,14 +178,14 @@ export async function initializeApp() {
     // Load configuration first
     console.log('Loading application configuration...');
     const { config } = await import('./shared/config.js');
-    
+
     try {
       await config.load();
       console.log('Configuration loaded successfully into app');
     } catch (error) {
       console.warn('⚠ Configuration loading failed, using defaults:', error.message);
     }
-    
+
     // Validate configuration
     const validation = config.validate();
     if (!validation.isValid) {
@@ -208,98 +208,98 @@ export async function initializeApp() {
 
     console.log(`Initializing ${config.get('app.name', 'NUFC GameTime')} v${config.get('app.version', '4.0')}`);
 
-  // Initialize custom modal system
-  initializeCustomModals();
+    // Initialize custom modal system
+    initializeCustomModals();
 
-  // Initialize high priority optimizations
-  initializeOptimizations();
+    // Initialize high priority optimizations
+    initializeOptimizations();
 
-  // Check storage health
-  if (!storage.checkStorageHealth()) {
-    notificationManager.warning('Storage may not be working properly. Some features may be limited.');
-  }
-
-  // Initialize authentication
-  authUI.init().then(isAuthenticated => {
-    if (isAuthenticated) {
-      console.log('User authenticated successfully');
-      // Track app usage
-      authService.trackUsage('app_start');
-    } else {
-      console.log('User not authenticated');
+    // Check storage health
+    if (!storage.checkStorageHealth()) {
+      notificationManager.warning('Storage may not be working properly. Some features may be limited.');
     }
-  });
 
-  // Load saved state
-  loadAppState();
+    // Initialize authentication
+    authUI.init().then(isAuthenticated => {
+      if (isAuthenticated) {
+        console.log('User authenticated successfully');
+        // Track app usage
+        authService.trackUsage('app_start');
+      } else {
+        console.log('User not authenticated');
+      }
+    });
 
-  // Initialize components
-  teamManager.initializeTeams();
-  rosterManager.init();
-  attendanceManager.init();
-  
-  // Ensure attendance is properly initialized after roster is loaded
-  setTimeout(() => {
-    if (attendanceManager.getMatchAttendance) {
-      attendanceManager.getMatchAttendance(); // This will initialize default attendance if needed
-    }
-  }, 200);
+    // Load saved state
+    loadAppState();
 
-  // Initialize UI components
-  bindEventListeners();
-  bindModalEvents();
-  initializeTooltips();
-  eventsManager.init(); // Combined events manager handles both basic and enhanced functionality
-  releaseNotesManager.init();
-  matchSaveModal.init();
-  matchLoadModal.init();
-  matchSummaryModal.init();
-  rawDataModal.init();
+    // Initialize components
+    teamManager.initializeTeams();
+    rosterManager.init();
+    attendanceManager.init();
 
-  statisticsTab.init();
-  touchGestures.init();
-  leagueTableModal.init();
+    // Ensure attendance is properly initialized after roster is loaded
+    setTimeout(() => {
+      if (attendanceManager.getMatchAttendance) {
+        attendanceManager.getMatchAttendance(); // This will initialize default attendance if needed
+      }
+    }, 200);
 
-  // Initialize modal modules
-  teamModals.init();
-  goalModal.init();
-  eventModals.init();
-  resetModal.init();
-  rosterModal.init();
-  attendanceModal.init();
-  sharingModal.init();
+    // Initialize UI components
+    bindEventListeners();
+    bindModalEvents();
+    initializeTooltips();
+    eventsManager.init(); // Combined events manager handles both basic and enhanced functionality
+    releaseNotesManager.init();
+    matchSaveModal.init();
+    matchLoadModal.init();
+    matchSummaryModal.init();
+    rawDataModal.init();
 
-  // Make modals available globally after initialization
-  window.goalModal = goalModal;
+    statisticsTab.init();
+    touchGestures.init();
+    leagueTableModal.init();
 
-  // Initialize theme manager first
-  await themeManager.init();
+    // Initialize modal modules
+    teamModals.init();
+    goalModal.init();
+    eventModals.init();
+    resetModal.init();
+    rosterModal.init();
+    attendanceModal.init();
+    sharingModal.init();
 
-  // Initialize timer with enhanced state recovery
-  timerController.initialize();
+    // Make modals available globally after initialization
+    window.goalModal = goalModal;
 
-  // Make timer controller available globally for beforeunload handler
-  window.timerControllerInstance = timerController;
+    // Initialize theme manager first
+    await themeManager.init();
 
-  // Make goal manager available globally
-  window.goalManager = goalManager;
+    // Initialize timer with enhanced state recovery
+    timerController.initialize();
 
-  // Initialize PWA updater
-  pwaUpdater.init().then(success => {
-    if (success) {
-      // PWA updater initialized successfully
-    }
-  });
+    // Make timer controller available globally for beforeunload handler
+    window.timerControllerInstance = timerController;
 
-  // Update displays
-  timerController.updateDisplay();
-  updateMatchLog();
+    // Make goal manager available globally
+    window.goalManager = goalManager;
 
-  console.log('App initialization complete');
+    // Initialize PWA updater
+    pwaUpdater.init().then(success => {
+      if (success) {
+        // PWA updater initialized successfully
+      }
+    });
+
+    // Update displays
+    timerController.updateDisplay();
+    updateMatchLog();
+
+    console.log('App initialization complete');
 
   } catch (error) {
     console.error('Failed to initialize application:', error);
-    
+
     // Show error notification if notification service is available
     if (notificationManager) {
       notificationManager.error('Failed to initialize application');
@@ -368,7 +368,16 @@ function bindEventListeners() {
         // Gather match data with saved attendance and lineup
         const savedAttendance = storage.load(STORAGE_KEYS.MATCH_ATTENDANCE, []);
         const savedLineup = storage.load(STORAGE_KEYS.MATCH_LINEUP, null);
-        
+
+        // Debug: Log what we found in storage
+        console.log('🔍 DEBUG: Storage data check:', {
+          attendanceCount: savedAttendance.length,
+          hasStoredLineup: !!savedLineup,
+          hasGameStateLineup: !!gameState.matchLineup,
+          storedLineupData: savedLineup,
+          gameStateLineupData: gameState.matchLineup
+        });
+
         // Generate lineup from attendance data if no saved lineup exists
         let matchLineup = savedLineup || gameState.matchLineup;
         if (!matchLineup && savedAttendance.length > 0) {
@@ -378,7 +387,7 @@ function bindEventListeners() {
           const substitutes = savedAttendance
             .filter(player => player.attending && player.lineupRole === 'substitute')
             .map(player => player.playerName);
-          
+
           if (startingXI.length > 0 || substitutes.length > 0) {
             matchLineup = {
               startingXI,
@@ -387,7 +396,7 @@ function bindEventListeners() {
             };
           }
         }
-        
+
         const matchData = {
           title,
           notes,
@@ -405,6 +414,43 @@ function bindEventListeners() {
           matchLineup: matchLineup,
           savedAt: Date.now()
         };
+
+        // Debug: Log what we're sending to the API
+        console.log('🔍 DEBUG: Match data being sent to API:', {
+          hasMatchLineup: !!matchData.matchLineup,
+          matchLineupKeys: matchData.matchLineup ? Object.keys(matchData.matchLineup) : null,
+          startingXICount: matchData.matchLineup?.startingXI?.length || 0,
+          substitutesCount: matchData.matchLineup?.substitutes?.length || 0,
+          allKeys: Object.keys(matchData),
+          fullMatchLineup: matchData.matchLineup
+        });
+
+        // Final verification before API call
+        if (!matchData.matchLineup) {
+          console.warn('⚠️ WARNING: No matchLineup data found! This should not happen.');
+          console.warn('Attempting to create lineup from attendance data...');
+
+          if (savedAttendance.length > 0) {
+            const emergencyStartingXI = savedAttendance
+              .filter(player => player.attending)
+              .slice(0, 11)
+              .map(player => player.playerName);
+            const emergencySubstitutes = savedAttendance
+              .filter(player => player.attending)
+              .slice(11)
+              .map(player => player.playerName);
+
+            if (emergencyStartingXI.length > 0) {
+              matchData.matchLineup = {
+                startingXI: emergencyStartingXI,
+                substitutes: emergencySubstitutes,
+                createdAt: Date.now(),
+                source: 'emergency_generation'
+              };
+              console.log('✅ Emergency lineup created:', matchData.matchLineup);
+            }
+          }
+        }
 
         await userMatchesApi.saveMatchData(matchData);
 
@@ -630,7 +676,7 @@ function resetTracker() {
 
   // Clear storage (except auth data)
   storage.clear();
-  
+
   // Explicitly clear match lineup data
   storage.remove(STORAGE_KEYS.MATCH_LINEUP);
 

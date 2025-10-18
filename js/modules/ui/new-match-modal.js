@@ -572,39 +572,40 @@ class NewMatchModal {
                 gameState.matchTitle = matchTitle;
             }
             
-            // Set player attendance and lineup after reset
-            setTimeout(() => {
-                const roster = rosterManager.getRoster();
+            // Set player attendance and lineup immediately (no timeout)
+            const roster = rosterManager.getRoster();
+            
+            const attendanceData = roster.map((player, index) => {
+                const state = playerStatesCopy.get(index) || 'absent';
+                const isAttending = state !== 'absent';
+                const isStarter = state === 'starting';
+                const isSubstitute = state === 'attending'; // attending but not starting = substitute
                 
-                const attendanceData = roster.map((player, index) => {
-                    const state = playerStatesCopy.get(index) || 'absent';
-                    const isAttending = state !== 'absent';
-                    const isStarter = state === 'starting';
-                    const isSubstitute = state === 'attending'; // attending but not starting = substitute
-                    
-                    return {
-                        playerName: player.name,
-                        attending: isAttending,
-                        lineupRole: isStarter ? 'starter' : isSubstitute ? 'substitute' : null
-                    };
-                });
-                
-                // Save attendance with lineup data
-                storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
-                
-                // Save lineup data separately for match reports and cloud sync
-                const lineupData = {
-                    startingXI: roster.filter((player, index) => playerStatesCopy.get(index) === 'starting').map(p => p.name),
-                    substitutes: roster.filter((player, index) => playerStatesCopy.get(index) === 'attending').map(p => p.name),
-                    createdAt: Date.now()
+                return {
+                    playerName: player.name,
+                    attending: isAttending,
+                    lineupRole: isStarter ? 'starter' : isSubstitute ? 'substitute' : null
                 };
-                storage.saveImmediate(STORAGE_KEYS.MATCH_LINEUP, lineupData);
-                
-                // Add lineup to game state for cloud saving
-                gameState.matchLineup = lineupData;
-                
+            });
+            
+            // Save attendance with lineup data immediately
+            storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
+            
+            // Save lineup data separately for match reports and cloud sync
+            const lineupData = {
+                startingXI: roster.filter((player, index) => playerStatesCopy.get(index) === 'starting').map(p => p.name),
+                substitutes: roster.filter((player, index) => playerStatesCopy.get(index) === 'attending').map(p => p.name),
+                createdAt: Date.now()
+            };
+            storage.saveImmediate(STORAGE_KEYS.MATCH_LINEUP, lineupData);
+            
+            // Add lineup to game state for cloud saving
+            gameState.matchLineup = lineupData;
+            
+            // Update attendance list after a short delay to ensure DOM is ready
+            setTimeout(() => {
                 attendanceManager.updateAttendanceList();
-            }, 200);
+            }, 100);
 
             // Update UI
             this.updateTeamNamesInUI(team1Name, team2Name);

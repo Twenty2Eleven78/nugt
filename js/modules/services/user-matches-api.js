@@ -30,8 +30,22 @@ class UserMatchesAPI {
       throw new Error('Invalid match data provided');
     }
 
+    // Debug: Log the match data before enhancement
+    console.log('🔍 DEBUG: Original match data:', {
+      hasMatchLineup: !!matchData.matchLineup,
+      matchLineupData: matchData.matchLineup,
+      allKeys: Object.keys(matchData)
+    });
+
     const token = await this._getAuthToken();
     const enhancedMatchData = this._enhanceMatchData(matchData);
+    
+    // Debug: Log the enhanced match data
+    console.log('🔍 DEBUG: Enhanced match data:', {
+      hasMatchLineup: !!enhancedMatchData.matchLineup,
+      matchLineupData: enhancedMatchData.matchLineup,
+      allKeys: Object.keys(enhancedMatchData)
+    });
 
     const requestOptions = {
       method: HTTP_METHODS.PUT,

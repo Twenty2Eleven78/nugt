@@ -40,8 +40,8 @@ export const APP_CONFIG = {
 
 // Cache Configuration
 export const CACHE_CONFIG = {
-  NAME: 'nugt-cache-v327',
-  VERSION: 'v327'
+  NAME: 'nugt-cache-v328',
+  VERSION: 'v328'
 };
 
 // Storage Keys - Local Storage identifiers
@@ -67,6 +67,7 @@ export const STORAGE_KEYS = {
   // Match Data
   MATCH_EVENTS: 'nugt_matchEvents',
   MATCH_ATTENDANCE: 'nugt_matchAttendance',
+  MATCH_LINEUP: 'nugt_matchLineup',
 
   // Player Management
   ROSTER: 'nugt_roster',

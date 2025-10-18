@@ -367,7 +367,27 @@ function bindEventListeners() {
       try {
         // Gather match data with saved attendance and lineup
         const savedAttendance = storage.load(STORAGE_KEYS.MATCH_ATTENDANCE, []);
-        const savedLineup = storage.load('MATCH_LINEUP', null);
+        const savedLineup = storage.load(STORAGE_KEYS.MATCH_LINEUP, null);
+        
+        // Generate lineup from attendance data if no saved lineup exists
+        let matchLineup = savedLineup || gameState.matchLineup;
+        if (!matchLineup && savedAttendance.length > 0) {
+          const startingXI = savedAttendance
+            .filter(player => player.attending && player.lineupRole === 'starter')
+            .map(player => player.playerName);
+          const substitutes = savedAttendance
+            .filter(player => player.attending && player.lineupRole === 'substitute')
+            .map(player => player.playerName);
+          
+          if (startingXI.length > 0 || substitutes.length > 0) {
+            matchLineup = {
+              startingXI,
+              substitutes,
+              createdAt: Date.now()
+            };
+          }
+        }
+        
         const matchData = {
           title,
           notes,
@@ -382,7 +402,7 @@ function bindEventListeners() {
           score1,
           score2,
           attendance: savedAttendance,
-          matchLineup: savedLineup || gameState.matchLineup,
+          matchLineup: matchLineup,
           savedAt: Date.now()
         };
 
@@ -612,7 +632,7 @@ function resetTracker() {
   storage.clear();
   
   // Explicitly clear match lineup data
-  storage.remove('MATCH_LINEUP');
+  storage.remove(STORAGE_KEYS.MATCH_LINEUP);
 
   // Show confirmation and redirect
   notificationManager.success('Game reset successfully');

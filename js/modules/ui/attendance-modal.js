@@ -224,6 +224,41 @@ class AttendanceModal {
   }
 
   /**
+   * Update lineup data based on current attendance
+   */
+  updateLineupData(attendanceData) {
+    const startingXI = attendanceData
+      .filter(player => player.attending && player.lineupRole === 'starter')
+      .map(player => player.playerName);
+    
+    const substitutes = attendanceData
+      .filter(player => player.attending && player.lineupRole === 'substitute')
+      .map(player => player.playerName);
+    
+    if (startingXI.length > 0 || substitutes.length > 0) {
+      const lineupData = {
+        startingXI,
+        substitutes,
+        createdAt: Date.now()
+      };
+      
+      // Save lineup data to storage
+      storage.saveImmediate(STORAGE_KEYS.MATCH_LINEUP, lineupData);
+      
+      // Also update game state for cloud saving
+      if (window.gameState) {
+        window.gameState.matchLineup = lineupData;
+      }
+    } else {
+      // Clear lineup data if no players are selected
+      storage.remove(STORAGE_KEYS.MATCH_LINEUP);
+      if (window.gameState && window.gameState.matchLineup) {
+        delete window.gameState.matchLineup;
+      }
+    }
+  }
+
+  /**
    * Toggle player attendance status
    */
   togglePlayerAttendance(playerName) {
@@ -253,6 +288,9 @@ class AttendanceModal {
     
     // Save updated attendance
     storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, savedAttendance);
+    
+    // Update lineup data
+    this.updateLineupData(savedAttendance);
     
     // Refresh the grid and counts
     this.populateAttendanceGrid();
@@ -289,6 +327,9 @@ class AttendanceModal {
     // Save updated attendance
     storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, savedAttendance);
     
+    // Update lineup data
+    this.updateLineupData(savedAttendance);
+    
     // Refresh the grid and counts
     this.populateAttendanceGrid();
     this.updateCounts();
@@ -306,6 +347,7 @@ class AttendanceModal {
     }));
     
     storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
+    this.updateLineupData(attendanceData);
     this.populateAttendanceGrid();
     this.updateCounts();
   }
@@ -322,6 +364,7 @@ class AttendanceModal {
     }));
     
     storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
+    this.updateLineupData(attendanceData);
     this.populateAttendanceGrid();
     this.updateCounts();
   }
@@ -331,6 +374,10 @@ class AttendanceModal {
    */
   clearAttendance() {
     storage.remove(STORAGE_KEYS.MATCH_ATTENDANCE);
+    storage.remove(STORAGE_KEYS.MATCH_LINEUP);
+    if (window.gameState && window.gameState.matchLineup) {
+      delete window.gameState.matchLineup;
+    }
     this.populateAttendanceGrid();
     this.updateCounts();
   }

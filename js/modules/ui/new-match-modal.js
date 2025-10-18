@@ -598,7 +598,7 @@ class NewMatchModal {
                     substitutes: roster.filter((player, index) => playerStatesCopy.get(index) === 'attending').map(p => p.name),
                     createdAt: Date.now()
                 };
-                storage.saveImmediate('MATCH_LINEUP', lineupData);
+                storage.saveImmediate(STORAGE_KEYS.MATCH_LINEUP, lineupData);
                 
                 // Add lineup to game state for cloud saving
                 gameState.matchLineup = lineupData;
@@ -721,7 +721,7 @@ class NewMatchModal {
         stateManager.setPendingGoalTimestamp(null);
         
         // Clear lineup data
-        storage.remove('MATCH_LINEUP');
+        storage.remove(STORAGE_KEYS.MATCH_LINEUP);
         if (gameState.matchLineup) {
             delete gameState.matchLineup;
         }

@@ -368,11 +368,37 @@ function bindEventListeners() {
         // Gather match data with saved attendance and lineup
         console.log('🔍 DEBUG: Storage keys being used:', {
           attendanceKey: STORAGE_KEYS.MATCH_ATTENDANCE,
-          lineupKey: STORAGE_KEYS.MATCH_LINEUP
+          lineupKey: STORAGE_KEYS.MATCH_LINEUP,
+          storageKeysObject: STORAGE_KEYS,
+          constantsImported: typeof STORAGE_KEYS
         });
 
         const savedAttendance = storage.load(STORAGE_KEYS.MATCH_ATTENDANCE, []);
         const savedLineup = storage.load(STORAGE_KEYS.MATCH_LINEUP, null);
+        
+        // Debug: Log the exact values returned from storage
+        console.log('🔍 DEBUG: Raw storage values:', {
+          savedAttendanceType: typeof savedAttendance,
+          savedAttendanceLength: savedAttendance?.length,
+          savedLineupType: typeof savedLineup,
+          savedLineupValue: savedLineup,
+          rawStorageAttendance: localStorage.getItem(STORAGE_KEYS.MATCH_ATTENDANCE),
+          rawStorageLineup: localStorage.getItem(STORAGE_KEYS.MATCH_LINEUP)
+        });
+        
+        // Debug: Manual test of localStorage access
+        try {
+          const manualLineupTest = localStorage.getItem('nugt_matchLineup');
+          const manualAttendanceTest = localStorage.getItem('nugt_matchAttendance');
+          console.log('🔍 DEBUG: Manual localStorage test:', {
+            manualLineupExists: !!manualLineupTest,
+            manualLineupValue: manualLineupTest,
+            manualAttendanceExists: !!manualAttendanceTest,
+            manualAttendanceLength: manualAttendanceTest ? JSON.parse(manualAttendanceTest).length : 0
+          });
+        } catch (e) {
+          console.error('🔍 DEBUG: Manual localStorage test failed:', e);
+        }
 
         // Debug: Log what we found in storage
         console.log('🔍 DEBUG: Storage data check:', {
@@ -390,7 +416,12 @@ function bindEventListeners() {
 
         // Generate lineup from attendance data if no saved lineup exists
         let matchLineup = savedLineup || gameState.matchLineup;
-        console.log('🔍 DEBUG: Initial matchLineup value:', matchLineup);
+        console.log('🔍 DEBUG: Initial matchLineup value:', {
+          matchLineupType: typeof matchLineup,
+          matchLineupValue: matchLineup,
+          savedLineupTruthy: !!savedLineup,
+          gameStateLineupTruthy: !!gameState.matchLineup
+        });
         if (!matchLineup && savedAttendance.length > 0) {
           console.log('🔧 DEBUG: Generating lineup from attendance data...');
 

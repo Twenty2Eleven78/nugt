@@ -32,7 +32,7 @@ class NewMatchModal {
 
         this.createModal();
         this.bindEvents();
-        
+
         this.isInitialized = true;
     }
 
@@ -144,15 +144,15 @@ class NewMatchModal {
         `;
 
         createAndAppendModal(
-          'newMatchModal',
-          '<i class="fas fa-plus-circle me-2"></i>Start New Match',
-          bodyContent,
-          {
-            ...MODAL_CONFIGS.LARGE,
-            footerContent: footerContent
-          }
+            'newMatchModal',
+            '<i class="fas fa-plus-circle me-2"></i>Start New Match',
+            bodyContent,
+            {
+                ...MODAL_CONFIGS.LARGE,
+                footerContent: footerContent
+            }
         );
-        
+
         // Set default values after modal is created - moved to show() method for better timing
     }
 
@@ -201,9 +201,9 @@ class NewMatchModal {
                     const btn = e.target.closest('.starter-btn');
                     const playerId = parseInt(btn.dataset.playerId);
                     const currentState = this.playerStates.get(playerId) || 'absent';
-                    
+
                     console.log('Starter button clicked! PlayerId:', playerId, 'Current state:', currentState);
-                    
+
                     if (currentState === 'attending') {
                         const currentStarters = this.getStarterCount();
                         if (currentStarters >= 11) {
@@ -220,23 +220,23 @@ class NewMatchModal {
                         btn.classList.add('btn-outline-success');
                         console.log('Set player to attending! PlayerId:', playerId);
                     }
-                    
+
                     this.updateCounts();
                     this.updateSummary();
                     return;
                 }
-                
+
                 const playerCard = e.target.closest('.player-card');
                 if (playerCard) {
                     const playerId = parseInt(playerCard.dataset.playerId);
                     const currentState = this.playerStates.get(playerId) || 'absent';
                     const starterBtn = document.querySelector(`[data-player-id="${playerId}"].starter-btn`);
-                    
+
                     if (currentState === 'absent' || currentState === 'attending') {
                         // Toggle attendance
                         const newState = currentState === 'absent' ? 'attending' : 'absent';
                         this.playerStates.set(playerId, newState);
-                        
+
                         if (newState === 'attending') {
                             playerCard.classList.add('selected');
                             starterBtn.disabled = false;
@@ -254,7 +254,7 @@ class NewMatchModal {
                         starterBtn.classList.remove('btn-success');
                         starterBtn.classList.add('btn-outline-success');
                     }
-                    
+
                     this.updateCounts();
                     this.updateSummary();
                 }
@@ -270,7 +270,7 @@ class NewMatchModal {
         if (modal) {
             // Handle input events with debounced updates for better performance
             const updateFields = ['newMatchTeam1Name', 'newMatchTeam2Name', 'matchTitle', 'customDuration'];
-            
+
             modal.addEventListener('input', (e) => {
                 if (updateFields.includes(e.target.id)) {
                     this.debouncedUpdateSummary();
@@ -295,9 +295,9 @@ class NewMatchModal {
     show() {
         this.init();
         this.populatePlayersList();
-        
+
         showModal('newMatchModal');
-        
+
         // Ensure proper initialization after modal is shown
         setTimeout(() => {
             this.bindFormEvents();
@@ -310,7 +310,7 @@ class NewMatchModal {
     setDefaultValues() {
         const team1Input = document.getElementById('newMatchTeam1Name');
         const team2Input = document.getElementById('newMatchTeam2Name');
-        
+
         if (team1Input) {
             team1Input.value = GAME_CONFIG.DEFAULT_TEAM1_NAME;
         }
@@ -340,7 +340,7 @@ class NewMatchModal {
         playersGrid.innerHTML = roster.map((player, index) => {
             // Use array index as unique ID since players don't have id property
             const playerId = index;
-            
+
             return `
       <div class="col-12">
         <div class="d-flex align-items-center gap-2 mb-2">
@@ -381,9 +381,9 @@ class NewMatchModal {
             ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
-        
+
         document.body.appendChild(notification);
-        
+
         // Auto remove after 3 seconds
         setTimeout(() => {
             if (notification.parentNode) {
@@ -421,20 +421,20 @@ class NewMatchModal {
         const attending = Array.from(this.playerStates.values()).filter(state => state !== 'absent').length;
         const starting = Array.from(this.playerStates.values()).filter(state => state === 'starting').length;
         const substitutes = Array.from(this.playerStates.values()).filter(state => state === 'attending').length;
-        
+
         // Target elements specifically within the modal to avoid duplicate ID issues
         const modal = document.getElementById('newMatchModal');
         const selectedCountElement = modal ? modal.querySelector('#selectedCount') : document.getElementById('selectedCount');
         const startingCountElement = modal ? modal.querySelector('#startingCount') : document.getElementById('startingCount');
         const subsCountElement = modal ? modal.querySelector('#subsCount') : document.getElementById('subsCount');
-        
+
     }
 
     syncUIWithSelectedState() {
         document.querySelectorAll('.player-card').forEach(card => {
             const playerId = parseInt(card.dataset.playerId);
             const isSelected = this.selectedPlayers.has(playerId);
-            
+
             if (isSelected) {
                 card.classList.add('selected');
                 card.setAttribute('data-selected', 'true');
@@ -452,7 +452,7 @@ class NewMatchModal {
             const team2Input = document.getElementById('newMatchTeam2Name');
             const matchTitleInput = document.getElementById('matchTitle');
             const durationSelect = document.getElementById('matchDuration');
-            
+
             // Read values directly from DOM elements
             const team1Value = team1Input?.value || '';
             const team2Value = team2Input?.value || '';
@@ -550,26 +550,26 @@ class NewMatchModal {
             if (matchTitle) {
                 gameState.matchTitle = matchTitle;
             }
-            
+
             // Set player attendance and lineup immediately (no timeout)
             const roster = rosterManager.getRoster();
-            
+
             const attendanceData = roster.map((player, index) => {
                 const state = playerStatesCopy.get(index) || 'absent';
                 const isAttending = state !== 'absent';
                 const isStarter = state === 'starting';
                 const isSubstitute = state === 'attending'; // attending but not starting = substitute
-                
+
                 return {
                     playerName: player.name,
                     attending: isAttending,
                     lineupRole: isStarter ? 'starter' : isSubstitute ? 'substitute' : null
                 };
             });
-            
+
             // Save attendance with lineup data immediately
             storage.saveImmediate(STORAGE_KEYS.MATCH_ATTENDANCE, attendanceData);
-            
+
             // Save lineup data separately for match reports and cloud sync
             const lineupData = {
                 startingXI: roster.filter((player, index) => playerStatesCopy.get(index) === 'starting').map(p => p.name),
@@ -577,10 +577,10 @@ class NewMatchModal {
                 createdAt: Date.now()
             };
             storage.saveImmediate(STORAGE_KEYS.MATCH_LINEUP, lineupData);
-            
+
             // Add lineup to game state for cloud saving
             gameState.matchLineup = lineupData;
-            
+
             // Update attendance list after a short delay to ensure DOM is ready
             setTimeout(() => {
                 attendanceManager.updateAttendanceList();
@@ -611,7 +611,7 @@ class NewMatchModal {
         if (gameState.isRunning) {
             timerController.toggleTimer();
         }
-        
+
         // Clean up timer interval to prevent memory leaks
         timerController.cleanup();
 
@@ -632,18 +632,18 @@ class NewMatchModal {
     resetUIElements() {
         // Reset timer display
         timerController.updateDisplay();
-        
+
         // Reset scoreboard displays
         const firstScoreElement = domCache.get('firstScoreElement');
         const secondScoreElement = domCache.get('secondScoreElement');
-        
+
         if (firstScoreElement) firstScoreElement.textContent = '0';
         if (secondScoreElement) secondScoreElement.textContent = '0';
-        
+
         // Reset team name displays to defaults
         const team1Element = domCache.get('Team1NameElement');
         const team2Element = domCache.get('Team2NameElement');
-        
+
         if (team1Element) team1Element.textContent = 'Team 1';
         if (team2Element) team2Element.textContent = 'Team 2';
 
@@ -696,16 +696,16 @@ class NewMatchModal {
     clearTemporaryState() {
         // Clear any editing states
         stateManager.clearEditingEvent();
-        
+
         // Clear pending goal timestamps
         stateManager.setPendingGoalTimestamp(null);
-        
+
         // Clear lineup data
         storage.remove(STORAGE_KEYS.MATCH_LINEUP);
         if (gameState.matchLineup) {
             delete gameState.matchLineup;
         }
-        
+
         // Clear any temporary selections or UI state
         this.playerStates.clear();
     }

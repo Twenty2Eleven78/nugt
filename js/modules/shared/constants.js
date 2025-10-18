@@ -8,28 +8,28 @@ import { config } from './config.js';
 
 // Application Configuration - now loaded from config.json with fallbacks
 export const APP_CONFIG = {
-  get NAME() { 
+  get NAME() {
     try {
       return config.get('app.name', 'NUFC GameTime');
     } catch (error) {
       return 'NUFC GameTime';
     }
   },
-  get VERSION() { 
+  get VERSION() {
     try {
       return config.get('app.version', '4.0');
     } catch (error) {
       return '4.0';
     }
   },
-  get AUTHOR() { 
+  get AUTHOR() {
     try {
       return config.get('app.author', 'NUFC GameTime Team');
     } catch (error) {
       return 'NUFC GameTime Team';
     }
   },
-  get DESCRIPTION() { 
+  get DESCRIPTION() {
     try {
       return config.get('app.description', 'Football match tracking and statistics application');
     } catch (error) {
@@ -77,21 +77,21 @@ export const STORAGE_KEYS = {
 // Game Configuration - now loaded from config.json with fallbacks
 export const GAME_CONFIG = {
   // Time Settings (in seconds)
-  get DEFAULT_GAME_TIME() { 
+  get DEFAULT_GAME_TIME() {
     try {
       return config.get('match.defaultGameTime', 4200);
     } catch (error) {
       return 4200;
     }
   },
-  get HALF_TIME_DURATION() { 
+  get HALF_TIME_DURATION() {
     try {
       return Math.floor(config.get('match.defaultGameTime', 4200) / 2);
     } catch (error) {
       return 2100;
     }
   },
-  get FULL_TIME_DURATION() { 
+  get FULL_TIME_DURATION() {
     try {
       return config.get('match.defaultGameTime', 4200);
     } catch (error) {
@@ -100,7 +100,7 @@ export const GAME_CONFIG = {
   },
 
   // Timer Settings (in milliseconds)
-  get TIMER_UPDATE_INTERVAL() { 
+  get TIMER_UPDATE_INTERVAL() {
     try {
       return config.get('match.timerUpdateInterval', 100);
     } catch (error) {
@@ -108,7 +108,7 @@ export const GAME_CONFIG = {
     }
   },
   STORAGE_DEBOUNCE_DELAY: 100,
-  get AUTO_SAVE_INTERVAL() { 
+  get AUTO_SAVE_INTERVAL() {
     try {
       return config.get('match.autoSaveInterval', 5000);
     } catch (error) {
@@ -117,14 +117,14 @@ export const GAME_CONFIG = {
   },
 
   // Team Defaults - now configurable
-  get DEFAULT_TEAM1_NAME() { 
+  get DEFAULT_TEAM1_NAME() {
     try {
       return config.get('team.defaultTeam1Name', 'Netherton');
     } catch (error) {
       return 'Netherton';
     }
   },
-  get DEFAULT_TEAM2_NAME() { 
+  get DEFAULT_TEAM2_NAME() {
     try {
       return config.get('team.defaultTeam2Name', 'Opposition');
     } catch (error) {
@@ -133,7 +133,7 @@ export const GAME_CONFIG = {
   },
 
   // UI Settings
-  get DEBOUNCE_DELAY() { 
+  get DEBOUNCE_DELAY() {
     try {
       return config.get('ui.debounceDelay', 300);
     } catch (error) {
@@ -192,7 +192,7 @@ export const NOTIFICATION_TYPES = {
 };
 
 export const NOTIFICATION_CONFIG = {
-  get DEFAULT_DURATION() { 
+  get DEFAULT_DURATION() {
     try {
       return config.get('ui.notifications.defaultDuration', 2000);
     } catch (error) {
@@ -200,7 +200,7 @@ export const NOTIFICATION_CONFIG = {
     }
   },
   PERSISTENT_DURATION: 0, // No auto-hide
-  get MAX_NOTIFICATIONS() { 
+  get MAX_NOTIFICATIONS() {
     try {
       return config.get('ui.notifications.maxNotifications', 5);
     } catch (error) {

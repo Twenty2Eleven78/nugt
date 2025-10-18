@@ -85,16 +85,20 @@ class MatchSummaryModal {
     if (allEvents.length > 0) {
       allEvents.forEach(event => {
         const eventElement = document.createElement('div');
-        eventElement.className = 'timeline-item';
+        eventElement.className = `timeline-item${event.type === 'Goal' && event.disallowed ? ' timeline-item-disallowed' : ''}`;
         let body = `${event.type}${event.notes ? ` - ${event.notes}` : ''}`;
         if (event.type === 'Goal') {
-          body = `Goal for ${event.teamName}: ${event.goalScorerName} (${event.timestamp})${event.goalAssistName ? `, assisted by ${event.goalAssistName}` : ''}`;
+          if (event.disallowed) {
+            body = `Goal for ${event.teamName}: [DISALLOWED] (${event.timestamp})${event.disallowedReason ? ` - ${event.disallowedReason}` : ''}`;
+          } else {
+            body = `Goal for ${event.teamName}: ${event.goalScorerName} (${event.timestamp})${event.goalAssistName ? `, assisted by ${event.goalAssistName}` : ''}`;
+          }
         }
         eventElement.innerHTML = `
-          <div class="timeline-marker"></div>
+          <div class="timeline-marker${event.type === 'Goal' && event.disallowed ? ' timeline-marker-disallowed' : ''}"></div>
           <div class="timeline-content">
             <p class="timeline-time">${this._escapeHtml(event.timestamp || 'Unknown time')}</p>
-            <p class="timeline-body">${this._escapeHtml(body)}</p>
+            <p class="timeline-body${event.type === 'Goal' && event.disallowed ? ' text-muted' : ''}">${this._escapeHtml(body)}</p>
           </div>
         `;
         timelineElement.appendChild(eventElement);
@@ -111,14 +115,16 @@ class MatchSummaryModal {
       const team1Goals = matchData.goals.filter(goal => goal.team === 1);
       const team2Goals = matchData.goals.filter(goal => goal.team === 2);
 
-      const goalsByTeam = matchData.goals.reduce((acc, goal) => {
-        const teamName = goal.team === 1 ? matchData.team1Name : matchData.team2Name;
-        if (!acc[teamName]) {
-          acc[teamName] = {};
-        }
-        acc[teamName][goal.goalScorerName] = (acc[teamName][goal.goalScorerName] || 0) + 1;
-        return acc;
-      }, {});
+      const goalsByTeam = matchData.goals
+        .filter(goal => !goal.disallowed) // Only count allowed goals
+        .reduce((acc, goal) => {
+          const teamName = goal.team === 1 ? matchData.team1Name : matchData.team2Name;
+          if (!acc[teamName]) {
+            acc[teamName] = {};
+          }
+          acc[teamName][goal.goalScorerName] = (acc[teamName][goal.goalScorerName] || 0) + 1;
+          return acc;
+        }, {});
 
       Object.entries(goalsByTeam).forEach(([teamName, scorers]) => {
         const teamTitle = document.createElement('h6');

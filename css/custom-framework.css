@@ -3411,6 +3411,38 @@ body {
     }
 }
 
+/* Disallowed Goal Timeline Styles */
+.timeline-item-disallowed {
+    opacity: 0.6;
+}
+
+.timeline-marker-disallowed {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+}
+
+.timeline-marker-disallowed::after {
+    background-color: #fff;
+    content: '✕';
+    font-size: 10px;
+    color: #dc3545;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.timeline-item-disallowed .timeline-content {
+    background-color: #f8f9fa;
+    border-color: #dc3545;
+    border-style: dashed;
+}
+
 /* Dark Mode Timeline Adjustments */
 .theme-dark .timeline-content::after {
     border-color: var(--bg-card) transparent transparent transparent;
@@ -3422,6 +3454,11 @@ body {
 
 .theme-dark .timeline-item-right .timeline-content::after {
     border-right-color: var(--bg-card);
+}
+
+.theme-dark .timeline-item-disallowed .timeline-content {
+    background-color: #2d3748;
+    border-color: #dc3545;
 }
 
 /*

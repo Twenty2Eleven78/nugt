@@ -365,6 +365,9 @@ function bindEventListeners() {
       defaultNotes: ''
     }, async ({ title, notes }) => {
       try {
+        console.log('🚀 DEBUG: Match saving started!');
+        alert('DEBUG: Match saving started - check console for details');
+        
         // Gather match data with saved attendance and lineup
         console.log('🔍 DEBUG: Storage keys being used:', {
           attendanceKey: STORAGE_KEYS.MATCH_ATTENDANCE,
@@ -495,6 +498,13 @@ function bindEventListeners() {
           matchLineup: matchLineup,
           savedAt: Date.now()
         };
+        
+        console.log('📦 DEBUG: matchData object created:', {
+          hasMatchLineup: !!matchData.matchLineup,
+          matchLineupValue: matchData.matchLineup,
+          allKeys: Object.keys(matchData),
+          matchLineupVariable: matchLineup
+        });
 
         // Debug: Log what we're sending to the API
         console.log('🔍 DEBUG: Match data being sent to API:', {

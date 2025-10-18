@@ -365,68 +365,13 @@ function bindEventListeners() {
       defaultNotes: ''
     }, async ({ title, notes }) => {
       try {
-        console.log('🚀 DEBUG: Match saving started!');
-        
         // Gather match data with saved attendance and lineup
-        console.log('🔍 DEBUG: Storage keys being used:', {
-          attendanceKey: STORAGE_KEYS.MATCH_ATTENDANCE,
-          lineupKey: STORAGE_KEYS.MATCH_LINEUP,
-          storageKeysObject: STORAGE_KEYS,
-          constantsImported: typeof STORAGE_KEYS
-        });
-
         const savedAttendance = storage.load(STORAGE_KEYS.MATCH_ATTENDANCE, []);
         const savedLineup = storage.load(STORAGE_KEYS.MATCH_LINEUP, null);
-        
-        // Debug: Log the exact values returned from storage
-        console.log('🔍 DEBUG: Raw storage values:', {
-          savedAttendanceType: typeof savedAttendance,
-          savedAttendanceLength: savedAttendance?.length,
-          savedLineupType: typeof savedLineup,
-          savedLineupValue: savedLineup,
-          rawStorageAttendance: localStorage.getItem(STORAGE_KEYS.MATCH_ATTENDANCE),
-          rawStorageLineup: localStorage.getItem(STORAGE_KEYS.MATCH_LINEUP)
-        });
-        
-        // Debug: Manual test of localStorage access
-        try {
-          const manualLineupTest = localStorage.getItem('nugt_matchLineup');
-          const manualAttendanceTest = localStorage.getItem('nugt_matchAttendance');
-          console.log('🔍 DEBUG: Manual localStorage test:', {
-            manualLineupExists: !!manualLineupTest,
-            manualLineupValue: manualLineupTest,
-            manualAttendanceExists: !!manualAttendanceTest,
-            manualAttendanceLength: manualAttendanceTest ? JSON.parse(manualAttendanceTest).length : 0
-          });
-        } catch (e) {
-          console.error('🔍 DEBUG: Manual localStorage test failed:', e);
-        }
-
-        // Debug: Log what we found in storage
-        console.log('🔍 DEBUG: Storage data check:', {
-          attendanceCount: savedAttendance.length,
-          hasStoredLineup: !!savedLineup,
-          hasGameStateLineup: !!gameState.matchLineup,
-          storedLineupData: savedLineup,
-          gameStateLineupData: gameState.matchLineup,
-          attendanceWithRoles: savedAttendance.filter(p => p.lineupRole).length,
-          attendingPlayers: savedAttendance.filter(p => p.attending).length,
-          sampleAttendanceRecord: savedAttendance[0],
-          gameStateType: typeof gameState,
-          gameStateKeys: Object.keys(gameState || {})
-        });
 
         // Generate lineup from attendance data if no saved lineup exists
         let matchLineup = savedLineup || gameState.matchLineup;
-        console.log('🔍 DEBUG: Initial matchLineup value:', {
-          matchLineupType: typeof matchLineup,
-          matchLineupValue: matchLineup,
-          savedLineupTruthy: !!savedLineup,
-          gameStateLineupTruthy: !!gameState.matchLineup
-        });
         if (!matchLineup && savedAttendance.length > 0) {
-          console.log('🔧 DEBUG: Generating lineup from attendance data...');
-
           // First try to use players with specific roles
           let startingXI = savedAttendance
             .filter(player => player.attending && player.lineupRole === 'starter')
@@ -435,33 +380,16 @@ function bindEventListeners() {
             .filter(player => player.attending && player.lineupRole === 'substitute')
             .map(player => player.playerName);
 
-          console.log('🔧 DEBUG: Players with specific roles:', {
-            startingXI,
-            substitutes,
-            startingCount: startingXI.length,
-            subsCount: substitutes.length
-          });
-
           // If no players have specific roles, create a basic lineup from attending players
           if (startingXI.length === 0 && substitutes.length === 0) {
-            console.log('🔧 DEBUG: No players with roles found, creating basic lineup from attending players...');
             const attendingPlayers = savedAttendance
               .filter(player => player.attending)
               .map(player => player.playerName);
-
-            console.log('🔧 DEBUG: All attending players:', attendingPlayers);
 
             if (attendingPlayers.length > 0) {
               // Take first 11 as starters, rest as substitutes
               startingXI = attendingPlayers.slice(0, 11);
               substitutes = attendingPlayers.slice(11);
-
-              console.log('🔧 DEBUG: Created basic lineup:', {
-                startingXI,
-                substitutes,
-                startingCount: startingXI.length,
-                subsCount: substitutes.length
-              });
             }
           }
 
@@ -469,16 +397,10 @@ function bindEventListeners() {
             matchLineup = {
               startingXI,
               substitutes,
-              createdAt: Date.now(),
-              source: startingXI.length > 0 && substitutes.length > 0 ? 'roles' : 'basic_attendance'
+              createdAt: Date.now()
             };
-            console.log('✅ DEBUG: Generated matchLineup:', matchLineup);
-          } else {
-            console.log('❌ DEBUG: No lineup could be generated - no attending players found');
           }
         }
-
-        console.log('🔍 DEBUG: Final matchLineup before creating matchData:', matchLineup);
 
         const matchData = {
           title,
@@ -497,50 +419,6 @@ function bindEventListeners() {
           matchLineup: matchLineup,
           savedAt: Date.now()
         };
-        
-        console.log('📦 DEBUG: matchData object created:', {
-          hasMatchLineup: !!matchData.matchLineup,
-          matchLineupValue: matchData.matchLineup,
-          allKeys: Object.keys(matchData),
-          matchLineupVariable: matchLineup
-        });
-
-        // Debug: Log what we're sending to the API
-        console.log('🔍 DEBUG: Match data being sent to API:', {
-          hasMatchLineup: !!matchData.matchLineup,
-          matchLineupKeys: matchData.matchLineup ? Object.keys(matchData.matchLineup) : null,
-          startingXICount: matchData.matchLineup?.startingXI?.length || 0,
-          substitutesCount: matchData.matchLineup?.substitutes?.length || 0,
-          allKeys: Object.keys(matchData),
-          fullMatchLineup: matchData.matchLineup
-        });
-
-        // Final verification before API call
-        if (!matchData.matchLineup) {
-          console.warn('⚠️ WARNING: No matchLineup data found! This should not happen.');
-          console.warn('Attempting to create lineup from attendance data...');
-
-          if (savedAttendance.length > 0) {
-            const emergencyStartingXI = savedAttendance
-              .filter(player => player.attending)
-              .slice(0, 11)
-              .map(player => player.playerName);
-            const emergencySubstitutes = savedAttendance
-              .filter(player => player.attending)
-              .slice(11)
-              .map(player => player.playerName);
-
-            if (emergencyStartingXI.length > 0) {
-              matchData.matchLineup = {
-                startingXI: emergencyStartingXI,
-                substitutes: emergencySubstitutes,
-                createdAt: Date.now(),
-                source: 'emergency_generation'
-              };
-              console.log('✅ Emergency lineup created:', matchData.matchLineup);
-            }
-          }
-        }
 
         await userMatchesApi.saveMatchData(matchData);
 

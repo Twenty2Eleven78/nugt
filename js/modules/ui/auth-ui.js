@@ -599,8 +599,7 @@ class AuthUI {
               matchLineup = {
                 startingXI,
                 substitutes,
-                createdAt: Date.now(),
-                source: 'profile_dropdown_save'
+                createdAt: Date.now()
               };
             }
           }

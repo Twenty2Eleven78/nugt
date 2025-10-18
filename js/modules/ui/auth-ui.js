@@ -563,7 +563,48 @@ class AuthUI {
       // Define the save callback
       const onSave = async ({ title, notes }) => {
         try {
-          // Gather match data
+          // Gather match data with lineup
+          const savedAttendance = attendanceManager.getMatchAttendance();
+          
+          // Import storage to get lineup data
+          const { storage } = await import('../data/storage.js');
+          const { STORAGE_KEYS } = await import('../shared/constants.js');
+          const savedLineup = storage.load(STORAGE_KEYS.MATCH_LINEUP, null);
+          
+          // Generate lineup from attendance data if no saved lineup exists
+          let matchLineup = savedLineup || gameState.matchLineup;
+          if (!matchLineup && savedAttendance.length > 0) {
+            // First try to use players with specific roles
+            let startingXI = savedAttendance
+              .filter(player => player.attending && player.lineupRole === 'starter')
+              .map(player => player.playerName);
+            let substitutes = savedAttendance
+              .filter(player => player.attending && player.lineupRole === 'substitute')
+              .map(player => player.playerName);
+
+            // If no players have specific roles, create a basic lineup from attending players
+            if (startingXI.length === 0 && substitutes.length === 0) {
+              const attendingPlayers = savedAttendance
+                .filter(player => player.attending)
+                .map(player => player.playerName);
+              
+              if (attendingPlayers.length > 0) {
+                // Take first 11 as starters, rest as substitutes
+                startingXI = attendingPlayers.slice(0, 11);
+                substitutes = attendingPlayers.slice(11);
+              }
+            }
+
+            if (startingXI.length > 0 || substitutes.length > 0) {
+              matchLineup = {
+                startingXI,
+                substitutes,
+                createdAt: Date.now(),
+                source: 'profile_dropdown_save'
+              };
+            }
+          }
+          
           const matchData = {
             title,
             notes,
@@ -577,7 +618,8 @@ class AuthUI {
             team2Name,
             score1,
             score2,
-            attendance: attendanceManager.getMatchAttendance(),
+            attendance: savedAttendance,
+            matchLineup: matchLineup,
             savedAt: Date.now()
           };
 

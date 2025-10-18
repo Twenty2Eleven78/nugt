@@ -366,7 +366,6 @@ function bindEventListeners() {
     }, async ({ title, notes }) => {
       try {
         console.log('🚀 DEBUG: Match saving started!');
-        alert('DEBUG: Match saving started - check console for details');
         
         // Gather match data with saved attendance and lineup
         console.log('🔍 DEBUG: Storage keys being used:', {

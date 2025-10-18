@@ -637,8 +637,7 @@ class StatisticsTab {
 
         const topScorers = playerStats
             .filter(p => p.goals > 0)
-            .sort((a, b) => b.goals - a.goals)
-            .slice(0, 10);
+            .sort((a, b) => b.goals - a.goals);
 
         if (topScorers.length === 0) {
             return '<div class="stats-empty"><i class="fas fa-futbol me-2"></i>No goals recorded yet</div>';
@@ -671,8 +670,7 @@ class StatisticsTab {
 
         const topAssists = playerStats
             .filter(p => p.assists > 0)
-            .sort((a, b) => b.assists - a.assists)
-            .slice(0, 10);
+            .sort((a, b) => b.assists - a.assists);
 
         if (topAssists.length === 0) {
             return '<div class="stats-empty"><i class="fas fa-hands-helping me-2"></i>No assists recorded yet</div>';

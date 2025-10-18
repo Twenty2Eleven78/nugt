@@ -1062,8 +1062,7 @@ class StatsPage {
     _renderTopScorers(playerStats) {
         const topScorers = [...playerStats]
             .filter(p => p.goals > 0)
-            .sort((a, b) => b.goals - a.goals)
-            .slice(0, 10);
+            .sort((a, b) => b.goals - a.goals);
 
         if (topScorers.length === 0) {
             return '<div class="text-muted text-center py-3">No goal scorers yet</div>';
@@ -1084,8 +1083,7 @@ class StatsPage {
     _renderTopAssists(playerStats) {
         const topAssists = [...playerStats]
             .filter(p => p.assists > 0)
-            .sort((a, b) => b.assists - a.assists)
-            .slice(0, 10);
+            .sort((a, b) => b.assists - a.assists);
 
         if (topAssists.length === 0) {
             return '<div class="text-muted text-center py-3">No assists recorded yet</div>';

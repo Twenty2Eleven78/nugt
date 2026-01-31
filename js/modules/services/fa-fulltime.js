@@ -18,7 +18,7 @@ class FAFullTimeService {
 
     const cacheKey = url;
     const cached = this.cache.get(cacheKey);
-    
+
     if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
       return cached.data;
     }
@@ -26,17 +26,28 @@ class FAFullTimeService {
     try {
       // Try multiple CORS proxies
       const proxies = [
-        `https://corsproxy.io/?${encodeURIComponent(url)}`,
-        `https://cors-anywhere.herokuapp.com/${url}`,
-        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
+        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+        `https://corsproxy.org/?${encodeURIComponent(url)}`,
+        `https://proxy.cors.sh/${url}`,
+        `https://cors.eu.org/${url}`
       ];
-      
+
       let html = null;
       let lastError = null;
-      
+
       for (const proxyUrl of proxies) {
         try {
-          const response = await fetch(proxyUrl);
+          const response = await fetch(proxyUrl, {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+              'Accept-Language': 'en-US,en;q=0.5',
+              'Accept-Encoding': 'gzip, deflate',
+              'Connection': 'keep-alive',
+              'Upgrade-Insecure-Requests': '1'
+            }
+          });
+
           if (response.ok) {
             if (proxyUrl.includes('allorigins')) {
               const data = await response.json();
@@ -45,21 +56,28 @@ class FAFullTimeService {
               html = await response.text();
             }
             break;
+          } else if (response.status === 403) {
+            console.warn(`403 Forbidden from proxy: ${proxyUrl}`);
+            lastError = new Error(`Access forbidden (403) - proxy may be blocked`);
+          } else {
+            console.warn(`HTTP ${response.status} from proxy: ${proxyUrl}`);
+            lastError = new Error(`HTTP ${response.status} from proxy service`);
           }
         } catch (error) {
+          console.warn(`Proxy failed: ${proxyUrl}`, error.message);
           lastError = error;
           continue;
         }
       }
-      
+
       if (!html) {
         throw lastError || new Error('All proxy services failed');
       }
-      
 
-      
+
+
       const leagueTable = this.parseLeagueTable(html);
-      
+
       // Cache the result
       this.cache.set(cacheKey, {
         data: leagueTable,
@@ -68,9 +86,13 @@ class FAFullTimeService {
 
       return leagueTable;
     } catch (error) {
-      
+
       // Fallback: Show manual entry option
-      throw new Error(`FA Full-Time uses dynamic loading. Please try copying the table data manually or use a different league table source.`);
+      const errorMsg = lastError?.message?.includes('403') || lastError?.message?.includes('forbidden')
+        ? 'FA Full-Time is blocking automated requests (403 Forbidden). This is common with sports websites. Please try copying the table data manually or check if the league table URL is still valid.'
+        : 'FA Full-Time uses dynamic loading or is currently unavailable. Please try copying the table data manually or use a different league table source.';
+
+      throw new Error(errorMsg);
     }
   }
 
@@ -78,11 +100,11 @@ class FAFullTimeService {
   parseLeagueTable(html) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
-    
+
     // Look for league table in tab-2 div
     const tab2 = doc.querySelector('.tab-2');
     let table = null;
-    
+
     if (tab2) {
       table = tab2.querySelector('table');
       if (!table) {
@@ -96,7 +118,7 @@ class FAFullTimeService {
         }
       }
     }
-    
+
     if (!table) {
       const tableSelectors = ['table', '.table', '[class*="table"]'];
       for (const selector of tableSelectors) {
@@ -135,23 +157,19 @@ class FAFullTimeService {
   extractTableData(table) {
     const rows = table.querySelectorAll('tr');
     const teams = [];
-    let headerSkipped = false;
-    
+
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
       const cells = row.querySelectorAll('td, th');
-      
-      if (cells.length < 4) continue;
-      
 
-      
+      if (cells.length < 4) continue;
+
       // Skip header row
       const firstCellText = this.extractText(cells[0]).toLowerCase();
       if (firstCellText.includes('pos') || firstCellText.includes('team') || firstCellText.includes('#')) {
-        headerSkipped = true;
         continue;
       }
-      
+
       const team = this.parseTeamRow(cells, teams.length);
       if (team && team.team && team.team.length > 1) {
         teams.push(team);
@@ -159,7 +177,7 @@ class FAFullTimeService {
     }
 
 
-    
+
     if (teams.length === 0) {
       throw new Error('No valid team data found in table');
     }
@@ -212,17 +230,17 @@ class FAFullTimeService {
 
   // Validate FA Full-Time URL
   isValidFAUrl(url) {
-    return url.includes('fulltime.thefa.com') || 
-           url.includes('fa-fulltime.com') ||
-           url.includes('thefa.com');
+    return url.includes('fulltime.thefa.com') ||
+      url.includes('fa-fulltime.com') ||
+      url.includes('thefa.com');
   }
 
   // Find team in league table
   findTeam(leagueTable, teamName) {
     if (!leagueTable?.teams) return null;
-    
+
     const searchName = teamName.toLowerCase();
-    return leagueTable.teams.find(team => 
+    return leagueTable.teams.find(team =>
       team.team.toLowerCase().includes(searchName) ||
       searchName.includes(team.team.toLowerCase())
     );
@@ -247,11 +265,11 @@ class FAFullTimeService {
           </thead>
           <tbody>
             ${leagueTable.teams.map(team => {
-              const isHighlighted = highlightName && 
-                team.team.toLowerCase().includes(highlightName);
-              const rowClass = isHighlighted ? 'table-success fw-bold' : '';
-              
-              return `
+      const isHighlighted = highlightName &&
+        team.team.toLowerCase().includes(highlightName);
+      const rowClass = isHighlighted ? 'table-success fw-bold' : '';
+
+      return `
                 <tr class="${rowClass}">
                   <td class="text-center" style="padding: 0.25rem;">${team.position}</td>
                   <td style="padding: 0.25rem;">
@@ -260,7 +278,7 @@ class FAFullTimeService {
                   </td>
                 </tr>
               `;
-            }).join('')}
+    }).join('')}
           </tbody>
         </table>
         <small class="text-muted">
